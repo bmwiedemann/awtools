@@ -12,9 +12,10 @@ tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
 tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
 tie(%relation, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm", O_RDONLY) or print "error accessing DB\n";
 
+our %relationname=(1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
 sub getrelationcolor($) { my($rel)=@_;
 	if(!$rel) { $rel=0; }
-	("black", "red", "red", "orange", "black", "black", "blue", "cyan", "green", "lightgreen")[$rel];
+	("black", "red", "orange", "yellow", "black", "grey", "blue", "cyan", "lightgreen", "green")[$rel];
 }
 sub getrelation($) { my($name)=@_;
 	my $rel=$::relation{"\L$name"};
