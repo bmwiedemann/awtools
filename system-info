@@ -7,6 +7,7 @@ my %options;
 
 sub spinfo($) { my($id)=@_; # short player info string
 	if($id==2) {return "unknown"}
+	if($id==0) {return "free planet"}
 	my $name=$::player{$id}{name};
 	my $aid=$::player{$id}{alliance};
 	my @rel=getrelation($name);
@@ -14,7 +15,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my $alliancestr="";
 	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
-	return span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) <a href="relations?user=$name">relation</a> !.profilelink($id));
+	return span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) <a href="relations?name=$name">relation</a> !.profilelink($id));
 }
 
 print header;
@@ -27,7 +28,7 @@ if(param("legend")) {
 	print "legend: ";
 	for my $n (1..9) {
 		my $color=getrelationcolor($n);
-		print span({-style=>'color: '.$color}, "$n $color \n");
+		print span({-style=>'color: '.$color}, br."$n $color = $::relationname{$n}\n");
 	}
 	print end_html;
 	exit 0;
@@ -41,8 +42,8 @@ if(param()) {
 	require "awmap.pm";
 	require "input.pm";
 	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
-	else { ($x,$y)=imgtomap($options{x}, $options{y}) }
-	$system=$::starmap{"$x,$y"};
+	elsif(defined($options{x})) { ($x,$y)=imgtomap($options{x}, $options{y}) }
+	if(defined($x)) { $system=$::starmap{"$x,$y"}; }
 	if(!$system && $options{name}) { $system=$::starmap{"\L$options{name}"} }
 	if(!$system && $options{id}) { $system=$options{id} }
 	if(!$system) {
@@ -56,9 +57,9 @@ if(param()) {
 		foreach my $h (@$planets) {
 			print li;
 			next if(!$h);
+#			foreach my $item (sort keys %$h) { print " $item=$$h{$item}\n"; }
 			print "#$$h{planetid} pop $$h{population} SB $$h{starbase} ", spinfo($$h{ownerid});
 			
-#			foreach my $item (sort keys %$h) { print " $item=",$$h{$item}; }
 		}
 		print "</ul>\n";
 		print "players having their origin here: <ul>";
