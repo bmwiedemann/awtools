@@ -1,59 +1,40 @@
 #!/usr/bin/perl -w
 
+use MLDBM;
+use DB_File;
+use Fcntl;
 use strict "vars";
-our (%alliances,%starmap,%player,%playerid);
-my (@elements);
-sub starmap { my($x,$y,$level,$id,$name)=@_;
-	$starmap{$id}={"x"=>$x, "y"=>$y, "level"=>$level, "name"=>$name};
-	$starmap{"\L$name"}=$id;
-	$starmap{"$x,$y"}=$id;
-}
-sub alliances {
-	my %h=();
-	my $id;
-	splice(@elements,5,1);
-	for(my $i=0; $i<=$#elements; ++$i) {
-		if($elements[$i] eq "id") {$id=$_[$i]}
-		else {$h{$elements[$i]}=$_[$i];}
-		if($elements[$i] eq "tag") {$alliances{"\L$_[$i]"}=$id}
-	}
-	$alliances{$id}=\%h;
-}
-sub player { #rank points id science culture level home_id logins from joined alliance name
-	my %h=();
-	my $id;
-	splice(@_,7,1);
-	for(my $i=0; $i<=$#elements; ++$i) {
-		if($elements[$i] eq "id") {$id=$_[$i]}
-		else {$h{$elements[$i]}=$_[$i];}
-		if($elements[$i] eq "name") {$playerid{$_[$i]}=$id}
-	}
-	$player{$id}=\%h;
-}
+our (%alliances,%starmap,%player,%playerid,%planets,%relation);
+tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666 or die $!;
+tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
+tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
+tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
+tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
+tie(%relation, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm", O_RDONLY) or print "error accessing DB\n";
 
-for my $f (@::files) {
-#for my $f (qw(alliances starmap player)) {
-	my $file="$f.csv";
-	my $head=1;
-	open(F, $file) or die "could not open $file: $!";
-	while(<F>) {
-		chomp();
-		my @a=split ("\t", $_);
-		if($head) {
-			@elements=@a;
-			$head=0;
-			next;
-		}
-		#print "$f $_\n";
-		&$f(@a);
-	}
+sub getrelationcolor($) { my($rel)=@_;
+	if(!$rel) { $rel=0; }
+	("black", "red", "red", "orange", "black", "black", "blue", "cyan", "green", "lightgreen")[$rel];
 }
-#my $x=$starmap{$starmap{"0,0"}};
-#my $x=$alliances{$alliances{"TGD"}};
-#my $x=$player{49545};
-#foreach(keys(%$x)) {
-#	print "$_ = $$x{$_}\n";
-#}
-#print $playerid{"greenbird"},"\n";
+sub getrelation($) { my($name)=@_;
+	my $rel=$::relation{"\L$name"};
+	if(!$rel) {
+#		if(!$rel) { return undef; }
+		my $id=$::playerid{"\L$name"};
+		if(!$id) { return undef }
+		my $aid=$::player{$id}{alliance};
+#		print "aid $aid \n";
+		if(!$aid) { return undef }
+		my $atag=$::alliances{$aid}{tag};
+#		print "id $id a $aid at $atag\n<br>";
+		$rel=$::relation{"\L$atag"};
+		if(!$rel) { return undef }
+	}
+	$rel=~/^(\d+) (\w+) (.*)/;
+	return ($1, $2, $3);
+}
+sub profilelink($) { my($id)=@_;
+	qq!<a href="http://www1.astrowars.com/about/playerprofile.php?id=$id">pubprofile</a> <a href="http://www1.astrowars.com/0/Player/Profile.php/?id=$id">yourprofile</a>\n!;
+}
 
 1;
