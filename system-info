@@ -6,6 +6,7 @@ use CGI ":standard";
 my %options;
 
 sub spinfo($) { my($id)=@_; # short player info string
+	if($id==2) {return "unknown"}
 	my $name=$::player{$id}{name};
 	my $aid=$::player{$id}{alliance};
 	my @rel=getrelation($name);
@@ -13,20 +14,31 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my $alliancestr="";
 	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
-	return span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) <a href="relations?user=$name">relation</a>!.profilelink($id));
+	return span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) <a href="relations?user=$name">relation</a> !.profilelink($id));
 }
 
 print header;
 print start_html('AW system info');
+my $path="/home/bernhard/code/cvs/perl/awcalc";
+chdir $path;
+
+if(param("legend")) {
+	require "input.pm";
+	print "legend: ";
+	for my $n (1..9) {
+		my $color=getrelationcolor($n);
+		print span({-style=>'color: '.$color}, "$n $color \n");
+	}
+	print end_html;
+	exit 0;
+}
+
 if(param()) {
 	my($x,$y,$system);
 	for my $p (qw'x y mapx mapy id name') {
 	  $options{$p}=param($p);
 	}
-	my $path="/home/bernhard/code/cvs/perl/awcalc";
-	chdir $path;
 	require "awmap.pm";
-	#our @files=qw(starmap); #player unused
 	require "input.pm";
 	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
 	else { ($x,$y)=imgtomap($options{x}, $options{y}) }
@@ -37,6 +49,7 @@ if(param()) {
 		print "no system $options{name} at $x,$y";
 	} else {
 		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
+		print qq!<a href="?legend=1">legend</a>!,br;
 		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id=$system level=$::starmap{$system}{level}",br;
 		print "planets here: <ul>";
 		my $planets=$::planets{$system};
