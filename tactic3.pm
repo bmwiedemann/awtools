@@ -7,6 +7,8 @@ my %max=qw(hf 13 rf 13 gc 99 rl 13 sb 0);
 sub rentability($$){my ($p,$building)=@_;
   my $rf=$$p{"rf"};
   my $result=$rentability{$building};
+  my $eog=6000; 
+  if($options{turns}>$eog) {$eog=$options{turns}}
   if($$p{$building}>=$max{$building}) {return 0.00001}
   if($building eq "gc") {
     $result+=$rf/15;
@@ -16,7 +18,7 @@ sub rentability($$){my ($p,$building)=@_;
   }
   if($building eq "rl" and $rf<6) {return 0.0001}
   if($building eq "rf" or $building eq "rl") {
-    if(buildcost($$p{$building})>1300-$turn/$updatetime) { return 0.0001; }
+    if(buildcost($$p{$building})*$updatetime>$eog-$turn) { return 0.0001; }
   }
   return $result;
 }
