@@ -5,10 +5,11 @@ alarm 30;
 
 sub round($) {int($_[0]+0.5)}
 if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
-my $title="\U$ENV{REMOTE_USER}\E new tactical map";
+my $title="\U$ENV{REMOTE_USER}\E large tactical map";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "awmap.pm";
+require "input.pm";
 chdir "large-$ENV{REMOTE_USER}";
 for my $p (qw'xs xe ys ye x y') {
 	$options{$p}=param($p);
@@ -24,7 +25,7 @@ if(defined($options{x}) && defined($options{y})) {
 	exit(0);
 }
 
-my $style=qq%\nimg {border:0;}%; #body {margin-left:0px; margin-top:0px;}
+my $style="/tactical.css";#qq%\nimg {border:0;}%; #body {margin-left:0px; margin-top:0px;}
 print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style, -leftmargin=>0, -topmargin=>0);#, -bgcolor=>"#000000");
 if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))
 {
@@ -44,7 +45,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 				if($mx%10<=1) {$n|=2}
 				if($my%10<=1) {$n|=1}
 				if($mx%10==0||$my%10==0) {$n=3}
-				$f="/images/aw/$n.gif";
+				$f="/$n.gif";
 				$link=qq!<a href="?xs=$mx&ys=$my&xe=$options{xe}&ye=$options{ye}">!;
 			} else {
 				$f="?x=$mx&y=$my";
@@ -56,14 +57,22 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	}
 	print "</table>";
 } else {
-	my ($dx,$dy);
-	if($ENV{REMOTE_USER} eq "af") { ($dx,$dy)=(46,-50) }
-	else { ($dx,$dy)=(-42,19) }
+	my @pos=(0,0);
+	my @s=(29,25);
+	if($ENV{REMOTE_USER} eq "af") { @pos=(-60,-44); $s[1]=37; }
+	elsif($ENV{REMOTE_USER} eq "tgd") { @pos=(-36,-62) }
+	elsif($ENV{REMOTE_USER} eq "xr") { @pos=(71,-60) }
+	elsif($ENV{REMOTE_USER} eq "blub") { @pos=(-6,-65) }
+        my $awuid=playername2id(cookie('user'));
+        if($awuid>2) {
+		my $home=playerid2home($awuid);
+		@pos=systemid2coord($home);
+	}
 	print start_form('get'), 
-		textfield('xs',$dx), " x position (center)", br,
-		textfield('ys',$dy), " y position (center)", p,
-		textfield('xe',29), " width", br,
-		textfield('ye',25), " height", br;
+		textfield('xs',$pos[0]), " x position (center)", br,
+		textfield('ys',$pos[1]), " y position (center)", p,
+		textfield('xe',$s[0]), " width", br,
+		textfield('ye',$s[1]), " height", br;
 	print submit("query"), end_form();
 }
 print end_html;
