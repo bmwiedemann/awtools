@@ -66,7 +66,16 @@ if($options{name}) {
 	textarea(-name=>'comment', -value=>$options{comment}, -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
 	submit("submit"), qq! <a href="?">new query</a>!;
 	if($id>2) {
-		print br,$user," owns planets<ul>";
+		my $planets=@{$::player{$id}{planets}};
+		my $level=$::player{$id}{level};
+		my $pop=0;
+		foreach my $p (@{$::player{$id}{planets}}) {
+			my @p=split("#",$p);
+			my $pp=$::planets{$p[0]}[$p[1]-1];
+			$pop+=planet2pop($pp);
+		}
+		print br,"pl=$level sl=$::player{$id}{science} cl=$::player{$id}{culture} points=$::player{$id}{points} (".3*$level."+$pop+".($::player{$id}{points}-$pop-3*$level).")";
+		print br,$user," owns $planets planets<ul>";
 		foreach my $p (@{$::player{$id}{planets}}) { # sort popsort
 			my @p=split("#",$p);
 			my $pp=$::planets{$p[0]}[$p[1]-1];
