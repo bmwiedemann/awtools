@@ -7,7 +7,7 @@ require "standard.pm";
 our %options;
 my $title="AW feed stuff";
 print AWheader($title);
-foreach my $p (qw(tz html file)) {
+foreach my $p (qw(tz html file debug name url)) {
 	$options{$p}=param($p);
 }
 if(param()) {
@@ -19,22 +19,16 @@ if(param()) {
 		#print $bytes_read;
 	}
 	print "input ",length($html)," bytes<br>";
-	$_=$html;
-	if(! m!>([^<>]*)</title>!) { print "no title found\n"; exit 0;}
-	my $title=$1;
-	if($title=~m!Alliance / Detail!) {
-		require './feed/alliance_detail.pm';
-	} elsif ($title=~m!Player / Profile!) {
-		require './feed/player.pm';
-	} else {
-		print "this input (title=$title) is not supported (yet) or not recognized\n";
-	}
+	require './feed/dispatch.pm';
+	feed_dispatch($html);
 	#print "$html";
 } else {
 	print start_form(-method=>'post',-enctype=>"multipart/form-data"),
 	textfield('tz',"+1"), " timezone of subject: GMT+n", br,
+	textfield('name',''), " who reports (e.g. for own fleet movements)", br,
 	textarea(-name=>'html',-value=>"", -cols=>40, -rows=>9), " copy+paste HTML source here", br,
 	filefield('file'), " or upload a downloaded HTML file", br,
+#	checkbox('debug'), br,
 	submit('add data'), reset(), end_form, 
 }
 print end_html;
