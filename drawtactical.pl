@@ -9,11 +9,12 @@ our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff);
 require "awmap.pm";
 our $imagesize=$mapsize*$pixelpersystem+1;
 our $ih=$imagesize/2;
+if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
 #my $file=shift(@ARGV) || die "need input\n";
 #my $fileend=$file;
 #$fileend=~s".*/"";
 #$fileend=~s/(\d\d)-(\d\d)-(\d+)\.tar\.bz2/$3-$2-$1/;
-my $out="tactical";
+my $out="tactical-$ENV{REMOTE_USER}";
 my $axiscolor="blue";
 my $c=25; # base color
 
@@ -22,7 +23,6 @@ my $c=25; # base color
 #system(qw"tar xjf",$file);
 print "reading csv...\n";
 our @files=qw(starmap);
-$ENV{REMOTE_USER}="af";
 require "input.pm";
 
 # Create the main image
@@ -45,6 +45,7 @@ sub mrelationcolor($) { my($name)=@_;
 }
 sub mrelationcolorid($) {
 	my $e=$::player{$_[0]};
+	my $dummye=$::player{$_[0]};
 	my $n;
 	if(!$e) {$n="unknown"}
 	else {$n=$$e{name}}
@@ -75,15 +76,15 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 	if(defined($::starmap{"$x,$y"})) {
 		my $id=$::starmap{"$x,$y"};
 		my $sys=$::starmap{$id};
-		$v=($$sys{level}+1)/1.7;
-		if($v>12){$v=12}
-		my @player=@{$$sys{origin}};
-		foreach(@player) {
-			my @rel=getrelation($::player{$_}{name});
-			$color=getrelationcolor($rel[0]);
-			$color=~s/black/white/;
+#		$v=($$sys{level}+1)/1.7;
+#		if($v>12){$v=12}
+#		my @player=@{$$sys{origin}};
+#		foreach(@player) {
+#			my @rel=getrelation($::player{$_}{name});
+#			$color=getrelationcolor($rel[0]);
+#			$color=~s/black/white/;
 #			push(@color, $color);
-		}
+#		}
 #	}
 	$v=12;
 #	if($v) {
@@ -94,14 +95,17 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 #			if(@color) {
 #				$color=$color[($i-1)/$v*@color];
 #			}
-			my $psys=$::planets{$id};
-			my $planet=$::planets{$id}[$i-1];
+			my $planet=getplanet($id, $i); 
 			my $ownerid=$$planet{ownerid};
 			#print "own $ownerid\n";
 			if(defined($ownerid) && $ownerid>2) {
 				$color=mrelationcolorid($ownerid);
-			} else {$color="black"}
+			} else {$color="white"}
 			$img->Draw(fill=>'none',stroke=>$color,primitive=>'line', points=>"$px2,$py2 $px3,$py2", strokewidth=>1);
+			if(planet2siege($planet)) {
+				$px2=$pxe-5;
+				$img->Draw(fill=>'none',stroke=>'red',primitive=>'line', points=>"$px2,$py2 $px3,$py2", strokewidth=>1);
+			}
 		}
 	}
 #	if($v>0){$v=$c+$v*int((255-$c)/8)}
