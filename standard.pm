@@ -66,7 +66,7 @@ sub addplayerir($@@;$) { my($oldentry,$sci,$race,$newlogin)=@_;
 	return $rest."\n".$magic;
 }
 
-sub relation2race() { local $_=$_[0];
+sub relation2race($) { local $_=$_[0];
 	return undef unless(/automagic/);
 	return undef unless(/race:([0-9,+-]*)/);
 	return split(",", $1);
