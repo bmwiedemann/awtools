@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "standard.pm";
+
+our %options;
+my $title="AW feed stuff";
+print AWheader($title);
+foreach my $p (qw(tz html file)) {
+	$options{$p}=param($p);
+}
+if(param()) {
+	chdir("/home/bernhard/code/cvs/perl/awcalc");
+	my $html=$options{html};
+	if(upload('file')) {
+		print "uploaded file $options{file}<br>\n";
+		my $bytes_read=read(upload('file'), $html, 40000);
+		#print $bytes_read;
+	}
+	print "input ",length($html)," bytes<br>";
+	$_=$html;
+	if(! m!>([^<>]*)</title>!) { print "no title found\n"; exit 0;}
+	my $title=$1;
+	if($title=~m!Alliance / Detail!) {
+		require './feed/alliance_detail.pm';
+	} elsif ($title=~m!Player / Profile!) {
+		require './feed/player.pm';
+	} else {
+		print "this input (title=$title) is not supported (yet) or not recognized\n";
+	}
+	#print "$html";
+} else {
+	print start_form(-method=>'post',-enctype=>"multipart/form-data"),
+	textfield('tz',"+1"), " timezone of subject: GMT+n", br,
+	textarea(-name=>'html',-value=>"", -cols=>40, -rows=>9), " copy+paste HTML source here", br,
+	filefield('file'), " or upload a downloaded HTML file", br,
+	submit('add data'), reset(), end_form, 
+}
+print end_html;
+
