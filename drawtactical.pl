@@ -43,7 +43,13 @@ sub mrelationcolor($) { my($name)=@_;
 	$color=~s/black/white/;
 	return $color;
 }
-sub mrelationcolorid($) { mrelationcolor($::player{$_[0]}{name}); }
+sub mrelationcolorid($) {
+	my $e=$::player{$_[0]};
+	my $n;
+	if(!$e) {$n="unknown"}
+	else {$n=$$e{name}}
+	mrelationcolor($n); 
+}
 
 
 $img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"0,$ih $imagesize,$ih",strokewidth=>1);
