@@ -9,7 +9,9 @@ our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=qw(Biology Economy Energy Mathematics Physics Social);
 our @racestr=qw(growth science culture production speed attack defense);
+our @racebonus=qw(0.09 0.10 0.04 0.04 0.19 0.15 0.15);
 our $magicstring="automagic:";
+our %artifact=("BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HOR"=>15);
 
 
 
@@ -56,18 +58,20 @@ sub systemlink($) { my($id)=@_;
 }
 
 
-sub addplayerir($@@;$@) { my($oldentry,$sci,$race,$newlogin,$trade)=@_;
+sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 	foreach($race,$sci,$trade) {next unless defined $_; if(!@$_){$_=undef}}
 	if($race) {$race="race:".join(",",@$race);} else {undef $race}
 	if($sci) {$sci="science:".time().",".join(",",@$sci);} else {undef $sci}
 	if($trade) {$trade="trade:".join(",",@$trade);} else {undef $trade}
-	if(!$oldentry) {$oldentry="4 UNKNOWN "}
+	if($prod) {$prod="production:".join(",",@$prod);} else {undef $prod}
+	if(!$oldentry) {$oldentry="0 UNKNOWN "}
 	my ($rest,$magic)=($oldentry,$magicstring." ");
 	if($oldentry=~/^(\d+ \w+ .*)(?=$magicstring)(.*)/s){
 		($rest,$magic)=($1,$2);
 	}
 #	if(!$magic) {$magic=$magicstring." "}
 	if($trade && $magic!~s/trade:\S*/$trade/) {$magic=~s/automagic:/$&\n$trade /}
+	if($prod && $magic!~s/productio:\S*/$prod/) {$magic=~s/automagic:/$&\n$prod /}
 	if($sci && $magic!~s/science:[-+,.0-9]*/$sci/) {$magic=~s/automagic:/$&\n$sci /}
 	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic=~s/automagic:/$&\n$race /}
 	if($newlogin) {
@@ -99,7 +103,7 @@ sub addfleet($$$$$@) { my($oldentry,$pid, $name, $time, $own, $fleet)=@_;
 	for my $s (@$fleet) {$ships+=$s}
 	my $CV=fleet2cv($fleet);
 	#if($CV<10) {return $oldentry}
-	if($ships<6 && $status!=4) {return $oldentry}
+	if($ships<4 && $status!=4) {return $oldentry}
 	$oldentry||="$status $pid";
 	if($oldentry=~/@$fleet/ || $time<time()-3600*24) {return $oldentry}
 	return "$oldentry \nautomagic:$name:$gmtime @$fleet ${CV}CV";
@@ -117,6 +121,37 @@ sub relation2science($) { local $_=$_[0];
 	return undef unless(/automagic/);
 	return undef unless(/science:([0-9,.+-]*)/);
 	return split(",", $1);
+}
+sub relation2production($) { local $_=$_[0];
+	return undef unless($_);
+	return undef unless(/automagic/);
+	return undef unless(/production:(\S*)/);
+	my @prod=split(",", $1);
+	my @race=relation2race($_[0]);
+	return undef unless @race;
+	for(my $i=0; $i<@race; ++$i){$race[$i]=$race[$i]*$racebonus[$i]}
+	my $a=$prod[3];
+	my $t=1+$prod[4]*0.01;
+	my @bonus=($t,$t,$t,$t);
+	if($a=~/(\w+)(\d)/) {
+		my $effect=$artifact{$1};
+		for(my $i=0; $i<@race; ++$i) {
+			if((1<<$i) & $effect)
+			{$race[$i]+=0.1*$2}
+		}
+	}
+	$bonus[0]+=$race[3]; # prod
+	$bonus[1]+=$race[1]; # sci
+	$bonus[2]+=$race[2]; # cul
+	$bonus[3]+=$race[0]; # grow
+	push(@prod, @bonus);
+#	for(my $i=0; $i<3; ++$i){ $prod[$i]+=$bonus[$i]; }
+	return @prod;
+}
+
+sub gmdate($) {
+	my @a=gmtime($_[0]); $a[5]+=1900;
+	return "$month[$a[4]] $a[3] $a[5]";
 }
 
 1;
