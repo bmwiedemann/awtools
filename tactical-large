@@ -13,8 +13,8 @@ chdir "large-$ENV{REMOTE_USER}";
 for my $p (qw'xs xe ys ye') {
 	$options{$p}=param($p);
 }
-my $style=qq%A {\ntext-decoration: none;\n}\n}%;
-print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style);
+my $style=qq%\nimg {border:0;}%; 
+print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style, -leftmargin=>0, -topmargin=>0);#, -bgcolor=>"#000000");
 if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))
 {
 	my $xe=round($options{xs}+$options{xe}/2);
@@ -29,11 +29,16 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 			my $f="star$mx,$my.gif";
 			my $link="";
 			my $linkend="</a>";
-			if(! -e $f) {my $n=($mx%10==0||$my%10==0?1:2); 
-				$f="star-none$n.gif";
+			if(! -e $f) {my $n=0;
+				if($mx%10<=1) {$n|=2}
+				if($my%10<=1) {$n|=1}
+				if($mx%10==0||$my%10==0) {$n=3}
+				$f="/aw/$n.gif";
 				$link=qq!<a href="?xs=$mx&ys=$my&xe=$options{xe}&ye=$options{ye}">!;
-			} else {$link=qq!<a href="system-info?mapx=$mx&mapy=$my" border=0>!;}
-			print qq!<td>$link<img src="/~bernhard/aw/awcalc/large-$ENV{REMOTE_USER}/$f">$linkend</td>!;
+			} else {
+				$f="/~bernhard/aw/awcalc/large-$ENV{REMOTE_USER}/$f";
+				$link=qq!<a href="system-info?mapx=$mx&mapy=$my">!;}
+			print qq!<td>$link<img src="$f">$linkend</td>!;
 
 		}
 		print "</tr>\n";
@@ -41,7 +46,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	print "</table>";
 } else {
 	my ($dx,$dy);
-	if($ENV{REMOTE_USER} eq "af") { ($dx,$dy)=(46,-46) }
+	if($ENV{REMOTE_USER} eq "af") { ($dx,$dy)=(46,-50) }
 	else { ($dx,$dy)=(-42,19) }
 	print qq!<a href="/~bernhard/aw/">click here</a> first to authenticate!,br,start_form('get'), 
 		textfield('xs',$dx), " x position (center)", br,
