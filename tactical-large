@@ -10,10 +10,21 @@ my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "awmap.pm";
 chdir "large-$ENV{REMOTE_USER}";
-for my $p (qw'xs xe ys ye') {
+for my $p (qw'xs xe ys ye x y') {
 	$options{$p}=param($p);
 }
-my $style=qq%\nimg {border:0;}%; 
+if(defined($options{x}) && defined($options{y})) {
+	my $f="star$options{x},$options{y}.gif";
+	my $size=(stat($f))[7];
+	my $modified=(stat($f))[9];
+	print header(-type=>'image/gif', -expires=>'+1d', -last_modified=>$modified, -content_lenth=>$size);
+	undef($/);
+	open(F,"< $f") or die $!;
+	print <F>;
+	exit(0);
+}
+
+my $style=qq%\nimg {border:0;}%; #body {margin-left:0px; margin-top:0px;}
 print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style, -leftmargin=>0, -topmargin=>0);#, -bgcolor=>"#000000");
 if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))
 {
@@ -36,7 +47,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 				$f="/aw/$n.gif";
 				$link=qq!<a href="?xs=$mx&ys=$my&xe=$options{xe}&ye=$options{ye}">!;
 			} else {
-				$f="/~bernhard/aw/awcalc/large-$ENV{REMOTE_USER}/$f";
+				$f="?x=$mx&y=$my";
 				$link=qq!<a href="system-info?mapx=$mx&mapy=$my">!;}
 			print qq!<td>$link<img src="$f">$linkend</td>!;
 
@@ -48,7 +59,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	my ($dx,$dy);
 	if($ENV{REMOTE_USER} eq "af") { ($dx,$dy)=(46,-50) }
 	else { ($dx,$dy)=(-42,19) }
-	print qq!<a href="/~bernhard/aw/">click here</a> first to authenticate!,br,start_form('get'), 
+	print start_form('get'), 
 		textfield('xs',$dx), " x position (center)", br,
 		textfield('ys',$dy), " y position (center)", p,
 		textfield('xe',27), " width", br,
