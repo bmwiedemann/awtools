@@ -5,12 +5,10 @@
 use Image::Magick;
 use strict;
 
-my $pixelpersystem=13; # for 12 planet status lines
-my $mapsize=11;
-my $mapxoff=-int(($mapsize-1)/2);
-my $mapyoff=-int(($mapsize-1)/2);
-my $imagesize=$mapsize*$pixelpersystem+1;
-my $ih=$imagesize/2;
+our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff);
+require "awmap.pm";
+our $imagesize=$mapsize*$pixelpersystem+1;
+our $ih=$imagesize/2;
 #my $file=shift(@ARGV) || die "need input\n";
 #my $fileend=$file;
 #$fileend=~s".*/"";
@@ -20,10 +18,6 @@ my $axiscolor="blue";
 my $gridcolor="gray";
 my $c=25; # base color
 
-sub maptoimg($$) { my($x,$y)=@_;
- return (($x-$mapxoff)*$pixelpersystem, ($y-$mapyoff)*$pixelpersystem);}
-#sub imgtomap($$) { my($x,$y)=@_;
-# return (($x-$ih)/$pixelpersystem, ($y-$ih)/$pixelpersystem);}
 
 
 #system(qw"tar xjf",$file);
