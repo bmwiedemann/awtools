@@ -18,16 +18,17 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 	$hour+=$::options{tz};
 	my $servertime=$hour*3600+$min*60+$sec;
         #print scalar gmtime(), " GMT ";#: $name idle:$1 $2  ";
-	m,Local Time</td><td>(\d\d):(\d\d)</td></tr>,; my $localtime=($1*60+$2)*60+30;
+#	m,Local Time</td><td>(\d\d):(\d\d)</td></tr>,; my $localtime=($1*60+$2)*60+30;
+	my $localtime=$::time[0]*3600+$::time[1]*60+$::time[2];
 	my $deliverytime=($servertime-$localtime);
-	if($deliverytime<-24*60*60+50*60) {$deliverytime+=24*60*60}
+	if($deliverytime<(-24*60+50)*60) {$deliverytime+=24*60*60}
 	if($deliverytime<-60 || $deliverytime>50*60) {
 		print "version outdated or wrong timezone?";
 		exit(0);
 	}
 	$idlei+=$deliverytime;
 	my $lastonline=time()-$idlei;
-	my $inaccuracy=$timevalue{$timestr}+30;
+	my $inaccuracy=$timevalue{$timestr}+1;
 	
         m,Logins</td><td>(\d+),; my $logins=$1;
 	m,Playerlevel</a></td><td>(\d+ - \d+%)</td></tr>,; my $pl=$1;
