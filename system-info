@@ -36,9 +36,9 @@ if(defined($options{x}) && defined($options{y})) {
 	exit(0);
 }
 print header;
-print start_html('AW system info');
 
 if(param("legend")) {
+	print start_html('legend of AW relations');
 	require "input.pm";
 	print "legend: ";
 	for my $n (1..9) {
@@ -62,19 +62,23 @@ if(param()) {
 	if(!$system && $options{name}) { $system=systemname2id($options{name}) }
 	if(!$system && $options{id}) { $system=$options{id} }
 	if(!$system) {
+		print start_html('system not found');
 		print "no system $options{name} at $x,$y";
 	} else {
 		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
+		print start_html("($x,$y) $::starmap{$system}{name} system info [\U$ENV{REMOTE_USER}\E]");
 		my ($bs,$be,$eol)=('[b]','[/b]',"\n");
 
 		## start of normal output ##
 		if(!$options{export}) {
 			print qq!<a href="?legend=1">legend</a> <a href="?">new query</a> <a href="?id=$system&export=1">BB-export</a>!,br;
-			($bs,$be)=('<b>','</b>',"<br>\n");
+			($bs,$be,$eol)=('<b>','</b>',"<br>\n");
 		}
 		my $output="$bs$::starmap{$system}{name}($x,$y)$be${eol}Id=$system level=$::starmap{$system}{level}$eol";
 		if(!$options{export}) {
-			tprint $output, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br,
+			my @systeminfo=getplanetinfo($system,0);
+			my $sysinfo=$systeminfo[2]||"";
+			tprint $output, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
 			"planets here: <ul>";
 		}
 		my $planets=$::planets{$system};
@@ -121,6 +125,7 @@ if(param()) {
 		}
 	}
 } else { 
+  print start_html("AW system info");
   print start_form('get'),
    textfield('mapx'), " x", br,
    textfield('mapy'), " y (e.g. x=0 y=0 for Rana)", br,
