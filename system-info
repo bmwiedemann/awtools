@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
 use CGI ":standard";
@@ -15,7 +15,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my $alliancestr="";
 	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
-	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" alt="relation"></a> !;
+	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" title="player info + relation"></a> !;
 	return profilelink($id).$rellink.
 		span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) !);
 }
@@ -61,8 +61,11 @@ if(param()) {
 		print "no system $options{name} at $x,$y";
 	} else {
 		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
+
+		## start of normal output ##
 		print qq!<a href="?legend=1">legend</a> <a href="?">new query</a>!,br;
-		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id=$system level=$::starmap{$system}{level}",qq! <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br;
+		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id=$system level=$::starmap{$system}{level}",
+		qq! <a href="tactical-large?xs=$x&ys=$y&xe=27&ye=17">tactical</a> <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br;
 		print "planets here: <ul>";
 		my $planets=$::planets{$system};
 		foreach my $h (@$planets) {
@@ -70,17 +73,18 @@ if(param()) {
 			next if(!$h);
 #			foreach my $item (sort keys %$h) { print " $item=$$h{$item}\n"; }
 			my $id="$system#$$h{planetid}";
-			my $pinfo=$::planetinfo{$id};
+			my $pinfo;
+			my @pinfo=getplanetinfo($system,$$h{planetid});
 			$id=~s/#/%23/;
 			my $info="";
-			if($pinfo) {
-				$pinfo=~/^(\d) (\d+) (.*)/;
-				my $status=$1;
-				$pinfo=$3;
-				my $name=playerid2name($2);
-				$info=" ".$::planetstatusstring{$status}." ".span({-style=>'color: '.getstatuscolor($status)},$name.": ".$pinfo);
+			if(@pinfo) {
+				my $status=$pinfo[0];
+				my $name=playerid2name($pinfo[1]);
+				$pinfo=$pinfo[2];
+				my @rel=getrelation($name);
+				$info=" ".span({-style=>'color: '.getstatuscolor($status)},$::planetstatusstring{$status})." ".span({-style=>'color: '.getrelationcolor($rel[0])},getatag($rel[1])." ".$name).": ".$pinfo;
 			}
-			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" alt="edit planet-info"></a> !;
+			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" title="edit planet-info"></a> !;
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
 			printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, spinfo($$h{ownerid}), $info;
