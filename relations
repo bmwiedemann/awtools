@@ -1,28 +1,37 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 use strict;
 use CGI ":standard";
 
-my $title="add relation";
+my $title="manage relation";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %options;
 print header, start_html($title), h1($title);
-for my $p (qw'id name alliance relation comment') {
+for my $p (qw'id name alliance relation comment submit') {
 	$options{$p}=param($p);
 }
+if(defined($options{submit}) && $options{submit}=~/delete/) { $options{delete}=1 }
 #if($options{id}) { $options{name}=$::player{$options{id}}{name}; }
 if($options{relation}) {
 	$options{name} =~ y/A-Z/a-z/;
-	$options{alliance} =~ y/a-z/A-Z/;
-	if($options{name} !~ /^[-_. a-z0-9\[\]]*$/) { print 'illegal character in user name'; exit(0);}
-	$options{relation}+=0;
-	if($options{relation}<1 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
-	if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
+	if(!$options{delete}) {
+		$options{alliance} =~ y/a-z/A-Z/;
+		if($options{name} !~ /^[-_. a-z0-9\[\]*!|äöüÄÖÜû{}]*$/) { print 'illegal character in user name'; exit(0);}
+		$options{relation}+=0;
+		if($options{relation}<1 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
+		if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
+	}
 	use DB_File;
 	my %data;
 	tie(%data, "DB_File", $dbname) or print "error accessing DB\n";
-	$data{$options{name}}="$options{relation} $options{alliance} $options{comment}";
+	my $mod=$data{$options{name}} ? "modified" : "added";
+	if($options{delete}) {
+		delete $data{$options{name}};
+		$mod="deleted";
+	} else {
+		$data{$options{name}}="$options{relation} $options{alliance} $options{comment}";
+	}
 	untie(%data);
-	print span({-style=>'color: darkgreen'},"added $options{name}"),br;
+	print span({-style=>'color: darkgreen'},"$mod $options{name}"),br;
 }
 
 if($options{name}) {
@@ -33,8 +42,10 @@ if($options{name}) {
 	$user =~ y/A-Z/a-z/;
 	my $entry=$::relation{$user};
 	my $new="edit existing entry";
+	my $id=$::playerid{$user};
+	my $atag=playerid2tag($id);
 	if(!defined($entry)) {
-		$options{alliance}="unknown";
+		$options{alliance}=$atag || "unknown";
 		$options{comment}="";
 		$options{relation}=4;
 		$new=span({-style=>'color: red'},"user unknown - add new entry");
@@ -46,21 +57,22 @@ if($options{name}) {
 	}
 	
 	
-	my $id=$::playerid{$user};
 	my @rel=getrelation($user);
-	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)")." ", profilelink($id), br;
+	$atag=$atag?" [$atag]":"";
+	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), br;
 	print hidden(-name=>'name', $user);
 	print textfield('alliance', $options{alliance}), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[1..9], -default=>$options{relation},
 		-labels=>\%::relationname), " relation", br,
 	textarea('comment', $options{comment}), " who added him, why, contact, intel, etc...", br,
-	submit("submit"), qq! <a href="?">back</a>!;
+	submit("submit"), qq! <a href="?">new query</a>!;
 	if($id>2) {
-		print br,"owns planets<ul>";
+		print br,$user," owns planets<ul>";
 		foreach my $p (@{$::player{$id}{planets}}) { # sort popsort
 			my @p=split("#",$p);
 			my $pp=$::planets{$p[0]}[$p[1]-1];
-			print li,qq! <a href="system-info?id=$p[0]">$p[0]</a> #$p[1] : pop=$$pp{population} SB=$$pp{starbase}!;
+			print li,qq! <a href="system-info?id=$p[0]">!.systemid2name($p[0]);
+			printf qq!</a> #$p[1] : pop=%i SB=%i!, planet2pop($pp), planet2sb($pp);
 		}
 		print "</ul>\n";
 	}

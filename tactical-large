@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+use strict;
+use CGI ":standard";
+alarm 30;
+
+sub round($) {int($_[0]+0.5)}
+if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
+my $title="\U$ENV{REMOTE_USER}\E new tactical map";
+my %options;
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "awmap.pm";
+chdir "large-$ENV{REMOTE_USER}";
+for my $p (qw'xs xe ys ye') {
+	$options{$p}=param($p);
+}
+my $style=qq%A {\ntext-decoration: none;\n}\n}%;
+print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style);
+if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))
+{
+	my $xe=round($options{xs}+$options{xe}/2);
+	my $ye=round($options{ys}+$options{ye}/2);
+	my $xs=round($options{xs}-$options{xe}/2);
+	my $ys=round($options{ys}-$options{ye}/2);
+	print qq!<table border="0" cellspacing="0" cellpadding="0" bgcolor='#000000'>!;
+	for(my $my=$ys; $my<$ye; $my++) {
+		print "<tr>";
+		for(my $mx=$xs; $mx<$xe; $mx++) {
+#			print "<td> $mx,$my</td>"
+			my $f="star$mx,$my.gif";
+			my $link="";
+			my $linkend="</a>";
+			if(! -e $f) {my $n=($mx%10==0||$my%10==0?1:2); 
+				$f="star-none$n.gif";
+				$link=qq!<a href="?xs=$mx&ys=$my&xe=$options{xe}&ye=$options{ye}">!;
+			} else {$link=qq!<a href="system-info?mapx=$mx&mapy=$my" border=0>!;}
+			print qq!<td>$link<img src="/~bernhard/aw/awcalc/large-$ENV{REMOTE_USER}/$f">$linkend</td>!;
+
+		}
+		print "</tr>\n";
+	}
+	print "</table>";
+} else {
+	my ($dx,$dy);
+	if($ENV{REMOTE_USER} eq "af") { ($dx,$dy)=(46,-46) }
+	else { ($dx,$dy)=(-42,19) }
+	print qq!<a href="/~bernhard/aw/">click here</a> first to authenticate!,br,start_form('get'), 
+		textfield('xs',$dx), " x position (center)", br,
+		textfield('ys',$dy), " y position (center)", p,
+		textfield('xe',27), " width", br,
+		textfield('ye',19), " height", br;
+	print submit("query"), end_form();
+}
+print end_html;
