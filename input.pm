@@ -31,7 +31,7 @@ sub player { #rank points id science culture level home_id logins from joined al
 	$player{$id}=\%h;
 }
 
-for my $f (qw(starmap)) {
+for my $f (@::files) {
 #for my $f (qw(alliances starmap player)) {
 	my $file="$f.csv";
 	my $head=1;

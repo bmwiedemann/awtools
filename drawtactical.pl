@@ -28,6 +28,7 @@ sub imgtomap($$) { my($x,$y)=@_;
 
 #system(qw"tar xjf",$file);
 print "reading csv...\n";
+our @files=qw(starmap);
 require "input.pm";
 
 # Create the main image
@@ -82,5 +83,5 @@ for(my $x=-$mapxoff; $x+$mapxoff<$mapsize; $x++) {
 
 
 $img->Write("$out.png");
-$img->Write('win:');
+#$img->Write('win:');
 
