@@ -16,7 +16,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my $alliancestr="";
 	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
-	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" title="player info + relation"></a> !;
+	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" title="player info"></a> !;
 	if($options{export}) {
 		return "[color=$color]$alliancestr $name [/color]";
 	}
@@ -24,16 +24,19 @@ sub spinfo($) { my($id)=@_; # short player info string
 		span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) !);
 }
 sub mkhash($) { my($tag)=@_;
-	my $token="$tag#$options{id}#secret9";
+	if($options{uniq} && $options{uniq}!~/\./) {$options{uniq}=".$options{uniq}."} else {$options{uniq}=""}
+	my $token="$tag$options{uniq}$options{expires}#$options{id}#secret9";
 	return md5_hex($token);
 }
 sub auth_ok($) { my($auth)=@_;
 	my @auth=split("#",$auth);
-	if(mkhash($auth[0]) eq $auth[1]) {
-		$ENV{REMOTE_USER}=$auth[0];
-		return 1;
+	if(mkhash($auth[0]) ne $auth[1]) {return 0}
+	if($options{expires} && $options{expires}<time) {
+		print "valid link has expired\n";
+		return 0;
 	}
-	return 0;
+	$ENV{REMOTE_USER}=$auth[0];
+	return 1;
 }
 sub tprint { unless($options{export}){print @_} }
 
@@ -64,14 +67,22 @@ if(param("legend")) {
 
 if(param()) {
 	my($x,$y,$system);
-	for my $p (qw'x y mapx mapy id name export auth') {
+	for my $p (qw'x y mapx mapy id name export auth expires uniq') {
 	  $options{$p}=param($p);
 	}
 	if($options{export}==2) {
 		my $u=$ENV{REMOTE_USER};
-		my $l="http://guest:guest\@lsmod.de/cgi-bin/aw/public/system-info?id=$options{id}&auth=$u%23".mkhash($u);
+		if(!$options{expires}) {$options{expires}=""}
+		else {$options{expires}=time+$options{expires}*3600*24;}
+		my $l="http://guest:guest\@lsmod.de/cgi-bin/aw/public/system-info?id=$options{id}&expires=$options{expires}&uniq=$options{uniq}&auth=$u%23".mkhash($u);
 		print start_html("export for system $options{id}").
-		qq!This is an anonymous read-only access URL. It is valid for whole beta - give only to trusted friends.<br> <a href="$l">copy this link</a> or try $l <br>note: for IE leave out the guest:guest\@!;
+		qq!This is an anonymous read-only access URL. It is valid for whole beta - give only to trusted friends.<br> <a href="$l">copy this link</a> or try $l <br>note: for IE leave out the guest:guest\@!,p,
+		"set expiry time: ", start_form('get'),
+		hidden('id', $options{id}),
+		hidden('export', $options{export}),
+		textfield('expires', "7"), " days valid from now",br,
+		textfield('uniq',12345), " unique id",br,
+		submit;
 		exit 0;
 	}
 	if($ENV{REMOTE_USER} eq "guest" && !auth_ok($options{auth})) {
@@ -97,12 +108,14 @@ if(param()) {
 			print qq!<a href="?legend=1">legend</a> <a href="?">new query</a> <a href="?id=$system&export=1">BB-export</a> <a href="?id=$system&export=2">anonymous updated export</a>!,br;
 			($bs,$be,$eol)=('<b>','</b>',"<br>\n");
 		}
-		my $output="$bs$::starmap{$system}{name}($x,$y)$be${eol}Id=$system level=$::starmap{$system}{level}$eol";
+		my $output="$bs$::starmap{$system}{name}($x,$y)$be${eol}Id=$system level=$::starmap{$system}{level} ";
 		if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
-			tprint $output, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
+			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
 			"planets here: <ul>";
+		} else {
+			$output.="[url=http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y]starmap[/url] [url=http://www1.astrowars.com/0/Map/Detail.php/?nr=$system]Map/Details[/url]$eol";
 		}
 		my $planets=$::planets{$system};
 		foreach my $h (@$planets) {
