@@ -1,11 +1,18 @@
 #!/usr/bin/perl -w
 
 use strict;
+use CGI ":standard";
 require "input.pm";
 
+sub holesort { $$a[3]<=>$$b[3] }
+
+my @holes;
 {my $x=$::planets}
-print "<html><head><title>holes list</title></head><body>sys: members:friends:others<br>\n";
-for my $sid (1..3000) {
+my $head=AWheader2("holes list");
+$head=~s!index!/cgi-bin/index!;
+print $head.
+"sys: members:friends:others<br>\n";
+for my $sid (1..4000) {
 	my $friend=0;
 	my $other=0;
 	my $member=0;
@@ -17,7 +24,12 @@ for my $sid (1..3000) {
 			if($rel[0]==9) {$member++}
 		} else {$other++}
 	}
-	next if $member<5 || $friend==12;
+	next if $member<3 || $friend==12;
+	push(@holes, [$sid, $member, $friend, $other]);
+}
+
+foreach(sort holesort @holes) {
+	my ($sid, $member, $friend, $other)=@$_;
 	print qq!<a href="/cgi-bin/system-info?id=$sid">$sid: $member:$friend:$other</a><br>\n!;
 }
 print "</body></html>\n";
