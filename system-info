@@ -7,6 +7,8 @@ use Digest::MD5 "md5_hex";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "standard.pm";
+my $awuser=cookie('user');
+my $refsys=cookie('refsys');
 
 sub spinfo($) { my($id)=@_; # short player info string
 	if($id==2) {return "unknown"}
@@ -156,6 +158,15 @@ if(param()) {
 			print "players having their origin here: <ul>";
 			foreach(@{$::starmap{$system}{origin}}) { print li,spinfo($_); }
 			print "</ul>\n";
+			my $uid=playername2id($awuser);
+			if($uid>2) {
+				my $home=playerid2home($uid);
+				my ($hx,$hy)=systemid2coord($home);
+				my ($dx,$dy)=(abs($hx-$x),abs($hy-$y));
+				my $sqr=$dx**2+$dy**2;
+				my $bio=($dx>$dy?$dx:$dy)*2;
+				print "$awuser($uid): ($hx,$hy)-&gt($x,$y) = ($dx,$dy)  Bio=$bio distsqr=$sqr";
+			}
 		} else {
 			print qq!<textarea cols=80 rows=15 name="dummy">$output</textarea>!;
 		}
