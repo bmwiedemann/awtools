@@ -15,7 +15,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my $alliancestr="";
 	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
-	return span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) <a href="relations?name=$name">relation</a> !.profilelink($id));
+	return span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) <a href="relations?name=$name"><img src="/images/aw/relations-16.png" alt="relation"></a> !.profilelink($id));
 }
 
 print header;
@@ -51,14 +51,25 @@ if(param()) {
 	} else {
 		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
 		print qq!<a href="?legend=1">legend</a>!,br;
-		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id=$system level=$::starmap{$system}{level}",br;
+		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id=$system level=$::starmap{$system}{level}",qq! <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br;
 		print "planets here: <ul>";
 		my $planets=$::planets{$system};
 		foreach my $h (@$planets) {
 			print li;
 			next if(!$h);
 #			foreach my $item (sort keys %$h) { print " $item=$$h{$item}\n"; }
-			print "#$$h{planetid} pop $$h{population} SB $$h{starbase} ", spinfo($$h{ownerid});
+			my $id="$system#$$h{planetid}";
+			my $pinfo=$::planetinfo{$id};
+			$id=~s/#/%23/;
+			my $info="";
+			if($pinfo) {
+				$pinfo=~/^(\d) (\d+) (.*)/;
+				my $status=$1;
+				$pinfo=$3;
+				my $name=playerid2name($2);
+				$info=$::planetstatusstring{$status}." ".span({-style=>'color: '.getstatuscolor($status)},$name.": ".$pinfo);
+			}
+			print "#$$h{planetid} pop $$h{population} SB $$h{starbase} ", spinfo($$h{ownerid}), qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet-28.png" alt="edit planet-info"></a> !, $info;
 			
 		}
 		print "</ul>\n";
