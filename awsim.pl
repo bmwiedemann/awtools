@@ -56,12 +56,13 @@ sub printstate()
 {
   print "turn $turn: ";
   foreach my $p (@planet) {
-#    while(my @a=each(%$p)) {
-#      print "$a[0]:$a[1] ";
-#    }
-    foreach my $b(@buildings) {
-      print "$b:$$p{$b} ";
+    printf("pop:%.2f  ",$$p{pop});
+    foreach my $b(@buildings, "pp") {
+      my $v=$$p{$b};
+      if(length($v)<2) {$v.=" "}
+      print "$b:$v ";
     }
+    print " ";
     while(my @a=each(%player)) {
       print "$a[0]:$a[1] ";
     }
