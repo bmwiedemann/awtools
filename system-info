@@ -15,13 +15,24 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my $alliancestr="";
 	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
-	return span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) <a href="relations?name=$name"><img src="/images/aw/relations-16.png" alt="relation"></a> !.profilelink($id));
+	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" alt="relation"></a> !;
+	return profilelink($id).$rellink.
+		span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) !);
 }
 
-print header;
-print start_html('AW system info');
 my $path="/home/bernhard/code/cvs/perl/awcalc";
 chdir $path;
+for my $p (qw'x y') {
+  $options{$p}=param($p);
+}
+if(defined($options{x}) && defined($options{y})) {
+	require "awmap.pm";
+	my($x,$y)=imgtomap($options{x}, $options{y});
+	print redirect("http://$ENV{HTTP_HOST}$ENV{SCRIPT_NAME}?mapx=$x&mapy=$y");
+	exit(0);
+}
+print header;
+print start_html('AW system info');
 
 if(param("legend")) {
 	require "input.pm";
@@ -43,14 +54,14 @@ if(param()) {
 	require "input.pm";
 	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
 	elsif(defined($options{x})) { ($x,$y)=imgtomap($options{x}, $options{y}) }
-	if(defined($x)) { $system=$::starmap{"$x,$y"}; }
-	if(!$system && $options{name}) { $system=$::starmap{"\L$options{name}"} }
+	if(defined($x)) { $system=systemcoord2id($x,$y) }
+	if(!$system && $options{name}) { $system=systemname2id($options{name}) }
 	if(!$system && $options{id}) { $system=$options{id} }
 	if(!$system) {
 		print "no system $options{name} at $x,$y";
 	} else {
 		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
-		print qq!<a href="?legend=1">legend</a>!,br;
+		print qq!<a href="?legend=1">legend</a> <a href="?">new query</a>!,br;
 		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id=$system level=$::starmap{$system}{level}",qq! <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br;
 		print "planets here: <ul>";
 		my $planets=$::planets{$system};
@@ -67,9 +78,12 @@ if(param()) {
 				my $status=$1;
 				$pinfo=$3;
 				my $name=playerid2name($2);
-				$info=$::planetstatusstring{$status}." ".span({-style=>'color: '.getstatuscolor($status)},$name.": ".$pinfo);
+				$info=" ".$::planetstatusstring{$status}." ".span({-style=>'color: '.getstatuscolor($status)},$name.": ".$pinfo);
 			}
-			print "#$$h{planetid} pop $$h{population} SB $$h{starbase} ", spinfo($$h{ownerid}), qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet-28.png" alt="edit planet-info"></a> !, $info;
+			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" alt="edit planet-info"></a> !;
+			my $siegedcol="";
+			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
+			printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, spinfo($$h{ownerid}), $info;
 			
 		}
 		print "</ul>\n";
