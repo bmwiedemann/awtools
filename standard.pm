@@ -1,5 +1,9 @@
+use Time::Local;
+
 our $server="www1.astrowars.com";
+our $bmwserver="aw.lsmod.de";
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
 our %relationname=(1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=qw(Biology Economy Energy Mathematics Physics Social);
@@ -50,9 +54,11 @@ sub systemlink($) { my($id)=@_;
         qq!<a href="system-info?id=$id">info for system $id</a>\n!;
 }
 
-sub addplayerir($@@;$) { my($oldentry,$sci,$race,$newlogin)=@_;
+
+sub addplayerir($@@;$@) { my($oldentry,$sci,$race,$newlogin,$trade)=@_;
 	if(@$race) {$race="race:".join(",",@$race);} else {undef $race}
 	if(@$sci) {$sci="science:".join(",",@$sci);} else {undef $sci}
+	if(@$trade) {$trade="trade:".join(",",@$trade);} else {undef $trade}
 	if(!$oldentry) {$oldentry="4 UNKNOWN "}
 	my ($rest,$magic)=($oldentry,$magicstring." ");
 	if($oldentry=~/^(\d+ \w+ .*)(?=$magicstring)(.*)/s){
@@ -61,7 +67,18 @@ sub addplayerir($@@;$) { my($oldentry,$sci,$race,$newlogin)=@_;
 #	if(!$magic) {$magic=$magicstring." "}
 	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic.=" ".$race}
 	if($sci && $magic!~s/science:[,0-9]*/$sci/) {$magic.=" ".$sci}
-	if($newlogin) {$magic.=" login:".$newlogin}
+	if($trade && $magic!~s/trade:\S*/$trade/) {$magic.=" ".$trade}
+	if($newlogin) {
+		my @l2;
+		@l2=($newlogin=~/(\d+):(\d+)\+(\d+)/);
+		my $add=1;
+		if($oldentry=~/$l2[0]:(\d+)\+(\d+)/) {
+			my $diff=abs($l2[1]-$1);
+			#print "debug: $1 + $2 @l2 diff $diff";
+			if($diff<$l2[2]) { $add=0; }
+		}
+		$magic.=" login:".$newlogin if $add;
+	}
 	chomp($rest);
 	return $rest."\n".$magic;
 }
@@ -71,16 +88,19 @@ sub feet2cv(@) { my($fleet)=@_;
 }
 sub addfleet($$$$$@) { my($oldentry,$pid, $name, $time, $own, $fleet)=@_;
 	my $status=4;
+	my $ships=0;
 	if($own) {$status=7}
 	if($own==0) {$status=4}
 	if($time) {$status=3; $time-=3600*$::options{tz}}
 	else {$time=time()}
 	my $gmtime=gmtime($time);
+	for my $s (@$fleet) {$ships+=$s}
 	my $CV=feet2cv($fleet);
-	if($CV<10) {return $oldentry}
+	#if($CV<10) {return $oldentry}
+	if($ships<1) {return $oldentry}
 	$oldentry||="$status $pid";
-	if($oldentry=~/@$fleet/) {return $oldentry}
-	return "$oldentry automagic:$name:$gmtime @$fleet";
+	if($oldentry=~/@$fleet/ || $time<time()-3600*24) {return $oldentry}
+	return "$oldentry \nautomagic:$name:$gmtime @$fleet";
 }
 
 
