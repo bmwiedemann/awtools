@@ -46,6 +46,9 @@ sub pixel($$$) {my($x,$y,$c)=@_;
 }
 
 
+$img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"0,$ih $imagesize,$ih",strokewidth=>1);
+$img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"$ih,0 $ih,$imagesize",strokewidth=>1);
+
 
 for(my $px=0; $px<$imagesize; $px++) {
  for(my $py=0; $py<$imagesize; $py++) {
@@ -57,8 +60,10 @@ for(my $px=0; $px<$imagesize; $px++) {
 	if($v>0){$v=$c+$v*int((255-$c)/8)}
 	if($v>255){$v=255}
 #	print $v," ";
-	$v=sprintf("#%.2x%.2x%.2x", $v,$v,$v);
-	pixel($px,$py,$v);
+	if($v>0){
+		$v=sprintf("#%.2x%.2x%.2x", $v,$v,$v);
+		pixel($px,$py,$v);
+	}
 }}
 #foreach(@coor){
 #	my ($kx,$ky)=@$_;
@@ -67,8 +72,6 @@ for(my $px=0; $px<$imagesize; $px++) {
 #}
 
 
-$img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"0,$ih $imagesize,$ih",strokewidth=>1);
-$img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"$ih,0 $ih,$imagesize",strokewidth=>1);
 
 $img->Write("$out.png");
 #$img->Write('win:');
