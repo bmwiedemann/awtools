@@ -15,7 +15,6 @@ our $ih=$imagesize/2;
 #$fileend=~s/(\d\d)-(\d\d)-(\d+)\.tar\.bz2/$3-$2-$1/;
 my $out="tactical";
 my $axiscolor="blue";
-my $gridcolor="gray";
 my $c=25; # base color
 
 
@@ -35,6 +34,7 @@ my $img=$im->Clone();
 sub pixel($$$) {my($x,$y,$c)=@_;
   $img->Set("pixel[$x,$y]", $c);
 }
+sub gridtest($) { $_[0]%10<=1 ? "lightgray":"gray" }
 
 
 $img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"0,$ih $imagesize,$ih",strokewidth=>1);
@@ -51,7 +51,9 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 #	print "$x,$y $px,$py\n";
 
 	# grid
+	my $gridcolor=gridtest($x);
 	$img->Draw(fill=>'none',stroke=>$gridcolor,primitive=>'line', points=>"$px,$py $px,$pye",strokewidth=>1);
+	$gridcolor=gridtest($y);
 	$img->Draw(fill=>'none',stroke=>$gridcolor,primitive=>'line', points=>"$px,$py $pxe,$py",strokewidth=>1);
 	
 	if(defined($::starmap{"$x,$y"})) {
