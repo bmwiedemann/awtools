@@ -1,10 +1,11 @@
+use strict;
 use Time::Local;
 
 our $server="www1.astrowars.com";
 our $bmwserver="aw.lsmod.de";
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
-our %relationname=(1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
+our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=qw(Biology Economy Energy Mathematics Physics Social);
 our @racestr=qw(growth science culture production speed attack defense);
@@ -56,18 +57,19 @@ sub systemlink($) { my($id)=@_;
 
 
 sub addplayerir($@@;$@) { my($oldentry,$sci,$race,$newlogin,$trade)=@_;
-	if(@$race) {$race="race:".join(",",@$race);} else {undef $race}
-	if(@$sci) {$sci="science:".join(",",@$sci);} else {undef $sci}
-	if(@$trade) {$trade="trade:".join(",",@$trade);} else {undef $trade}
+	foreach($race,$sci,$trade) {next unless defined $_; if(!@$_){$_=undef}}
+	if($race) {$race="race:".join(",",@$race);} else {undef $race}
+	if($sci) {$sci="science:".time().",".join(",",@$sci);} else {undef $sci}
+	if($trade) {$trade="trade:".join(",",@$trade);} else {undef $trade}
 	if(!$oldentry) {$oldentry="4 UNKNOWN "}
 	my ($rest,$magic)=($oldentry,$magicstring." ");
 	if($oldentry=~/^(\d+ \w+ .*)(?=$magicstring)(.*)/s){
 		($rest,$magic)=($1,$2);
 	}
 #	if(!$magic) {$magic=$magicstring." "}
-	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic.=" ".$race}
-	if($sci && $magic!~s/science:[,0-9]*/$sci/) {$magic.=" ".$sci}
-	if($trade && $magic!~s/trade:\S*/$trade/) {$magic.=" ".$trade}
+	if($trade && $magic!~s/trade:\S*/$trade/) {$magic=~s/automagic:/$&\n$trade /}
+	if($sci && $magic!~s/science:[-+,.0-9]*/$sci/) {$magic=~s/automagic:/$&\n$sci /}
+	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic=~s/automagic:/$&\n$race /}
 	if($newlogin) {
 		my @l2;
 		@l2=($newlogin=~/(\d+):(\d+)\+(\d+)/);
@@ -83,7 +85,7 @@ sub addplayerir($@@;$@) { my($oldentry,$sci,$race,$newlogin,$trade)=@_;
 	return $rest."\n".$magic;
 }
 
-sub feet2cv(@) { my($fleet)=@_;
+sub fleet2cv(@) { my($fleet)=@_;
 	return $$fleet[2]*3+$$fleet[3]*24+$$fleet[4]*60;
 }
 sub addfleet($$$$$@) { my($oldentry,$pid, $name, $time, $own, $fleet)=@_;
@@ -95,18 +97,25 @@ sub addfleet($$$$$@) { my($oldentry,$pid, $name, $time, $own, $fleet)=@_;
 	else {$time=time()}
 	my $gmtime=gmtime($time);
 	for my $s (@$fleet) {$ships+=$s}
-	my $CV=feet2cv($fleet);
+	my $CV=fleet2cv($fleet);
 	#if($CV<10) {return $oldentry}
-	if($ships<1) {return $oldentry}
+	if($ships<6 && $status!=4) {return $oldentry}
 	$oldentry||="$status $pid";
 	if($oldentry=~/@$fleet/ || $time<time()-3600*24) {return $oldentry}
-	return "$oldentry \nautomagic:$name:$gmtime @$fleet";
+	return "$oldentry \nautomagic:$name:$gmtime @$fleet ${CV}CV";
 }
 
 
 sub relation2race($) { local $_=$_[0];
+	return undef unless($_);
 	return undef unless(/automagic/);
 	return undef unless(/race:([0-9,+-]*)/);
+	return split(",", $1);
+}
+sub relation2science($) { local $_=$_[0];
+	return undef unless($_);
+	return undef unless(/automagic/);
+	return undef unless(/science:([0-9,.+-]*)/);
 	return split(",", $1);
 }
 
