@@ -1,9 +1,10 @@
 #!/usr/bin/perl -w
 
-use MLDBM;
+use MLDBM qw(DB_File Storable);
 use DB_File;
 use Fcntl;
 use strict "vars";
+require "standard.pm";
 our (%alliances,%starmap,%player,%playerid,%planets,%relation,%planetinfo);
 tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666 or die $!;
 tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
@@ -15,27 +16,6 @@ if($ENV{REMOTE_USER} ne "guest") {
 	tie(%planetinfo, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm", O_RDONLY) or print "error accessing DB\n";
 }
 
-our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-our %relationname=(1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
-our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
-sub mon2id($) {my($m)=@_;
-	for(my $i=0; $i<12; $i++) {
-		if($m eq $month[$i]) {return $i}
-	}
-}
-sub parseawdate($) {my($d)=@_;
-	return undef if($d!~/(\d\d):(\d\d):(\d\d)\s-\s(\w{3})\s(\d+)/);
-	return timegm($3,$2,$1,$5, mon2id($4), (gmtime())[5]);
-}
-sub getrelationcolor($) { my($rel)=@_;
-	if(!$rel) { $rel=4; }
-	("", "Firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "Turquoise", "lightgreen", "green")[$rel];
-}
-# http://www.iconbazaar.com/color_tables/lepihce.html
-
-sub getstatuscolor($) { my($s)=@_; if(!$s) {$s=1}
-	(qw(black black blue cyan red green orange green))[$s];
-}
 sub getrelation($) { my($name)=@_;
 	my $rel=$::relation{"\L$name"};
 	if(!$rel) {
@@ -53,17 +33,7 @@ sub getrelation($) { my($name)=@_;
 	$rel=~/^(\d+) (\w+) (.*)/s;
 	return ($1, $2, $3);
 }
-sub planetlink($) {my ($id)=@_;
-	my $escaped=$id;
-	$escaped=~s/#/%23/;
-	return qq!<a href="planet-info?id=$escaped">$id</a>!;
-}
-sub profilelink($) { my($id)=@_;
-	qq!<a href="http://www1.astrowars.com/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public profile"></a> <a href="http://www1.astrowars.com/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" title="your profile"></a>\n!;
-}
-sub systemlink($) { my($id)=@_;
-	qq!<a href="system-info?id=$id">info for system $id</a>\n!;
-}
+
 sub playername2id($) { my($name)=@_;
 #	print qq!$name = $::playerid{"\L$name"}\n!;
 	$::playerid{"\L$name"};

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use MLDBM;
+use MLDBM qw(DB_File Storable);
 use Fcntl;
 use strict;
 our (%alliances,%starmap,%player,%playerid,%planets);
