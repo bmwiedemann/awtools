@@ -65,10 +65,10 @@ if($options{id}) {
 	}
 
 	print start_form, "$new: ". span({-style=>'color: '.getstatuscolor($options{status})},systemid2name($sid)."($id)")." ", systemlink($sid), br,
-		popup_menu(-name=>'status', -values=>[1..6], -default=>$options{status},
+		popup_menu(-name=>'status', -values=>[1..7], -default=>$options{status},
 		-labels=>\%::planetstatusstring), " status", br,
 		textfield('who', $options{who}), " user-id or user-name of the one who does the above $link", br,
-		textarea('comment', $options{comment}), " ETA, fleet, etc...", br,
+		textarea(-name=>'comment', -value=>$options{comment}, -rows=>9, -cols=>40), " ETA, fleet, etc...", br,
 		hidden(-name=>'id', $id),
 		submit("submit"), qq! <a href="?">new query</a> !, submit("submit","delete entry");
 } else {

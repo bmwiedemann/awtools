@@ -5,17 +5,21 @@
 use Image::Magick;
 use strict;
 
-our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff);
+our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff, $mapxend, $mapyend);
 require "awmap.pm";
 my $scale=2;
-my $extra=1;
-$mapxoff-=$extra;
-$mapyoff-=$extra;
+my $extra=9;
 $mapsize+=2*$extra;
+$mapxoff-=$extra;
+$mapxend=$mapsize+$mapxoff;
+$mapyoff-=$extra;
+$mapyend=$mapsize+$mapyoff;
 $pixelpersystem*=$scale;
 our $imagesize=$mapsize*$pixelpersystem+1;
 our $ih=$imagesize/2;
 if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
+if($ENV{REMOTE_USER} eq "af") {$mapxend=110}
+if($ENV{REMOTE_USER} eq "tgd") {$mapxoff=-110; $mapyoff=-100}
 my $out="large-$ENV{REMOTE_USER}/star";
 my $axiscolor="blue";
 my $c=25; # base color
@@ -66,8 +70,8 @@ sub mrelationcolorid($) {
 }
 
 
-for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
-  for(my $y=$mapyoff; $y-$mapyoff<$mapsize; $y++) {
+for(my $x=$mapxoff; $x<$mapxend; $x++) {
+  for(my $y=$mapyoff; $y<$mapyend; $y++) {
 	my ($px,$py)=(0,0);
 	my $pxe=$px+$pixelpersystem;
 	my $pye=$py+$pixelpersystem;

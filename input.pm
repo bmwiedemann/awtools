@@ -53,6 +53,11 @@ sub getrelation($) { my($name)=@_;
 	$rel=~/^(\d+) (\w+) (.*)/s;
 	return ($1, $2, $3);
 }
+sub planetlink($) {my ($id)=@_;
+	my $escaped=$id;
+	$escaped=~s/#/%23/;
+	return qq!<a href="planet-info?id=$escaped">$id</a>!;
+}
 sub profilelink($) { my($id)=@_;
 	qq!<a href="http://www1.astrowars.com/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public profile"></a> <a href="http://www1.astrowars.com/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" title="your profile"></a>\n!;
 }

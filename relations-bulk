@@ -20,7 +20,7 @@ if($options{relation}) {
 	foreach my $user(split(" ", $options{user})) {
 		$i++; print "user $i: $user\n<br>";
 		if($user=~m/^\s*$/) {next}
-		if($user !~ /^[-_. a-z0-9\[\]]*$/) { print 'illegal character in user name'; exit(0);}
+#		if($user !~ /^[-_. a-z0-9\[\]]*$/) { print 'illegal character in user name'; exit(0);}
 		$options{relation}+=0;
 		if($options{relation}<1 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
 		if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}

@@ -13,6 +13,7 @@ if(defined($options{submit}) && $options{submit}=~/delete/) { $options{delete}=1
 #if($options{id}) { $options{name}=$::player{$options{id}}{name}; }
 if($options{relation}) {
 	$options{name} =~ y/A-Z/a-z/;
+	$options{comment}=~s/\r//g;
 	if(!$options{delete}) {
 		$options{alliance} =~ y/a-z/A-Z/;
 		if($options{name} !~ /^[-_. a-z0-9\[\]*!|äöüÄÖÜû{}]*$/) { print 'illegal character in user name'; exit(0);}
@@ -62,7 +63,7 @@ if($options{name}) {
 	print textfield('alliance', $options{alliance}), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[1..9], -default=>$options{relation},
 		-labels=>\%::relationname), " relation", br,
-	textarea('comment', $options{comment}), " who added him, why, contact, intel, etc...", br,
+	textarea(-name=>'comment', -value=>$options{comment}, -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
 	submit("submit"), qq! <a href="?">new query</a>!;
 	if($id>2) {
 		print br,$user," owns planets<ul>";
@@ -73,6 +74,10 @@ if($options{name}) {
 			printf qq!</a> #$p[1] : pop=%i SB=%i!, planet2pop($pp), planet2sb($pp);
 		}
 		print "</ul>\n";
+		while($options{comment}=~/login:(\d+):(\d+)(.*)/) {
+			$options{comment}=$3;
+			print br,"login $1: ", scalar gmtime($2), " GMT";
+		}
 	}
 } else {
 	print start_form('get'), textfield(-name=>'name'), " user name", br,
