@@ -5,7 +5,7 @@ our (%alliances,%starmap,%player,%playerid);
 my (@elements);
 sub starmap { my($x,$y,$level,$id,$name)=@_;
 	$starmap{$id}={"x"=>$x, "y"=>$y, "level"=>$level, "name"=>$name};
-	$starmap{$name}=$id;
+	$starmap{"\L$name"}=$id;
 	$starmap{"$x,$y"}=$id;
 }
 sub alliances {
@@ -15,7 +15,7 @@ sub alliances {
 	for(my $i=0; $i<=$#elements; ++$i) {
 		if($elements[$i] eq "id") {$id=$_[$i]}
 		else {$h{$elements[$i]}=$_[$i];}
-		if($elements[$i] eq "tag") {$alliances{$_[$i]}=$id}
+		if($elements[$i] eq "tag") {$alliances{"\L$_[$i]"}=$id}
 	}
 	$alliances{$id}=\%h;
 }
