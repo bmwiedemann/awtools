@@ -2,8 +2,15 @@
 
 use strict;
 
-our (@sci,@pop,@prod,@planet,%player,$turn,$debug);
+our (@sci,@pop,@prod,@planet,%player,$turn,$debug,%options);
 our @buildings=qw"hf rf gc rl sb";
+
+%options=qw;
+init 1
+tactic 3
+turns 70
+print 15
+;;
 
 open(IN, "< input") or die $!;
 
@@ -40,16 +47,18 @@ sub build($$$)
 sub update()
 {
   for my $planet(@planet) {
-    my $ppp=$$planet{rf}+int($$planet{pop});
+    my $pop=int($$planet{pop});
+    my $ppp=$$planet{rf}+$pop;
     $$planet{pp}+=$ppp;
     $$planet{pop}+=($$planet{hf}+1)/$pop[int($$planet{pop})+1]+0.0001;
-    $player{sci}+=$$planet{rl};
+    $player{sci}+=$$planet{rl}+$pop;
     $player{cul}+=$$planet{gc};
     $player{pp}+=$ppp;
   }
 }
 
 my $tactic=shift(@ARGV)||"tactic1.pm";
+#$options{turns}=shift(@ARGV)||"70";
 require $tactic;
 
 sub printstate()
@@ -71,19 +80,15 @@ sub printstate()
 }
 sub finish(){}
 
-$planet[0]{pp}=60;
-$planet[0]{pop}=1;
-$planet[0]{hf}=0;
-$planet[0]{rf}=0;
-$planet[0]{rl}=0;
-$planet[0]{gc}=0;
-$planet[0]{sb}=2;
 $player{cul}=0;
 $player{sci}=0;
+$player{pp}=0;
+require "init".$options{init}.".pm";
 
-for $turn(1..70) {
+
+for $turn(0..$options{turns}) {
   spend1();
-  printstate();
+  printstate() if($turn % $options{print}==0);
   update();
 }
 finish();

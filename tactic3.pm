@@ -1,10 +1,10 @@
-my %rentability=qw"hf 0.9 rf 1.5 gc 1 rl 0.8 sb 0.5";
+my %rentability=qw"hf 1.2 rf 1.5 gc 1 rl 0.8 sb 0.4";
 #my %rentability=qw"hf 0.9 rf 1 gc 1 rl 1 sb 1";
 
 # returns value>0
 sub rentability($$){my ($p,$building)=@_;
   if($building eq "gc") {
-    return $rentability{$building}+$$p{"rf"}/10;
+    return $rentability{$building}+$$p{"rf"}/15;
   }
   return $rentability{$building};
 }
