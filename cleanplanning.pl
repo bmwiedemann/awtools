@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
 use Time::Local;
@@ -16,9 +16,9 @@ sub test_age { my ($name, $dayname, $mon, $day, $hour, $min, $sec, $year)=@_;
 while((my @a=each %::planetinfo)) {
   #print "$a[0] \n";
   my $p=$a[1];
-  $a[1]=~s/$::magicstring([^:]+):(...) (...)\s+(\d+) (\d\d):(\d\d):(\d\d) (\d+) (?:\d+\s*){5}/test_age($1,$2,$3,$4,$5,$6,$7,$8,$9)/ge;
+  $a[1]=~s/$::magicstring([^:]+):(...) (...)\s+(\d+) (\d\d):(\d\d):(\d\d) (\d+) (?:\d+\s*){5}(?:\d+CV)?/test_age($1,$2,$3,$4,$5,$6,$7,$8,$9)/ge;
 #	print $a[0]," ",time-timegm($7,$6,$5,$4,mon2id($3),$8),"\n";
-  if($a[1] ne $p) {
+  if($a[1] ne $p || $p=~/^5 /s) {
   	#print "$p -> $a[1]\n";
   	my %data;
 	tie(%data, "DB_File", $dbname) or die "error accessing DB\n";
