@@ -12,6 +12,7 @@ tie %planets, "MLDBM", "db/planets.mldbm", O_RDWR|O_CREAT, 0666;
 my @origin;
 #my @playersat; # who has planets at ID
 my @playerplanets; #where does he have his
+my @alliancemembers; #who is member
 my %tempplanets;
 my $firstline;
 my (@elements);
@@ -35,6 +36,7 @@ sub alliances {
 		else {$h{$elements[$i]}=$_[$i];}
 		if($elements[$i] eq "tag") {$alliances{"\L$_[$i]"}=$id}
 	}
+	$h{m}=$alliancemembers[$id];
 	$alliances{$id}=\%h;
 }
 sub player { #rank points id science culture level home_id logins from joined alliance name
@@ -48,6 +50,7 @@ sub player { #rank points id science culture level home_id logins from joined al
 		if($elements[$i] eq "home_id") { push @{$origin[$_[$i]]}, $id; }
 	}
 	$h{planets}=$playerplanets[$id];
+	push(@{$alliancemembers[$h{alliance}]},$id);
 	$player{$id}=\%h;
 }
 
@@ -82,7 +85,7 @@ sub planets {
 
 print "reading CSV files\n";
 #for my $f (@::files) {
-for my $f (qw(planets alliances player starmap)) {
+for my $f (qw(planets player alliances starmap)) {
 	my $file="$f.csv";
 	my $head=1;
 	$firstline=1;
@@ -131,6 +134,8 @@ for my $f (qw(planets alliances player starmap)) {
 #}
 #print $playerid{"greenbird"},"\n";
 #print "@{$::starmap{480}{origin}}";
+
+#foreach(@alliancemembers) { next unless $_; print "@$_\n"; }
 
 print "done\n";
 1;
