@@ -6,7 +6,7 @@ use Image::Magick;
 use strict;
 
 my $pixelpersystem=13; # for 12 planet status lines
-my $mapsize=41;
+my $mapsize=11;
 my $mapxoff=-int(($mapsize-1)/2);
 my $mapyoff=-int(($mapsize-1)/2);
 my $imagesize=$mapsize*$pixelpersystem+1;
@@ -21,9 +21,9 @@ my $gridcolor="gray";
 my $c=25; # base color
 
 sub maptoimg($$) { my($x,$y)=@_;
- return (($x+$mapxoff)*$pixelpersystem, ($y+$mapyoff)*$pixelpersystem);}
-sub imgtomap($$) { my($x,$y)=@_;
- return (($x-$ih)/$pixelpersystem, ($y-$ih)/$pixelpersystem);}
+ return (($x-$mapxoff)*$pixelpersystem, ($y-$mapyoff)*$pixelpersystem);}
+#sub imgtomap($$) { my($x,$y)=@_;
+# return (($x-$ih)/$pixelpersystem, ($y-$ih)/$pixelpersystem);}
 
 
 #system(qw"tar xjf",$file);
@@ -47,13 +47,14 @@ $img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"0,$ih $im
 $img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"$ih,0 $ih,$imagesize",strokewidth=>1);
 
 
-for(my $x=-$mapxoff; $x+$mapxoff<$mapsize; $x++) {
-  for(my $y=-$mapyoff; $y+$mapyoff<$mapsize; $y++) {
+for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
+  for(my $y=$mapyoff; $y-$mapyoff<$mapsize; $y++) {
 	my ($px,$py)=maptoimg($x,$y);
 	my $pxe=$px+$pixelpersystem;
 	my $pye=$py+$pixelpersystem;
 	my $v; # value
 	my $color="white";
+#	print "$x,$y $px,$py\n";
 
 	# grid
 	$img->Draw(fill=>'none',stroke=>$gridcolor,primitive=>'line', points=>"$px,$py $px,$pye",strokewidth=>1);
