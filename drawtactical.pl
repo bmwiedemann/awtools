@@ -37,6 +37,14 @@ sub pixel($$$) {my($x,$y,$c)=@_;
 }
 sub gridtest($) { $_[0]%10<=1 ? "lightgray":"gray" }
 
+sub mrelationcolor($) { my($name)=@_;
+	my @rel=getrelation($name);
+	my $color=getrelationcolor($rel[0]);
+	$color=~s/black/white/;
+	return $color;
+}
+sub mrelationcolorid($) { mrelationcolor($::player{$_[0]}{name}); }
+
 
 $img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"0,$ih $imagesize,$ih",strokewidth=>1);
 $img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"$ih,0 $ih,$imagesize",strokewidth=>1);
@@ -68,17 +76,25 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 			my @rel=getrelation($::player{$_}{name});
 			$color=getrelationcolor($rel[0]);
 			$color=~s/black/white/;
-			push(@color, $color);
+#			push(@color, $color);
 		}
-	}
-	if($v) {
+#	}
+	$v=12;
+#	if($v) {
 		for(my $i=1; $i<=$v; $i++) {
 			my $px2=$px+1;
 			my $px3=$pxe-1;
 			my $py2=$py+$i;
-			if(@color) {
-				$color=$color[($i-1)/$v*@color];
-			}
+#			if(@color) {
+#				$color=$color[($i-1)/$v*@color];
+#			}
+			my $psys=$::planets{$id};
+			my $planet=$::planets{$id}[$i-1];
+			my $ownerid=$$planet{ownerid};
+			#print "own $ownerid\n";
+			if(defined($ownerid) && $ownerid>2) {
+				$color=mrelationcolorid($ownerid);
+			} else {$color="black"}
 			$img->Draw(fill=>'none',stroke=>$color,primitive=>'line', points=>"$px2,$py2 $px3,$py2", strokewidth=>1);
 		}
 	}
