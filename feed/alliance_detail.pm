@@ -50,10 +50,10 @@ for(;(@a=m!<tr[^>]*><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</td>){5
 	my $oldentry=$data{$sid};
 	my $time=gmtime();
 	if($oldentry=~/$details/){$oldentry=~s/^3 $pid /4 $pid /;next}
-	$details="automagic:$name:$time $details";
 	my $newentry=$oldentry||"4 $pid";
+	print "sieged: ".planetlink($sid)." $details<br>\n";
+	$details="automagic:$name:$time $details";
 	$newentry.=" $details";
-	print "sieged: ".planetlink($sid)."<br>\n";
 	if(!$debug){$data{$sid}=$newentry;}
 	else {print "$sid $newentry<br>\n"}
 }
@@ -96,7 +96,7 @@ for(;(@a=m!([^>]*)</td><td[^>]*> <b>Attention(.*?) going to attack <b>([^<]+)</b
 	if($oldentry=~/$details/) {next}
 	if($oldentry) {$newentry=$oldentry." ".$details}
 	else {$newentry="3 $pid ".$details}
-	print "incoming: ".planetlink($sid)."<br>\n";
+	print "incoming: ".planetlink($sid)." @ship<br>\n";
 	#print " old:$oldentry new:$newentry<br>\n";
 	if(!$debug){$data{$sid}=$newentry;}
 }
