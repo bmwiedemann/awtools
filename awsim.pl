@@ -148,14 +148,20 @@ sub finish(){
     $pkt+=int($$p{pop});
   }
   while(1){
-    $player{sci}-=$sci[$sci+1]*6;
-    last if($player{sci}<0);
-    $sci++;
+    my $scineeded=$sci[$sci+1]*6;
+    if($player{sci}>$scineeded) {
+	$player{sci}-=$scineeded;
+    	$sci++;
+    } else {
+	    $sci+=$player{sci}/$scineeded;
+	    last;
+    }
   }
+  
   if($sci>20) {
     $pkt+=6*($sci-20);
   }
-  print "total points: $pkt sci: $sci\n";
+  printf "total points: %.2f sci: %.2f\n", $pkt, $sci;
 }
 sub initplanet {my ($p)=@_;
 $$p{pp}=0;
