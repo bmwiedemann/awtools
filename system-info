@@ -74,7 +74,7 @@ if(param()) {
 		my $u=$ENV{REMOTE_USER};
 		if(!$options{expires}) {$options{expires}=""}
 		else {$options{expires}=time+$options{expires}*3600*24;}
-		my $l="http://guest:guest\@lsmod.de/cgi-bin/aw/public/system-info?id=$options{id}&expires=$options{expires}&uniq=$options{uniq}&auth=$u%23".mkhash($u);
+		my $l="http://guest:guest\@aw.lsmod.de/cgi-bin/public/system-info?id=$options{id}&expires=$options{expires}&uniq=$options{uniq}&auth=$u%23".mkhash($u);
 		print start_html("export for system $options{id}").
 		qq!This is an anonymous read-only access URL. It is valid for whole beta - give only to trusted friends.<br> <a href="$l">copy this link</a> or try $l <br>note: for IE leave out the guest:guest\@!,p,
 		"set expiry time: ", start_form('get'),
@@ -115,7 +115,7 @@ if(param()) {
 			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://$::server/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://$::server/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
 			"planets here: <ul>";
 		} else {
-			$output.="[url=http://$::server/about/starmap.php?dx=$x&dy=$y]starmap[/url] [url=http://$::server/0/Map/Detail.php/?nr=$system]Map/Details[/url]$eol";
+			$output.="[url=http://$::server/about/starmap.php?dx=$x&dy=$y]starmap[/url] [url=http://$::server/0/Map/Detail.php/?nr=$system]Map/Details[/url] [url=http://$::bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
 		}
 		my $planets=$::planets{$system};
 		foreach my $h (@$planets) {
