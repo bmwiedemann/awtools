@@ -6,22 +6,22 @@ my $title="manage relation [\U$ENV{REMOTE_USER}\E]";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
+require "./input.pm";
 
 print AWheader($title);
 for my $p (qw'id name alliance relation comment submit') {
 	$options{$p}=param($p);
 }
 if(defined($options{submit}) && $options{submit}=~/delete/) { $options{delete}=1 }
-#if($options{id}) { $options{name}=$::player{$options{id}}{name}; }
-if($options{relation}) {
+if($options{id}) { $options{name}=playerid2name($options{id}); param("name",$options{name}) }
+if(defined($options{relation})) {
 	$options{name} =~ y/A-Z/a-z/;
 	$options{comment}=~s/\r//g;
 	if(!$options{delete}) {
 		$options{alliance} =~ y/a-z/A-Z/;
 		if($options{name} !~ /^[-_. a-z0-9\[\]*!|äöüÄÖÜû{}]*$/) { print 'illegal character in user name'; exit(0);}
 		$options{relation}+=0;
-		if($options{relation}<1 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
+		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
 		if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
 	}
 	use DB_File;
@@ -51,17 +51,18 @@ if($options{name}) {
 		$options{comment}="";
 		#print "<br>debug: @rel <br>";
 		$options{relation}=$rel[0]||4;
+		$options{realrelation}=$options{relation};
 		$new=span({-style=>'color: red'},"user unknown - add new entry");
 	} else {
-		($options{relation},$options{alliance},$options{comment})=getrelation($user);
+		($options{relation},$options{alliance},$options{comment},$options{realrelation})=@rel;
 	}
 	
 	
-	$atag=$atag?" [$atag]":"";
+	$atag=$atag?" ".a({-href=>"alliance?alliance=$atag"},"[$atag]"):"";
 	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), br;
 	print hidden(-name=>'name', $user);
 	print textfield('alliance', $options{alliance}), " alliance membership (e.g. unknown, TZAR, ES)", br,
-	popup_menu(-name=>'relation', -values=>[1..9], -default=>$options{relation},
+	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
 		-labels=>\%::relationname), " relation", br,
 	textarea(-name=>'comment', -value=>$options{comment}, -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
 	submit("submit"), qq! <a href="?">new query</a>!;
@@ -72,18 +73,42 @@ if($options{name}) {
 		foreach my $p (@{$::player{$id}{planets}}) {
 			my @p=split("#",$p);
 			my $pp=$::planets{$p[0]}[$p[1]-1];
-			$pop+=planet2pop($pp);
+			$pop+=planet2opop($pp);
 		}
-		print br,"pl=$level sl=$::player{$id}{science} cl=$::player{$id}{culture} points=$::player{$id}{points} (".3*$level."+$pop+".($::player{$id}{points}-$pop-3*$level).")";
+		print br,"pl=$level sl=$::player{$id}{science} cl=$::player{$id}{culture} points=$::player{$id}{points} (".3*$level."+$pop+".($::player{$id}{points}-$pop-3*$level).") logins=$::player{$id}{logins} from=$::player{$id}{from} joined=$::player{$id}{joined} ";
+#		require "guess.pm";
+#		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
 		foreach my $p (@{$::player{$id}{planets}}) { # sort popsort
 			my @p=split("#",$p);
-			my $pp=$::planets{$p[0]}[$p[1]-1];
-			print li,qq! <a href="system-info?id=$p[0]">!.systemid2name($p[0]);
-			printf qq!</a> #$p[1] : pop=%i SB=%i!, planet2pop($pp), planet2sb($pp);
+			my $sid=$p[0];
+			my $pp=$::planets{$sid}[$p[1]-1];
+			print li,qq! <a href="system-info?id=$sid">!.systemid2name($sid);
+			printf qq!</a> ($::starmap{$sid}{x},$::starmap{$sid}{y}) #$p[1] : pop=%i SB=%i!, planet2pop($pp), planet2sb($pp);
 		}
 		print "</ul>\n";
-		while($options{comment}=~/login:(\d+):(\d+)(.*)/) {
+		if($options{comment}=~/race:([-+,0-9]*)/) {
+			print "<p>race: <br>\n";
+			my @race=split(",",$1);
+			my $n=0;
+			foreach(@race) {
+				print "$::racestr[$n++] ($_)<br>\n";
+			}
+		}
+		if($options{comment}=~/science:([-+,0-9]*)/) {
+			print "<p>science";
+			my @sci=split(",",$1);
+			my $n=0;
+			if($sci[0]>100) {
+				my $time=shift(@sci);
+				print " from ".gmdate($time);
+			}
+			print ":<br>\n";
+			foreach(@sci) {
+				print "$::sciencestr[$n++] $_<br>\n";
+			}
+		}
+		while($options{comment}=~/login:(\d+):(\d+)(.*)/s) {
 			$options{comment}=$3;
 			print br,"login $1: ", scalar gmtime($2), " GMT";
 		}
