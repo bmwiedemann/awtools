@@ -52,7 +52,7 @@ sub systemlink($) { my($id)=@_;
 
 sub addplayerir($@@;$) { my($oldentry,$sci,$race,$newlogin)=@_;
 	if(@$race) {$race="race:".join(",",@$race);} else {undef $race}
-	if(@$science) {$sci="science:".join(",",@$sci);} else {undef $science}
+	if(@$sci) {$sci="science:".join(",",@$sci);} else {undef $sci}
 	if(!$oldentry) {$oldentry="4 UNKNOWN "}
 	my ($rest,$magic)=($oldentry,$magicstring." ");
 	if($oldentry=~/^(\d+ \w+ .*)(?=$magicstring)(.*)/s){
@@ -60,10 +60,11 @@ sub addplayerir($@@;$) { my($oldentry,$sci,$race,$newlogin)=@_;
 	}
 #	if(!$magic) {$magic=$magicstring." "}
 	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic.=" ".$race}
-	if($science && $magic!~s/science:[,0-9]*/$sci/) {$magic.=" ".$sci}
+	if($sci && $magic!~s/science:[,0-9]*/$sci/) {$magic.=" ".$sci}
 	if($newlogin) {$magic.=" login:".$newlogin}
 	chomp($rest);
 	return $rest."\n".$magic;
 }
+
 
 1;
