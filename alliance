@@ -22,12 +22,12 @@ if($options{alliance}) {
 	}
 	print qq!<a href="http://$::server/rankings/alliances/$alli.php">$alli (AW)</a><br>!;
 	print "$alli members",br,start_table();
-	print "<tr><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td></tr>\n";
+	print "<tr align=\"center\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td></tr>\n";
 	for my $pid (@{$::alliances{$aid}{m}}) {
 		my $p=$::player{$pid};
 		next if ! defined($p);
 		next if $$p{alliance} ne $aid;
-		print "<tr>";
+		print "<tr align=\"center\">";
 		my $name=playerid2name($pid);
 		my $alink="";
 		my $planets=@{$$p{planets}};
@@ -37,7 +37,7 @@ if($options{alliance}) {
 		print "<td>",profilelink($pid), $alink, "</td><td>", qq!<a href="relation?name=$name">$name ($pid)</a></td>
 		<td><a href="system-info?id=$$p{home_id}">$home</td><td>$$p{level}</td><td>$$p{science}</td><td>$planets/$$p{culture}</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>$$p{from}</td><td>$joined</td>!;
 		$n++;
-		print "</tr>";
+		print "</tr>\n";
 	}
 	print end_table();
 } else {
