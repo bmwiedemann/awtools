@@ -6,7 +6,7 @@ use Digest::MD5 "md5_hex";
 
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
+require "standard.pm";
 
 sub spinfo($) { my($id)=@_; # short player info string
 	if($id==2) {return "unknown"}
@@ -57,7 +57,6 @@ print header;
 
 if(param("legend")) {
 	print AWheader2('legend of AW relations');
-	print "legend: ";
 	for my $n (1..9) {
 		my $color=getrelationcolor($n);
 		print span({-style=>'color: '.$color}, br."$n $color = $::relationname{$n}\n");
@@ -89,6 +88,7 @@ if(param()) {
 	if($ENV{REMOTE_USER} eq "guest" && !auth_ok($options{auth})) {
 	#	print "incorrect auth\n";
 	}
+	require "input.pm";
 	require "awmap.pm";
 	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
 	elsif(defined($options{x})) { ($x,$y)=imgtomap($options{x}, $options{y}) }
