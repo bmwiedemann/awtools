@@ -20,7 +20,8 @@ my $time=traveltime(\%options);
 
 my $h=int($time);
 my $m=int(($time-$h)*60);
-printf "%.3f = %2i:%.2i\n", $time, $h, $m;
+my $s=int((($time-$h)*60-$m)*60);
+printf "%.3f = %2i:%.2i:%.2i\n", $time, $h, $m, $s;
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time()+$time*3600);
 $year+=1900;$mon++;
 printf "ETA %.2i.%.2i.%i %2i:%.2i:%.2i\n", $mday,$mon,$year, $hour,$min,$sec;

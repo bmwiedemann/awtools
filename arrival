@@ -34,8 +34,8 @@ printf "ETA %.2i.%.2i.%i %2i:%.2i:%.2i<br>\n", $mday,$mon,$year, $hour,$min,$sec
    textfield('distance'), " Dist sqr", br,
    textfield('energy'), " Energy lvl", br,
    popup_menu(-name=>'racespeed', -values=>[-4..4], -default=>0), " Race speed mod", br,
-   checkbox(-name=>'own', -label=>''), " Own planets", br,
-   submit, end_form;
+   checkbox(-name=>'own', -label=>''), " Own destination", br,
+   submit, end_form, '<p>When going from Planet a in System A(x/y) to Planet b in System B(X/Y) then <br>Planet diff is the absolute of a-b  and  Dist sqr is (x-X)<sup>2</sup>+(y-Y)<sup>2</sup><br>Energy level accepts fractions like 10.5<br>leaving fields blank counts as zero<br>';
 }
 print end_html;
 
