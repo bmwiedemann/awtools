@@ -22,11 +22,8 @@ tie(%relation, "DB_File", $dbname2) or print "error accessing DB\n";
 #my $science="";
 my @science;
 foreach my $sci (@::sciencestr) {
-	next if ! m,$sci</td><td>(\d+),; #$sci{$sci}=$1;
-	my $val=$1;
-	push(@science,$val);
-	#$sci=~/^(...)/;$sci=$1;
-	#$science.=" $sci=$val";
+	next if ! m,$sci</td><td>(\d+),;
+	push(@science,$1);
 }
 my @race;
 {
@@ -36,9 +33,17 @@ my @race;
 	}
 	if(/$racere/) {@race=($1,$2,$3,$4,$5,$6,$7);}
 }
+my @prod;
+foreach my $prod (qw(Production Science Culture)) {
+	next if ! m,$prod</td><td>\+(\d+)/h,;
+	push(@prod,$1);
+}
+if(m,Artifact</td><td>([^<]*)<,) {my $val=$1;$val=~s/ //;push(@prod,$val)}
+if(m,Trade Revenue</td><td>(\d+)%,) {push(@prod,$1)}
+
 my $oldentry=$relation{$name2};
-my $newentry=addplayerir($oldentry,\@science,\@race);
-if($debug){ print "$oldentry @race @science new:$newentry\n<br>" }
+my $newentry=addplayerir($oldentry,\@science,\@race,undef,undef,\@prod);
+if($debug){ print "$oldentry @race @science @prod new:$newentry\n<br>" }
 else {$relation{$name2}=$newentry}
 untie %relation;
 
