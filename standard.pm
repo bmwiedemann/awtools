@@ -66,6 +66,24 @@ sub addplayerir($@@;$) { my($oldentry,$sci,$race,$newlogin)=@_;
 	return $rest."\n".$magic;
 }
 
+sub feet2cv(@) { my($fleet)=@_;
+	return $$fleet[2]*3+$$fleet[3]*24+$$fleet[4]*60;
+}
+sub addfleet($$$$$@) { my($oldentry,$pid, $name, $time, $own, $fleet)=@_;
+	my $status=4;
+	if($own) {$status=7}
+	if($own==0) {$status=4}
+	if($time) {$status=3; $time-=3600*$::options{tz}}
+	else {$time=time()}
+	my $gmtime=gmtime($time);
+	my $CV=feet2cv($fleet);
+	if($CV<10) {return $oldentry}
+	$oldentry||="$status $pid";
+	if($oldentry=~/@$fleet/) {return $oldentry}
+	return "$oldentry automagic:$name:$gmtime @$fleet";
+}
+
+
 sub relation2race($) { local $_=$_[0];
 	return undef unless(/automagic/);
 	return undef unless(/race:([0-9,+-]*)/);
