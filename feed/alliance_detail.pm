@@ -11,7 +11,7 @@ if(!/<tr><td><center>([^<]*)<br>/) {return 1;}
 my $name=$1;
 my $pid=playername2id($name);
 if(!$pid) {print "user $name not found<br>\n";return 1}
-print qq!user <a href="relation?name=$name">$name($pid)</a><br>\n!;
+print qq!user <a href="relations?name=$name">$name($pid)</a><br>\n!;
 my $name2="\L$name";
 
 my %data;
