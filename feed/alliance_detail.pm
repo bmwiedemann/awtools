@@ -13,7 +13,7 @@ if(!$pid) {print "user $name not found<br>\n";return 1}
 print qq!user <a href="relations?name=$name">$name($pid)</a><br>\n!;
 my $name2="\L$name";
 
-my %data;
+our %data;
 tie(%data, "DB_File", $dbname) or print "error accessing DB\n";
 my %data2;
 tie(%relation, "DB_File", $dbname2) or print "error accessing DB\n";

@@ -22,6 +22,8 @@ if(@science=/$sciencere/) {
 }
 if(@race || @science) {
 	my %relation;
+	require "./input.pm";
+	if(!playername2id($name)) {print "player $name not found<br>\n"; exit 0;}
 	tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
 	my $oldentry=$relation{$name};
 	my $newentry=addplayerir($oldentry, \@science, \@race);
