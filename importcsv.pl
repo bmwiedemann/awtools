@@ -4,11 +4,11 @@ use MLDBM;
 use Fcntl;
 use strict;
 our (%alliances,%starmap,%player,%playerid,%planets);
-tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDWR|O_CREAT, 0666 or die $!;
-tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDWR|O_CREAT, 0666;
-tie %player, "MLDBM", "db/player.mldbm", O_RDWR|O_CREAT, 0666;
-tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDWR|O_CREAT, 0666;
-tie %planets, "MLDBM", "db/planets.mldbm", O_RDWR|O_CREAT, 0666;
+tie %alliances, "MLDBM", "newdb/alliances.mldbm", O_RDWR|O_CREAT, 0666 or die $!;
+tie %starmap, "MLDBM", "newdb/starmap.mldbm", O_RDWR|O_CREAT, 0666;
+tie %player, "MLDBM", "newdb/player.mldbm", O_RDWR|O_CREAT, 0666;
+tie %playerid, "MLDBM", "newdb/playerid.mldbm", O_RDWR|O_CREAT, 0666;
+tie %planets, "MLDBM", "newdb/planets.mldbm", O_RDWR|O_CREAT, 0666;
 my @origin;
 #my @playersat; # who has planets at ID
 my @playerplanets; #where does he have his
