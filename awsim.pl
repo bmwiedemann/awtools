@@ -4,6 +4,7 @@ use strict;
 use Getopt::Long;
 
 alarm(60);
+srand(0);
 our (@sci,@pop,@cul,@prod,@planet,%player,$turn,$debug,%options);
 our @buildings=qw"hf rf gc rl sb";
 our $updatetime=4; # update each quarter hour
@@ -111,8 +112,14 @@ sub update()
     if($$planet{pop}>$maxpop) {$$planet{pop}=$maxpop}
   }
   if($turn%(24*$updatetime)==0) { # daily spontaneous growth
-    my $n=@planet-1;#int(rand(@planet));
-#    $planet[$n]{pop}++;
+    my @smallplanet=();
+    foreach my $p (@planet) {if($$p{pop}<=$player{social}-6){push(@smallplanet,$p)}}
+    #my $n=@planet-1;
+    #if(@smallplanet) {
+    #  my $n=int(rand(@smallplanet));
+    #  $smallplanet[$n]{pop}++;
+    #}
+    foreach my $p (@smallplanet) { $$p{pop}+=1/@smallplanet }
   }
 }
 
@@ -145,7 +152,8 @@ sub finish(){
   my $sci=0;
   my $pkt=int($player{cul});
   foreach my $p (@planet) {
-    $pkt+=int($$p{pop});
+    $pkt+=$$p{pop}-0.5;
+    #$pkt+=int($$p{pop});
   }
   while(1){
     my $scineeded=$sci[$sci+1]*6;
