@@ -3,15 +3,18 @@
 use strict;
 use Getopt::Long;
 
+alarm(60);
 our (@sci,@pop,@cul,@prod,@planet,%player,$turn,$debug,%options);
 our @buildings=qw"hf rf gc rl sb";
 our $updatetime=4; # update each quarter hour
-our %racebonus=qw(pop 0.13 pp 0.05 cul 0.05 sci 0.11);
+#our %racebonus=qw(pop 0.13 pp 0.05 cul 0.05 sci 0.11);
+our %racebonus=qw(pop 0.10 pp 0.04 cul 0.04 sci 0.10);
 %options=qw(
 init 1
 tactic 3
 turns 400
 print 4
+adprice 0.94
 ); # simulate 8 weeks
 
 my @options=qw"tactic|t=i init|i=i turns=i print|p=i pop=i pp=i cul=i sci=i help|h|?";
@@ -35,7 +38,7 @@ while(<IN>) {
 		}
 	}
 	if(/culture/) {
-		for my $l(1..25) {
+		for my $l(1..27) {
 			$_=<IN>;
 			/\d+\s+(\d+)/;
 			$cul[$l]=$1;
@@ -67,16 +70,28 @@ sub build($$$)
 	return 0;
 }
 
+sub spend_all()
+{
+	foreach my $planet(@planet[0..$#planet-2]) {
+		$player{ad}+=$$planet{pp}*$options{adprice};
+		$$planet{pp}=0;
+	}
+}
+
 sub update()
 {
+  my %bonus;
+  foreach(qw(pop pp sci cul)) {
+    $bonus{$_}=$player{"race$_"}+$player{tas}*0.07;
+  }
   for my $planet(@planet) {
     my $pop=int($$planet{pop});
-    my $ppp=($$planet{rf}+$pop)*$player{racepp}/$updatetime;
+    my $ppp=($$planet{rf}+$pop)*$bonus{pp}/$updatetime;
     $$planet{pp}+=$ppp;
     $player{pp}+=$ppp;
-    $player{sci}+=(($$planet{rl}+$pop)*$player{racesci})/$updatetime;
-    $player{cul}+=(($$planet{gc})*$player{racecul})/$cul[int($player{cul})+1]/$updatetime;
-    $$planet{pop}+=$player{racepop}*($$planet{hf}+1.00000001)/$pop[int($$planet{pop})+1]/$updatetime;
+    $player{sci}+=(($$planet{rl}+$pop)*$bonus{sci})/$updatetime;
+    $player{cul}+=(($$planet{gc})*$bonus{cul})/$cul[int($player{cul})+1]/$updatetime;
+    $$planet{pop}+=$bonus{pop}*($$planet{hf}+1.00000001)/$pop[int($$planet{pop})+1]/$updatetime;
   }
   if($turn%(24*$updatetime)==0) { # daily spontaneous growth
     my $n=@planet-1;#int(rand(@planet));
@@ -104,7 +119,7 @@ sub printstate()
   }
   #while(my @a=each(%player)) {
     #printf "$a[0]:%.2f ",$a[1];
-  foreach(qw"pp sci cul") {
+  foreach(qw"pp sci cul ad tas") {
     printf "$_:%.2f ", $player{$_};
 }
   print "\n";
@@ -138,6 +153,8 @@ $$p{sb}=0;
 $player{cul}=1;
 $player{sci}=0;
 $player{pp}=0;
+$player{tas}=0;
+$player{ad}=0;
 $player{racepop}=1;
 $player{racepp}=1;
 $player{racecul}=1;
