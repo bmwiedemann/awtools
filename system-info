@@ -119,6 +119,19 @@ if(param()) {
 		} else {
 			$output.="[url=http://$::server/about/starmap.php?dx=$x&dy=$y]starmap[/url] [url=http://$::server/0/Map/Detail.php/?nr=$system]Map/Details[/url] [url=http://$::bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
 		}
+		my ($refdist,$refp,$refid,$refe,$refs);
+		if($refsys) {
+			($refid,$refp)=split("#",$refsys);
+			my($refx,$refy)=systemid2coord($refid);
+			if(defined($refx)) {
+				$refdist=($refx-$x)**2+($refy-$y)**2;
+				my @rel=getrelation($awuser);
+				my @race;
+				my @sci;
+				if((@race=relation2race($rel[2]))) {$refs=$race[4]}
+				if((@sci=relation2science($rel[2]))) {if($sci[0]>99){shift(@sci)};$refe=$sci[2]}
+			}
+		}
 		my $planets=$::planets{$system};
 		foreach my $h (@$planets) {
 			tprint li;
@@ -147,7 +160,10 @@ if(param()) {
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
 			if(!$options{export}) {
-				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, spinfo($$h{ownerid}), $info;
+				my $pdiff=abs($refp-$$h{planetid});
+				my $etalink;
+				if(defined($refdist)) {$etalink=qq! <a href="arrival?distance=$refdist&planet=$pdiff&energy=$refe&racespeed=$refs">ETA</a> !;}
+				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info;
 			} else {
 				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s", $$h{planetid}, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), $info);
 			}
