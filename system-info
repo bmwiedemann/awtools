@@ -2,6 +2,7 @@
 
 use strict;
 use CGI ":standard";
+use Digest::MD5 "md5_hex";
 
 my %options;
 
@@ -21,6 +22,18 @@ sub spinfo($) { my($id)=@_; # short player info string
 	}
 	return profilelink($id).$rellink.
 		span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) !);
+}
+sub mkhash($) { my($tag)=@_;
+	my $token="$tag#$options{id}#secret9";
+	return md5_hex($token);
+}
+sub auth_ok($) { my($auth)=@_;
+	my @auth=split("#",$auth);
+	if(mkhash($auth[0]) eq $auth[1]) {
+		$ENV{REMOTE_USER}=$auth[0];
+		return 1;
+	}
+	return 0;
 }
 sub tprint { unless($options{export}){print @_} }
 
@@ -51,8 +64,18 @@ if(param("legend")) {
 
 if(param()) {
 	my($x,$y,$system);
-	for my $p (qw'x y mapx mapy id name export') {
+	for my $p (qw'x y mapx mapy id name export auth') {
 	  $options{$p}=param($p);
+	}
+	if($options{export}==2) {
+		my $u=$ENV{REMOTE_USER};
+		my $l="http://guest:guest\@lsmod.de/cgi-bin/aw/public/system-info?id=$options{id}&auth=$u%23".mkhash($u);
+		print start_html("export for system $options{id}").
+		qq!This is an anonymous read-only access URL. It is valid for whole beta - give only to trusted friends.<br> <a href="$l">copy this link</a> or try $l <br>note: for IE leave out the guest:guest\@!;
+		exit 0;
+	}
+	if($ENV{REMOTE_USER} eq "guest" && !auth_ok($options{auth})) {
+	#	print "incorrect auth\n";
 	}
 	require "awmap.pm";
 	require "input.pm";
@@ -71,7 +94,7 @@ if(param()) {
 
 		## start of normal output ##
 		if(!$options{export}) {
-			print qq!<a href="?legend=1">legend</a> <a href="?">new query</a> <a href="?id=$system&export=1">BB-export</a>!,br;
+			print qq!<a href="?legend=1">legend</a> <a href="?">new query</a> <a href="?id=$system&export=1">BB-export</a> <a href="?id=$system&export=2">anonymous updated export</a>!,br;
 			($bs,$be,$eol)=('<b>','</b>',"<br>\n");
 		}
 		my $output="$bs$::starmap{$system}{name}($x,$y)$be${eol}Id=$system level=$::starmap{$system}{level}$eol";
