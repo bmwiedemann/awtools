@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+my $title="add relation";
+my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
+my %options;
+print header, start_html($title), h1($title);
+for my $p (qw'id name alliance relation comment') {
+	$options{$p}=param($p);
+}
+#if($options{id}) { $options{name}=$::player{$options{id}}{name}; }
+if($options{relation}) {
+	$options{name} =~ y/A-Z/a-z/;
+	$options{alliance} =~ y/a-z/A-Z/;
+	if($options{name} !~ /^[-_. a-z0-9\[\]]*$/) { print 'illegal character in user name'; exit(0);}
+	$options{relation}+=0;
+	if($options{relation}<1 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
+	if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
+	use DB_File;
+	my %data;
+	tie(%data, "DB_File", $dbname) or print "error accessing DB\n";
+	$data{$options{name}}="$options{relation} $options{alliance} $options{comment}";
+	untie(%data);
+	print span({-style=>'color: darkgreen'},"added $options{name}"),br;
+}
+
+if($options{name}) {
+	my $path="/home/bernhard/code/cvs/perl/awcalc";
+	my $user=$options{name};
+        chdir $path;
+	require "input.pm";
+	$user =~ y/A-Z/a-z/;
+	my $entry=$::relation{$user};
+	my $new="edit existing entry";
+	if(!defined($entry)) {
+		$options{alliance}="unknown";
+		$options{comment}="";
+		$options{relation}=4;
+		$new=span({-style=>'color: red'},"user unknown - add new entry");
+	} else {
+		$entry=~/^(\d+) (\w*) (.*)/;
+		$options{alliance}=$2;
+		$options{comment}=$3;
+		$options{relation}=$1;
+	}
+	
+	
+	my $id=$::playerid{$user};
+	my @rel=getrelation($user);
+	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)")." ", profilelink($id), br;
+	print hidden(-name=>'name', $user);
+	print textfield('alliance', $options{alliance}), " alliance membership (e.g. unknown, TZAR, ES)", br,
+	popup_menu(-name=>'relation', -values=>[1..9], -default=>$options{relation},
+		-labels=>\%::relationname), " relation", br,
+	textarea('comment', $options{comment}), " who added him, why, contact, intel, etc...", br,
+	submit("submit"), qq! <a href="?">back</a>!;
+	if($id>2) {
+		print br,"owns planets<ul>";
+		foreach my $p (@{$::player{$id}{planets}}) { # sort popsort
+			my @p=split("#",$p);
+			my $pp=$::planets{$p[0]}[$p[1]-1];
+			print li,qq! <a href="system-info?id=$p[0]">$p[0]</a> #$p[1] : pop=$$pp{population} SB=$$pp{starbase}!;
+		}
+		print "</ul>\n";
+	}
+} else {
+	print start_form('get'), textfield(-name=>'name'), " user name", br,
+	 submit("query")
+}
+print end_form, end_html;
+#foreach(keys %ENV) {  print "$_ $ENV{$_}<br>";}
+
