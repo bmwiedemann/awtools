@@ -5,6 +5,17 @@ use CGI ":standard";
 
 my %options;
 
+sub spinfo($) { my($id)=@_; # short player info string
+	my $name=$::player{$id}{name};
+	my $aid=$::player{$id}{alliance};
+	my @rel=getrelation($name);
+	my $color=getrelationcolor($rel[0]);
+	my $alliancestr="";
+	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
+	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
+	return span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) <a href="relations?user=$name">relation</a>!.profilelink($id));
+}
+
 print header;
 print start_html('AW system info');
 if(param()) {
@@ -15,31 +26,39 @@ if(param()) {
 	my $path="/home/bernhard/code/cvs/perl/awcalc";
 	chdir $path;
 	require "awmap.pm";
-	our @files=qw(starmap); #player unused
+	#our @files=qw(starmap); #player unused
 	require "input.pm";
 	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
 	else { ($x,$y)=imgtomap($options{x}, $options{y}) }
 	$system=$::starmap{"$x,$y"};
-	if(!$system && $options{name}) { $system=$::starmap{$options{name}} }
+	if(!$system && $options{name}) { $system=$::starmap{"\L$options{name}"} }
 	if(!$system && $options{id}) { $system=$options{id} }
 	if(!$system) {
 		print "no system $options{name} at $x,$y";
 	} else {
 		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
-		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id $system<br>level $::starmap{$system}{level}",br;
-#		print "players having their origin here: ";
-#		print $::starmap{$system}{origins};
-#		while(my @a=each(%::player)) {
-#		  if($a[1]{home_id} == $system) {
-#			print "$a[0]",br;
-#		  }
-#		}
+		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id=$system level=$::starmap{$system}{level}",br;
+		print "planets here: <ul>";
+		my $planets=$::planets{$system};
+		foreach my $h (@$planets) {
+			print li;
+			next if(!$h);
+			print "#$$h{planetid} pop $$h{population} SB $$h{starbase} ", spinfo($$h{ownerid});
+			
+#			foreach my $item (sort keys %$h) { print " $item=",$$h{$item}; }
+		}
+		print "</ul>\n";
+		print "players having their origin here: <ul>";
+		foreach(@{$::starmap{$system}{origin}}) { print li,spinfo($_); }
+		print "</ul>\n";
 	}
 } else { 
   print start_form('get'),
    textfield('mapx'), " x", br,
-   textfield('mapy'), " y", br,
+   textfield('mapy'), " y (e.g. x=0 y=0 for Rana)", br,
+   "or",br,
    textfield('id'), " system id", br,
+   "or",br,
    textfield('name'), " system name", br,
    submit, end_form;
 }
