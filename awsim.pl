@@ -6,6 +6,7 @@ use Getopt::Long;
 our (@sci,@pop,@cul,@prod,@planet,%player,$turn,$debug,%options);
 our @buildings=qw"hf rf gc rl sb";
 our $updatetime=4; # update each quarter hour
+our %racebonus=qw(pop 0.13 pp 0.05 cul 0.05 sci 0.11);
 %options=qw(
 init 1
 tactic 3
@@ -13,7 +14,7 @@ turns 400
 print 4
 ); # simulate 8 weeks
 
-my @options=qw"tactic|t=i init|i=i turns=i print|p=i help|h|?";
+my @options=qw"tactic|t=i init|i=i turns=i print|p=i pop=i pp=i cul=i sci=i help|h|?";
 my $result=GetOptions(\%options, @options);
 if(!$result or @ARGV or $options{help}) {
   print "usage $0 [--param=value]\n\tallowable params: @options\n";
@@ -119,7 +120,9 @@ sub finish(){
     last if($player{sci}<0);
     $sci++;
   }
-  $pkt+=6*$sci+45;
+  if($sci>20) {
+    $pkt+=6*($sci-20);
+  }
   print "total points: $pkt sci: $sci\n";
 }
 sub initplanet {my ($p)=@_;
@@ -141,7 +144,9 @@ $player{racecul}=1;
 $player{racesci}=1;
 initplanet(\%{$planet[0]});
 require "init".$options{init}.".pm";
-
+foreach(qw(pop pp cul sci)) {
+	if($options{$_}) {$player{'race'.$_}=1+$racebonus{$_}*$options{$_}}
+}
 
 for $turn(0..$options{turns}) {
   spend1();
@@ -149,3 +154,4 @@ for $turn(0..$options{turns}) {
   update();
 }
 finish();
+exit 0;
