@@ -2,13 +2,17 @@ our $server="www1.astrowars.com";
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 our %relationname=(1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
+our @sciencestr=qw(Biology Economy Energy Mathematics Physics Social);
+our @racestr=qw(growth science culture production speed attack defense);
+our $magicstring="automagic:";
+
 
 
 
 sub AWheader2($) { my($title)=@_;
 	start_html($title). a({href=>"index.html"}, "AW tools index"). h1($title);
 }
-sub AWheader($) { my($title)=@_; header.AWheader2($title);}
+sub AWheader($) { my($title)=@_; header().AWheader2($title);}
 
 sub mon2id($) {my($m)=@_;
         for(my $i=0; $i<12; $i++) {
@@ -44,6 +48,22 @@ sub alliancedetailslink($) { my($id)=@_;
 }
 sub systemlink($) { my($id)=@_;
         qq!<a href="system-info?id=$id">info for system $id</a>\n!;
+}
+
+sub addplayerir($@@;$) { my($oldentry,$sci,$race,$newlogin)=@_;
+	if(@$race) {$race="race:".join(",",@$race);} else {undef $race}
+	if(@$science) {$sci="science:".join(",",@$sci);} else {undef $science}
+	if(!$oldentry) {$oldentry="4 UNKNOWN "}
+	my ($rest,$magic)=($oldentry,$magicstring." ");
+	if($oldentry=~/^(\d+ \w+ .*)(?=$magicstring)(.*)/s){
+		($rest,$magic)=($1,$2);
+	}
+#	if(!$magic) {$magic=$magicstring." "}
+	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic.=" ".$race}
+	if($science && $magic!~s/science:[,0-9]*/$sci/) {$magic.=" ".$sci}
+	if($newlogin) {$magic.=" login:".$newlogin}
+	chomp($rest);
+	return $rest."\n".$magic;
 }
 
 1;
