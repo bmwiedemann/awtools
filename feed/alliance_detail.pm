@@ -1,5 +1,4 @@
 my $debug=$::options{debug};
-use Time::Local;
 print "alliance_detail\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
@@ -58,58 +57,26 @@ for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td>(?:<td>(?:\d+)</td>){6}<td>
 
 for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</td>){5}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
 	my $sid="$a[0]#$a[1]";
-	my $details="@a[3..7]";
+	my @fleet=@a[3..7];
+	my $details="@fleet";
 	my $oldentry=$data{$sid};
-	my $time=gmtime();
-	if(defined($oldentry) && $oldentry=~/$details/){$oldentry=~s/^3 $pid /4 $pid /;next}
-	my $newentry=$oldentry||"4 $pid";
-	print "sieged: ".planetlink($sid)." $details<br>\n";
-	$details="automagic:$name:$time $details";
-	$newentry.=" $details";
+	my $time=undef;
+	my $newentry=addfleet($oldentry,$pid, $name, $time, 0, \@fleet);
 	if(!$debug){$data{$sid}=$newentry;}
 	else {print "$sid $newentry<br>\n"}
 }
 for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)(.*)!); $_=$a[8]) {
 	my $sid="$a[0]#$a[1]";
-	my $details="@a[3..7]";
+	my @fleet=@a[3..7];
+	my $details="@fleet";
 	print "targeted: ".planetlink($sid)." $details <br>\n";
 	my $oldentry=$data{$sid};
 	my $time=parseawdate($a[2]);
-	$time=gmtime($time-3600*$::options{tz});
-	$details="automagic:$name:$time $details";
-	#print "old: ",$oldentry;
-	my $newentry=$oldentry||"3 $pid";
-	if(defined($oldentry) && $oldentry=~/$details/) {next}
-	$newentry.=" $details";
-	#print "new: $newentry<br>";
+	my $newentry=addfleet($oldentry,$pid, $name, $time, 0, \@fleet);
 	if(!$debug){$data{$sid}=$newentry;}
+	else {print "$sid $newentry<br>\n"}
 }
-for(;(@a=m!([^>]*)</td><td[^>]*> <b>Attention(.*?) going to attack <b>([^<]+)</b>.<br>We suppose its the Fleet of <a href=/0/Player/Profile.php/\?id=(\d+)>([^<]+)</a>((?:[^>]*</td><td[^>]*> <b>Attention)?.*)!);$_=$a[5]) {
-	my @ship=(0,0,0,0,0);
-	my $pid=$a[3];
-	my $sid;
-	my $shipn=0;
-	foreach my $ship (qw(Transports Colony Destroyer Cruiser Battleship)) {
-		if($a[1]=~/(\d+) $ship/) {
-			$ship[$shipn]=$1;
-		}
-		$shipn++;
-	}
-	my $time=parseawdate($a[0]);
-	$time=gmtime($time-3600*$::options{tz});
-	if($a[2]=~/(.+) (\d+)$/) {
-		$sid=systemname2id($1);
-		if($sid){$sid.="#$2"}
-	}
-	if(!$sid) {next}
-	my $oldentry=$data{$sid};
-	my $newentry;
-	my $details="automagic:$a[4]:$time @ship";
-	if($oldentry=~/$details/) {next}
-	if($oldentry) {$newentry=$oldentry." ".$details}
-	else {$newentry="3 $pid ".$details}
-	print "incoming: ".planetlink($sid)." @ship<br>\n";
-	#print " old:$oldentry new:$newentry<br>\n";
-	if(!$debug){$data{$sid}=$newentry;}
-}
+require 'feed/libincoming.pm';
+parseincomings($_);
+print "<br>done\n";
 1;
