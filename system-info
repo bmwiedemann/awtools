@@ -16,9 +16,13 @@ sub spinfo($) { my($id)=@_; # short player info string
 	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
 	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" title="player info + relation"></a> !;
+	if($options{export}) {
+		return "[color=$color]$alliancestr $name [/color]";
+	}
 	return profilelink($id).$rellink.
 		span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) !);
 }
+sub tprint { unless($options{export}){print @_} }
 
 my $path="/home/bernhard/code/cvs/perl/awcalc";
 chdir $path;
@@ -47,7 +51,7 @@ if(param("legend")) {
 
 if(param()) {
 	my($x,$y,$system);
-	for my $p (qw'x y mapx mapy id name') {
+	for my $p (qw'x y mapx mapy id name export') {
 	  $options{$p}=param($p);
 	}
 	require "awmap.pm";
@@ -61,15 +65,21 @@ if(param()) {
 		print "no system $options{name} at $x,$y";
 	} else {
 		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
+		my ($bs,$be,$eol)=('[b]','[/b]',"\n");
 
 		## start of normal output ##
-		print qq!<a href="?legend=1">legend</a> <a href="?">new query</a>!,br;
-		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id=$system level=$::starmap{$system}{level}",
-		qq! <a href="tactical-large?xs=$x&ys=$y&xe=27&ye=17">tactical</a> <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br;
-		print "planets here: <ul>";
+		if(!$options{export}) {
+			print qq!<a href="?legend=1">legend</a> <a href="?">new query</a> <a href="?id=$system&export=1">BB-export</a>!,br;
+			($bs,$be)=('<b>','</b>',"<br>\n");
+		}
+		my $output="$bs$::starmap{$system}{name}($x,$y)$be${eol}Id=$system level=$::starmap{$system}{level}$eol";
+		if(!$options{export}) {
+			tprint $output, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br,
+			"planets here: <ul>";
+		}
 		my $planets=$::planets{$system};
 		foreach my $h (@$planets) {
-			print li;
+			tprint li;
 			next if(!$h);
 #			foreach my $item (sort keys %$h) { print " $item=$$h{$item}\n"; }
 			my $id="$system#$$h{planetid}";
@@ -82,18 +92,33 @@ if(param()) {
 				my $name=playerid2name($pinfo[1]);
 				$pinfo=$pinfo[2];
 				my @rel=getrelation($name);
-				$info=" ".span({-style=>'color: '.getstatuscolor($status)},$::planetstatusstring{$status})." ".span({-style=>'color: '.getrelationcolor($rel[0])},getatag($rel[1])." ".$name).": ".$pinfo;
+				my $scolor=getstatuscolor($status);
+				my $rcolor=getrelationcolor($rel[0]);
+				my $atag=getatag($rel[1]);
+				if($options{export}) {
+					$info=qq![color=$scolor]$::planetstatusstring{$status} [/color] [color=$rcolor]$atag $name [/color]: $pinfo!;
+				} else {
+					$info=" ".span({-style=>"color: $scolor"},$::planetstatusstring{$status})." ".span({-style=>"color: $rcolor"},$atag." ".$name).": ".$pinfo;
+				}
 			}
 			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" title="edit planet-info"></a> !;
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
-			printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, spinfo($$h{ownerid}), $info;
+			if(!$options{export}) {
+				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, spinfo($$h{ownerid}), $info;
+			} else {
+				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s", $$h{planetid}, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), $info);
+			}
 			
 		}
-		print "</ul>\n";
-		print "players having their origin here: <ul>";
-		foreach(@{$::starmap{$system}{origin}}) { print li,spinfo($_); }
-		print "</ul>\n";
+		if(!$options{export}) {
+			print "</ul>\n";
+			print "players having their origin here: <ul>";
+			foreach(@{$::starmap{$system}{origin}}) { print li,spinfo($_); }
+			print "</ul>\n";
+		} else {
+			print qq!<textarea cols=80 rows=15 name="dummy">$output</textarea>!;
+		}
 	}
 } else { 
   print start_form('get'),
