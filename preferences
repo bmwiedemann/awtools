@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "standard.pm";
+
+my $u=param('user');
+my $uc=cookie('user');
+my $ref=param('ref');
+my $refc=cookie('refsys');
+
+if(!defined($u) && $uc) {$u=$uc}
+if(!defined($ref) && $refc) {$ref=$refc}
+if(defined($u)) {
+	my $cookie=cookie(-name=>'user', -value=>$u);
+	my $cookie2=cookie(-name=>'refsys', -value=>$ref);
+	print header(-cookie=>[$cookie,$cookie2]).AWheader2("logged in as $u ($ref)");
+} else { print AWheader("login"); }
+
+print start_form('get'), textfield('user'), " user name", br,
+textfield('ref'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
+submit("submit"), end_form, "",
+end_html;
+
