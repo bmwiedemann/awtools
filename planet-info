@@ -5,11 +5,10 @@ use CGI ":standard";
 my $title="manage planet info";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 my %options;
-my $path="/home/bernhard/code/cvs/perl/awcalc";
-chdir $path;
+chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "input.pm";
 
-print header, start_html($title), h1($title);
+print AWheader($title);
 for my $p (qw'id status who comment legend submit') {
 	$options{$p}=param($p);
 }

@@ -5,7 +5,10 @@ use CGI ":standard";
 my $title="manage relation [\U$ENV{REMOTE_USER}\E]";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %options;
-print header, start_html($title), h1($title);
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+
+print AWheader($title);
 for my $p (qw'id name alliance relation comment submit') {
 	$options{$p}=param($p);
 }
@@ -36,10 +39,7 @@ if($options{relation}) {
 }
 
 if($options{name}) {
-	my $path="/home/bernhard/code/cvs/perl/awcalc";
 	my $user=$options{name};
-        chdir $path;
-	require "input.pm";
 	$user =~ y/A-Z/a-z/;
 	my $entry=$::relation{$user};
 	my $new="edit existing entry";

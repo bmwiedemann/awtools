@@ -5,6 +5,8 @@ use CGI ":standard";
 use Digest::MD5 "md5_hex";
 
 my %options;
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
 
 sub spinfo($) { my($id)=@_; # short player info string
 	if($id==2) {return "unknown"}
@@ -54,8 +56,7 @@ if(defined($options{x}) && defined($options{y})) {
 print header;
 
 if(param("legend")) {
-	print start_html('legend of AW relations');
-	require "input.pm";
+	print AWheader2('legend of AW relations');
 	print "legend: ";
 	for my $n (1..9) {
 		my $color=getrelationcolor($n);
@@ -89,18 +90,17 @@ if(param()) {
 	#	print "incorrect auth\n";
 	}
 	require "awmap.pm";
-	require "input.pm";
 	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
 	elsif(defined($options{x})) { ($x,$y)=imgtomap($options{x}, $options{y}) }
 	if(defined($x)) { $system=systemcoord2id($x,$y) }
 	if(!$system && $options{name}) { $system=systemname2id($options{name}) }
 	if(!$system && $options{id}) { $system=$options{id} }
 	if(!$system) {
-		print start_html('system not found');
+		print AWheader2('system not found');
 		print "no system $options{name} at $x,$y";
 	} else {
 		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
-		print start_html("($x,$y) $::starmap{$system}{name} system info [\U$ENV{REMOTE_USER}\E]");
+		print AWheader2("($x,$y) $::starmap{$system}{name} system info [\U$ENV{REMOTE_USER}\E]");
 		my ($bs,$be,$eol)=('[b]','[/b]',"\n");
 
 		## start of normal output ##
@@ -112,10 +112,10 @@ if(param()) {
 		if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
-			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://www1.astrowars.com/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
+			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://$::server/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://$::server/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
 			"planets here: <ul>";
 		} else {
-			$output.="[url=http://www1.astrowars.com/about/starmap.php?dx=$x&dy=$y]starmap[/url] [url=http://www1.astrowars.com/0/Map/Detail.php/?nr=$system]Map/Details[/url]$eol";
+			$output.="[url=http://$::server/about/starmap.php?dx=$x&dy=$y]starmap[/url] [url=http://$::server/0/Map/Detail.php/?nr=$system]Map/Details[/url]$eol";
 		}
 		my $planets=$::planets{$system};
 		foreach my $h (@$planets) {
@@ -161,7 +161,7 @@ if(param()) {
 		}
 	}
 } else { 
-  print start_html("AW system info");
+  print AWheader2("AW system info");
   print start_form('get'),
    textfield('mapx'), " x", br,
    textfield('mapy'), " y (e.g. x=0 y=0 for Rana)", br,
