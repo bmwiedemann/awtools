@@ -29,17 +29,27 @@ $im->Set(size=>$pixelpersystem . 'x' . $pixelpersystem);
 $im->Read('xc:black');
 print "Drawing...\n";
 
-sub drawgrid($$) { my($c1,$c2)=@_;
+sub drawgrid { my($c1,$c2)=@_;
 	$im->Draw(fill=>'none',stroke=>$c1,primitive=>'line', points=>"0,0 $pixelpersystem,0",strokewidth=>$scale);
 	$im->Draw(fill=>'none',stroke=>$c2,primitive=>'line', points=>"0,0 0,$pixelpersystem",strokewidth=>$scale);
 }
 
-drawgrid($gc1,$gc1);
-$im->Write("$out-none1.gif");
 drawgrid($gc2,$gc2);
+$im->Write("$out-none0.gif");
+drawgrid($gc1,$gc2);
+$im->Write("$out-none1.gif");
+drawgrid($gc2,$gc1);
 $im->Write("$out-none2.gif");
+drawgrid($gc1,$gc1);
+$im->Write("$out-none3.gif");
 
-sub gridtest($) { $_[0]%10<=1 ? $gc1:$gc2 }
+sub gridtest($$) { my($x,$y)=@_; my($c1,$c2)=($gc2,$gc2);
+$y++; #FIXME: workaround for strange bug
+if($x%10==0 || $y%10==0) {return ($gc1,$gc1)}
+if($x%10<=1) {$c2=$gc1}
+if($y%10<=1) {$c1=$gc1}
+return ($c1,$c2);
+}
 sub mrelationcolor($) { my($name)=@_;
 	my @rel=getrelation($name);
 	my $color=getrelationcolor($rel[0]);
@@ -68,7 +78,7 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 
 	my $img=$im->Clone();
 	# grid
-	drawgrid(gridtest($y), gridtest($x));
+	drawgrid(gridtest($x,$y));
 	
 	if(defined($::starmap{"$x,$y"})) {
 		my $id=$::starmap{"$x,$y"};
