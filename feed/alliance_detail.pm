@@ -1,3 +1,4 @@
+my $ironly=0;
 my $debug=$::options{debug};
 print "alliance_detail\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -41,20 +42,28 @@ if($debug){ print "$oldentry @race @science new:$newentry\n<br>" }
 else {$relation{$name2}=$newentry}
 untie %relation;
 
+if($ironly){exit 0}
+
 
 my @a;
-for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td>(?:<td>(?:\d+)</td>){6}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[7]) {
-        my $system=$a[0];
-        my $sid="$system#$a[1]";
-        my @fleet=@a[2..6];
+# defending fleet
+for(;(@a=m!<tr([^>]*)><td[^>]*>(\d+)</td><td>(\d+)</td>(?:<td>(?:\d+)</td>){6}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
+        my $system=$a[1];
+        my $sid="$system#$a[2]";
+        my @fleet=@a[3..7];
         my $details="@fleet";
+	my $localname=$name;
+	my $localpid=$pid;
+	my $own=1;
+	if($a[0]=~/602020/) {$localname="unknown"; $localpid=2; $own=0; }
         print "defending fleet: ".planetlink($sid)." $details<br>\n";
         my $oldentry=$data{$sid};
-        my $newentry=addfleet($oldentry,$pid, $name, $time, 1, \@fleet);
+        my $newentry=addfleet($oldentry,$localpid, $localname, $time, $own, \@fleet);
         if(!$debug){$data{$sid}=$newentry;}
         else {if($newentry){print "$sid $newentry<br>\n"}}
 }
 
+# own fleets on foreign planet
 for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</td>){5}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
 	my $sid="$a[0]#$a[1]";
 	my @fleet=@a[3..7];
@@ -65,6 +74,8 @@ for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</t
 	if(!$debug){$data{$sid}=$newentry;}
 	else {print "$sid $newentry<br>\n"}
 }
+
+# flying fleets
 for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)(.*)!); $_=$a[8]) {
 	my $sid="$a[0]#$a[1]";
 	my @fleet=@a[3..7];
