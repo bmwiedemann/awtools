@@ -14,7 +14,7 @@ for my $p (qw'id status who comment legend submit') {
 }
 if(param("legend")) {
         print "legend: "; 
-        for my $n (1..6) {
+        for my $n (1..7) {
                 my $color=getstatuscolor($n);
                 print span({-style=>'color: '.$color}, br."$n $color = $::planetstatusstring{$n}\n");
         }
