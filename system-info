@@ -1,0 +1,47 @@
+#!/usr/bin/perl -w
+
+use strict;
+use CGI ":standard";
+
+my %options;
+
+print header;
+print start_html('AW system info');
+if(param()) {
+	my($x,$y,$system);
+	for my $p (qw'x y mapx mapy id name') {
+	  $options{$p}=param($p);
+	}
+	my $path="/home/bernhard/code/cvs/perl/awcalc";
+	chdir $path;
+	require "awmap.pm";
+	our @files=qw(starmap); #player unused
+	require "input.pm";
+	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
+	else { ($x,$y)=imgtomap($options{x}, $options{y}) }
+	$system=$::starmap{"$x,$y"};
+	if(!$system && $options{name}) { $system=$::starmap{$options{name}} }
+	if(!$system && $options{id}) { $system=$options{id} }
+	if(!$system) {
+		print "no system $options{name} at $x,$y";
+	} else {
+		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
+		print "<b>$::starmap{$system}{name}($x,$y)</b><br>Id $system<br>level $::starmap{$system}{level}",br;
+#		print "players having their origin here: ";
+#		print $::starmap{$system}{origins};
+#		while(my @a=each(%::player)) {
+#		  if($a[1]{home_id} == $system) {
+#			print "$a[0]",br;
+#		  }
+#		}
+	}
+} else { 
+  print start_form('get'),
+   textfield('mapx'), " x", br,
+   textfield('mapy'), " y", br,
+   textfield('id'), " system id", br,
+   textfield('name'), " system name", br,
+   submit, end_form;
+}
+print end_html;
+
