@@ -40,6 +40,17 @@ sub findtarget($) { my($p)=@_;
 
 sub spend1()
 { 
+  $player{artifact}=~/(\d)$/;
+  my $artifactlevel=$1 || 0;
+  if(($turn-2000)/1400 > $artifactlevel && $artifactlevel<3) {
+	spend_all();
+	my $na=$artifactlevel+1; # desired level
+	my $oldcost=$artifact{"BM$artifactlevel"} || 0;
+	if($player{ad}>=$artifact{"BM$na"}) {
+		$player{ad}-=$artifact{"BM$na"}-$oldcost;
+		$player{artifact}="BM$na";
+	}
+  }
   if(($turn-3000)/672 > $player{tas} && $player{tas}<5) {
 	spend_all();
 	if($player{ad}>=20000) { $player{tas}++; $player{ad}-=20000; }
