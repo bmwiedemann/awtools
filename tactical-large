@@ -44,7 +44,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 				if($mx%10<=1) {$n|=2}
 				if($my%10<=1) {$n|=1}
 				if($mx%10==0||$my%10==0) {$n=3}
-				$f="/aw/$n.gif";
+				$f="/images/aw/$n.gif";
 				$link=qq!<a href="?xs=$mx&ys=$my&xe=$options{xe}&ye=$options{ye}">!;
 			} else {
 				$f="?x=$mx&y=$my";
@@ -63,7 +63,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 		textfield('xs',$dx), " x position (center)", br,
 		textfield('ys',$dy), " y position (center)", p,
 		textfield('xe',29), " width", br,
-		textfield('ye',19), " height", br;
+		textfield('ye',25), " height", br;
 	print submit("query"), end_form();
 }
 print end_html;
