@@ -2,7 +2,7 @@
 use strict;
 use CGI ":standard";
 
-my $title="manage relation";
+my $title="manage relation [\U$ENV{REMOTE_USER}\E]";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %options;
 print header, start_html($title), h1($title);
@@ -44,20 +44,18 @@ if($options{name}) {
 	my $new="edit existing entry";
 	my $id=$::playerid{$user};
 	my $atag=playerid2tag($id);
+	my @rel=getrelation($user);
 	if(!defined($entry)) {
 		$options{alliance}=$atag || "unknown";
 		$options{comment}="";
-		$options{relation}=4;
+		#print "<br>debug: @rel <br>";
+		$options{relation}=$rel[0]||4;
 		$new=span({-style=>'color: red'},"user unknown - add new entry");
 	} else {
-		$entry=~/^(\d+) (\w*) (.*)/;
-		$options{alliance}=$2;
-		$options{comment}=$3;
-		$options{relation}=$1;
+		($options{relation},$options{alliance},$options{comment})=getrelation($user);
 	}
 	
 	
-	my @rel=getrelation($user);
 	$atag=$atag?" [$atag]":"";
 	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), br;
 	print hidden(-name=>'name', $user);
