@@ -55,7 +55,7 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 		if(/$racere/) {@race=($1,$2,$3,$4,$5,$6,$7);print "race: @race<br>\n"}
 	}
 	my $lastonlinegmt=gmtime($lastonline);
-	print qq! <a href="relation?name=$name">name=$name</a> idle=$idle time=$localtime last=&quot;$lastonlinegmt&quot; logins=$logins pl=$pl sl=$sl cl=$cl\n<br>!;
+	print qq! <a href="relations?name=$name">name=$name</a> idle=$idle time=$localtime last=&quot;$lastonlinegmt&quot; logins=$logins pl=$pl sl=$sl cl=$cl\n<br>!;
 	tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
 	$name="\L$name";
 	my $oldentry=$relation{$name};
@@ -78,3 +78,4 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 	else {print "<br>new:",$newentry;}
 }
 
+1;
