@@ -16,6 +16,8 @@ turns 400
 print 4
 adprice 0.94
 ); # simulate 8 weeks
+our %artifact=qw(BM1 3300 BM2 12000 BM3 25000);
+our %artifactbonus=qw(BM cul CP pop CD pp AL sci);
 
 my @options=qw"tactic|t=i init|i=i turns=i print|p=i pop=i pp=i cul=i sci=i help|h|?";
 my $result=GetOptions(\%options, @options);
@@ -28,7 +30,7 @@ open(IN, "< input") or die $!;
 
 while(<IN>) {
 	if(/science/) {
-		for my $l(1..28) {
+		for my $l(1..30) {
 			$sci[$l]=<IN>;
 		}
 	}
@@ -38,7 +40,7 @@ while(<IN>) {
 		}
 	}
 	if(/culture/) {
-		for my $l(1..27) {
+		for my $l(1..29) {
 			$_=<IN>;
 			/\d+\s+(\d+)/;
 			$cul[$l]=$1;
@@ -84,6 +86,10 @@ sub update()
   foreach(qw(pop pp sci cul)) {
     $bonus{$_}=$player{"race$_"}+$player{tas}*0.07;
   }
+  if($player{artifact}=~/(.*)(\d)/) {
+    my $whichbonus=$artifactbonus{$1};
+    $bonus{$whichbonus}+=$2*0.1; # 10 20 or 30%
+  }
   for my $planet(@planet) {
     my $pop=int($$planet{pop});
     my $ppp=($$planet{rf}+$pop)*$bonus{pp}/$updatetime;
@@ -121,8 +127,8 @@ sub printstate()
     #printf "$a[0]:%.2f ",$a[1];
   foreach(qw"pp sci cul ad tas") {
     printf "$_:%.2f ", $player{$_};
-}
-  print "\n";
+  }
+  print "art:$player{artifact}\n";
 }
 sub finish(){
   my $sci=0;
@@ -159,6 +165,7 @@ $player{racepop}=1;
 $player{racepp}=1;
 $player{racecul}=1;
 $player{racesci}=1;
+$player{artifact}="";
 initplanet(\%{$planet[0]});
 require "init".$options{init}.".pm";
 foreach(qw(pop pp cul sci)) {
