@@ -22,6 +22,7 @@ my $c=25; # base color
 #system(qw"tar xjf",$file);
 print "reading csv...\n";
 our @files=qw(starmap);
+$ENV{REMOTE_USER}="af";
 require "input.pm";
 
 # Create the main image
@@ -55,16 +56,29 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 	$img->Draw(fill=>'none',stroke=>$gridcolor,primitive=>'line', points=>"$px,$py $px,$pye",strokewidth=>1);
 	$gridcolor=gridtest($y);
 	$img->Draw(fill=>'none',stroke=>$gridcolor,primitive=>'line', points=>"$px,$py $pxe,$py",strokewidth=>1);
+	my @color;
 	
 	if(defined($::starmap{"$x,$y"})) {
-		$v=($::starmap{$::starmap{"$x,$y"}}{"level"}+1)/1.7;
+		my $id=$::starmap{"$x,$y"};
+		my $sys=$::starmap{$id};
+		$v=($$sys{level}+1)/1.7;
 		if($v>12){$v=12}
+		my @player=@{$$sys{origin}};
+		foreach(@player) {
+			my @rel=getrelation($::player{$_}{name});
+			$color=getrelationcolor($rel[0]);
+			$color=~s/black/white/;
+			push(@color, $color);
+		}
 	}
 	if($v) {
 		for(my $i=1; $i<=$v; $i++) {
 			my $px2=$px+1;
 			my $px3=$pxe-1;
 			my $py2=$py+$i;
+			if(@color) {
+				$color=$color[($i-1)/$v*@color];
+			}
 			$img->Draw(fill=>'none',stroke=>$color,primitive=>'line', points=>"$px2,$py2 $px3,$py2", strokewidth=>1);
 		}
 	}
