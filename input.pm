@@ -17,7 +17,7 @@ our %relationname=(1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to");
 sub getrelationcolor($) { my($rel)=@_;
 	if(!$rel) { $rel=4; }
-	("", "red", "orange", "yellow", "grey", "blue", "RoyalBlue", "Turquoise", "lightgreen", "green")[$rel];
+	("", "Firebrick", "OrangeRed", "orange", "grey", "blue", "RoyalBlue", "Turquoise", "lightgreen", "green")[$rel];
 }
 # http://www.iconbazaar.com/color_tables/lepihce.html
 
@@ -42,7 +42,7 @@ sub getrelation($) { my($name)=@_;
 	return ($1, $2, $3);
 }
 sub profilelink($) { my($id)=@_;
-	qq!<a href="http://www1.astrowars.com/about/playerprofile.php?id=$id">pubprofile</a> <a href="http://www1.astrowars.com/0/Player/Profile.php/?id=$id">yourprofile</a>\n!;
+	qq!<a href="http://www1.astrowars.com/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public profile"></a> <a href="http://www1.astrowars.com/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" title="your profile"></a>\n!;
 }
 sub systemlink($) { my($id)=@_;
 	qq!<a href="system-info?id=$id">info for system $id</a>\n!;
@@ -52,8 +52,51 @@ sub playername2id($) { my($name)=@_;
 	$::playerid{"\L$name"};
 }
 sub playerid2name($) { my($id)=@_;
+	if(!defined($id)) {return "unknown"}
 	if($id<=2 || !$::player{$id}) {return "unknown"}
 	$::player{$id}{name};
+}
+sub getplanet($$) { my($sid,$pid)=@_;
+	my $sys=$::planets{$sid};
+	if(!$sys) {return undef}
+	$$sys[$pid-1];
+}
+sub getplanetinfo($$) { my($sid,$pid)=@_;
+	my $pinfo=$::planetinfo{"$sid#$pid"};
+	if(!$pinfo){return ()}
+	$pinfo=~/^(\d) (\d+) (.*)/;
+	return ($1,$2,$3);
+}
+sub systemname2id($) { my($name)=@_;
+	$::starmap{"\L$name"};
+}
+sub systemcoord2id($$) { my($x,$y)=@_;
+	$::starmap{"$x,$y"};
+}
+sub systemid2name($) { my($id)=@_;
+	$::starmap{$id}?$::starmap{$id}{name}:undef;
+}
+sub allianceid2tag($) { my($id)=@_;
+	$::alliances{$id}?$::alliances{$id}{tag}:undef;
+}
+sub playerid2alliance($) { my($id)=@_;
+	$::player{$id}?$::player{$id}{alliance}:undef;
+}
+sub playerid2tag($) { my($id)=@_;
+	allianceid2tag(playerid2alliance($id));
+}
+sub planet2sb($) { my($h)=@_;
+        $h?$$h{sb}:undef;
+}
+sub planet2pop($) { my($h)=@_;
+        $h?$$h{pop}:undef;
+}
+sub planet2siege($) {my($h)=@_;
+	$h?$$h{s}:undef;
+}
+sub getatag($) {my($tag)=@_;
+	if(!$tag) { return ""; }
+	return "[$tag]";
 }
 
 1;
