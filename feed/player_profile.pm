@@ -45,6 +45,7 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 		#$sci=~/^(...)/;$sci=$1;
 		#$science.=" $sci=$val";
 	}
+	if($debug){print "science: @science<br>\n";}
 	my @race;
 	{
 		my $racere="";
