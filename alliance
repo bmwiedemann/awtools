@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+
+my %options;
+print AWheader("alliance info");
+#print header, start_html($title), h1($title);
+for my $p (qw'alliance') {
+	$options{$p}=param($p);
+}
+
+if($options{alliance}) {
+	my $n=0;
+	my $alli="\U$options{alliance}\E";
+	my $aid=alliancetag2id($alli);
+	my $own=("\L$alli" eq $ENV{REMOTE_USER});
+	if(!$aid) {
+		print "unknown alliance";
+		exit(0);
+	}
+	print qq!<a href="http://$::server/rankings/alliances/$alli.php">$alli (AW)</a><br>!;
+	print "$alli members",br,"<ul>";
+	for my $pid (@{$::alliances{$aid}{m}}) {
+		next if ! defined($::player{$pid});
+		next if $::player{$pid}{alliance} ne $aid;
+		my $name=playerid2name($pid);
+		my $alink="";
+		if($own) { $alink=alliancedetailslink($n) }
+		print li, profilelink($pid), $alink, qq!<a href="relation?name=$name">$name ($pid)</a>!;
+		$n++;
+	}
+	print "</ul>"
+} else {
+	print start_form('get'), textfield(-name=>'alliance'), " alliance tag", br,
+	 submit("query"),end_form
+}
+print end_html;
+#foreach(keys %ENV) {  print "$_ $ENV{$_}<br>";}
+
