@@ -1,5 +1,5 @@
 $::pixelpersystem=13; # for 12 planet status lines
-$::mapsize=81;
+$::mapsize=131;
 $::mapxoff=-int(($mapsize-1)/2);
 $::mapyoff=-int(($mapsize-1)/2);
 
