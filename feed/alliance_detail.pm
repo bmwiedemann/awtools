@@ -44,12 +44,24 @@ untie %relation;
 
 
 my @a;
-for(;(@a=m!<tr[^>]*><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</td>){5}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
+for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td>(?:<td>(?:\d+)</td>){6}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[7]) {
+        my $system=$a[0];
+        my $sid="$system#$a[1]";
+        my @fleet=@a[2..6];
+        my $details="@fleet";
+        print "defending fleet: ".planetlink($sid)." $details<br>\n";
+        my $oldentry=$data{$sid};
+        my $newentry=addfleet($oldentry,$pid, $name, $time, 1, \@fleet);
+        if(!$debug){$data{$sid}=$newentry;}
+        else {if($newentry){print "$sid $newentry<br>\n"}}
+}
+
+for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</td>){5}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
 	my $sid="$a[0]#$a[1]";
 	my $details="@a[3..7]";
 	my $oldentry=$data{$sid};
 	my $time=gmtime();
-	if($oldentry=~/$details/){$oldentry=~s/^3 $pid /4 $pid /;next}
+	if(defined($oldentry) && $oldentry=~/$details/){$oldentry=~s/^3 $pid /4 $pid /;next}
 	my $newentry=$oldentry||"4 $pid";
 	print "sieged: ".planetlink($sid)." $details<br>\n";
 	$details="automagic:$name:$time $details";
@@ -57,7 +69,7 @@ for(;(@a=m!<tr[^>]*><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</td>){5
 	if(!$debug){$data{$sid}=$newentry;}
 	else {print "$sid $newentry<br>\n"}
 }
-for(;(@a=m!<tr[^>]*><td>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)(.*)!); $_=$a[8]) {
+for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)(.*)!); $_=$a[8]) {
 	my $sid="$a[0]#$a[1]";
 	my $details="@a[3..7]";
 	print "targeted: ".planetlink($sid)." $details <br>\n";
@@ -67,7 +79,7 @@ for(;(@a=m!<tr[^>]*><td>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</td><t
 	$details="automagic:$name:$time $details";
 	#print "old: ",$oldentry;
 	my $newentry=$oldentry||"3 $pid";
-	if($oldentry=~/$details/) {next}
+	if(defined($oldentry) && $oldentry=~/$details/) {next}
 	$newentry.=" $details";
 	#print "new: $newentry<br>";
 	if(!$debug){$data{$sid}=$newentry;}
