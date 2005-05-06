@@ -21,8 +21,8 @@ my $c=25; # base color
 
 
 #system(qw"tar xjf",$file);
-print "reading csv...\n";
-our @files=qw(starmap);
+#print "reading csv...\n";
+#our @files=qw(starmap);
 require "input.pm";
 
 # Create the main image
