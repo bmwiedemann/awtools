@@ -5,10 +5,12 @@
 use Image::Magick;
 use strict;
 
+if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
 our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff, $mapxend, $mapyend);
 require "awmap.pm";
+my $suf=".png";
 my $scale=2;
-my $extra=9;
+my $extra=13;
 $mapsize+=2*$extra;
 $mapxoff-=$extra;
 $mapxend=$mapsize+$mapxoff;
@@ -17,9 +19,8 @@ $mapyend=$mapsize+$mapyoff;
 $pixelpersystem*=$scale;
 our $imagesize=$mapsize*$pixelpersystem+1;
 our $ih=$imagesize/2;
-if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
-if($ENV{REMOTE_USER} eq "af") {$mapxend=110}
-if($ENV{REMOTE_USER} eq "tgd") {$mapxoff=-110; $mapyoff=-100}
+if($ENV{REMOTE_USER} eq "af") {$mapxoff=-100}
+#if($ENV{REMOTE_USER} eq "tgd") {$mapxoff=-110; $mapyoff=-100}
 my $out="large-$ENV{REMOTE_USER}/star";
 my $axiscolor="blue";
 my $c=25; # base color
@@ -39,13 +40,13 @@ sub drawgrid { my($c1,$c2)=@_;
 }
 
 drawgrid($gc2,$gc2);
-$im->Write("$out-none0.gif");
+$im->Write("$out-none0$suf");
 drawgrid($gc1,$gc2);
-$im->Write("$out-none1.gif");
+$im->Write("$out-none1$suf");
 drawgrid($gc2,$gc1);
-$im->Write("$out-none2.gif");
+$im->Write("$out-none2$suf");
 drawgrid($gc1,$gc1);
-$im->Write("$out-none3.gif");
+$im->Write("$out-none3$suf");
 
 sub gridtest($$) { my($x,$y)=@_; my($c1,$c2)=($gc2,$gc2);
 $y++; #FIXME: workaround for strange bug
@@ -132,7 +133,7 @@ for(my $x=$mapxoff; $x<$mapxend; $x++) {
 		}
 	}
 	if($star) {
-		$img->Write("$out$x,$y.gif");
+		$img->Write("$out$x,$y$suf");
 #		last;
 	}
 }}
