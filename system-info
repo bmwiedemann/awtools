@@ -29,7 +29,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 }
 sub mkhash($) { my($tag)=@_;
 	if($options{uniq} && $options{uniq}!~/\./) {$options{uniq}=".$options{uniq}."} else {$options{uniq}=""}
-	my $token="$tag$options{uniq}$options{expires}#$options{id}#secret9";
+	my $token="$tag$options{uniq}$options{expires}#$options{id}#sucret10";
 	return md5_hex($token);
 }
 sub auth_ok($) { my($auth)=@_;
@@ -74,11 +74,12 @@ if(param()) {
 	}
 	if($options{export}==2) {
 		my $u=$ENV{REMOTE_USER};
+		my $expiryinfo="whole beta";
 		if(!$options{expires}) {$options{expires}=""}
-		else {$options{expires}=time+$options{expires}*3600*24;}
+		else {$expiryinfo="$options{expires} days";$options{expires}=time+$options{expires}*3600*24;}
 		my $l="http://guest:guest\@aw.lsmod.de/cgi-bin/public/system-info?id=$options{id}&expires=$options{expires}&uniq=$options{uniq}&auth=$u%23".mkhash($u);
 		print start_html("export for system $options{id}").
-		qq!This is an anonymous read-only access URL. It is valid for whole beta - give only to trusted friends.<br> <a href="$l">copy this link</a> or try $l <br>note: for IE leave out the guest:guest\@!,p,
+		qq!This is an anonymous read-only access URL. It is valid for $expiryinfo - give only to trusted friends.<br> <a href="$l">copy this link</a> or try $l <br>note: for IE leave out the guest:guest\@!,p,
 		"set expiry time: ", start_form('get'),
 		hidden('id', $options{id}),
 		hidden('export', $options{export}),
@@ -87,7 +88,7 @@ if(param()) {
 		submit;
 		exit 0;
 	}
-	if($ENV{REMOTE_USER} eq "guest" && !auth_ok($options{auth})) {
+	if(!auth_ok($options{auth})) {
 	#	print "incorrect auth\n";
 	}
 	require "input.pm";
