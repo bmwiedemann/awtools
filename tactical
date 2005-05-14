@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+use strict;
+use CGI ":standard";
+
+if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
+my $title="\U$ENV{REMOTE_USER}\E tactical map";
+my %options;
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "awmap.pm";
+for my $p (qw'map') {
+	$options{$p}=param($p);
+}
+if($options{map}) {
+	my $f="tactical-$ENV{REMOTE_USER}.png";
+	#my $f="tactical.png";
+	chdir("/home/bernhard/code/cvs/perl/awcalc");
+	open(F, "< $f") or die $!;
+	my $size=(stat($f))[7];
+	my $expire;
+	my $modified=(stat(_))[9];
+	{
+	  my $e=time;
+	  my @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+	  my @week=qw(Sun Mon Tue Wed Thu Fri Sat);
+	  $e-=$e%86400;
+	  $e+=3600*22.4;
+	  my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime($e);
+	  $year+=1900;
+	  $expire=sprintf("$week[$wday], %.2i $month[$mon] $year %.2i:%.2i:%.2i GMT", $mday, $hour, $min, $sec);
+	  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime($modified);
+	  $year+=1900;
+	  $modified=sprintf("$week[$wday], %.2i $month[$mon] $year %.2i:%.2i:%.2i GMT", $mday, $hour, $min, $sec);
+	}
+#	print "Content-Type: image/png\015\012Expires: $expire\015\012Content-Length: $size\015\012\015\012";
+	print header(-type=>'image/png', -expires=>$expire, last_modified=>$modified, -content_lenth=>$size);
+	print <F>;
+} else {
+	print header(-expires=>'+1d'), start_html(-title=>$title , -style=>"/tactical.css"), start_form('get', "system-info"),
+		qq!<input type="image" src="?map=1" />!,
+#		qq!<input type="image" src="/~bernhard/aw/awcalc/tactical-$ENV{REMOTE_USER}.png" />!;
+qq%<script language="JavaScript1.2" type="text/javascript">
+<!--
+var IE = document.all?true:false
+if (!IE) document.captureEvents(Event.MOUSEMOVE)
+document.onmousemove = getMouseXY;
+var tempX = 0
+var tempY = 0
+function getMouseXY(e) {
+  if (IE) {
+    tempX = event.clientX + document.body.scrollLeft
+    tempY = event.clientY + document.body.scrollTop
+  } else {
+    tempX = e.pageX
+    tempY = e.pageY
+  }
+  window.status="("+Math.floor((tempX-9)/$::pixelpersystem+($::mapxoff))+","+Math.floor((tempY-9)/$::pixelpersystem+($::mapyoff))+")"
+  return true
+}
+//--></script>
+%;
+	print end_form, end_html;
+}
+

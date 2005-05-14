@@ -3,6 +3,7 @@ use strict;
 use CGI ":standard";
 alarm 30;
 
+my $imgsize=2*13;
 sub round($) {int($_[0]+0.5)}
 if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
 my $title="\U$ENV{REMOTE_USER}\E large tactical map";
@@ -15,20 +16,20 @@ for my $p (qw'xs xe ys ye x y') {
 	$options{$p}=param($p);
 }
 if(defined($options{x}) && defined($options{y})) {
-	my $f="star$options{x},$options{y}.gif";
+	my $f="star$options{x},$options{y}.png";
 	my $size=(stat($f))[7];
 	my $modified=(stat($f))[9];
-	print header(-type=>'image/gif', -expires=>'+1d', -last_modified=>$modified, -content_lenth=>$size);
+	print header(-type=>'image/png', -expires=>'+1d', -last_modified=>$modified, -content_lenth=>$size);
 	undef($/);
 	open(F,"< $f") or die $!;
 	print <F>;
 	exit(0);
 }
 
-my $style="/tactical.css";#qq%\nimg {border:0;}%; #body {margin-left:0px; margin-top:0px;}
-print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style, -leftmargin=>0, -topmargin=>0);#, -bgcolor=>"#000000");
+my $style="/tactical-large.css";#qq%\nimg {border:0;}%; #body {margin-left:0px; margin-top:0px;}
 if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))
 {
+	print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style);
 	my $xe=round($options{xs}+$options{xe}/2);
 	my $ye=round($options{ys}+$options{ye}/2);
 	my $xs=round($options{xs}-$options{xe}/2);
@@ -38,7 +39,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 		print "<tr>";
 		for(my $mx=$xs; $mx<$xe; $mx++) {
 #			print "<td> $mx,$my</td>"
-			my $f="star$mx,$my.gif";
+			my $f="star$mx,$my.png";
 			my $link="";
 			my $linkend="</a>";
 			if(! -e $f) {my $n=0;
@@ -50,19 +51,24 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 			} else {
 				$f="?x=$mx&y=$my";
 				$link=qq!<a href="system-info?mapx=$mx&mapy=$my">!;}
-			print qq!<td>$link<img src="$f">$linkend</td>!;
-
+			my $formatstr="";
+			if($my==$ys || $mx==$xs) {$formatstr=qq! height="$imgsize" width=$imgsize"!}
+			print qq!<td>$link<img src="$f"$formatstr>$linkend</td>!;
 		}
 		print "</tr>\n";
 	}
 	print "</table>";
 } else {
+	print header(-expires=>'+1d'), start_html(-title=>$title);
 	my @pos=(0,0);
 	my @s=(29,25);
-	if($ENV{REMOTE_USER} eq "af") { @pos=(-60,-44); $s[1]=37; }
-	elsif($ENV{REMOTE_USER} eq "tgd") { @pos=(-36,-62) }
-	elsif($ENV{REMOTE_USER} eq "xr") { @pos=(71,-60) }
-	elsif($ENV{REMOTE_USER} eq "blub") { @pos=(-6,-65) }
+	if($ENV{REMOTE_USER} eq "af") { @pos=(20,-51); }#$s[1]=37; }
+	elsif($ENV{REMOTE_USER} eq "fun") { @pos=(20,-51); }
+	elsif($ENV{REMOTE_USER} eq "tbgsaf") { @pos=(20,-54); }
+	elsif($ENV{REMOTE_USER} eq "tgd") { @pos=(57,20); $s[1]+=10; }
+	elsif($ENV{REMOTE_USER} eq "xr") { @pos=(-60,60) }
+	elsif($ENV{REMOTE_USER} eq "la") { @pos=(26,30) }
+	elsif($ENV{REMOTE_USER} eq "blub") { @pos=(57,39) }
         my $awuid=playername2id(cookie('user'));
         if($awuid>2) {
 		my $home=playerid2home($awuid);

@@ -2,22 +2,21 @@
 #
 # draw AW map
 #
-use Image::Magick;
+use GD;
 use strict;
 
+if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
 our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff);
 require "awmap.pm";
+require "mapcommon.pm";
 our $imagesize=$mapsize*$pixelpersystem+1;
 our $ih=$imagesize/2;
-if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
 #my $file=shift(@ARGV) || die "need input\n";
 #my $fileend=$file;
 #$fileend=~s".*/"";
 #$fileend=~s/(\d\d)-(\d\d)-(\d+)\.tar\.bz2/$3-$2-$1/;
 my $out="tactical-$ENV{REMOTE_USER}";
-my $axiscolor="blue";
 my $c=25; # base color
-
 
 
 #system(qw"tar xjf",$file);
@@ -26,16 +25,16 @@ my $c=25; # base color
 require "input.pm";
 
 # Create the main image
-my $im = new Image::Magick;
-$im->Set(size=>$imagesize . 'x' . $imagesize);
-$im->Read('xc:black');
+my $img = new GD::Image($imagesize, $imagesize);
+mapcoloralloc($img);
 print "Drawing...\n";
-my $img=$im->Clone();
 
 sub pixel($$$) {my($x,$y,$c)=@_;
-  $img->Set("pixel[$x,$y]", $c);
+  $img->setPixel($x, $y, $c);
 }
-sub gridtest($) { $_[0]%10<=1 ? "lightgray":"gray" }
+sub gridtest($) { $_[0]%10<=1 ? $::lightgridcolor:$::darkgridcolor }
+
+{ my ($d1,$d2)=($::lightgridcolor,$::darkgridcolor);} #dummy statement to avoid warning
 
 sub mrelationcolor($) { my($name)=@_;
 	my @rel=getrelation($name);
@@ -52,10 +51,8 @@ sub mrelationcolorid($) {
 	mrelationcolor($n); 
 }
 
-
-$img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"0,$ih $imagesize,$ih",strokewidth=>1);
-$img->Draw(fill=>'none',stroke=>$axiscolor,primitive=>'line', points=>"$ih,0 $ih,$imagesize",strokewidth=>1);
-
+$img->line(0,$ih, $imagesize,$ih,$::axiscolor);
+$img->line($ih,0, $ih,$imagesize,$::axiscolor);
 
 for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
   for(my $y=$mapyoff; $y-$mapyoff<$mapsize; $y++) {
@@ -68,11 +65,11 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 
 	# grid
 	my $gridcolor=gridtest($x);
-	$img->Draw(fill=>'none',stroke=>$gridcolor,primitive=>'line', points=>"$px,$py $px,$pye",strokewidth=>1);
+	$img->line($px,$py, $px,$pye, $gridcolor);
 	$gridcolor=gridtest($y);
-	$img->Draw(fill=>'none',stroke=>$gridcolor,primitive=>'line', points=>"$px,$py $pxe,$py",strokewidth=>1);
+	$img->line($px,$py, $pxe,$py, $gridcolor);
 	my @color;
-	
+#next;	
 	if(defined($::starmap{"$x,$y"})) {
 		my $id=$::starmap{"$x,$y"};
 		my $sys=$::starmap{$id};
@@ -101,24 +98,17 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 			if(defined($ownerid) && $ownerid>2) {
 				$color=mrelationcolorid($ownerid);
 			} else {$color="white"}
-			$img->Draw(fill=>'none',stroke=>$color,primitive=>'line', points=>"$px2,$py2 $px3,$py2", strokewidth=>1);
+			$img->line($px2,$py2, $px3,$py2, $::colorindex{$color});
 			if(planet2siege($planet)) {
 				$px2=$pxe-5;
-				$img->Draw(fill=>'none',stroke=>'red',primitive=>'line', points=>"$px2,$py2 $px3,$py2", strokewidth=>1);
+				$img->line($px2,$py2, $px3,$py2, $::colorindex{"red"});
 			}
 		}
 	}
-#	if($v>0){$v=$c+$v*int((255-$c)/8)}
-#	if($v>255){$v=255}
-#	if($v>0){
-#		$v=sprintf("#%.2x%.2x%.2x", $v,$v,$v);
-#		pixel($px,$py,$v);
-#	}
 	
 }}
 
 
-
-$img->Write("$out.png");
-#$img->Write('win:');
+writeimg($img, "$out.png");
+exit 0;
 

@@ -2,7 +2,7 @@
 #
 # draw AW map
 #
-use Image::Magick;
+use GD;
 use strict;
 
 if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
@@ -10,7 +10,7 @@ our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff, $mapxend, $mapyend);
 require "awmap.pm";
 my $suf=".png";
 my $scale=2;
-my $extra=13;
+my $extra=30;
 $mapsize+=2*$extra;
 $mapxoff-=$extra;
 $mapxend=$mapsize+$mapxoff;
@@ -22,37 +22,38 @@ our $ih=$imagesize/2;
 if($ENV{REMOTE_USER} eq "af") {$mapxoff=-100}
 #if($ENV{REMOTE_USER} eq "tgd") {$mapxoff=-110; $mapyoff=-100}
 my $out="large-$ENV{REMOTE_USER}/star";
-my $axiscolor="blue";
 my $c=25; # base color
-my ($gc1,$gc2)=("white","gray"); # grid color
 
 require "input.pm";
+require "mapcommon.pm";
 
 # Create the main image
-my $im = new Image::Magick;
-$im->Set(size=>$pixelpersystem . 'x' . $pixelpersystem);
-$im->Read('xc:black');
+my $im = new GD::Image($pixelpersystem, $pixelpersystem);
 print "Drawing...\n";
+mapcoloralloc($im);
+my ($gc1,$gc2)=($::lightgridcolor, $::darkgridcolor); # grid color
+($gc1,$gc2)=($::lightgridcolor, $::darkgridcolor); # avoid warning
 
-sub drawgrid { my($c1,$c2)=@_;
-	$im->Draw(fill=>'none',stroke=>$c1,primitive=>'line', points=>"0,0 $pixelpersystem,0",strokewidth=>$scale);
-	$im->Draw(fill=>'none',stroke=>$c2,primitive=>'line', points=>"0,0 0,$pixelpersystem",strokewidth=>$scale);
+sub drawgrid { my($c1,$c2,$im)=@_;
+	$im->rectangle(0,0, $pixelpersystem,$scale-1, $c1);
+	$im->rectangle(0,0, $scale-1,$pixelpersystem, $c2);
 }
 
-drawgrid($gc2,$gc2);
-$im->Write("$out-none0$suf");
-drawgrid($gc1,$gc2);
-$im->Write("$out-none1$suf");
-drawgrid($gc2,$gc1);
-$im->Write("$out-none2$suf");
-drawgrid($gc1,$gc1);
-$im->Write("$out-none3$suf");
+drawgrid($gc2,$gc2,$im);
+writeimg($im, "$out-none0$suf");
+drawgrid($gc1,$gc2,$im);
+writeimg($im, "$out-none1$suf");
+drawgrid($gc2,$gc1,$im);
+writeimg($im, "$out-none2$suf");
+drawgrid($gc1,$gc1,$im);
+writeimg($im, "$out-none3$suf");
 
 sub gridtest($$) { my($x,$y)=@_; my($c1,$c2)=($gc2,$gc2);
 $y++; #FIXME: workaround for strange bug
 if($x%10==0 || $y%10==0) {return ($gc1,$gc1)}
 if($x%10<=1) {$c2=$gc1}
 if($y%10<=1) {$c1=$gc1}
+#print "($x,$y)=$c1, $c2\n";
 return ($c1,$c2);
 }
 sub mrelationcolor($) { my($name)=@_;
@@ -73,41 +74,26 @@ sub mrelationcolorid($) {
 
 for(my $x=$mapxoff; $x<$mapxend; $x++) {
   for(my $y=$mapyoff; $y<$mapyend; $y++) {
-	my ($px,$py)=(0,0);
-	my $pxe=$px+$pixelpersystem;
-	my $pye=$py+$pixelpersystem;
-	my $v; # value
-	my $color="white";
-	my $star=0;
-#	print "$x,$y $px,$py\n";
-
-	my $img=$im->Clone();
-	# grid
-	drawgrid(gridtest($x,$y));
-	
 	if(defined($::starmap{"$x,$y"})) {
+		my ($px,$py)=(0,0);
+		my $pxe=$px+$pixelpersystem;
+		my $pye=$py+$pixelpersystem;
+		my $v; # value
+		my $color="white";
+	#	print "$x,$y $px,$py\n";
+
+		my $img=new GD::Image($pixelpersystem, $pixelpersystem);
+		mapcoloralloc($img);
+
+		# grid
+		drawgrid(gridtest($x,$y),$img);
 		my $id=$::starmap{"$x,$y"};
-#		my $sys=$::starmap{$id};
-#		$v=($$sys{level}+1)/1.7;
-#		if($v>12){$v=12}
-#		my @player=@{$$sys{origin}};
-#		foreach(@player) {
-#			my @rel=getrelation($::player{$_}{name});
-#			$color=getrelationcolor($rel[0]);
-#			$color=~s/black/white/;
-#		}
-		$star=1;
-#	}
-	$v=12;
-#	if($v) {
+	   $v=12;
 		for(my $i=1; $i<=$v; $i++) {
 			my $statuscolor;
 			my $px2=$px+$scale;
 			my $px3=$pxe-1;
 			my $py2=$py+$i*$scale;
-#			if(@color) {
-#				$color=$color[($i-1)/$v*@color];
-#			}
 			my @pinfo=getplanetinfo($id, $i);
 			my $planet=getplanet($id, $i); 
 			my $ownerid=$$planet{ownerid};
@@ -120,25 +106,18 @@ for(my $x=$mapxoff; $x<$mapxend; $x++) {
 			} else {$statuscolor=undef}
 			for my $j (0..$scale-1) {
 				my $py3=$py2+$j;
-				$img->Draw(fill=>'none',stroke=>$color,primitive=>'line', points=>"$px2,$py3 $px3,$py3", strokewidth=>1);
+				$img->line($px2,$py3, $px3,$py3, $::colorindex{$color});
 				my $px5=$pxe+$scale-int($pixelpersystem/2);
 				if($statuscolor) {
-					$img->Draw(fill=>'none',stroke=>$statuscolor,primitive=>'line', points=>"$px5,$py3 $px3,$py3", strokewidth=>1);
+					$img->line($px5,$py3, $px3,$py3, $::colorindex{$statuscolor});
 				}
 				if(planet2siege($planet)) {
 					my $px4=$pxe-3*$scale;
-					$img->Draw(fill=>'none',stroke=>'red',primitive=>'line', points=>"$px4,$py3 $px3,$py3", strokewidth=>1);
+					$img->rectangle($px4,$py3, $px3,$py3+$scale-1, $::colorindex{red});
 				}
 			}
 		}
-	}
-	if($star) {
-		$img->Write("$out$x,$y$suf");
-#		last;
+		writeimg($img, "$out$x,$y$suf");
 	}
 }}
-
-
-
-#$img->Write('win:');
 
