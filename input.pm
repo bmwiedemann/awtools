@@ -12,10 +12,10 @@ tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
 tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
 tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
 tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
-if($ENV{REMOTE_USER} ne "guest") {
+#if($ENV{REMOTE_USER} ne "guest") {
 	tie(%relation, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
 	tie(%planetinfo, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
-}
+#}
 
 sub getrelation($) { my($name)=@_;
 	my $rel=$::relation{"\L$name"};
@@ -26,8 +26,10 @@ sub getrelation($) { my($name)=@_;
 		if(!$id) { return undef }
 		my $aid=$::player{$id}{alliance};
 #		print "aid $aid \n";
+		my $atag;
+		if(!$aid && $rel && $rel=~/^\d+ (\w+) (.*)/s) {$atag=$1;$aid=-1; $info=$2}
 		if(!$aid) { return undef }
-		my $atag=$::alliances{$aid}{tag};
+		if(!$atag) {$atag=$::alliances{$aid}{tag};}
 #		print "id $id a $aid at $atag\n<br>";
 		if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {$info=$3}
 		$rel=$::relation{"\L$atag"};
@@ -67,6 +69,7 @@ sub getplanetinfo($$) { my($sid,$pid)=@_;
 	return ($1,$2,$3);
 }
 sub systemname2id($) { my($name)=@_;
+	$name=~s/\s+/ /;
 	$::starmap{"\L$name"};
 }
 sub systemcoord2id($$) { my($x,$y)=@_;
@@ -95,6 +98,9 @@ sub planet2sb($) { my($h)=@_;
 }
 sub planet2pop($) { my($h)=@_;
         $h?$$h{pop}:undef;
+}
+sub planet2opop($) { my($h)=@_;
+        $h?$$h{opop}:undef;
 }
 sub planet2siege($) {my($h)=@_;
 	$h?$$h{s}:undef;
