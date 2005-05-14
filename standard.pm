@@ -9,9 +9,11 @@ our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=qw(Biology Economy Energy Mathematics Physics Social);
 our @racestr=qw(growth science culture production speed attack defense);
-our @racebonus=qw(0.09 0.10 0.04 0.04 0.19 0.15 0.15);
+our @racebonus=qw(0.08 0.09 0.04 0.04 0.19 0.15 0.16);
 our $magicstring="automagic:";
 our %artifact=("BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HOR"=>15);
+our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "turquoise", "lightgreen", "green");
+our @statuscolor=qw(black black blue cyan red green orange green);
 
 
 
@@ -34,11 +36,11 @@ sub parseawdate($) {my($d)=@_;
 
 sub getrelationcolor($) { my($rel)=@_;
         if(!$rel) { $rel=4; }
-        ("", "Firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "Turquoise", "lightgreen", "green")[$rel];
+        $relationcolor[$rel];
 }
 
 sub getstatuscolor($) { my($s)=@_; if(!$s) {$s=1}
-        (qw(black black blue cyan red green orange green))[$s];
+        $statuscolor[$s];
 }
 # http://www.iconbazaar.com/color_tables/lepihce.html
 
@@ -48,10 +50,10 @@ sub planetlink($) {my ($id)=@_;
         return qq!<a href="planet-info?id=$escaped">$id</a>!;
 }
 sub profilelink($) { my($id)=@_;
-        qq!<a href="http://$::server/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public"></a> <a href="http://$::server/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif"></a>\n!;
+        qq!<a href="http://$::server/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a href="http://$::server/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
 }
 sub alliancedetailslink($) { my($id)=@_;
-        qq!<a href="http://$::server/0/Alliance/Detail.php/?id=$id"><img src="/images/aw/profile3.gif"></a>\n!;
+        qq!<a href="http://$::server/0/Alliance/Detail.php/?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
 }
 sub systemlink($) { my($id)=@_;
         qq!<a href="system-info?id=$id">info for system $id</a>\n!;
@@ -71,7 +73,7 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 	}
 #	if(!$magic) {$magic=$magicstring." "}
 	if($trade && $magic!~s/trade:\S*/$trade/) {$magic=~s/automagic:/$&\n$trade /}
-	if($prod && $magic!~s/productio:\S*/$prod/) {$magic=~s/automagic:/$&\n$prod /}
+	if($prod && $magic!~s/production:\S*/$prod/) {$magic=~s/automagic:/$&\n$prod /}
 	if($sci && $magic!~s/science:[-+,.0-9]*/$sci/) {$magic=~s/automagic:/$&\n$sci /}
 	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic=~s/automagic:/$&\n$race /}
 	if($newlogin) {
@@ -103,9 +105,9 @@ sub addfleet($$$$$@) { my($oldentry,$pid, $name, $time, $own, $fleet)=@_;
 	for my $s (@$fleet) {$ships+=$s}
 	my $CV=fleet2cv($fleet);
 	#if($CV<10) {return $oldentry}
-	if($ships<4 && $status!=4) {return $oldentry}
-	$oldentry||="$status $pid";
+	if($ships<1 && $status!=4) {return $oldentry}
 	if($oldentry=~/@$fleet/ || $time<time()-3600*24) {return $oldentry}
+	$oldentry||="$status $pid";
 	return "$oldentry \nautomagic:$name:$gmtime @$fleet ${CV}CV";
 }
 
