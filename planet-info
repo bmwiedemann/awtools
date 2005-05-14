@@ -75,5 +75,3 @@ if($options{id}) {
 	 submit("query")
 }
 print end_form, end_html;
-#foreach(keys %ENV) {  print "$_ $ENV{$_}<br>";}
-

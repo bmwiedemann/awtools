@@ -20,7 +20,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my $alliancestr="";
 	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
-	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" title="player info"></a> !;
+	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" alt="relations" title="player info" /></a> !;
 	if($options{export}) {
 		return "[color=$color]$alliancestr $name [/color]";
 	}
@@ -77,9 +77,9 @@ if(param()) {
 		my $expiryinfo="whole beta";
 		if(!$options{expires}) {$options{expires}=""}
 		else {$expiryinfo="$options{expires} days";$options{expires}=time+$options{expires}*3600*24;}
-		my $l="http://guest:guest\@aw.lsmod.de/cgi-bin/public/system-info?id=$options{id}&expires=$options{expires}&uniq=$options{uniq}&auth=$u%23".mkhash($u);
+		my $l="http://guest:guest\@aw.lsmod.de/cgi-bin/public/system-info?id=$options{id}&amp;expires=$options{expires}&amp;uniq=$options{uniq}&amp;auth=$u%23".mkhash($u);
 		print start_html("export for system $options{id}").
-		qq!This is an anonymous read-only access URL. It is valid for $expiryinfo - give only to trusted friends.<br> <a href="$l">copy this link</a> or try $l <br>note: for IE leave out the guest:guest\@!,p,
+		qq!This is an anonymous read-only access URL. It is valid for $expiryinfo - give only to trusted friends.<br /> <a href="$l">copy this link</a> or try $l <br />note: for IE leave out the guest:guest\@!,p,
 		"set expiry time: ", start_form('get'),
 		hidden('id', $options{id}),
 		hidden('export', $options{export}),
@@ -108,17 +108,17 @@ if(param()) {
 
 		## start of normal output ##
 		if(!$options{export}) {
-			print qq!<a href="?legend=1">legend</a> <a href="?">new query</a> <a href="?id=$system&export=1">BB-export</a> <a href="?id=$system&export=2">anonymous updated export</a>!,br;
-			($bs,$be,$eol)=('<b>','</b>',"<br>\n");
+			print qq!<a href="?legend=1">legend</a> <a href="?">new query</a> <a href="?id=$system&amp;export=1">BB-export</a> <a href="?id=$system&amp;export=2">anonymous updated export</a>!,br;
+			($bs,$be,$eol)=('<b>','</b>',"<br />\n");
 		}
 		my $output="$bs$::starmap{$system}{name}($x,$y)$be${eol}Id=$system level=$::starmap{$system}{level} ";
 		if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
-			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&ys=$y&xe=29&ye=19">tactical</a> <a href="http://$::server/about/starmap.php?dx=$x&dy=$y">starmap</a> <a href="http://$::server/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
+			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&amp;ys=$y&amp;xe=29&amp;ye=19">tactical</a> <a href="http://$::server/about/starmap.php?dx=$x&amp;dy=$y">starmap</a> <a href="http://$::server/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
 			"planets here: <ul>";
 		} else {
-			$output.="[url=http://$::server/about/starmap.php?dx=$x&dy=$y]starmap[/url] [url=http://$::server/0/Map/Detail.php/?nr=$system]Map/Details[/url] [url=http://$::bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
+			$output.="[url=http://$::server/about/starmap.php?dx=$x&amp;dy=$y]starmap[/url] [url=http://$::server/0/Map/Detail.php/?nr=$system]Map/Details[/url] [url=http://$::bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
 		}
 		my ($refdist,$refp,$refid,$refe,$refs);
 		if($refsys) {
@@ -135,7 +135,7 @@ if(param()) {
 		}
 		my $planets=$::planets{$system};
 		foreach my $h (@$planets) {
-			tprint li;
+			tprint "<li>";
 			next if(!$h);
 #			foreach my $item (sort keys %$h) { print " $item=$$h{$item}\n"; }
 			my $id="$system#$$h{planetid}";
@@ -157,14 +157,14 @@ if(param()) {
 					$info=" ".span({-style=>"color: $scolor"},$::planetstatusstring{$status})." ".span({-style=>"color: $rcolor"},$atag." ".$name).": ".$pinfo;
 				}
 			}
-			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" title="edit planet-info"></a> !;
+			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" title="edit planet-info" alt="planet info"/></a> !;
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
 			if(!$options{export}) {
 				my $pdiff=abs($refp-$$h{planetid});
 				my $etalink;
-				if(defined($refdist)) {$etalink=qq! <a href="arrival?distance=$refdist&planet=$pdiff&energy=$refe&racespeed=$refs">ETA</a> !;}
-				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info;
+				if(defined($refdist)) {$etalink=qq! <a href="arrival?distance=$refdist&amp;planet=$pdiff&amp;energy=$refe&amp;racespeed=$refs">ETA</a> !;}
+				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info."</li>\n";
 			} else {
 				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s", $$h{planetid}, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), $info);
 			}
@@ -173,7 +173,7 @@ if(param()) {
 		if(!$options{export}) {
 			print "</ul>\n";
 			print "players having their origin here: <ul>";
-			foreach(@{$::starmap{$system}{origin}}) { print li,spinfo($_); }
+			foreach(@{$::starmap{$system}{origin}}) { print li(spinfo($_)); }
 			print "</ul>\n";
 			my $uid=playername2id($awuser);
 			if($uid>2) {

@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 use strict;
 use CGI qw":standard *table";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
@@ -20,9 +20,11 @@ if($options{alliance}) {
 		print "unknown alliance";
 		exit(0);
 	}
-	print qq!<a href="http://$::server/rankings/alliances/$alli.php">$alli (AW)</a><br>!;
+	my $rellink=qq! <a href="relations?name=$alli"><img src="/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
+	print qq!<a href="http://$::server/rankings/alliances/$alli.php">$alli (AW)</a> $rellink<br />!;
 	print "$alli members",br,start_table();
 	print "<tr align=\"center\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td></tr>\n";
+	my @totalprod=(0,0,0);
 	for my $pid (@{$::alliances{$aid}{m}}) {
 		my $p=$::player{$pid};
 		next if ! defined($p);
@@ -31,15 +33,21 @@ if($options{alliance}) {
 		my $name=playerid2name($pid);
 		my $alink="";
 		my $planets=@{$$p{planets}};
-		my $joined=gmtime($$p{joined});
-		my $home="$::starmap{$$p{home_id}}{x},$::starmap{$$p{home_id}}{y}";
+		my $joined=gmtime($$p{joined});#." ".$$p{joined};
+		my $home="$$p{home_id}($::starmap{$$p{home_id}}{x},$::starmap{$$p{home_id}}{y})";
+		my @rel=getrelation($name);
+		my @prod=relation2production($rel[2]);
+		{ my $n=0;
+                        foreach(@prod[0..2]) { $_*=$prod[$n+5]; $totalprod[$n]+=$_; $n++}
+                }
 		if($own) { $alink=alliancedetailslink($n) }
-		print "<td>",profilelink($pid), $alink, "</td><td>", qq!<a href="relation?name=$name">$name ($pid)</a></td>
-		<td><a href="system-info?id=$$p{home_id}">$home</td><td>$$p{level}</td><td>$$p{science}</td><td>$planets/$$p{culture}</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>$$p{from}</td><td>$joined</td>!;
+		print "<td>",profilelink($pid), $alink, "</td><td>", qq!<a href="relations?name=$name">$name ($pid)</a></td>
+		<td><a href="system-info?id=$$p{home_id}">$home</a></td><td>$$p{level}</td><td>$$p{science}</td><td>$planets/$$p{culture}</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>$$p{from}</td><td>$joined</td>!;
 		$n++;
 		print "</tr>\n";
 	}
 	print end_table();
+	if($totalprod[0]) { print "total production: ".join(", ", @totalprod);}
 } else {
 	print start_form('get'), textfield(-name=>'alliance'), " alliance tag", br,
 	 submit("query"),end_form

@@ -2,6 +2,8 @@
 use strict;
 use CGI ":standard";
 
+my $readonly=0;
+if($ENV{REMOTE_USER} eq "is") {$ENV{REMOTE_USER}="fun"; $readonly=1;} # TODO: only for beta10
 my $title="manage relation [\U$ENV{REMOTE_USER}\E]";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %options;
@@ -16,7 +18,7 @@ for my $p (qw'id name alliance relation comment submit') {
 }
 if(defined($options{submit}) && $options{submit}=~/delete/) { $options{delete}=1 }
 if($options{id}) { $options{name}=playerid2name($options{id}); param("name",$options{name}) }
-if(defined($options{relation})) {
+if(!$readonly && defined($options{relation})) {
 	$options{name} =~ y/A-Z/a-z/;
 	$options{comment}=~s/\r//g;
 	if(!$options{delete}) {
@@ -61,7 +63,7 @@ if($options{name}) {
 	
 	
 	$atag=$atag?" ".a({-href=>"alliance?alliance=$atag"},"[$atag]"):"";
-	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), br;
+	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), a({-href=>"http://azgharde.free.fr/aw/player.php?name=".$user}, "azgharde"),br;
 	print hidden(-name=>'name', $user);
 	print textfield('alliance', $options{alliance}), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
@@ -85,40 +87,40 @@ if($options{name}) {
 		print br,$user," owns $planets planets<ul>";
 		foreach my $pp (sort planetpopsort @planets) {
 			my $sid=$$pp{systemid};
-			print li,qq! <a href="system-info?id=$sid">!.systemid2name($sid);
-			printf qq!</a> ($::starmap{$sid}{x},$::starmap{$sid}{y}) #$$pp{planetid} : pop=%i SB=%i!, planet2pop($pp), planet2sb($pp);
+			print qq! <li><a href="system-info?id=$sid">!.systemid2name($sid);
+			printf qq!</a> ($::starmap{$sid}{x},$::starmap{$sid}{y}) #$$pp{planetid} : pop=%i SB=%i </li>\n!, planet2pop($pp), planet2sb($pp);
 		}
 		print "</ul>\n";
 		my @race=relation2race($options{comment});
 		if(defined($race[0])) {
-			print "<p>race: <br>\n";
+			print p,"race:",br;
 			my $n=0;
 			foreach(@race) {
 				my $bonus=$::racebonus[$n]*100*$_;
 				if($bonus>=0) {$bonus="+".$bonus}
-				print "$bonus% $::racestr[$n++] ($_)<br>\n";
+				print "$bonus% $::racestr[$n++] ($_)<br />\n";
 			}
 		}
 		my @prod=relation2production($options{comment});
 		if(defined($prod[0])) {
-			print "<p>production: <br>\n";
+			print p,"production:",br;
 			my $n=0;
 			foreach(@prod[0..2]) {
 				my $total=int($_*$prod[5+$n]*24);
-				print "$_ * $prod[5+$n++] = $total/day<br>\n";
+				print "$_ * $prod[5+$n++] = $total/day<br />\n";
 			}
 		}
 		my @sci=relation2science($options{comment});
 		if(defined($sci[0])) {
-			print "<p>science";
+			print p,"science";
 			my $n=0;
 			if($sci[0]>100) {
 				my $time=shift(@sci);
 				print " from ".gmdate($time);
 			}
-			print ":<br>\n";
+			print ":<br />\n";
 			foreach(@sci) {
-				print "$::sciencestr[$n++] $_<br>\n";
+				print "$::sciencestr[$n++] $_<br />\n";
 			}
 		}
 		while($options{comment}=~/login:(\d+):(\d+)(.*)/s) {

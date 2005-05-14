@@ -12,7 +12,8 @@ my @out;
 
 sub sortfunc { return $CV{$b}<=>$CV{$a} }
 
-print "<html><head><title>fleets list</title></head><body>sys#planet: info<br>\n";
+#print "<html><head><title>fleets list</title></head><body>"
+print "sys#planet: info".br;
 foreach my $p (keys %::planetinfo) {
 	my $info=$::planetinfo{$p};
 	next unless $info=~s/$::magicstring([^:]*)/$::magicstring.span({-style=>"color: ".getrelationcolor((getrelation($1))[0])},$1)/geo;
@@ -23,9 +24,9 @@ foreach my $p (keys %::planetinfo) {
 	if($CV==0 && $info=~/2005 (\d+) (\d+) (\d+) (\d+) (\d+)/) { $CV=fleet2cv([$1,$2,$3,$4,$5]); }
 	$p=~/^(\d+)#/;
 	my $sid=$1;
-	#(my $penc=$p)=~s/#/%23/;
-	#print qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> $info<br>\n!;
-	my $str=qq!<a href="/cgi-bin/system-info?id=$sid">$p</a> $info<br>\n!;
+	(my $penc=$p)=~s/#/%23/;
+	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> $info<br />\n!;
+	#my $str=qq!<a href="/cgi-bin/system-info?id=$sid">$p</a> $info<br />\n!;
 	push(@out,$str);
 	$CV{$str}=$CV;
 }

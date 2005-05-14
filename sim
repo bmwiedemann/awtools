@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "standard.pm";
+
+my $title="AW economic simulation";
+print AWheader($title);
+my @params=();
+foreach(qw(turns print tactic pop pp cul sci social initialp)) { if(param($_)) {push(@params, "--$_=".param($_));}}
+if(@params && param("turns")<=9999) {
+	print "simulating...".br."\n<pre>";
+	system("./awsim.pl", @params);# or print "failed executing\n";
+	print "</pre>\n";
+} else {
+	my @default=(7300,7300,4);
+#	my @default=(400,40,3);
+	print start_form('get'), 
+	textfield('turns', $default[0]), " how many turns (of 15 min) to simulate", br,
+	textfield('print', $default[1]), " print only each n turns", br,
+	textfield('tactic', $default[2]), " use tactic (1..5)", p,
+	textfield('pop', 0), " growth bonus (-4..+4)", br,
+	textfield('sci', 0), " science bonus", br,
+	textfield('cul', 0), " culture bonus", br,
+	textfield('pp', 0), " production bonus", br,
+	textfield('social', 0.3), " how much to put in social science ", br,
+	textfield('initialp', 120), " initial starting points", br,
+	submit, end_form, 
+}
+print end_html;
+
