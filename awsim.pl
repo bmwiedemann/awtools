@@ -8,8 +8,9 @@ srand(0);
 our (@sci,@pop,@cul,@prod,@planet,%player,$turn,$debug,%options);
 our @buildings=qw"hf rf gc rl sb";
 our $updatetime=4; # update each quarter hour
-#our %racebonus=qw(pop 0.13 pp 0.05 cul 0.05 sci 0.11);
-our %racebonus=qw(pop 0.10 pp 0.04 cul 0.04 sci 0.10);
+#our %racebonus=qw(pop 0.13 pp 0.05 cul 0.05 sci 0.11); beta7
+#our %racebonus=qw(pop 0.10 pp 0.04 cul 0.04 sci 0.10); beta8
+our %racebonus=qw(pop 0.08 pp 0.04 cul 0.04 sci 0.09);
 %options=qw(
 init 2
 initialp 3
@@ -21,6 +22,8 @@ social 0.5
 ); # simulate 8 weeks
 our %artifact=qw(BM1 3300 BM2 12000 BM3 25000);
 our %artifactbonus=qw(BM cul CP pop CD pp AL sci);
+
+#growth = 9(x-1)^2+9(x-1)+3
 
 my @options=qw"tactic|t=i init|i=i initialp=i turns=i print|p=i pop=i pp=i cul=i sci=i social=f help|h|?";
 my $result=GetOptions(\%options, @options);
@@ -169,7 +172,8 @@ sub finish(){
   if($sci>20) {
     $pkt+=6*($sci-20);
   }
-  printf "total points: %.2f sci: %.2f\n", $pkt, $sci;
+  spend_all();
+  printf "total points: %.2f sci: %.2f a\$: %i\n", $pkt, $sci, $player{ad};
 }
 sub initplanet {my ($p)=@_;
 $$p{pp}=0;
