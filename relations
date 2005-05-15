@@ -65,10 +65,10 @@ if($options{name}) {
 	$atag=$atag?" ".a({-href=>"alliance?alliance=$atag"},"[$atag]"):"";
 	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), a({-href=>"http://azgharde.free.fr/aw/player.php?name=".$user}, "azgharde"),br;
 	print hidden(-name=>'name', $user);
-	print textfield('alliance', $options{alliance}), " alliance membership (e.g. unknown, TZAR, ES)", br,
+	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
 		-labels=>\%::relationname), " relation", br,
-	textarea(-name=>'comment', -value=>$options{comment}, -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
+	textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
 	submit("submit"), qq! <a href="?">new query</a>!;
 	if($id>2) {
 		my $planets=@{$::player{$id}{planets}};
@@ -129,8 +129,8 @@ if($options{name}) {
 		}
 	}
 } else {
-	print start_form('get'), textfield(-name=>'name'), " user name", br,
-	 submit("query")
+	print start_form('get'), textfield(-name=>'name', -class=>'text'), " user name", br,
+	 submit(-name=>"query", -class=>'smbutton')
 }
 print end_form, end_html;
 #foreach(keys %ENV) {  print "$_ $ENV{$_}<br>";}

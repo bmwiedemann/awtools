@@ -49,7 +49,7 @@ if($options{alliance}) {
 	print end_table();
 	if($totalprod[0]) { print "total production: ".join(", ", @totalprod);}
 } else {
-	print start_form('get'), textfield(-name=>'alliance'), " alliance tag", br,
-	 submit("query"),end_form
+	print start_form('get'), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
+	 submit(-name=>"query", -class=>'smbutton'),end_form
 }
 print end_html;

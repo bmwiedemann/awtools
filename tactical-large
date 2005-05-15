@@ -59,7 +59,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	}
 	print "</table>";
 } else {
-	print header(-expires=>'+1d'), start_html(-title=>$title);
+	print header(-expires=>'+1d'), AWheader2($title);
 	my @pos=(0,0);
 	my @s=(29,25);
 	if($ENV{REMOTE_USER} eq "af") { @pos=(20,-51); }#$s[1]=37; }
@@ -75,10 +75,10 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 		@pos=systemid2coord($home);
 	}
 	print start_form('get'), 
-		textfield('xs',$pos[0]), " x position (center)", br,
-		textfield('ys',$pos[1]), " y position (center)", p,
-		textfield('xe',$s[0]), " width", br,
-		textfield('ye',$s[1]), " height", br;
-	print submit("query"), end_form();
+		textfield(-name=>'xs', -value=>$pos[0], -class=>'text'), " x position (center)", br,
+		textfield(-name=>'ys', -value=>$pos[1], -class=>'text'), " y position (center)", p,
+		textfield(-name=>'xe', -value=>$s[0], -class=>'text'), " width", br,
+		textfield(-name=>'ye', -value=>$s[1], -class=>'text'), " height", br;
+	print submit(-name=>"query", -class=>'smbutton'), end_form();
 }
 print end_html;

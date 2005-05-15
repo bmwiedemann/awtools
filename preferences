@@ -17,8 +17,8 @@ if(defined($u)) {
 	print header(-cookie=>[$cookie,$cookie2]).AWheader2("logged in as $u ($ref)");
 } else { print AWheader("login"); }
 
-print start_form('get'), textfield('user'), " user name", br,
-textfield('ref'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
-submit("submit"), end_form, "",
+print start_form('get'), textfield(-name=>'user', -class=>'text'), " user name", br,
+textfield(-name=>'ref', -class=>'text'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
+submit(-name=>"submit", -class=>'smbutton'), end_form, "",
 end_html;
 

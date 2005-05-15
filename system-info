@@ -83,9 +83,9 @@ if(param()) {
 		"set expiry time: ", start_form('get'),
 		hidden('id', $options{id}),
 		hidden('export', $options{export}),
-		textfield('expires', "7"), " days valid from now",br,
-		textfield('uniq',12345), " unique id",br,
-		submit;
+		textfield(-name=>'expires', -value=>"7", -class=>'text'), " days valid from now",br,
+		textfield(-name=>'uniq', -value=>"12345", -class=>'text'), " unique id",br,
+		submit(-class=>'smbutton');
 		exit 0;
 	}
 	if(!auth_ok($options{auth})) {
@@ -185,19 +185,20 @@ if(param()) {
 				print "$awuser($uid): ($hx,$hy)-&gt($x,$y) = ($dx,$dy)  Bio=$bio distsqr=$sqr";
 			}
 		} else {
-			print qq!<textarea cols=80 rows=15 name="dummy">$output</textarea>!;
+			#print qq!<textarea cols=80 rows=15 name="dummy" class="text">$output</textarea>!;
+			print textarea(-cols=>80, -rows=>15, -class=>'text', -value=>$output);
 		}
 	}
 } else { 
   print AWheader2("AW system info");
   print start_form('get'),
-   textfield('mapx'), " x", br,
-   textfield('mapy'), " y (e.g. x=0 y=0 for Rana)", br,
+   textfield(-name=>'mapx', -class=>'text'), " x", br,
+   textfield(-name=>'mapy', -class=>'text'), " y (e.g. x=0 y=0 for Rana)", br,
    "or",br,
-   textfield('id'), " system id", br,
+   textfield(-name=>'id', -class=>'text'), " system id", br,
    "or",br,
-   textfield('name'), " system name", br,
-   submit, end_form;
+   textfield(-name=>'name', -class=>'text'), " system name", br,
+   submit(-class=>'smbutton'), end_form;
 }
 print end_html;
 

@@ -19,7 +19,12 @@ our @statuscolor=qw(black black blue cyan red green orange green);
 
 
 sub AWheader2($) { my($title)=@_;
-	start_html($title). a({href=>"index.html"}, "AW tools index"). h1($title);
+	my $links="";
+	foreach my $item (qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
+        	$links.=" ".a({href=>$item},$item);
+	}
+	start_html(-title=>$title, -style=>"/green.css"). a({href=>"index.html"}, "AW tools index").
+	$links. h1($title);
 }
 sub AWheader($) { my($title)=@_; header().AWheader2($title);}
 

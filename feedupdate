@@ -5,7 +5,8 @@ chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "standard.pm";
 
 our %options;
-my $title="AW feed stuff";
+my $title="AW feed update";
+my $debug=1;
 print AWheader($title);
 foreach my $p (qw(tz html file debug name url)) {
 	$options{$p}=param($p);
@@ -19,17 +20,24 @@ if(param()) {
 		#print $bytes_read;
 	}
 	print "input ",length($html)," bytes<br>";
+	if($debug) {
+		open(DEBUG, "> /tmp/debug");
+		print DEBUG time(),"\n";
+		foreach(keys(%options)) {
+			print DEBUG "$_=$options{$_}\n";
+		}
+	}
 	require './feed/dispatch.pm';
 	feed_dispatch($html);
 	#print "$html";
 } else {
 	print start_form(-method=>'post',-enctype=>"multipart/form-data"),
-	textfield('tz',"+1"), " timezone of subject: GMT+n", br,
-	textfield('name',''), " who reports (e.g. for own fleet movements)", br,
-	textarea(-name=>'html',-value=>"", -cols=>40, -rows=>9), " copy+paste HTML source here", br,
-	filefield('file'), " or upload a downloaded HTML file", br,
+	textfield(-name=>'tz', -value=>"+1", -class=>'text'), " timezone of subject: GMT+n", br,
+	textfield(-name=>'name',-value=>'', -class=>'text'), " who reports (e.g. for own fleet movements)", br,
+	textarea(-name=>'html',-value=>"", -cols=>40, -rows=>9, -class=>'text'), " copy+paste HTML source here", br,
+	filefield(-name=>'file', -class=>'text'), " or upload a downloaded HTML file", br,
 #	checkbox('debug'), br,
-	submit('add data'), reset(), end_form, 
+	submit(-name=>'add data', -class=>'smbutton'), reset(), end_form, 
 }
 print end_html;
 

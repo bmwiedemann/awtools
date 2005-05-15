@@ -28,13 +28,15 @@ if(param()) {
 	$year+=1900;$mon++;
 	printf "ETA %.2i.%.2i.%i %2i:%.2i:%.2i GMT".br, $mday,$mon,$year, $hour,$min,$sec;
 } else { 
+	my $s=6;
 	print start_form('get'),
-	textfield('planet'), " Planet diff", br,
-	textfield('distance'), " <a href=\"distsqr\">Dist sqr</a>", br,
-	textfield('energy'), " Energy lvl", br,
+	textfield(-name=>'planet', -size=>$s, -class=>'text'), " Planet diff", br,
+	textfield(-name=>'distance', -size=>$s, -class=>'text'), " ",a({-href=>"distsqr"},"Dist sqr"), br,
+	textfield(-name=>'energy', -size=>$s, -class=>'text'), " Energy lvl", br,
 	popup_menu(-name=>'racespeed', -values=>[-4..4], -default=>0), " Race speed mod", br,
 	checkbox(-name=>'own', -label=>''), " Own destination", br,
-	  submit, end_form, p.'When going from Planet a in System A(x/y) to Planet b in System B(X/Y) then '.br.'Planet diff is the absolute of a-b  and  Dist sqr is (x-X)<sup>2</sup>+(y-Y)<sup>2</sup>'.br.'Energy level accepts fractions like 10.5'.br.'leaving fields blank counts as zero'.br;
+	  submit(-class=>'smbutton'), end_form, p.
+'When going from Planet a in System A(x/y) to Planet b in System B(X/Y) then '.br.'Planet diff is the absolute of a-b  and  Dist sqr is (x-X)<sup>2</sup>+(y-Y)<sup>2</sup>'.br.'Energy level accepts fractions like 10.5'.br.'leaving fields blank counts as zero'.br;
 }
 print end_html;
 

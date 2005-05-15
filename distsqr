@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+
+use strict;
+use CGI ":standard";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "arrival.pm";
+require "standard.pm";
+
+my %options=qw;
+;;
+
+print AWheader('Distance calculator');
+if(param()) {
+ for my $p (qw'dx dy sx sy sid did') {
+  $options{$p}=param($p);
+ }
+ require "input.pm";
+ if($options{sid} && (my $m=$::starmap{$options{sid}})) {
+	$options{sx}=$$m{x}; $options{sy}=$$m{y};
+ }
+ if($options{did} && (my $m=$::starmap{$options{did}})) {
+	$options{dx}=$$m{x}; $options{dy}=$$m{y};
+ }
+ my $dx=$options{sx}-$options{dx};
+ my $dy=$options{sy}-$options{dy};
+ print "from ($options{sx},$options{sy}) to ($options{dx},$options{dy}) is distance ($dx,$dy) so <br>\n";
+ print "distsqr=".($dx**2+$dy**2);
+} else { 
+  my $s=4;
+  print start_form('get'),
+   textfield(-name=>'sx', -size=>$s, -class=>'text'), " x ", textfield(-name=>'sy', -size=>$s, -class=>'text'), " y - or id: ", textfield(-name=>'sid', -size=>$s+1, -class=>'text'), " starting location", br,
+   textfield(-name=>'dx', -size=>$s, -class=>'text'), " x ", textfield(-name=>'dy', -size=>$s, -class=>'text'), " y - or id: ", textfield(-name=>'did', -size=>$s+1, -class=>'text'), " destination location", br,
+   submit(-class=>'smbutton'), end_form;
+}
+print end_html;
+

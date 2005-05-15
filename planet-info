@@ -66,12 +66,12 @@ if($options{id}) {
 	print start_form, "$new: ". span({-style=>'color: '.getstatuscolor($options{status})},systemid2name($sid)."($id)")." ", systemlink($sid), br,
 		popup_menu(-name=>'status', -values=>[1..7], -default=>$options{status},
 		-labels=>\%::planetstatusstring), " status", br,
-		textfield('who', $options{who}), " user-id or user-name of the one who does the above $link", br,
-		textarea(-name=>'comment', -value=>$options{comment}, -rows=>9, -cols=>40), " ETA, fleet, etc...", br,
+		textfield(-name=>'who', -value=>$options{who}, -class=>'text'), " user-id or user-name of the one who does the above $link", br,
+		textarea(-name=>'comment', -value=>$options{comment}, -rows=>9, -cols=>40, -class=>'text'), " ETA, fleet, etc...", br,
 		hidden(-name=>'id', $id),
-		submit("submit"), qq! <a href="?">new query</a> !, submit("submit","delete entry");
+		submit(-name=>"submit", -class=>'smbutton'), qq! <a href="?">new query</a> !, submit(-name=>"submit",-value=>"delete entry", -class=>'smbutton');
 } else {
-	print start_form('get'), textfield(-name=>'id'), " ID: system#planet", br,
-	 submit("query")
+	print start_form('get'), textfield(-name=>'id', -class=>'text'), " ID: system#planet", br,
+	 submit(-name=>"query", -class=>'smbutton')
 }
 print end_form, end_html;
