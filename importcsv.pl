@@ -22,6 +22,8 @@ sub dumphash { my ($h)=@_;
 	}
 }
 sub starmap { my($x,$y,$level,$id,$name)=@_;
+	if(!$name) {print "$x $y\n"; $name="undefined"}
+	$name=~s/\s+/ /;
 	my %h=("x"=>$x, "y"=>$y, "level"=>$level, "name"=>$name, "origin" => \@{$origin[$id]});
 	$starmap{$id}=\%h;
 	$starmap{"\L$name"}=$id;
@@ -70,12 +72,13 @@ sub planets {
 	#		}
 		}
 		if($elements[$i] eq "systemid") {$id=$_[$i]}
-		else {$h{$elements[$i]}=$_[$i];}
+		{$h{$elements[$i]}=$_[$i];}
 		if($elements[$i] eq "ownerid") { 
 			push(@{$playerplanets[$_[$i]]}, "$id#$pid");
 #			push(@{$playersat[$id]}, $_[$i]) 
 		}
 	}
+	$h{opop}=$h{pop};
 #	$planets{"$id#$pid"}=\%h;
 	my @temp=$planets{$id}?@{$planets{$id}}:();
 	$temp[$pid-1]=\%h;
