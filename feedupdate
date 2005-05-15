@@ -35,7 +35,7 @@ if(param()) {
 	textfield(-name=>'tz', -value=>"+1", -class=>'text'), " timezone of subject: GMT+n", br,
 	textfield(-name=>'name',-value=>'', -class=>'text'), " who reports (e.g. for own fleet movements)", br,
 	textarea(-name=>'html',-value=>"", -cols=>40, -rows=>9, -class=>'text'), " copy+paste HTML source here", br,
-	filefield(-name=>'file', -class=>'text'), " or upload a downloaded HTML file", br,
+	filefield(-name=>'file', -class=>'file'), " or upload a downloaded HTML file", br,
 #	checkbox('debug'), br,
 	submit(-name=>'add data', -class=>'smbutton'), reset(), end_form, 
 }
