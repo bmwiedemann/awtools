@@ -40,13 +40,14 @@ sub guessrace {my($test)=@_;
 sub learn {my ($data)=@_;
   my $n=6000;
   for my $j (1..$n) {
+  	my $part=$j/$n;
 	my $i=rand(@$data);
 	my $e=$$data[$i];
 #	foreach my $e (@$data) {
 #		print "@$e\n";
 		translate($e);
 #		print "@$e\n";
-		$net->train(0.1,5-1*($j/$n),@$e);
+		$net->train(0.5-0.1*$part,5-1*$part,@$e);
 #	}
   }
 }
@@ -94,8 +95,8 @@ else{ initguess() }
 
 #runtest([qw(486 45 22 22 28 18 22 7 394 38)]);
 #runtest([qw(382 451 15 17 25 40 18 9 247 15)]);
-#for my $pid (qw(49545 24014 19832 56530 48306)) {
-#	printf ("$pid race fighter%.4f ranker%.4f\n",guessrace([getpubdata($pid)]));
-#}
+for my $pid (qw(49545 24014 19832 56530 48306 16242)) {
+	printf ("$pid race fighter%.4f ranker%.4f\n",guessrace([getpubdata($pid)]));
+}
 
 1; 
