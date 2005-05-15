@@ -25,7 +25,7 @@ updatemap2only:
 	done
 updaterank:
 	for a in $(allies) ; do \
-		REMOTE_USER=$$a perl rank.pl | sort -r > html/ranking.$$a.txt ; \
+		REMOTE_USER=$$a perl rank.pl > html/ranking.$$a.html ; \
 		REMOTE_USER=$$a perl holes.pl > html/$$a-holes.html ; \
 	done
 	

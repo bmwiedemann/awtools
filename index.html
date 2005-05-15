@@ -7,7 +7,7 @@ print AWheader('tools index');
 foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
 	print qq!<a href="$_">$_</a>!,br;
 }
-print p.qq!<a href="/ranking.$ENV{REMOTE_USER}.txt">\U$ENV{REMOTE_USER}\E alliance ranking</a>!,br;
+print p.qq!<a href="/ranking.$ENV{REMOTE_USER}.html">\U$ENV{REMOTE_USER}\E alliance ranking</a>!,br;
 print qq!<a href="/$ENV{REMOTE_USER}-holes.html">\U$ENV{REMOTE_USER}\E holes</a>!,br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
 print qq!<a href="/manual.html">manual</a>!,p;
