@@ -9,11 +9,11 @@ my $uc=cookie('user');
 my $ref=param('ref');
 my $refc=cookie('refsys');
 
-if(!defined($u) && $uc) {$u=$uc}
-if(!defined($ref) && $refc) {$ref=$refc}
+if(!defined($u) && $uc) {param("user",$uc);$u=$uc}
+if(!defined($ref) && $refc) {param("ref",$refc);$ref=$refc}
 if(defined($u)) {
-	my $cookie=cookie(-name=>'user', -value=>$u);
-	my $cookie2=cookie(-name=>'refsys', -value=>$ref);
+	my $cookie=cookie(-name=>'user', -value=>$u, -expires=>'+90d');
+	my $cookie2=cookie(-name=>'refsys', -value=>$ref, -expires=>'+90d');
 	print header(-cookie=>[$cookie,$cookie2]).AWheader2("logged in as $u ($ref)");
 } else { print AWheader("login"); }
 
