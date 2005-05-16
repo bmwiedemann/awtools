@@ -10,6 +10,7 @@ my %options=qw;
 ;;
 
 print AWheader('Distance calculator');
+print "calculation of euclidian distance square value for ".a({-href=>"arrival"},"arrival time calculation").p;
 if(param()) {
  for my $p (qw'dx dy sx sy sid did') {
   $options{$p}=param($p);
