@@ -3,15 +3,19 @@ use strict;
 use CGI ":standard";
 use DB_File;
 
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+
 my $title="add relation";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %options;
-print header, start_html($title), h1($title);
+print AWheader($title);
 for my $p (qw'user alliance relation comment') {
 	$options{$p}=param($p);
 }
-if($options{relation}) {
+if(defined($options{relation})) {
 	$options{user} =~ y/A-Z/a-z/;
+	if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
 	$options{alliance} =~ y/a-z/A-Z/;
 	my %data;
 	tie(%data, "DB_File", $dbname) or print "error accessing DB\n";
@@ -22,9 +26,9 @@ if($options{relation}) {
 		if($user=~m/^\s*$/) {next}
 #		if($user !~ /^[-_. a-z0-9\[\]]*$/) { print 'illegal character in user name'; exit(0);}
 		$options{relation}+=0;
-		if($options{relation}<1 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
-		if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
-		$data{$user}="$options{relation} $options{alliance} $options{comment}";
+		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
+		my @rel=getrelation($user);
+		$data{$user}="$options{relation} $options{alliance} $options{comment}\n$rel[2]";
 	}
 	untie(%data);
 	print span({-style=>'color: darkgreen'},"added $options{user}"),br;
@@ -33,13 +37,13 @@ if($options{relation}) {
 if(1) {
 	$options{alliance}="unknown";
 	$options{comment}="";
-	$options{relation}=4;
+	$options{relation}=0;
 	
 	print start_form, "enter one on each line", br;
 	print textarea(-name=>'user', "all\nmembers"), br;
 	print textfield('alliance', $options{alliance}), " alliance membership (e.g. unknown, TZAR, ES)", br,
-	popup_menu(-name=>'relation', -values=>[1..9], -default=>$options{relation},
-		-labels=>{1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member"}), " relation", br,
+	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{relation},
+		-labels=>\%::relationname), " relation", br,
 	textarea('comment', $options{comment}), " who added him, why, contact etc...", br,
 	submit("submit all - really sure?")
 } 
