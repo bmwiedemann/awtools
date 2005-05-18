@@ -32,10 +32,11 @@ sub getrelation($) { my($name)=@_;
 		if(!$atag) {$atag=$::alliances{$aid}{tag};}
 #		print "id $id a $aid at $atag\n<br>";
 		if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {$info=$3}
-		$rel=$::relation{"\L$atag"};
-		if(!$rel) { return undef }
-		$rel=~/^(\d+) (\w+) /s;
-		return ($1,$2,$info,0);
+		my $rel2=$::relation{"\L$atag"};
+		if($rel2) { 
+			$rel2=~/^(\d+) (\w+) /s;
+			return ($1,$2,$info,0);
+		}
 	}
 	$rel=~/^(\d+) (\w+) (.*)/s;
 	($effrel,$ally,$info)=($1, $2, $3);
