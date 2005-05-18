@@ -2,7 +2,7 @@
 
 use strict;
 use CGI ":standard";
-my $title="[\U$ENV{REMOTE_USER}\E] fleets";
+my $title="fleets [\U$ENV{REMOTE_USER}\E]";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "./input.pm";
 print AWheader($title);

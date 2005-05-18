@@ -6,7 +6,7 @@ alarm 30;
 my $imgsize=2*13;
 sub round($) {int($_[0]+0.5)}
 if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
-my $title="\U$ENV{REMOTE_USER}\E large tactical map";
+my $title="large tactical map [\U$ENV{REMOTE_USER}\E]";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "awmap.pm";
