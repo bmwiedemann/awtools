@@ -20,11 +20,13 @@ our @statuscolor=qw(black black blue cyan red green orange green);
 
 sub AWheader2($) { my($title)=@_;
 	my $links="";
-	foreach my $item (qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
+	foreach my $item (qw(login arrival tactical tactical-large relations alliance system-info fleets feedupdate)) {
         	$links.=" |&nbsp;".a({href=>$item},$item);
 	}
 	local $^W=0; #disable warnings for next line
-	start_html(-title=>$title, -style=>"/green.css"). 
+	start_html(-title=>$title, -style=>"/green.css", 
+	# -head=>qq!<link rel="icon" href="/favicon.ico" type="image/ico" />!).
+	 -head=>Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"})).
 	div({-align=>'justify',-class=>'header'},a({href=>"index.html"}, "AW tools index").
 	$links). h1($title);
 }
