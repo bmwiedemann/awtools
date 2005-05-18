@@ -19,7 +19,7 @@ if(@params && param("turns")<=9999) {
 	print start_form('get'), 
 	textfield(-name=>'turns', -value=>$default[0], -size=>$s, -class=>'text'), " how many turns (of 15 min) to simulate", br,
 	textfield(-name=>'print', -value=>$default[1], -size=>$s, -class=>'text'), " print only each n turns", br,
-	textfield(-name=>'tactic', -value=>$default[2], -size=>$s, -class=>'text'), " use tactic (1..5)", p,
+	textfield(-name=>'tactic', -value=>$default[2], -size=>$s, -class=>'text'), " use tactic (1..6)", p,
 	textfield(-name=>'pop', -value=>0, -size=>$s, -class=>'text'), " growth bonus (-4..+4)", br,
 	textfield(-name=>'sci', -value=>0, -size=>$s, -class=>'text'), " science bonus", br,
 	textfield(-name=>'cul', -value=>0, -size=>$s, -class=>'text'), " culture bonus", br,
