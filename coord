@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use strict;
+use CGI ":standard";
+
+my %options;
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+for my $p (qw'x y xs ys') {
+  $options{$p}=param($p);
+}
+if(defined($options{x}) && defined($options{y})) {
+	require "awmap.pm";
+	if(defined($options{xs})) {
+		$::mapxoff=$options{xs};
+		$::mapyoff=$options{ys};
+	}
+	my($x,$y)=imgtomap($options{x}, $options{y});
+	my $target=$ENV{SCRIPT_NAME};
+	$target=~s/coord/system-info/;
+	print redirect("http://$ENV{HTTP_HOST}$target?mapx=$x&mapy=$y");
+	exit(0);
+}
+print header(),"need coords from ".a({-href=>"tactical"},"tactical");
+
