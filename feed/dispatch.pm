@@ -1,12 +1,13 @@
 sub feed_dispatch($) { local $_=$_[0];
-	if(! m!>([^<>]*)</title>!) { 
+	if(! m!<title>([^<>]*)</title>!) { 
 		my @race;
 		if($::options{name}) { require './feed/plain_race.pm' }
 		print "no title found\n"; exit 0;
 	}
 	my $title=$1;
 	my $aw="Astro Wars";
-	our @time=($title=~/ - (\d+):(\d+):(\d+)/);
+	our @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
+	$title=shift(@time);
 	our $deliverytime;
 	{
 		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime();
@@ -33,6 +34,8 @@ sub feed_dispatch($) { local $_=$_[0];
 		require './feed/trade_agreement.pm';
 	} elsif ($title=~m!$aw Science!) {
 		require './feed/science.pm';
+	} elsif ($title=~m!^ $aw Planets$!) {
+		require './feed/planets.pm';
 	} elsif ($title=~m!$aw News!) {
 		require './feed/news.pm';
 	} else {
