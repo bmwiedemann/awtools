@@ -20,9 +20,9 @@ if($options{map}==1 && defined($options{xs})) {
 	my $ysize=$options{ye};
 	my $max=1600;
 	if($xsize>0 && $ysize>0 && $xsize*$ysize<=$max) {
-		$xsize>>=1;
-		$ysize>>=1;
-		my $png=mapimage($options{xs}-$xsize,$options{ys}-$ysize,$options{xs}+$xsize,$options{ys}+$ysize);
+		$options{xs}-=$xsize>>1;
+		$options{ys}-=$ysize>>1;
+		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize-1);
 		my $size=length($png);
 		print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>$size), $png;
 		exit 0;
