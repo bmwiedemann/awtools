@@ -10,7 +10,8 @@ my $title="large tactical map [\U$ENV{REMOTE_USER}\E]";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "awmap.pm";
-require "input.pm";
+require "awmapcgi.pm";
+#require "input.pm";
 chdir "large-$ENV{REMOTE_USER}";
 for my $p (qw'xs xe ys ye x y') {
 	$options{$p}=param($p);
@@ -75,10 +76,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 		@pos=systemid2coord($home);
 	}
 	print start_form('get'), 
-		textfield(-name=>'xs', -value=>$pos[0], -class=>'text'), " x position (center)", br,
-		textfield(-name=>'ys', -value=>$pos[1], -class=>'text'), " y position (center)", p,
-		textfield(-name=>'xe', -value=>$s[0], -class=>'text'), " width", br,
-		textfield(-name=>'ye', -value=>$s[1], -class=>'text'), " height", br;
-	print submit(-name=>"query", -class=>'smbutton'), end_form();
+	 awmapcoordinput(),
+	 submit(-name=>"draw", -class=>'smbutton'), end_form();
 }
 print end_html;
