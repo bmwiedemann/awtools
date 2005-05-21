@@ -44,8 +44,6 @@ sub auth_ok($) { my($auth)=@_;
 }
 sub tprint { unless($options{export}){print @_} }
 
-my $path="/home/bernhard/code/cvs/perl/awcalc";
-chdir $path;
 for my $p (qw'x y') {
   $options{$p}=param($p);
 }
@@ -172,9 +170,11 @@ if(param()) {
 		}
 		if(!$options{export}) {
 			print "</ul>\n";
-			print "players having their origin here: <ul>";
-			foreach(@{$::starmap{$system}{origin}}) { print li(spinfo($_)); }
-			print "</ul>\n";
+			if(@{$::starmap{$system}{origin}}) {
+				print "players having their origin here: <ul>";
+				foreach(@{$::starmap{$system}{origin}}) { print li(spinfo($_)); }
+				print "</ul>\n";
+			}
 			my $uid=playername2id($awuser);
 			if($uid>2) {
 				my $home=playerid2home($uid);
@@ -182,7 +182,7 @@ if(param()) {
 				my ($dx,$dy)=(abs($hx-$x),abs($hy-$y));
 				my $sqr=$dx**2+$dy**2;
 				my $bio=($dx>$dy?$dx:$dy)*2;
-				print "$awuser($uid): ($hx,$hy)-&gt($x,$y) = ($dx,$dy)  Bio=$bio distsqr=$sqr";
+				print "$awuser($uid): ($hx,$hy)-&gt;($x,$y) = ($dx,$dy)  Bio=$bio distsqr=$sqr";
 			}
 		} else {
 			#print qq!<textarea cols=80 rows=15 name="dummy" class="text">$output</textarea>!;
