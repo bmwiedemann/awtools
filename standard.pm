@@ -3,11 +3,12 @@ use Time::Local;
 
 our $server="www1.astrowars.com";
 our $bmwserver="aw.lsmod.de";
+our $style;
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
 our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
-our @sciencestr=qw(Biology Economy Energy Mathematics Physics Social);
+our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue","Trade Balance");
 our @racestr=qw(growth science culture production speed attack defense);
 our @racebonus=qw(0.08 0.09 0.04 0.04 0.19 0.15 0.16);
 our $magicstring="automagic:";
@@ -22,13 +23,18 @@ sub AWheader2($) { my($title)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
 	$owncgi=~s!/cgi-bin/!!;
-	foreach my $item (qw(index.html login arrival tactical tactical-large relations alliance system-info fleets feedupdate)) {
+	foreach my $item (qw(index.html login arrival tactical tactical-large tactical-live relations alliance system-info fleets feedupdate)) {
 		my %h=(href=>$item);
-		if($item eq $owncgi) {$h{class}='headeractive'}
-		$links.=" |&nbsp;".a(\%h,$item);
+		if($item eq $owncgi) {
+			$h{class}='headeractive';
+			$links.="|".span({-class=>"headeractive"},"&nbsp;".a(\%h,$item)." ");
+			next;
+		}
+		$links.="|&nbsp;".a(\%h,$item)." ";
 	}
+	if(!$style) {$style='green'}
 	local $^W=0; #disable warnings for next line
-	start_html(-title=>$title, -style=>"/green.css", 
+	start_html(-title=>$title, -style=>"/$style.css", 
 	# -head=>qq!<link rel="icon" href="/favicon.ico" type="image/ico" />!).
 	 -head=>Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"})).
 	div({-align=>'justify',-class=>'header'},#a({href=>"index.html"}, "AW tools index").
@@ -167,6 +173,10 @@ sub relation2production($) { local $_=$_[0];
 sub gmdate($) {
 	my @a=gmtime($_[0]); $a[5]+=1900;
 	return "$month[$a[4]] $a[3] $a[5]";
+}
+
+sub sb2cv($) { my($sb)=@_;
+	return int(-4+4*1.5**$sb+0.5);
 }
 
 1;

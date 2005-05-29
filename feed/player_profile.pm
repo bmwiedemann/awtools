@@ -40,7 +40,7 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 	#my $science="";
 	my @science;
 	foreach my $sci (@::sciencestr) {
-		next if ! m,$sci</td><td>(\d+),; #$sci{$sci}=$1;
+		next if ! m,$sci</td><td>([+-]?\d+),; #$sci{$sci}=$1;
 		#my $val=$1;
 		push(@science,$1);
 		#$sci=~/^(...)/;$sci=$1;
