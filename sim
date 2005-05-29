@@ -3,6 +3,7 @@ use strict;
 use CGI ":standard";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "standard.pm";
+require "cgicommon.pm";
 
 my $title="AW economic simulation";
 print AWheader($title);

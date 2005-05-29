@@ -3,8 +3,8 @@
 use strict;
 use CGI ":standard";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "arrival.pm";
 require "standard.pm";
+require "cgicommon.pm";
 
 my %options=qw;
 racespeed 0
@@ -17,6 +17,7 @@ own 0
 print AWheader('Arrival time calculator');
 printform();
 if(param()) {
+	require "arrival.pm";
 	for my $p (qw'planet distance own energy racespeed') {
 	  $options{$p}=param($p);
 	  if(!$options{$p}) {$options{$p}=0}

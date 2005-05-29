@@ -7,6 +7,7 @@ use Digest::MD5 "md5_hex";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "standard.pm";
+require "cgicommon.pm";
 my $awuser=cookie('user');
 my $refsys=cookie('refsys');
 
@@ -106,7 +107,7 @@ if(param()) {
 
 		## start of normal output ##
 		if(!$options{export}) {
-			print qq!<a href="?legend=1">legend</a> <a href="?">new query</a> <a href="?id=$system&amp;export=1">BB-export</a> <a href="?id=$system&amp;export=2">anonymous updated export</a>!,br;
+			print qq!<a href="?legend=1">legend</a> <a href="?id=$system&amp;export=1">BB-export</a> <a href="?id=$system&amp;export=2">anonymous updated export</a>!,br;
 			($bs,$be,$eol)=('<b>','</b>',"<br />\n");
 		}
 		my $output="$bs$::starmap{$system}{name}($x,$y)$be${eol}Id=$system level=$::starmap{$system}{level} ";

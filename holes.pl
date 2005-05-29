@@ -8,7 +8,7 @@ sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 
 my @holes;
 {my $x=$::planets}
-my $head=AWheader2("holes list");
+my $head=AWheader2("holes list [\U$ENV{REMOTE_USER}\Q]");
 #$head=~s!index!/cgi-bin/index!;
 $head=~s!<a href="!$&/cgi-bin/!g;
 print $head.

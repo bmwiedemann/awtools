@@ -9,6 +9,7 @@ chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "awmap.pm";
 require "awmapcgi.pm";
 #require "standard.pm";
+require "cgicommon.pm";
 
 for my $p (qw'map xs ys xe ye') {
 	$options{$p}=param($p);

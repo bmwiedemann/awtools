@@ -2,14 +2,19 @@
 use CGI ":standard";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "standard.pm";
+require "cgicommon.pm";
 print AWheader('tools index');
 
-foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-	print qq!<a href="$_">$_</a>!,br;
+#foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
+foreach(qw(sim planet-info distsqr ranking)) {
+	print a({-href=>$_},$_),br;
 }
-print p.qq!<a href="/ranking.$ENV{REMOTE_USER}.html">\U$ENV{REMOTE_USER}\E alliance ranking</a>!,br;
+print p;
+#print qq!<a href="/ranking.$ENV{REMOTE_USER}.html">\U$ENV{REMOTE_USER}\E alliance ranking</a>!,br;
 print qq!<a href="/$ENV{REMOTE_USER}-holes.html">\U$ENV{REMOTE_USER}\E holes</a>!,br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
+print a({href=>"/strongestfleet-1.html"},"strongest fleets"),br;
 print qq!<a href="/manual.html">manual</a>!,p;
-print qq!<a href="http://www1.astrowars.com/0/News/">AW</a>!;
+print qq!<a href="http://www1.astrowars.com/0/News/">AW</a>!,br;
+print qq!<a href="http://www.astrowars.com/about/battlecalculator/">AW battle calc</a>!;
 print end_html;

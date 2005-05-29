@@ -5,6 +5,7 @@ use CGI ":standard";
 my $title="fleets [\U$ENV{REMOTE_USER}\E]";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "./input.pm";
+require "cgicommon.pm";
 print AWheader($title);
 
 my %CV;

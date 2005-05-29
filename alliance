@@ -3,6 +3,7 @@ use strict;
 use CGI qw":standard *table";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "input.pm";
+require "cgicommon.pm";
 
 my %options;
 print AWheader("alliance info");

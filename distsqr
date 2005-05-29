@@ -3,8 +3,9 @@
 use strict;
 use CGI ":standard";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "arrival.pm";
+#require "arrival.pm";
 require "standard.pm";
+require "cgicommon.pm";
 
 my %options=qw;
 ;;

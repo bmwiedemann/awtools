@@ -12,6 +12,8 @@ chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "awmap.pm";
 require "awmapcgi.pm";
 #require "input.pm";
+require "cgicommon.pm";
+
 chdir "large-$ENV{REMOTE_USER}";
 for my $p (qw'xs xe ys ye x y') {
 	$options{$p}=param($p);
@@ -60,7 +62,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	}
 	print "</table>";
 } else {
-	print header(-expires=>'+1d'), AWheader2($title);
+	print header(), AWheader2($title);
 	my @pos=(0,0);
 	my @s=(29,25);
 	if($ENV{REMOTE_USER} eq "af") { @pos=(20,-51); }#$s[1]=37; }

@@ -9,6 +9,7 @@ my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "./input.pm";
+require "cgicommon.pm";
 
 sub planetpopsort {return $$b{pop}<=>$$a{pop}}
 
