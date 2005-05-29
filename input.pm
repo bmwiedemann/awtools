@@ -80,17 +80,29 @@ sub systemcoord2id($$) { my($x,$y)=@_;
 sub systemid2name($) { my($id)=@_;
 	$::starmap{$id}?$::starmap{$id}{name}:undef;
 }
+sub systemid2level($) { my($id)=@_;
+	$::starmap{$id}?$::starmap{$id}{level}:undef;
+}
 sub systemid2coord($) { my($id)=@_;
 	$::starmap{$id}?($::starmap{$id}{x},$::starmap{$id}{y}):undef;
 }
+sub systemid2planets($) { my($id)=@_;
+        $::planets{$id}?@{$::planets{$id}}:undef;
+}
 sub allianceid2tag($) { my($id)=@_;
 	$::alliances{$id}?$::alliances{$id}{tag}:undef;
+}
+sub allianceid2members($) { my($id)=@_;
+        $::alliances{$id}?@{$::alliances{$id}{m}}:undef;
 }
 sub alliancetag2id($) { my($tag)=@_;
         $::alliances{"\L$tag"}	#?$::alliances{$id}{tag}:undef;
 }
 sub playerid2alliance($) { my($id)=@_;
 	$::player{$id}?$::player{$id}{alliance}:undef;
+}
+sub playerid2planets($) { my($id)=@_;
+        $::player{$id}?@{$::player{$id}{planets}}:undef;
 }
 sub playerid2tag($) { my($id)=@_;
 	allianceid2tag(playerid2alliance($id));
