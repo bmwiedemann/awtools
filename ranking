@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+
+use CGI ":standard";
+#$ENV{REMOTE_USER}="af";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+require "cgicommon.pm";
+#open ENEMY, "> html/enemies.$ENV{REMOTE_USER}.html" or die $!;
+my @enemy;
+
+my $dummy=$::relation{greenbird};
+my @rankings=();
+foreach my $name(keys %::relation) {
+	my @rel=getrelation($name);
+	if(!defined($rel[0])) {next}
+	my $id=playername2id($name);
+	next unless $id;
+	my $points=$::player{$id}{points};
+#	printf("%.3i(%.4i) $name($id)\n",$points,$::player{$id}{rank});
+	my $p=$::player{$id};
+	if($rel[0]<=3) {
+		#my $aid=$$p{tag};
+		#my $atag=$aid && allianceid2tag($aid);
+		push @enemy, qq!<a href="/cgi-bin/relations?name=$name">$name ($id)</a> \n!.br;
+	}
+	if($rel[0]==9) {
+		my $entry="";
+		foreach my $k (qw"points rank culture science level name") {
+			my $v=$$p{$k};
+			if($v=~/^\d+$/) {$v=sprintf("%.4i",$v);}
+			if($k eq "name") {$v=a({href=>"relations?name=$v"},$v);}
+			$entry.="$k=$v ";
+		}
+		push @rankings, $entry;
+	}
+}
+
+my $head=AWheader("alliance ranking [\U$ENV{REMOTE_USER}\E]");
+#$head=~s!<a href="!$&/cgi-bin/!g;
+print $head,code( join(br."\n", reverse sort @rankings)),
+#p,h1("enemy list"),
+#join("",@enemy),
+end_html();
