@@ -1,7 +1,8 @@
 d=`date +%d-%m-%Y`
+awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-allies=af fun tgd xr la tbgsaf guest
+allies=fun tgd xr la tbgsaf guest
 #allies=
 #winterwolf arnaken manindamix
 all: TA.candidate
@@ -16,6 +17,10 @@ updatecsv: dumpdbs
 	tar xjf ${f2}
 	umask 2 ; perl importcsv.pl && ( mv db/* olddb ; mv newdb/* db )
 	cp -a tactical-af.png olddb/tactical-af-$d.png
+	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
+	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
+	for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
+	perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
 updatemap: updatemaponly updaterank af-relations.txt tgd-relations.txt
 updatemaponly:
 	for a in $(allies) ; do \
@@ -66,5 +71,5 @@ access:
 	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm
 
 tgz:
-	tar -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done system-info relations relations-bulk planet-info login tactical{,-large} alliance fleets feedupdate feed/*.pm LICENSE Makefile
+	tar -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done system-info relations relations-bulk planet-info login tactical{,-large,-live} alliance fleets feedupdate index.html sim arrival ranking distsqr feed/*.pm LICENSE Makefile
 	mv ../bmw-awtools.tar.gz html/
