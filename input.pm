@@ -37,6 +37,7 @@ sub getrelation($) { my($name)=@_;
 			$rel2=~/^(\d+) (\w+) /s;
 			return ($1,$2,$info,0);
 		}
+		if(!$rel) { return undef }
 	}
 	$rel=~/^(\d+) (\w+) (.*)/s;
 	($effrel,$ally,$info)=($1, $2, $3);
