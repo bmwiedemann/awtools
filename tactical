@@ -14,11 +14,10 @@ for my $p (qw'map') {
 }
 if($options{map}) {
 	my $f="tactical-$ENV{REMOTE_USER}.png";
-	chdir("/home/bernhard/code/cvs/perl/awcalc");
 	open(F, "< $f") or die $!;
-	my $size=-s $f;
-	my $expire;
-	print header(-type=>'image/png', -expires=>"+6h", -content_lenth=>$size);
+	my $size=(stat($f))[7];
+	my $modified=(stat(_))[9];
+	print header(-type=>'image/png', -expires=>"+6h", -last_modified=>$modified, -content_lenth=>$size);
 	print <F>;
 } else {
 	print header(-expires=>'+1d'), 
@@ -41,7 +40,7 @@ function getMouseXY(e) {
     tempX = e.pageX
     tempY = e.pageY
   }
-  window.status="("+Math.floor((tempX-9)/$::pixelpersystem+($::mapxoff))+","+Math.floor((tempY-9)/$::pixelpersystem+($::mapyoff))+")"
+  window.status="("+Math.floor((tempX-0)/$::pixelpersystem+($::mapxoff))+","+Math.floor((tempY-0)/$::pixelpersystem+($::mapyoff))+")"
   return true
 }
 //--></script>%;

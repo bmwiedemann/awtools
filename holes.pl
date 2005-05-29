@@ -7,7 +7,6 @@ require "input.pm";
 sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 
 my @holes;
-{my $x=$::planets}
 my $head=AWheader2("holes list [\U$ENV{REMOTE_USER}\Q]");
 #$head=~s!index!/cgi-bin/index!;
 $head=~s!<a href="!$&/cgi-bin/!g;
@@ -18,7 +17,7 @@ for my $sid (1..4600) {
 	my $other=0;
 	my $member=0;
 	my $worstrel=10;
-	foreach my $planet (@{$::planets{$sid}}) {
+	foreach my $planet (systemid2planets($sid)) {
 		my $p=$$planet{ownerid};
 		my @rel=getrelation(playerid2name($p));
 		if(!$p || $p<=2 || !$rel[0]) {$rel[0]=4}

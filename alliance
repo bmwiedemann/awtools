@@ -26,7 +26,7 @@ if($options{alliance}) {
 	print "$alli members",br,start_table();
 	print "<tr align=\"center\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td></tr>\n";
 	my @totalprod=(0,0,0);
-	for my $pid (@{$::alliances{$aid}{m}}) {
+	for my $pid (allianceid2members($aid)) {
 		my $p=$::player{$pid};
 		next if ! defined($p);
 		next if $$p{alliance} ne $aid;
@@ -35,7 +35,8 @@ if($options{alliance}) {
 		my $alink="";
 		my $planets=@{$$p{planets}};
 		my $joined=gmtime($$p{joined});#." ".$$p{joined};
-		my $home="$$p{home_id}($::starmap{$$p{home_id}}{x},$::starmap{$$p{home_id}}{y})";
+		my ($x,$y)=systemid2coord($$p{home_id});
+		my $home="$$p{home_id}($x,$y)";
 		my @rel=getrelation($name);
 		my @prod=relation2production($rel[2]);
 		{ my $n=0;
@@ -48,7 +49,7 @@ if($options{alliance}) {
 		print "</tr>\n";
 	}
 	print end_table();
-	if($totalprod[0]) { print "total production: ".join(", ", @totalprod);}
+	if($totalprod[0]) { print "total hourly production/science/culture: ".join(", ", @totalprod);}
 } else {
 	print start_form('get'), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
 	 submit(-name=>"query", -class=>'smbutton'),end_form

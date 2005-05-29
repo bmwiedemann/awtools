@@ -17,12 +17,8 @@ if(param()) {
   $options{$p}=param($p);
  }
  require "input.pm";
- if($options{sid} && (my $m=$::starmap{$options{sid}})) {
-	$options{sx}=$$m{x}; $options{sy}=$$m{y};
- }
- if($options{did} && (my $m=$::starmap{$options{did}})) {
-	$options{dx}=$$m{x}; $options{dy}=$$m{y};
- }
+ if($options{sid}) { ($options{sx},$options{sy})=systemid2coord($options{sid}); }
+ if($options{did}) { ($options{dx},$options{dy})=systemid2coord($options{did}); }
  my $dx=$options{sx}-$options{dx};
  my $dy=$options{sy}-$options{dy};
  print "from ($options{sx},$options{sy}) to ($options{dx},$options{dy}) is distance ($dx,$dy) so <br>\n";

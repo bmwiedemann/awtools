@@ -63,18 +63,14 @@ sub mrelationcolor($) { my($name)=@_;
 	return $color;
 }
 sub mrelationcolorid($) {
-	my $e=$::player{$_[0]};
-	my $dummye=$::player{$_[0]};
-	my $n;
-	if(!$e) {$n="unknown"}
-	else {$n=$$e{name}}
-	mrelationcolor($n); 
+	mrelationcolor(playerid2name($_[0])); 
 }
 
 
 for(my $x=$mapxoff; $x<$mapxend; $x++) {
   for(my $y=$mapyoff; $y<$mapyend; $y++) {
-	if(defined($::starmap{"$x,$y"})) {
+	my $id=systemcoord2id($x,$y);
+	if(defined($id)) {
 		my ($px,$py)=(0,0);
 		my $pxe=$px+$pixelpersystem;
 		my $pye=$py+$pixelpersystem;
@@ -87,7 +83,6 @@ for(my $x=$mapxoff; $x<$mapxend; $x++) {
 
 		# grid
 		drawgrid(gridtest($x,$y),$img);
-		my $id=$::starmap{"$x,$y"};
 	   $v=12;
 		for(my $i=1; $i<=$v; $i++) {
 			my $statuscolor;

@@ -31,4 +31,4 @@ foreach my $name(keys %::relation) {
 
 my $head=AWheader2($ENV{REMOTE_USER}." alliance ranking");
 $head=~s!<a href="!$&/cgi-bin/!g;
-print $head,"<pre>", join("\n", sort @rankings),"</pre>",end_html();
+print $head,"<pre>", join("\n", reverse sort @rankings),"</pre>",end_html();

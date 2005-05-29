@@ -23,7 +23,7 @@ if($options{map}==1 && defined($options{xs})) {
 	if($xsize>0 && $ysize>0 && $xsize*$ysize<=$max) {
 		$options{xs}-=$xsize>>1;
 		$options{ys}-=$ysize>>1;
-		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize-1);
+		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize-1)->png();
 		my $size=length($png);
 		print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>$size), $png;
 		exit 0;

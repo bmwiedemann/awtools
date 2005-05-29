@@ -72,13 +72,13 @@ if($options{name}) {
 	textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
 	submit("submit"), qq! <a href="?">new query</a>!;
 	if($id>2) {
-		my $planets=@{$::player{$id}{planets}};
+		my @pl=playerid2planets($id);
+		my $planets=@pl;
 		my $level=$::player{$id}{level};
 		my $pop=0;
 		my @planets;
-		foreach my $p (@{$::player{$id}{planets}}) {
-			my @p=split("#",$p);
-			my $pp=$::planets{$p[0]}[$p[1]-1];
+		foreach my $p (@pl) {
+			my $pp=sidpid2planet($p);
 			$pop+=planet2opop($pp);
 			push(@planets, $pp);
 		}
@@ -88,8 +88,9 @@ if($options{name}) {
 		print br,$user," owns $planets planets<ul>";
 		foreach my $pp (sort planetpopsort @planets) {
 			my $sid=$$pp{systemid};
+			my ($x,$y)=systemid2coord($sid);
 			print qq! <li><a href="system-info?id=$sid">!.systemid2name($sid);
-			printf qq!</a> ($::starmap{$sid}{x},$::starmap{$sid}{y}) #$$pp{planetid} : pop=%i SB=%i </li>\n!, planet2pop($pp), planet2sb($pp);
+			printf qq!</a> ($x,$y) #$$pp{planetid} : pop=%i SB=%i </li>\n!, planet2pop($pp), planet2sb($pp);
 		}
 		print "</ul>\n";
 		my @race=relation2race($options{comment});

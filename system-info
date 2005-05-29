@@ -19,7 +19,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my @rel=getrelation($name);
 	my $color=getrelationcolor($rel[0]);
 	my $alliancestr="";
-	if(!$rel[1] && $aid>0) { $rel[1]=$::alliances{$aid}{tag} }
+	if(!$rel[1] && $aid>0) { $rel[1]=allianceid2tag($aid); }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
 	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" alt="relations" title="player info" /></a> !;
 	if($options{export}) {
@@ -101,8 +101,9 @@ if(param()) {
 		print AWheader2('system not found');
 		print "no system $options{name} at $x,$y";
 	} else {
-		($x,$y)=($::starmap{$system}{x},$::starmap{$system}{y});
-		print AWheader2("($x,$y) $::starmap{$system}{name} system info [\U$ENV{REMOTE_USER}\E]");
+		($x,$y)=systemid2coord($system);
+		my $sysname=systemid2name($system);
+		print AWheader2("($x,$y) $sysname system info [\U$ENV{REMOTE_USER}\E]");
 		my ($bs,$be,$eol)=('[b]','[/b]',"\n");
 
 		## start of normal output ##
@@ -110,7 +111,8 @@ if(param()) {
 			print qq!<a href="?legend=1">legend</a> <a href="?id=$system&amp;export=1">BB-export</a> <a href="?id=$system&amp;export=2">anonymous updated export</a>!,br;
 			($bs,$be,$eol)=('<b>','</b>',"<br />\n");
 		}
-		my $output="$bs$::starmap{$system}{name}($x,$y)$be${eol}Id=$system level=$::starmap{$system}{level} ";
+		my $syslevel=systemid2level($system);
+		my $output="$bs$sysname($x,$y)$be${eol}Id=$system level=$syslevel ";
 		if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
@@ -132,8 +134,8 @@ if(param()) {
 				if((@sci=relation2science($rel[2]))) {if($sci[0]>99){shift(@sci)};$refe=$sci[2]}
 			}
 		}
-		my $planets=$::planets{$system};
-		foreach my $h (@$planets) {
+		my @planets=systemid2planets($system);
+		foreach my $h (@planets) {
 			tprint "<li>";
 			next if(!$h);
 #			foreach my $item (sort keys %$h) { print " $item=$$h{$item}\n"; }
@@ -171,11 +173,11 @@ if(param()) {
 		}
 		if(!$options{export}) {
 			print "</ul>\n";
-			if(@{$::starmap{$system}{origin}}) {
-				print "players having their origin here: <ul>";
-				foreach(@{$::starmap{$system}{origin}}) { print li(spinfo($_)); }
-				print "</ul>\n";
-			}
+#			if(@{$::starmap{$system}{origin}}) {
+#				print "players having their origin here: <ul>";
+#				foreach(@{$::starmap{$system}{origin}}) { print li(spinfo($_)); }
+#				print "</ul>\n";
+#			}
 			my $uid=playername2id($awuser);
 			if($uid>2) {
 				my $home=playerid2home($uid);

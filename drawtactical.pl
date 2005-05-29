@@ -23,36 +23,20 @@ my $c=25; # base color
 #print "reading csv...\n";
 #our @files=qw(starmap);
 require "input.pm";
+require "awdraw.pm";
 
 # Create the main image
-my $img = new GD::Image($imagesize, $imagesize);
-mapcoloralloc($img);
+#my $img = new GD::Image($imagesize, $imagesize);
+#mapcoloralloc($img);
 print "Drawing...\n";
 
-sub pixel($$$) {my($x,$y,$c)=@_;
-  $img->setPixel($x, $y, $c);
+sub drawaxis($) {my($img)=@_;
+	$img->line(0,$ih, $imagesize,$ih,$::axiscolor);
+	$img->line($ih,0, $ih,$imagesize,$::axiscolor);
 }
-sub gridtest($) { $_[0]%10<=1 ? $::lightgridcolor:$::darkgridcolor }
-
-{ my ($d1,$d2)=($::lightgridcolor,$::darkgridcolor);} #dummy statement to avoid warning
-
-sub mrelationcolor($) { my($name)=@_;
-	my @rel=getrelation($name);
-	my $color=getrelationcolor($rel[0]);
-	$color=~s/black/white/;
-	return $color;
-}
-sub mrelationcolorid($) {
-	my $e=$::player{$_[0]};
-	my $dummye=$::player{$_[0]};
-	my $n;
-	if(!$e) {$n="unknown"}
-	else {$n=$$e{name}}
-	mrelationcolor($n); 
-}
-
-$img->line(0,$ih, $imagesize,$ih,$::axiscolor);
-$img->line($ih,0, $ih,$imagesize,$::axiscolor);
+my $img=mapimage($mapxoff,$mapyoff, $mapxoff+$mapsize,$mapyoff+$mapsize, \&drawaxis);
+writeimg($img, "$out.png");
+exit 0;
 
 for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
   for(my $y=$mapyoff; $y-$mapyoff<$mapsize; $y++) {
@@ -73,25 +57,11 @@ for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
 	if(defined($::starmap{"$x,$y"})) {
 		my $id=$::starmap{"$x,$y"};
 		my $sys=$::starmap{$id};
-#		$v=($$sys{level}+1)/1.7;
-#		if($v>12){$v=12}
-#		my @player=@{$$sys{origin}};
-#		foreach(@player) {
-#			my @rel=getrelation($::player{$_}{name});
-#			$color=getrelationcolor($rel[0]);
-#			$color=~s/black/white/;
-#			push(@color, $color);
-#		}
-#	}
-	$v=12;
-#	if($v) {
+		$v=12;
 		for(my $i=1; $i<=$v; $i++) {
 			my $px2=$px+1;
 			my $px3=$pxe-1;
 			my $py2=$py+$i;
-#			if(@color) {
-#				$color=$color[($i-1)/$v*@color];
-#			}
 			my $planet=getplanet($id, $i); 
 			my $ownerid=$$planet{ownerid};
 			#print "own $ownerid\n";

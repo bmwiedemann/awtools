@@ -12,15 +12,10 @@ sub mrelationcolor($) { my($name)=@_;
 	return $color;
 }
 sub mrelationcolorid($) {
-	my $e=$::player{$_[0]};
-	my $dummye=$::player{$_[0]};
-	my $n;
-	if(!$e) {$n="unknown"}
-	else {$n=$$e{name}}
-	mrelationcolor($n); 
+	mrelationcolor(playerid2name($_[0])); 
 }
-sub mapimage($$$$) {
-my ($mapxstart, $mapystart, $mapxend, $mapyend)=@_;
+sub mapimage($$$$;$) {
+my ($mapxstart, $mapystart, $mapxend, $mapyend, $initdraw)=@_;
 $mapxend++;
 $mapyend++;
 our $pixelpersystem=13;
@@ -46,7 +41,7 @@ sub gridtest($) { $_[0]%10<=1 ? $::lightgridcolor:$::darkgridcolor }
 
 { my ($d1,$d2)=($::lightgridcolor,$::darkgridcolor);} #dummy statement to avoid warning
 
-
+$initdraw && &$initdraw($img);
 #$img->line(0,$ih, $imagesize,$ih,$::axiscolor);
 #$img->line($ih,0, $ih,$imagesize,$::axiscolor);
 
@@ -64,10 +59,8 @@ sub gridtest($) { $_[0]%10<=1 ? $::lightgridcolor:$::darkgridcolor }
 	$img->line($px,$py, $px,$pye, $gridcolor);
 	$gridcolor=gridtest($y);
 	$img->line($px,$py, $pxe,$py, $gridcolor);
-
-	if(defined($::starmap{"$x,$y"})) {
-		my $id=$::starmap{"$x,$y"};
-		my $sys=$::starmap{$id};
+	my $id=systemcoord2id($x,$y);
+	if(defined($id)) {
 		for(my $i=1; $i<=12; $i++) {
 			my $py2=$py+$i;
 			my $planet=getplanet($id, $i); 
@@ -85,7 +78,7 @@ sub gridtest($) { $_[0]%10<=1 ? $::lightgridcolor:$::darkgridcolor }
  }}
 
 
- return $img->png();
+ return $img;
 }
 
 1;
