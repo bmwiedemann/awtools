@@ -11,7 +11,7 @@ chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "./input.pm";
 require "cgicommon.pm";
 
-sub planetpopsort {return $$b{pop}<=>$$a{pop}}
+sub planetpopsort {return planet2pop($b)<=>planet2pop($a)}
 
 print AWheader($title);
 for my $p (qw'id name alliance relation comment submit') {
@@ -48,7 +48,7 @@ if($options{name}) {
 	$user =~ y/A-Z/a-z/;
 	my $entry=$::relation{$user};
 	my $new="edit existing entry";
-	my $id=$::playerid{$user};
+	my $id=playername2id($user);
 	my $atag=playerid2tag($id);
 	my @rel=getrelation($user);
 	if(!defined($entry)) {

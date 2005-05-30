@@ -139,10 +139,10 @@ if(param()) {
 			tprint "<li>";
 			next if(!$h);
 #			foreach my $item (sort keys %$h) { print " $item=$$h{$item}\n"; }
-			my $id="$system#$$h{planetid}";
+			my $planetid=planet2pid($h);
+			my $id="$system%23$planetid";
 			my $pinfo;
-			my @pinfo=getplanetinfo($system,$$h{planetid});
-			$id=~s/#/%23/;
+			my @pinfo=getplanetinfo($system,$planetid);
 			my $info="";
 			if(@pinfo) {
 				my $status=$pinfo[0];
@@ -162,12 +162,12 @@ if(param()) {
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
 			if(!$options{export}) {
-				my $pdiff=abs($refp-$$h{planetid});
+				my $pdiff=abs($refp-$planetid);
 				my $etalink;
 				if(defined($refdist)) {$etalink=qq! <a href="arrival?distance=$refdist&amp;planet=$pdiff&amp;energy=$refe&amp;racespeed=$refs">ETA</a> !;}
-				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s%s", $$h{planetid}, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info."</li>\n";
+				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info."</li>\n";
 			} else {
-				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s", $$h{planetid}, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), $info);
+				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s", $planetid, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), $info);
 			}
 			
 		}

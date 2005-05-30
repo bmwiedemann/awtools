@@ -33,7 +33,7 @@ if($options{alliance}) {
 		print "<tr align=\"center\">";
 		my $name=playerid2name($pid);
 		my $alink="";
-		my $planets=@{$$p{planets}};
+		my $planets=playerid2planets($pid);
 		my $joined=gmtime($$p{joined});#." ".$$p{joined};
 		my ($x,$y)=systemid2coord($$p{home_id});
 		my $home="$$p{home_id}($x,$y)";
@@ -44,7 +44,7 @@ if($options{alliance}) {
                 }
 		if($own) { $alink=alliancedetailslink($n) }
 		print "<td>",profilelink($pid), $alink, "</td><td>", qq!<a href="relations?name=$name">$name ($pid)</a></td>
-		<td><a href="system-info?id=$$p{home_id}">$home</a></td><td>$$p{level}</td><td>$$p{science}</td><td>$planets/$$p{culture}</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>$$p{from}</td><td>$joined</td>!;
+		<td><a href="system-info?id=$$p{home_id}">$home</a></td><td>$$p{level}</td><td>$$p{science}</td><td>$planets/$$p{culture}</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>!.playerid2country($pid).qq!</td><td>$joined</td>!;
 		$n++;
 		print "</tr>\n";
 	}
