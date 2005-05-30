@@ -8,7 +8,7 @@ my $title="manage relation [\U$ENV{REMOTE_USER}\E]";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "./input.pm";
+require "input.pm";
 require "cgicommon.pm";
 
 sub planetpopsort {return planet2pop($b)<=>planet2pop($a)}
@@ -78,7 +78,7 @@ if($options{name}) {
 		my $pop=0;
 		my @planets;
 		foreach my $p (@pl) {
-			my $pp=sidpid2planet($p);
+			my $pp=getplanet2($p);
 			$pop+=planet2opop($pp);
 			push(@planets, $pp);
 		}
@@ -87,10 +87,10 @@ if($options{name}) {
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
 		foreach my $pp (sort planetpopsort @planets) {
-			my $sid=$$pp{systemid};
+			my $sid=planet2sid($pp);
 			my ($x,$y)=systemid2coord($sid);
 			print qq! <li><a href="system-info?id=$sid">!.systemid2name($sid);
-			printf qq!</a> ($x,$y) #$$pp{planetid} : pop=%i SB=%i </li>\n!, planet2pop($pp), planet2sb($pp);
+			printf qq!</a> ($x,$y) #%i : pop=%i SB=%i </li>\n!, planet2pid($pp), planet2pop($pp), planet2sb($pp);
 		}
 		print "</ul>\n";
 		my @race=relation2race($options{comment});
