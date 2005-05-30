@@ -1,17 +1,23 @@
 #!/usr/bin/perl -w
 
-use MLDBM qw(DB_File Storable);
+#use MLDBM qw(DB_File Storable);
+use DBI;
+use Tie::DBI;
 use DB_File;
-use Fcntl;
+#use Fcntl;
 use strict "vars";
 require "standard.pm";
+require "dbconf.pm";
 my $head="Content-type: text/plain\015\012";
-our (%alliances,%starmap,%player,%playerid,%planets,%relation,%planetinfo);
-tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666 or die $!;
-tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
-tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
-tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
-tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
+our (%planets,%alliances,%starmap,%player,%playerid,%relation,%planetinfo);
+(undef,undef,undef)=($::connectionInfo,$::dbuser,$::dbpasswd); #dummy
+my $dbh = DBI->connect($::connectionInfo,$::dbuser,$::dbpasswd);
+if(!$dbh) {die "DB err: $!"}
+tie %planets,'Tie::DBI',$dbh,'planets','sidpid',{CLOBBER=>1};
+tie %player,'Tie::DBI',$dbh,'player','pid',{CLOBBER=>1};
+tie %playerid,'Tie::DBI',$dbh,'player','name',{CLOBBER=>1};
+tie %alliances,'Tie::DBI',$dbh,'alliances','aid',{CLOBBER=>1};
+tie %starmap,'Tie::DBI',$dbh,'starmap','sid',{CLOBBER=>1};
 #if($ENV{REMOTE_USER} ne "guest") {
 	tie(%relation, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
 	tie(%planetinfo, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
@@ -47,7 +53,7 @@ sub getrelation($) { my($name)=@_;
 
 sub playername2id($) { my($name)=@_;
 #	print qq!$name = $::playerid{"\L$name"}\n!;
-	$::playerid{"\L$name"};
+	$::playerid{"\L$name"}{pid};
 }
 sub playerid2name($) { my($id)=@_;
 	if(!defined($id)) {return "unknown"}
@@ -60,12 +66,11 @@ sub playerid2home($) { my($id)=@_;
 	$::player{$id}{home_id};
 }
 sub playerid2country($) { my($id)=@_;
-	$::player{$id}{from};
+	$::player{$id}{country};
 }
+sub getplanet2($) { $::planets{$_[0]} }
 sub getplanet($$) { my($sid,$pid)=@_;
-	my $sys=$::planets{$sid};
-	if(!$sys) {return undef}
-	$$sys[$pid-1];
+	my $sys=$::planets{$sid*12+$pid-1};
 }
 sub getplanetinfo($$) { my($sid,$pid)=@_;
 	my $pinfo=$::planetinfo{"$sid#$pid"};
@@ -90,40 +95,55 @@ sub systemid2coord($) { my($id)=@_;
 	$::starmap{$id}?($::starmap{$id}{x},$::starmap{$id}{y}):undef;
 }
 sub systemid2planets($) { my($id)=@_;
-        $::planets{$id}?@{$::planets{$id}}:undef;
+	my @p;
+	for(my $i=$id*12; $i<($id+1)*12; ++$i) {
+		my $x=$::planets{$i};
+		if($x){push @p,$x}
+	}
+	@p;
 }
 sub allianceid2tag($) { my($id)=@_;
 	$::alliances{$id}?$::alliances{$id}{tag}:undef;
 }
 sub allianceid2members($) { my($id)=@_;
-        $::alliances{$id}?@{$::alliances{$id}{m}}:undef;
+	my %playerbyaid;
+	tie %playerbyaid,'Tie::DBI',$dbh,'player','alliance',{};
+        @{$playerbyaid{$id}{pid}};
 }
 sub alliancetag2id($) { my($tag)=@_;
-        $::alliances{"\L$tag"}	#?$::alliances{$id}{tag}:undef;
+	my %alliancesbytag;
+	tie %alliancesbytag,'Tie::DBI',$dbh,'alliances','tag',{};
+        $alliancesbytag{"\L$tag"}{aid};
 }
 sub playerid2alliance($) { my($id)=@_;
 	$::player{$id}?$::player{$id}{alliance}:undef;
 }
 sub playerid2planets($) { my($id)=@_;
-        $::player{$id}?@{$::player{$id}{planets}}:undef;
+	my %planetsbyowner;
+	tie %planetsbyowner,'Tie::DBI',$dbh,'planets','ownerid',{};
+        @{$planetsbyowner{$id}{sidpid}};
 }
 sub playerid2tag($) { my($id)=@_;
 	allianceid2tag(playerid2alliance($id));
 }
 sub planet2sb($) { my($h)=@_;
-        $h?$$h{sb}:undef;
+        $h?$$h{starbase}:undef;
 }
 sub planet2pop($) { my($h)=@_;
-        $h?$$h{pop}:undef;
+        $h?$$h{population}:undef;
 }
 sub planet2opop($) { my($h)=@_;
         $h?$$h{opop}:undef;
 }
 sub planet2siege($) {my($h)=@_;
-	$h?$$h{s}:undef;
+	$h?$$h{siege}:undef;
 }
-sub planet2pid($) {${$_[0]}{planetid}}
-sub planet2sid($) {${$_[0]}{systemid}}
+sub planet2sid($) {my($h)=@_;
+	$h?int(($$h{sidpid})/12):undef;
+}
+sub planet2pid($) {my($h)=@_;
+	$h?(($$h{sidpid})%12+1):undef;
+}
 sub getatag($) {my($tag)=@_;
 	if(!$tag) { return ""; }
 	return "[$tag]";
@@ -132,6 +152,5 @@ sub sidpid2planet($) {my ($sidpid)=@_;
 	my @p=split('#',$sidpid);
 	return getplanet($p[0],$p[1])#$::planets{$p[0]}[$p[1]-1];
 }
-sub getplanet2($) { sidpid2planet($_[0]) }
 
 1;
