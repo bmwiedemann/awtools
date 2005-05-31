@@ -80,10 +80,19 @@ sub getplanetinfo($$) { my($sid,$pid)=@_;
 }
 sub systemname2id($) { my($name)=@_;
 	$name=~s/\s+/ /;
-	$::starmap{"\L$name"};
+	my %starmapbyname;
+	tie %starmapbyname,'Tie::DBI',$dbh,'starmap','name',{};
+	$starmapbyname{$name}{sid};
 }
 sub systemcoord2id($$) { my($x,$y)=@_;
-	$::starmap{"$x,$y"};
+	my $sid;
+	my $query = "SELECT sid from starmap where x=$x and y=$y";
+	my $sth = $dbh->prepare($query);
+	if(!$sth->execute()) {return undef}
+	$sth->bind_columns(\$sid);
+	$sth->fetch();
+	$sth->finish();
+	$sid;
 }
 sub systemid2name($) { my($id)=@_;
 	$::starmap{$id}?$::starmap{$id}{name}:undef;
