@@ -9,7 +9,7 @@ all: TA.candidate
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
 links:
-	ln -f index.html login arrival distsqr tactical tactical-large relations relations-bulk alliance system-info planet-info fleets feedupdate sim /srv/www/cgi-bin/aw/
+	ln -f index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim /srv/www/cgi-bin/aw/
 system-ids.txt:
 	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
 updatecsv: dumpdbs
