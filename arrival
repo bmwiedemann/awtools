@@ -35,10 +35,10 @@ if(param()) {
 sub printform { 
 	my $s=5;
 	print start_form('get'),
-	textfield(-name=>'planet', -size=>$s, -class=>'text'), " Planet diff", br,
-	textfield(-name=>'distance', -size=>$s, -class=>'text'), " ",a({-href=>"distsqr"},"Dist sqr"), br,
-	textfield(-name=>'energy', -size=>$s, -class=>'text'), " Energy lvl", br,
-	popup_menu(-name=>'racespeed', -values=>[-4..4], -default=>0), " Race speed mod", br,
+	textfield(-name=>'planet', -size=>$s, -class=>'text'), " Planet difference", br,
+	textfield(-name=>'distance', -size=>$s, -class=>'text'), " ",a({-href=>"distsqr"},"Distance squared"), br,
+	textfield(-name=>'energy', -size=>$s, -class=>'text'), " Energy level", br,
+	popup_menu(-name=>'racespeed', -values=>[-4..4], -default=>0), " Race speed modifier", br,
 	checkbox(-name=>'own', -label=>''), " Own or allied destination", br,
 	  submit(-class=>'smbutton'), end_form, p.
 'When going from Planet a in System A(x/y) to Planet b in System B(X/Y) then '.br.'Planet diff is the absolute of a-b  and  Dist sqr is (x-X)<sup>2</sup>+(y-Y)<sup>2</sup>'.
