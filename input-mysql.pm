@@ -70,7 +70,7 @@ sub playerid2country($) { my($id)=@_;
 }
 sub getplanet2($) { $::planets{$_[0]} }
 sub getplanet($$) { my($sid,$pid)=@_;
-	my $sys=$::planets{$sid*12+$pid-1};
+	my $sys=$::planets{$sid*13+$pid};
 }
 sub getplanetinfo($$) { my($sid,$pid)=@_;
 	my $pinfo=$::planetinfo{"$sid#$pid"};
@@ -85,8 +85,9 @@ sub systemname2id($) { my($name)=@_;
 	$starmapbyname{$name}{sid};
 }
 sub systemcoord2id($$) { my($x,$y)=@_;
+	return undef unless (defined ($x) and defined ($y) and $x=~/\d/ and $y=~/\d/);
 	my $sid;
-	my $query = "SELECT sid from starmap where x=$x and y=$y";
+	my $query = "SELECT `sid` FROM `starmap` WHERE `x` = $x AND `y` = $y";
 	my $sth = $dbh->prepare($query);
 	if(!$sth->execute()) {return undef}
 	$sth->bind_columns(\$sid);
@@ -104,9 +105,10 @@ sub systemid2coord($) { my($id)=@_;
 	$::starmap{$id}?($::starmap{$id}{x},$::starmap{$id}{y}):undef;
 }
 sub systemid2planets($) { my($id)=@_;
+	return @::planets{($id*13+1..$id*13+12)};
 	my @p;
-	for(my $i=$id*12; $i<($id+1)*12; ++$i) {
-		my $x=$::planets{$i};
+	for(my $pid=1; $pid<=12; ++$pid) {
+		my $x=getplanet($id,$pid);
 		if($x){push @p,$x}
 	}
 	@p;
@@ -148,10 +150,10 @@ sub planet2siege($) {my($h)=@_;
 	$h?$$h{siege}:undef;
 }
 sub planet2sid($) {my($h)=@_;
-	$h?int(($$h{sidpid})/12):undef;
+	$h?int(($$h{sidpid})/13):undef;
 }
 sub planet2pid($) {my($h)=@_;
-	$h?(($$h{sidpid})%12+1):undef;
+	$h?(($$h{sidpid})%13):undef;
 }
 sub getatag($) {my($tag)=@_;
 	if(!$tag) { return ""; }
