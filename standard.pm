@@ -1,5 +1,6 @@
 use strict;
 use Time::Local;
+use Time::HiRes qw(gettimeofday tv_interval);
 
 our $server="www1.astrowars.com";
 our $bmwserver="aw.lsmod.de";
@@ -16,12 +17,13 @@ our %artifact=("BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HOR"=>15)
 our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "turquoise", "lightgreen", "green");
 our @statuscolor=qw(black black blue cyan red green orange green);
 
-
+our $start_time;
 
 
 sub AWheader2($) { my($title)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
+	$start_time = [gettimeofday()];
 	$owncgi=~s!/cgi-bin/!!;
 	foreach my $item (qw(index.html login arrival tactical tactical-large tactical-live relations alliance system-info fleets feedupdate)) {
 		my %h=(href=>$item);
@@ -41,6 +43,10 @@ sub AWheader2($) { my($title)=@_;
 	$links). h1($title);
 }
 sub AWheader($) { my($title)=@_; header().AWheader2($title);}
+sub AWtail() {
+	my $t = tv_interval($start_time);
+	return br()."request took $t seconds".end_html();
+}
 
 sub mon2id($) {my($m)=@_;
         for(my $i=0; $i<12; $i++) {
