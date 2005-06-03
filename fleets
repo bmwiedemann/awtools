@@ -13,7 +13,6 @@ my @out;
 
 sub sortfunc { return $CV{$b}<=>$CV{$a} }
 
-#print "<html><head><title>fleets list</title></head><body>"
 print "sys#planet: info".br;
 foreach my $p (keys %::planetinfo) {
 	my $info=$::planetinfo{$p};
@@ -32,4 +31,4 @@ foreach my $p (keys %::planetinfo) {
 	$CV{$str}=$CV;
 }
 print (sort sortfunc @out);
-print "</body></html>\n";
+print AWtail();
