@@ -3,7 +3,6 @@ use strict;
 use CGI ":standard";
 
 my $title="manage planet info";
-my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "input.pm";
@@ -31,17 +30,17 @@ if($options{status}) {
 		$options{who}=playername2id($options{who});
 	}
 	if(!$options{who}) {$options{who}=2};
-	use DB_File;
-	my %data;
-	tie(%data, "DB_File", $dbname) or print "error accessing DB\n";
-	my $mod=$data{$options{id}} ? "modified" : "added";
+	if($options{id}!~m/(\d+)#(\d+)/) {print "invalid system/planet id\n"; exit 0; }
+	my ($sid,$pid)=($1,$2);
+	my @pinfo=getplanetinfo($sid,$pid);
+	my $mod=(@pinfo)? "modified" : "added";
 	if($options{submit}=~/delete/) {
-		delete $data{$options{id}};
+		setplanetinfo($options{id},undef);
 		$mod="deleted";
 	} else {
-		$data{$options{id}}="$options{status} $options{who} $options{comment}";
+		$options{info}=$options{comment};
+		setplanetinfo($options{id},\%options);
 	}
-	untie(%data);
 	print span({-style=>'color: darkgreen'},"$mod $options{id}"),br;
 }
 
