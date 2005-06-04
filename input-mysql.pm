@@ -3,8 +3,6 @@
 #use MLDBM qw(DB_File Storable);
 use DBI;
 use Tie::DBI;
-use DB_File;
-#use Fcntl;
 use strict "vars";
 require "standard.pm";
 require "dbconf.pm";
@@ -23,10 +21,6 @@ tie %relation,'Tie::DBI',$dbh,'relations','name',{CLOBBER=>2};
 tie %planetinfo,'Tie::DBI',$dbh,'planetinfos','sidpid',{CLOBBER=>2};
 tie %logins,'Tie::DBI',$dbh,'logins','lid',{CLOBBER=>2};
 tie %fleets,'Tie::DBI',$dbh,'fleets','fid',{CLOBBER=>2};
-#if($ENV{REMOTE_USER} ne "guest") {
-#	tie(%relation, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
-#	tie(%planetinfo, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
-#}
 $readalli=$ENV{REMOTE_USER};
 
 sub filterpersonal($) { my($ref)=@_;
@@ -89,9 +83,7 @@ sub getrelation($) { my($name)=@_;
 	return ($effrel,$ally,$info,$realrel,1);
 }
 sub setrelation($%) { my($id,$options)=@_;
-
-#UPDATE `relations` SET `info` = 'greenbird testing new DBx' WHERE `name` = 'greenbird' AND `alli` = 'af' LIMIT 1 ;
-
+	$dbh->do("UPDATE `relations` SET `status` = ".$$options{status}.", `atag` = ".$dbh->quote($$options{atag}).", `info` = ".$dbh->quote($$options{info})." WHERE `name` = ".$dbh->quote($id)." AND `alli` = '$ENV{REMOTE_USER}' LIMIT 1 ;");
 }
 
 sub playername2id($) { my($name)=@_;
@@ -120,7 +112,7 @@ sub getplanetinfo($$) { my($sid,$pid)=@_;
 	
 	#$::planetinfo{$sidpid};
 	my $array=selectpersonal($pinfo);
-	if(!$array){return undef}
+	if(!$array){return ()}
 	@_=@$array;
 	$pinfo={"sidpid",shift,"alli",shift,"status",shift,"who",shift,"time",shift,"added",shift,"info",shift};
 	return ($$pinfo{status},$$pinfo{who},$$pinfo{info});
