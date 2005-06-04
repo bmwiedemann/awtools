@@ -12,9 +12,11 @@ tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
 tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
 tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
 tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
+my $dbnamer="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
+my $dbnamep="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 #if($ENV{REMOTE_USER} ne "guest") {
-	tie(%relation, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
-	tie(%planetinfo, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
+	tie(%relation, "DB_File", $dbnamer, O_RDONLY);# or print $head,"\nerror accessing DB\n";
+	tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY);# or print $head,"\nerror accessing DB\n";
 #}
 
 sub getrelation($) { my($name)=@_;
@@ -44,6 +46,16 @@ sub getrelation($) { my($name)=@_;
 	$realrel=$effrel unless defined $realrel;
 	return ($effrel,$ally,$info,$realrel,1);
 }
+sub setrelation($%) { my($id,$options)=@_;
+	my %data;
+	tie(%data, "DB_File", $dbnamer);
+	#print "set '$id', '$options' $dbnamer ";
+	if(!$options) {delete $data{$id}; }
+	else {
+		$data{$id}="$$options{status} $$options{atag} $$options{info}";
+	}
+	untie(%data);
+}
 
 sub playername2id($) { my($name)=@_;
 #	print qq!$name = $::playerid{"\L$name"}\n!;
@@ -72,6 +84,16 @@ sub getplanetinfo($$) { my($sid,$pid)=@_;
 	if(!$pinfo){return ()}
 	$pinfo=~/^(\d) (\d+) (.*)/s;
 	return ($1,$2,$3);
+}
+sub setplanetinfo($%) { my($id,$options)=@_;
+	my %data;
+	tie(%data, "DB_File", $dbnamep);
+	#print "set '$id', '$options' $dbnamep ";
+	if(!$options) {delete $data{$id}; }
+	else {
+		$data{$id}="$$options{status} $$options{who} $$options{info}";
+	}
+	untie(%data);
 }
 sub systemname2id($) { my($name)=@_;
 	$name=~s/\s+/ /;
