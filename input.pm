@@ -35,14 +35,14 @@ sub getrelation($) { my($name)=@_;
 		my $rel2=$::relation{"\L$atag"};
 		if($rel2) { 
 			$rel2=~/^(\d+) (\w+) /s;
-			return ($1,$2,$info,0);
+			return ($1,$2,$info,0,0);
 		}
 		if(!$rel) { return undef }
 	}
 	$rel=~/^(\d+) (\w+) (.*)/s;
 	($effrel,$ally,$info)=($1, $2, $3);
 	$realrel=$effrel unless defined $realrel;
-	return ($effrel,$ally,$info,$realrel);
+	return ($effrel,$ally,$info,$realrel,1);
 }
 
 sub playername2id($) { my($name)=@_;
