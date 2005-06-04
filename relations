@@ -46,12 +46,11 @@ if(!$readonly && defined($options{relation})) {
 if($options{name}) {
 	my $user=$options{name};
 	$user =~ y/A-Z/a-z/;
-	my $entry=$::relation{$user};
 	my $new="edit existing entry";
 	my $id=playername2id($user);
 	my $atag=playerid2tag($id);
 	my @rel=getrelation($user);
-	if(!defined($entry)) {
+	if(!$rel[4]) {
 		$options{alliance}=$atag || "unknown";
 		$options{comment}="";
 		#print "<br>debug: @rel <br>";
@@ -82,7 +81,7 @@ if($options{name}) {
 			$pop+=planet2opop($pp);
 			push(@planets, $pp);
 		}
-		print br,"pl=$level sl=$::player{$id}{science} cl=$::player{$id}{culture} points=$::player{$id}{points} (".3*$level."+$pop+".($::player{$id}{points}-$pop-3*$level).") logins=$::player{$id}{logins} from=$::player{$id}{from} joined=$::player{$id}{joined} ";
+		print br,"pl=$level sl=$::player{$id}{science} cl=$::player{$id}{culture} points=$::player{$id}{points} (".3*$level."+$pop+".($::player{$id}{points}-$pop-3*$level).") logins=$::player{$id}{logins} from=$::player{$id}{from} joined=".(gmtime($::player{$id}{joined}))." ";
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
