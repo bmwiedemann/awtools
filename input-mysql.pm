@@ -8,51 +8,93 @@ use DB_File;
 use strict "vars";
 require "standard.pm";
 require "dbconf.pm";
+require "access.pm";
 my $head="Content-type: text/plain\015\012";
-our (%planets,%alliances,%starmap,%player,%playerid,%relation,%planetinfo);
+our (%planets,%alliances,%starmap,%player,%playerid,%relation,%planetinfo,%logins,%fleets,$dbh,$readalli);
 (undef,undef,undef)=($::connectionInfo,$::dbuser,$::dbpasswd); #dummy
-my $dbh = DBI->connect($::connectionInfo,$::dbuser,$::dbpasswd);
+$dbh = DBI->connect($::connectionInfo,$::dbuser,$::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
 tie %planets,'Tie::DBI',$dbh,'planets','sidpid',{CLOBBER=>1};
 tie %player,'Tie::DBI',$dbh,'player','pid',{CLOBBER=>1};
 tie %playerid,'Tie::DBI',$dbh,'player','name',{CLOBBER=>1};
 tie %alliances,'Tie::DBI',$dbh,'alliances','aid',{CLOBBER=>1};
 tie %starmap,'Tie::DBI',$dbh,'starmap','sid',{CLOBBER=>1};
+tie %relation,'Tie::DBI',$dbh,'relations','name',{CLOBBER=>2};
+tie %planetinfo,'Tie::DBI',$dbh,'planetinfos','sidpid',{CLOBBER=>2};
+tie %logins,'Tie::DBI',$dbh,'logins','lid',{CLOBBER=>2};
+tie %fleets,'Tie::DBI',$dbh,'fleets','fid',{CLOBBER=>2};
 #if($ENV{REMOTE_USER} ne "guest") {
-	tie(%relation, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
-	tie(%planetinfo, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
+#	tie(%relation, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
+#	tie(%planetinfo, "DB_File", "/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm", O_RDONLY);# or print $head,"\nerror accessing DB\n";
 #}
+$readalli=$ENV{REMOTE_USER};
+
+sub filterpersonal($) { my($ref)=@_;
+	my %read=($ENV{REMOTE_USER}=>1);
+	for(@{$::read_access{$ENV{REMOTE_USER}}}) {
+		$read{$_}=1;
+	}
+	my @result;
+	for(@$ref) {
+		if($read{$$_[1]}) {
+			push(@result, $_);
+		}
+	}
+	return \@result;
+}
+sub selectpersonal($) { my($ref)=@_;
+	my %havealli;
+	my $n=0;
+	for(@$ref) {
+		$havealli{$$_[1]}=++$n;
+	}
+	if($havealli{$readalli}) {return $$ref[$havealli{$readalli}-1]}
+	# next select readable friends
+	for my $readalli (@{$::read_access{$ENV{REMOTE_USER}}}) {
+		if($havealli{$readalli}) {return $$ref[$havealli{$readalli}-1]}
+	}
+	return undef;
+}
+
+sub getpurerelation($) { my($name)=@_;
+	my $rel=$dbh->selectall_arrayref("SELECT * FROM `relations` WHERE `name` = ".$dbh->quote("\L$name"));
+	#my $rel=$::relation{"\L$name"};
+	my $relarray=selectpersonal($rel);
+	if(!$relarray){return undef}
+	@_=@$relarray;
+	$rel={"name",shift,"alli",shift,"status",shift,"atag",shift,"race",shift,"science",shift,"sciencedate",shift,"info",shift};
+}
 
 sub getrelation($) { my($name)=@_;
-	my $rel=$::relation{"\L$name"};
-	my ($effrel,$ally,$info,$realrel);
-	if(!$rel || $rel=~/^0 /) {
+	my $rel=getpurerelation($name);
+	my ($effrel,$ally,$info,$realrel,$hadentry);
+	if(!$rel || $$rel{status}==0) {
 #		if(!$rel) { return undef; }
 		my $id=playername2id($name);
 		if(!$id) { return undef }
 		my $aid=$::player{$id}{alliance};
-#		print "aid $aid \n";
 		my $atag;
-		if(!$aid && $rel && $rel=~/^\d+ (\w+) (.*)/s) {$atag=$1;$aid=-1; $info=$2}
+		if(!$aid && $rel) {$atag=$$rel{atag};$aid=-1; $info=$$rel{info}; $hadentry=1}
 		if(!$aid) { return undef }
 		if(!$atag) {$atag=$::alliances{$aid}{tag};}
-#		print "id $id a $aid at $atag\n<br>";
-		if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {$info=$3}
-		my $rel2=$::relation{"\L$atag"};
+		if($rel) {$info=$$rel{info}}
+		my $rel2=getpurerelation($atag);
 		if($rel2) { 
-			$rel2=~/^(\d+) (\w+) /s;
-			return ($1,$2,$info,0);
+			return ($$rel2{status},$$rel2{atag},$info,0,$hadentry);
 		}
-		if(!$rel) { return undef }
+		if(!$rel) { return (4,$atag,"",0,0) }
 	}
-	$rel=~/^(\d+) (\w+) (.*)/s;
-	($effrel,$ally,$info)=($1, $2, $3);
+	($effrel,$ally,$info)=($$rel{status},$$rel{atag},$$rel{info});
 	$realrel=$effrel unless defined $realrel;
-	return ($effrel,$ally,$info,$realrel);
+	return ($effrel,$ally,$info,$realrel,1);
+}
+sub setrelation($%) { my($id,$options)=@_;
+
+#UPDATE `relations` SET `info` = 'greenbird testing new DBx' WHERE `name` = 'greenbird' AND `alli` = 'af' LIMIT 1 ;
+
 }
 
 sub playername2id($) { my($name)=@_;
-#	print qq!$name = $::playerid{"\L$name"}\n!;
 	$::playerid{"\L$name"}{pid};
 }
 sub playerid2name($) { my($id)=@_;
@@ -70,13 +112,21 @@ sub playerid2country($) { my($id)=@_;
 }
 sub getplanet2($) { $::planets{$_[0]} }
 sub getplanet($$) { my($sid,$pid)=@_;
-	my $sys=$::planets{$sid*13+$pid};
+	my $sys=$::planets{sidpid22sidpid3($sid,$pid)};
 }
 sub getplanetinfo($$) { my($sid,$pid)=@_;
-	my $pinfo=$::planetinfo{"$sid#$pid"};
-	if(!$pinfo){return ()}
-	$pinfo=~/^(\d) (\d+) (.*)/s;
-	return ($1,$2,$3);
+	my $sidpid=sidpid22sidpid3($sid,$pid);
+	my $pinfo=$dbh->selectall_arrayref("SELECT * FROM `planetinfos` WHERE `sidpid` = $sidpid");
+	
+	#$::planetinfo{$sidpid};
+	my $array=selectpersonal($pinfo);
+	if(!$array){return undef}
+	@_=@$array;
+	$pinfo={"sidpid",shift,"alli",shift,"status",shift,"who",shift,"time",shift,"added",shift,"info",shift};
+	return ($$pinfo{status},$$pinfo{who},$$pinfo{info});
+}
+sub setplanetinfo($%) { my($id,$options)=@_;
+	
 }
 sub systemname2id($) { my($name)=@_;
 	$name=~s/\s+/ /;
@@ -159,6 +209,8 @@ sub getatag($) {my($tag)=@_;
 	if(!$tag) { return ""; }
 	return "[$tag]";
 }
+sub sidpid12sidpid2($) {my @p=split('#',$_[0]); return @p;}
+sub sidpid22sidpid3($$) {my @p=@_; return $p[0]*13+$p[1];}
 sub sidpid2planet($) {my ($sidpid)=@_;
 	my @p=split('#',$sidpid);
 	return getplanet($p[0],$p[1])#$::planets{$p[0]}[$p[1]-1];
