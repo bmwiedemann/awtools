@@ -19,7 +19,7 @@ tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
 
 sub getrelation($) { my($name)=@_;
 	my $rel=$::relation{"\L$name"};
-	my ($effrel,$ally,$info,$realrel);
+	my ($effrel,$ally,$info,$realrel,$hadentry);
 	if(!$rel || $rel=~/^0 /) {
 #		if(!$rel) { return undef; }
 		my $id=playername2id($name);
@@ -31,11 +31,11 @@ sub getrelation($) { my($name)=@_;
 		if(!$aid) { return undef }
 		if(!$atag) {$atag=$::alliances{$aid}{tag};}
 #		print "id $id a $aid at $atag\n<br>";
-		if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {$info=$3}
+		if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {$info=$3;$hadentry=1}
 		my $rel2=$::relation{"\L$atag"};
 		if($rel2) { 
 			$rel2=~/^(\d+) (\w+) /s;
-			return ($1,$2,$info,0,0);
+			return ($1,$2,$info,0,$hadentry);
 		}
 		if(!$rel) { return undef }
 	}
