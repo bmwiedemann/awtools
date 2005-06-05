@@ -28,10 +28,13 @@ sub getrelation($;$) { my($name)=@_;
 		($effrel,$ally,$info)=($1, $2, $3);
 		$hadentry=1
 	}
-	if(!$rel || !$effrel) {
+	while(!$rel || !$effrel) {
 #		if(!$rel) { return undef; }
 		my $id=playername2id($name);
-		if(!$id) { return undef }
+		if(!$id) {
+			if($hadentry){last}
+			return undef
+		}
 		my $aid=$::player{$id}{alliance};
 #		print "aid $aid \n";
 		my $atag;
@@ -45,6 +48,7 @@ sub getrelation($;$) { my($name)=@_;
 			return ($1,$2,$info,0,$hadentry,$lname);
 		}
 		if(!$rel) { return undef }
+		last;
 	}
 	$realrel=$effrel unless defined $realrel;
 	return ($effrel,$ally,$info,$realrel,1,$lname);
