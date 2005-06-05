@@ -23,18 +23,22 @@ sub getrelation($;$) { my($name)=@_;
 	my $lname="\L$name";
 	my $rel=$::relation{$lname};
 	my ($effrel,$ally,$info,$realrel,$hadentry);
-	if(!$rel || $rel=~/^0 /) {
+	my $hadentry=0;
+	if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {
+		($effrel,$ally,$info)=($1, $2, $3);
+		$hadentry=1
+	}
+	if(!$rel || !$effrel) {
 #		if(!$rel) { return undef; }
 		my $id=playername2id($name);
 		if(!$id) { return undef }
 		my $aid=$::player{$id}{alliance};
 #		print "aid $aid \n";
 		my $atag;
-		if(!$aid && $rel && $rel=~/^\d+ (\w+) (.*)/s) {$atag=$1;$aid=-1; $info=$2}
+		if(!$aid && $rel) {$atag=$ally;$aid=-1;}
 		if(!$aid) { return undef }
-		if(!$atag) {$atag=$::alliances{$aid}{tag};}
+		if($aid>0) {$ally=$atag=$::alliances{$aid}{tag};}
 #		print "id $id a $aid at $atag\n<br>";
-		if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {$info=$3;$hadentry=1}
 		my $rel2=$::relation{"\L$atag"};
 		if($rel2) { 
 			$rel2=~/^(\d+) (\w+) /s;
@@ -42,8 +46,6 @@ sub getrelation($;$) { my($name)=@_;
 		}
 		if(!$rel) { return undef }
 	}
-	$rel=~/^(\d+) (\w+) (.*)/s;
-	($effrel,$ally,$info)=($1, $2, $3);
 	$realrel=$effrel unless defined $realrel;
 	return ($effrel,$ally,$info,$realrel,1,$lname);
 }
