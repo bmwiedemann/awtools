@@ -32,14 +32,14 @@ if($options{status}) {
 	if(!$options{who}) {$options{who}=2};
 	if($options{id}!~m/(\d+)#(\d+)/) {print "invalid system/planet id\n"; exit 0; }
 	my ($sid,$pid)=($1,$2);
-	my @pinfo=getplanetinfo($sid,$pid);
+	my @pinfo=getplanetinfo($sid,$pid,1);
 	my $mod=(@pinfo)? "modified" : "added";
 	if($options{submit}=~/delete/) {
-		setplanetinfo($options{id},undef);
+		setplanetinfo($pinfo[3],undef);
 		$mod="deleted";
 	} else {
-		$options{info}=$options{comment};
-		setplanetinfo($options{id},\%options);
+		#$options{info}=$options{comment};
+		setplanetinfo($pinfo[3],{"sidpid"=>sidpid22sidpid3($sid,$pid), "status"=>$options{status}, "who"=>$options{who}, "info"=>$options{comment}});
 	}
 	print span({-style=>'color: darkgreen'},"$mod $options{id}"),br;
 }
