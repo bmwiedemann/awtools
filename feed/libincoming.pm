@@ -5,6 +5,8 @@ for(;(@a=m!([^>]*)</td><td[^>]*>\s*<b>Attention(.*?) going to attack <b>([^<]+)<
 	my @fleet=(0,0,0,0,0);
 	my $pid=$a[3];
 	my $sid;
+	my $planetid;
+	my $systemid;
 	my $enemyname=$a[4];
 	my $shipn=0;
 	foreach my $ship (qw(Transports Colony Destroyer Cruiser Battleship)) {
@@ -16,14 +18,11 @@ for(;(@a=m!([^>]*)</td><td[^>]*>\s*<b>Attention(.*?) going to attack <b>([^<]+)<
 	my $time=parseawdate($a[0]);
 	if($a[2]=~/(.+) (\d+)$/) {
 		$sid=systemname2id($1);
-		if($sid){$sid.="#$2"}
+		if($sid){$systemid=$sid;$planetid=$2;$sid.="#$2"}
 	}
 	if(!$sid) {next}
-	my $oldentry=$::data{$sid};
 	print "incoming: ".planetlink($sid)." @fleet<br>\n";
-	my $newentry=addfleet($oldentry,$pid, $enemyname, $time, 1, \@fleet);
-	if(!$::options{debug}){$::data{$sid}=$newentry;}
-	else {print "$sid $newentry<br>\n"}
+	dbfleetadd($systemid,$planetid,$pid, $enemyname, $time, 1, \@fleet);
 }
 }
 1;

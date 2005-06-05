@@ -23,7 +23,7 @@ sub getrelation($;$) { my($name)=@_;
 	my $lname="\L$name";
 	my $rel=$::relation{$lname};
 	my ($effrel,$ally,$info,$realrel,$hadentry);
-	my $hadentry=0;
+	$hadentry=0;
 	if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {
 		($effrel,$ally,$info)=($1, $2, $3);
 		$hadentry=1
@@ -166,5 +166,21 @@ sub sidpid2planet($) {my ($sidpid)=@_;
 }
 sub getplanet2($) { sidpid2planet($_[0]) }
 sub sidpid22sidpid3($$) { "$_[0]#$_[1]" }
+
+sub dbfleetaddinit($) { my($pid)=@_;
+	untie %planetinfo;
+	tie(%planetinfo, "DB_File", $dbnamep) or print "error accessing DB\n";
+}
+sub dbfleetadd($$$$$$@) { my($sid,$pid,$plid,$name,$time,$type,$fleet)=@_;
+	my $sidpid=sidpid22sidpid3($sid,$pid);
+	my $oldentry=$planetinfo{$sidpid};
+	my $newentry=addfleet($oldentry,$plid, $name, $time, $type, $fleet);
+	if($newentry) {
+		if(!$::options{debug}) {$planetinfo{$sidpid}=$newentry}
+		else {print "$sid#$pid: $newentry <br />\n"}
+	}
+}
+sub dbfleetaddfinish() {
+}
 
 1;

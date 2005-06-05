@@ -3,7 +3,6 @@ my $debug=$::options{debug};
 print "alliance_detail\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
-my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 my $dbname2="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 use DB_File;
 require "./input.pm";
@@ -14,12 +13,9 @@ if(!$pid) {print "user $name not found<br>\n";return 1}
 print qq!user <a href="relations?name=$name">$name($pid)</a><br>\n!;
 my $name2="\L$name";
 
-our %data;
-tie(%data, "DB_File", $dbname) or print "error accessing DB\n";
 my %data2;
 tie(%relation, "DB_File", $dbname2) or print "error accessing DB\n";
 
-#my $science="";
 my @science;
 foreach my $sci (@::sciencestr) {
 	next if ! m,$sci</td><td>(\d+),;
@@ -49,12 +45,12 @@ untie %relation;
 
 if($ironly){exit 0}
 
-
+dbfleetaddinit($pid);
 my @a;
 # defending fleet
 for(;(@a=m!<tr([^>]*)><td[^>]*>(\d+)</td><td>(\d+)</td>(?:<td>(?:\d+)</td>){6}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
-        my $system=$a[1];
-        my $sid="$system#$a[2]";
+        my ($system,$planetid)=@a[1..2];
+        my $sid="$system#$planetid";
         my @fleet=@a[3..7];
         my $details="@fleet";
 	my $localname=$name;
@@ -62,37 +58,31 @@ for(;(@a=m!<tr([^>]*)><td[^>]*>(\d+)</td><td>(\d+)</td>(?:<td>(?:\d+)</td>){6}<t
 	my $own=1;
 	if($a[0]=~/602020/) {$localname="unknown"; $localpid=2; $own=0; }
         print "defending fleet: ".planetlink($sid)." $details<br>\n";
-        my $oldentry=$data{$sid};
-        my $newentry=addfleet($oldentry,$localpid, $localname, $time, $own, \@fleet);
-        if(!$debug){$data{$sid}=$newentry;}
-        else {if($newentry){print "$sid $newentry<br>\n"}}
+        dbfleetadd($system,$planetid,$localpid, $localname, $time, $own, \@fleet);
 }
 
 # own fleets on foreign planet
 for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</td>){5}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
-	my $sid="$a[0]#$a[1]";
+        my ($system,$planetid)=@a[0..1];
+        my $sid="$system#$planetid";
 	my @fleet=@a[3..7];
 	my $details="@fleet";
-	my $oldentry=$data{$sid};
 	my $time=undef;
-	my $newentry=addfleet($oldentry,$pid, $name, $time, 0, \@fleet);
-	if(!$debug){$data{$sid}=$newentry;}
-	else {print "$sid $newentry<br>\n"}
+	dbfleetadd($system,$planetid,$pid, $name, $time, 0, \@fleet);
 }
 
 # flying fleets
 for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)(.*)!); $_=$a[8]) {
-	my $sid="$a[0]#$a[1]";
+        my ($system,$planetid)=@a[0..1];
+        my $sid="$system#$planetid";
 	my @fleet=@a[3..7];
 	my $details="@fleet";
 	print "targeted: ".planetlink($sid)." $details <br>\n";
-	my $oldentry=$data{$sid};
 	my $time=parseawdate($a[2]);
-	my $newentry=addfleet($oldentry,$pid, $name, $time, 0, \@fleet);
-	if(!$debug){$data{$sid}=$newentry;}
-	else {print "$sid $newentry<br>\n"}
+	dbfleetadd($system,$planetid,$pid, $name, $time, 0, \@fleet);
 }
 require 'feed/libincoming.pm';
 parseincomings($_);
+dbfleetaddfinish();
 print "<br>done\n";
 1;
