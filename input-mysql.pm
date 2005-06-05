@@ -8,7 +8,7 @@ require "standard.pm";
 require "dbconf.pm";
 require "access.pm";
 my $head="Content-type: text/plain\015\012";
-our (%planets,%alliances,%starmap,%player,%playerid,%relation,%planetinfo,%logins,%fleets,$dbh,$readalli);
+our (%planets,%alliances,%starmap,%player,%playerid,$dbh,$readalli);
 (undef,undef,undef)=($::connectionInfo,$::dbuser,$::dbpasswd); #dummy
 $dbh = DBI->connect($::connectionInfo,$::dbuser,$::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
@@ -17,10 +17,10 @@ tie %player,'Tie::DBI',$dbh,'player','pid',{CLOBBER=>1};
 tie %playerid,'Tie::DBI',$dbh,'player','name',{CLOBBER=>1};
 tie %alliances,'Tie::DBI',$dbh,'alliances','aid',{CLOBBER=>1};
 tie %starmap,'Tie::DBI',$dbh,'starmap','sid',{CLOBBER=>1};
-tie %relation,'Tie::DBI',$dbh,'relations','name',{CLOBBER=>2};
-tie %planetinfo,'Tie::DBI',$dbh,'planetinfos','sidpid',{CLOBBER=>2};
-tie %logins,'Tie::DBI',$dbh,'logins','lid',{CLOBBER=>2};
-tie %fleets,'Tie::DBI',$dbh,'fleets','fid',{CLOBBER=>2};
+#tie %relation,'Tie::DBI',$dbh,'relations','id',{CLOBBER=>2};
+#tie %planetinfo,'Tie::DBI',$dbh,'planetinfos','id',{CLOBBER=>2};
+#tie %logins,'Tie::DBI',$dbh,'logins','lid',{CLOBBER=>2};
+#tie %fleets,'Tie::DBI',$dbh,'fleets','fid',{CLOBBER=>2};
 $readalli=$ENV{REMOTE_USER};
 
 sub filterpersonal($) { my($ref)=@_;
@@ -36,11 +36,16 @@ sub filterpersonal($) { my($ref)=@_;
 	}
 	return \@result;
 }
-sub selectpersonal($) { my($ref)=@_;
+sub selectpersonal($$) { my($ref,$wantwrite)=@_;
 	my %havealli;
 	my $n=0;
 	for(@$ref) {
 		$havealli{$$_[1]}=++$n;
+	}
+	if($wantwrite) {
+		my $n=$havealli{$ENV{REMOTE_USER}};
+		if($n) {return $$ref[$n-1];}
+		else {return undef}
 	}
 	if($havealli{$readalli}) {return $$ref[$havealli{$readalli}-1]}
 	# next select readable friends
@@ -50,17 +55,17 @@ sub selectpersonal($) { my($ref)=@_;
 	return undef;
 }
 
-sub getpurerelation($) { my($name)=@_;
+sub getpurerelation($$) { my($name,$wantwrite)=@_;
 	my $rel=$dbh->selectall_arrayref("SELECT * FROM `relations` WHERE `name` = ".$dbh->quote("\L$name"));
 	#my $rel=$::relation{"\L$name"};
-	my $relarray=selectpersonal($rel);
+	my $relarray=selectpersonal($rel,$wantwrite);
 	if(!$relarray){return undef}
 	@_=@$relarray;
-	$rel={"name",shift,"alli",shift,"status",shift,"atag",shift,"race",shift,"science",shift,"sciencedate",shift,"info",shift};
+	$rel={"id",shift,"alli",shift,"name",shift,"status",shift,"atag",shift,"race",shift,"science",shift,"sciencedate",shift,"info",shift};
 }
 
-sub getrelation($) { my($name)=@_;
-	my $rel=getpurerelation($name);
+sub getrelation($;$) { my($name,$wantwrite)=@_;
+	my $rel=getpurerelation($name,$wantwrite);
 	my ($effrel,$ally,$info,$realrel,$hadentry);
 	if(!$rel || $$rel{status}==0) {
 #		if(!$rel) { return undef; }
@@ -72,18 +77,28 @@ sub getrelation($) { my($name)=@_;
 		if(!$aid) { return undef }
 		if(!$atag) {$atag=$::alliances{$aid}{tag};}
 		if($rel) {$info=$$rel{info}}
-		my $rel2=getpurerelation($atag);
+		my $rel2=getpurerelation($atag,$wantwrite);
 		if($rel2) { 
-			return ($$rel2{status},$$rel2{atag},$info,0,$hadentry);
+			return ($$rel2{status},$$rel2{atag},$info,0,$hadentry,$rel?$$rel{id}:'');
 		}
 		if(!$rel) { return (4,$atag,"",0,0) }
 	}
 	($effrel,$ally,$info)=($$rel{status},$$rel{atag},$$rel{info});
 	$realrel=$effrel unless defined $realrel;
-	return ($effrel,$ally,$info,$realrel,1);
+	return ($effrel,$ally,$info,$realrel,1,$$rel{id});
 }
 sub setrelation($%) { my($id,$options)=@_;
-	$dbh->do("UPDATE `relations` SET `status` = ".$$options{status}.", `atag` = ".$dbh->quote($$options{atag}).", `info` = ".$dbh->quote($$options{info})." WHERE `name` = ".$dbh->quote($id)." AND `alli` = '$ENV{REMOTE_USER}' LIMIT 1 ;");
+	my %relation;
+	tie %relation,'Tie::DBI',$dbh,'relations','id',{CLOBBER=>2};
+	if(!$options) {
+		delete $relation{$id};
+	} else {
+		$$options{alli}=$ENV{REMOTE_USER};
+		#print "$id $relation{$id}=";
+		#foreach(keys %$options) { print "$_=$$options{$_}<br />\n"; }
+		$relation{$id}=$options;
+	}
+#	$dbh->do("UPDATE `relations` SET `status` = ".$$options{status}.", `atag` = ".$dbh->quote($$options{atag}).", `info` = ".$dbh->quote($$options{info})." WHERE `name` = ".$dbh->quote($id)." AND `alli` = '$ENV{REMOTE_USER}' LIMIT 1 ;");
 }
 
 sub playername2id($) { my($name)=@_;
@@ -106,19 +121,28 @@ sub getplanet2($) { $::planets{$_[0]} }
 sub getplanet($$) { my($sid,$pid)=@_;
 	my $sys=$::planets{sidpid22sidpid3($sid,$pid)};
 }
-sub getplanetinfo($$) { my($sid,$pid)=@_;
+sub getplanetinfo($$;$) { my($sid,$pid,$wantwrite)=@_;
 	my $sidpid=sidpid22sidpid3($sid,$pid);
 	my $pinfo=$dbh->selectall_arrayref("SELECT * FROM `planetinfos` WHERE `sidpid` = $sidpid");
 	
 	#$::planetinfo{$sidpid};
-	my $array=selectpersonal($pinfo);
+	my $array=selectpersonal($pinfo,$wantwrite);
 	if(!$array){return ()}
 	@_=@$array;
-	$pinfo={"sidpid",shift,"alli",shift,"status",shift,"who",shift,"time",shift,"added",shift,"info",shift};
-	return ($$pinfo{status},$$pinfo{who},$$pinfo{info});
+	$pinfo={"id",shift,"alli",shift,"sidpid",shift,"status",shift,"who",shift,"time",shift,"added",shift,"info",shift};
+	return ($$pinfo{status},$$pinfo{who},$$pinfo{info},$$array[0]);
 }
 sub setplanetinfo($%) { my($id,$options)=@_;
-	
+	my %data;
+	tie %data,'Tie::DBI',$dbh,'planetinfos','id',{CLOBBER=>2};
+	if(!$options) {
+		delete $data{$id};
+	} else {
+		$$options{alli}=$ENV{REMOTE_USER};
+		#print "$id ";
+		#foreach(keys %$options) { print "$_=$$options{$_}<br />\n"; }
+		$data{$id}=$options;
+	}
 }
 sub systemname2id($) { my($name)=@_;
 	$name=~s/\s+/ /;

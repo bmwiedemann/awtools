@@ -9,7 +9,7 @@ require "dbconf.pm";
 my $dbh = DBI->connect($::connectionInfo,$::dbuser,$::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
 if(1) { # create tables
-my $query=qq!
+$dbh->do(qq!
 CREATE TABLE starmap (
 sid INT( 16 ) UNSIGNED NOT NULL ,
 x INT( 16 ) NOT NULL ,
@@ -18,11 +18,9 @@ level INT( 8 ) NOT NULL ,
 name VARCHAR( 50 ) NOT NULL ,
 UNIQUE ( x,y ),
 INDEX ( name ),
-PRIMARY KEY ( sid ));!;
-my $sth = $dbh->prepare($query);
-$sth->execute();
+PRIMARY KEY ( sid ));!);
 
-$query=qq!
+$dbh->do(qq!
 CREATE TABLE alliances (
 aid INT( 16 ) UNSIGNED NOT NULL ,
 tag VARCHAR ( 5 ) NOT NULL ,
@@ -33,10 +31,8 @@ points INT( 16 ) NOT NULL ,
 name VARCHAR( 50 ) NOT NULL ,
 url VARCHAR( 50 ) NOT NULL ,
 UNIQUE ( tag ),
-PRIMARY KEY ( aid ));!;
-$sth = $dbh->prepare($query);
-$sth->execute();
-$query=qq!
+PRIMARY KEY ( aid ));!);
+$dbh->do(qq!
 CREATE TABLE player (
 pid INT( 24 ) UNSIGNED NOT NULL ,
 points INT( 16 ) NOT NULL ,
@@ -52,10 +48,8 @@ alliance INT( 16 ) NOT NULL ,
 name VARCHAR ( 50 ) NOT NULL ,
 UNIQUE ( name ),
 INDEX ( alliance ),
-PRIMARY KEY ( pid ));!;
-$sth = $dbh->prepare($query);
-$sth->execute();
-$query=qq!
+PRIMARY KEY ( pid ));!);
+$dbh->do(qq!
 CREATE TABLE planets (
 sidpid SMALLINT( 6 ) UNSIGNED NOT NULL ,
 population TINYINT( 2 ) NOT NULL ,
@@ -64,9 +58,71 @@ starbase TINYINT( 2 ) NOT NULL ,
 ownerid MEDIUMINT( 7 ) NOT NULL ,
 siege ENUM ( '0', '1' ) NOT NULL ,
 INDEX ( ownerid ),
-PRIMARY KEY ( sidpid ));!;
-$sth = $dbh->prepare($query);
-$sth->execute();
+PRIMARY KEY ( sidpid ));!);
+$dbh->do(qq!
+CREATE TABLE `planetinfos` (
+`id` INT ( 14 ) NOT NULL AUTO_INCREMENT,
+`alli` VARCHAR( 7 ) NOT NULL ,
+`sidpid` INT( 16 ) UNSIGNED NOT NULL ,
+`status` INT( 2 ) UNSIGNED NOT NULL ,
+`who` INT( 16 ) UNSIGNED NOT NULL ,
+`time` INT( 16 ) NULL ,
+`added` INT( 16 ) NOT NULL ,
+`info` TEXT NULL ,
+INDEX ( who ),
+UNIQUE ( `sidpid`, `alli` ),
+PRIMARY KEY ( id )
+);!);
+$dbh->do(qq!
+CREATE TABLE `relations` (
+`id` INT ( 14 ) NOT NULL AUTO_INCREMENT,
+`alli` VARCHAR( 7 ) NOT NULL ,
+`name` VARCHAR( 30 ) NOT NULL ,
+`status` INT( 4 ) UNSIGNED DEFAULT '4' NOT NULL ,
+`atag` VARCHAR( 8 ) NULL ,
+`race` VARCHAR( 30 ) NULL ,
+`science` VARCHAR( 30 ) NULL ,
+`sciencedate` INT (15) NULL,
+`info` TEXT NULL ,
+INDEX ( alli ),
+INDEX ( status ),
+UNIQUE ( `name`,`alli` ),
+PRIMARY KEY ( id )
+);!);
+$dbh->do(qq!  
+CREATE TABLE `logins` (
+`lid` INT ( 14 ) NOT NULL AUTO_INCREMENT,
+`alli` VARCHAR( 7 ) NOT NULL ,
+`pid` INT ( 8 ) NOT NULL ,
+`n` INT ( 4 ) ,
+`time` INT ( 15 ),
+`fuzz` INT ( 8 ),
+INDEX ( alli ),
+INDEX ( `pid` ),
+PRIMARY KEY ( `lid` )
+);!);
+$dbh->do(qq!
+CREATE TABLE `fleets` (
+`fid` INT ( 14 ) NOT NULL AUTO_INCREMENT,
+`alli` VARCHAR( 7 ) NOT NULL ,
+`status` INT( 2 ) UNSIGNED DEFAULT '0' NOT NULL ,
+`sidpid` INT( 16 ) UNSIGNED NOT NULL ,
+`owner` INT( 16 ) UNSIGNED NOT NULL ,
+`time` INT( 16 ) NULL ,
+`added` INT( 16 ) NOT NULL ,
+`trn` SMALLINT (5) ,
+`cls` SMALLINT (5) ,
+`ds` SMALLINT (5) ,
+`cs` SMALLINT (5) ,
+`bs` SMALLINT (5) ,
+`cv` INT( 6 ) NOT NULL ,
+`info` VARCHAR( 200 ) NULL ,
+INDEX ( alli ),
+INDEX (`status`),
+INDEX (`owner`),
+PRIMARY KEY ( `fid` )
+);!);
+#exit 0;
 }
 
 our (%alliances,%starmap,%player,%playerid,%planets);
@@ -148,7 +204,7 @@ sub planets {
 		}
 	}
 	$h{opop}=$h{population};
-	my $sidpid=$id*12+$pid-1;
+	my $sidpid=$id*13+$pid;
 	$planets{"$sidpid"}=\%h;
 #	my @temp=$planets{$id}?@{$planets{$id}}:();
 #	$temp[$pid-1]=\%h;
