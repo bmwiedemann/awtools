@@ -130,7 +130,7 @@ sub addfleet($$$$$@) { my($oldentry,$pid, $name, $time, $own, $fleet)=@_;
 	my $CV=fleet2cv($fleet);
 	#if($CV<10) {return $oldentry}
 	if($ships<1 && $status!=4) {return $oldentry}
-	if($oldentry=~/@$fleet/ || $time<time()-3600*24) {return $oldentry}
+	if(($oldentry && $oldentry=~/@$fleet/) || $time<time()-3600*24) {return $oldentry}
 	$oldentry||="$status $pid";
 	return "$oldentry \nautomagic:$name:$gmtime @$fleet ${CV}CV";
 }
