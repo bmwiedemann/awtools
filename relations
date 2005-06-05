@@ -28,13 +28,13 @@ if(!$readonly && defined($options{relation})) {
 		$options{relation}+=0;
 		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
 	}
-	my @rel=getrelation($options{name});
+	my @rel=getrelation($options{name},1);
 	my $mod=$rel[4] ? "modified" : "added";
 	if($options{delete}) {
-		setrelation($options{name},undef);
+		setrelation($rel[5],undef);
 		$mod="deleted";
 	} else {
-		setrelation($options{name},{"status"=>$options{relation}, "atag"=>$options{alliance}, "info"=>$options{comment}});
+		setrelation($rel[5],{"name"=>$options{name}, "status"=>$options{relation}, "atag"=>$options{alliance}, "info"=>$options{comment}});
 	}
 	print span({-style=>'color: darkgreen'},"$mod $options{name}"),br;
 }
@@ -65,7 +65,9 @@ if($options{name}) {
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
 		-labels=>\%::relationname), " relation", br,
 	textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
-	submit("submit"), qq! <a href="?">new query</a>!;
+	 submit("submit")." ".a({href=>"?"},"new query")." "
+	 #.submit(-name=>"submit", -value=>"delete")
+	;
 	if($id>2) {
 		my @pl=playerid2planets($id);
 		my $planets=@pl;
