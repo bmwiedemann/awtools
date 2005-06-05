@@ -19,8 +19,9 @@ my $dbnamep="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 	tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY);# or print $head,"\nerror accessing DB\n";
 #}
 
-sub getrelation($) { my($name)=@_;
-	my $rel=$::relation{"\L$name"};
+sub getrelation($;$) { my($name)=@_;
+	my $lname="\L$name";
+	my $rel=$::relation{$lname};
 	my ($effrel,$ally,$info,$realrel,$hadentry);
 	if(!$rel || $rel=~/^0 /) {
 #		if(!$rel) { return undef; }
@@ -37,14 +38,14 @@ sub getrelation($) { my($name)=@_;
 		my $rel2=$::relation{"\L$atag"};
 		if($rel2) { 
 			$rel2=~/^(\d+) (\w+) /s;
-			return ($1,$2,$info,0,$hadentry);
+			return ($1,$2,$info,0,$hadentry,$lname);
 		}
 		if(!$rel) { return undef }
 	}
 	$rel=~/^(\d+) (\w+) (.*)/s;
 	($effrel,$ally,$info)=($1, $2, $3);
 	$realrel=$effrel unless defined $realrel;
-	return ($effrel,$ally,$info,$realrel,1);
+	return ($effrel,$ally,$info,$realrel,1,$lname);
 }
 sub setrelation($%) { my($id,$options)=@_;
 	my %data;
@@ -79,15 +80,17 @@ sub getplanet($$) { my($sid,$pid)=@_;
 	if(!$sys) {return undef}
 	$$sys[$pid-1];
 }
-sub getplanetinfo($$) { my($sid,$pid)=@_;
-	my $pinfo=$::planetinfo{"$sid#$pid"};
+sub getplanetinfo($$;$) { my($sid,$pid)=@_;
+	my $id="$sid#$pid";
+	my $pinfo=$::planetinfo{$id};
 	if(!$pinfo){return ()}
 	$pinfo=~/^(\d) (\d+) (.*)/s;
-	return ($1,$2,$3);
+	return ($1,$2,$3,$id);
 }
 sub setplanetinfo($%) { my($id,$options)=@_;
 	my %data;
 	tie(%data, "DB_File", $dbnamep);
+	if(!$id) {$id=$$options{sidpid}}
 	#print "set '$id', '$options' $dbnamep ";
 	if(!$options) {delete $data{$id}; }
 	else {
@@ -155,5 +158,6 @@ sub sidpid2planet($) {my ($sidpid)=@_;
 	return getplanet($p[0],$p[1])#$::planets{$p[0]}[$p[1]-1];
 }
 sub getplanet2($) { sidpid2planet($_[0]) }
+sub sidpid22sidpid3($$) { "$_[0]#$_[1]" }
 
 1;
