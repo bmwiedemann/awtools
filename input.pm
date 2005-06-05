@@ -50,6 +50,7 @@ sub getrelation($;$) { my($name)=@_;
 sub setrelation($%) { my($id,$options)=@_;
 	my %data;
 	tie(%data, "DB_File", $dbnamer);
+	if(!$id) {$id=$$options{name}}
 	#print "set '$id', '$options' $dbnamer ";
 	if(!$options) {delete $data{$id}; }
 	else {
