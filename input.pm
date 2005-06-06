@@ -54,15 +54,14 @@ sub getrelation($;$) { my($name)=@_;
 	return ($effrel,$ally,$info,$realrel,1,$lname);
 }
 sub setrelation($%) { my($id,$options)=@_;
-	my %data;
-	tie(%data, "DB_File", $dbnamer);
+	untie %relation;
+	tie(%relation, "DB_File", $dbnamer) or die $!;
 	if(!$id) {$id=$$options{name}}
 	#print "set '$id', '$options' $dbnamer ";
-	if(!$options) {delete $data{$id}; }
+	if(!$options) {delete $relation{$id}; }
 	else {
-		$data{$id}="$$options{status} $$options{atag} $$options{info}";
+		$relation{$id}="$$options{status} $$options{atag} $$options{info}";
 	}
-	untie(%data);
 }
 
 sub playername2id($) { my($name)=@_;
@@ -95,15 +94,14 @@ sub getplanetinfo($$;$) { my($sid,$pid)=@_;
 	return ($1,$2,$3,$id);
 }
 sub setplanetinfo($%) { my($id,$options)=@_;
-	my %data;
-	tie(%data, "DB_File", $dbnamep);
+	untie %planetinfo;
+	tie(%planetinfo, "DB_File", $dbnamep) or die $!;
 	if(!$id) {$id=$$options{sidpid}}
 	#print "set '$id', '$options' $dbnamep ";
-	if(!$options) {delete $data{$id}; }
+	if(!$options) {delete $planetinfo{$id}; }
 	else {
-		$data{$id}="$$options{status} $$options{who} $$options{info}";
+		$planetinfo{$id}="$$options{status} $$options{who} $$options{info}";
 	}
-	untie(%data);
 }
 sub systemname2id($) { my($name)=@_;
 	$name=~s/\s+/ /;
@@ -183,4 +181,15 @@ sub dbfleetadd($$$$$$@) { my($sid,$pid,$plid,$name,$time,$type,$fleet)=@_;
 sub dbfleetaddfinish() {
 }
 
+sub dbplayeriradd { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
+	$name="\L$name";
+	untie %relation;
+	tie(%relation, "DB_File", $dbnamer) or print "error accessing DB\n";
+	my $oldentry=$relation{$name};
+	my $newentry=addplayerir($oldentry, $sci,$race,$newlogin,$trade,$prod);
+	if($newentry) {
+		if(!$::options{debug}) {$relation{$name}=$newentry;}
+		else {print "<br />$name new:",$newentry;}
+	}
+}
 1;
