@@ -12,12 +12,14 @@ tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
 tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
 tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
 tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
-my $dbnamer="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
-my $dbnamep="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
+our ($dbnamer,$dbnamep);
+if($ENV{REMOTE_USER}) {
+	$dbnamer="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
+	$dbnamep="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 #if($ENV{REMOTE_USER} ne "guest") {
 	tie(%relation, "DB_File", $dbnamer, O_RDONLY);# or print $head,"\nerror accessing DB\n";
 	tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY);# or print $head,"\nerror accessing DB\n";
-#}
+}
 
 sub getrelation($;$) { my($name)=@_;
 	my $lname="\L$name";
