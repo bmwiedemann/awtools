@@ -11,10 +11,15 @@ foreach(qw(sim planet-info distsqr ranking)) {
 }
 print p;
 #print qq!<a href="/ranking.$ENV{REMOTE_USER}.html">\U$ENV{REMOTE_USER}\E alliance ranking</a>!,br;
-print qq!<a href="/$ENV{REMOTE_USER}-holes.html">\U$ENV{REMOTE_USER}\E holes</a>!,br;
+print a({href=>"/$ENV{REMOTE_USER}-holes.html"},"\U$ENV{REMOTE_USER}\E holes"),br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
-print a({href=>"/strongestfleet-1.html"},"strongest fleets"),br;
-print qq!<a href="/manual.html">manual</a>!,p;
-print qq!<a href="http://www1.astrowars.com/0/News/">AW</a>!,br;
-print qq!<a href="http://www.astrowars.com/about/battlecalculator/">AW battle calc</a>!;
-print end_html;
+print a({href=>"/strongestfleet-1.html"},"strongest fleets"),"+history",br,
+ a({href=>"/manual.html"},"manual"),p,
+
+ h2("extra links"),
+ a({href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
+ a({href=>"http://www1.astrowars.com/rankings/"},"AW rankings"),br,
+ a({href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
+ a({href=>"http://www.astrowars.com/about/battlecalculator/"},"AW battle calculator"),br,
+ a({href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
+ end_html;
