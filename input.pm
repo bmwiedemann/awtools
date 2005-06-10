@@ -151,6 +151,9 @@ sub planet2pop($) { my($h)=@_;
 sub planet2opop($) { my($h)=@_;
         $h?$$h{opop}:undef;
 }
+sub planet2owner($) { my($h)=@_;
+        $h?$$h{ownerid}:undef;
+}
 sub planet2siege($) {my($h)=@_;
 	$h?$$h{s}:undef;
 }
