@@ -23,6 +23,7 @@ for my $sid (1..6000) {
  foreach my $a1 (keys %allis) {
   foreach my $a2 (keys %allis) {
 	next if $a1==$a2;
+	#if($a1==19 && $a2==96) {print "$sid\n"}
 	$relation{"$a1,$a2"}+=$minpop;#*$allis{$a1}*$allis{$a2};
 	$nsystems{"$a1,$a2"}++;
   }
@@ -30,12 +31,13 @@ for my $sid (1..6000) {
 }
 
 #sub sortfunc { return $relation{$b}<=>$relation{$a} }
-sub sortfunc { return $nsystems{$b}<=>$nsystems{$a} }
+sub sortfunc { return $nsystems{$b}<=>$nsystems{$a} || $relation{$b}<=>$relation{$a}}
 
 foreach my $rel (sort sortfunc keys %relation) {
 	my @a=split(",",$rel);
 	if($a[0]>=$a[1]) {next}
 	$a[0]=allianceid2tag($a[0]);
 	$a[1]=allianceid2tag($a[1]);
-	print "$a[0] -- $a[1]; //$relation{$rel} $nsystems{$rel}\n";
+	my $f=sprintf "%.4f",$relation{$rel}/$nsystems{$rel}-6; # friendship rating
+	print "$a[0] -- $a[1]; //$relation{$rel} $nsystems{$rel} $f\n";
 }
