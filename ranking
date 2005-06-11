@@ -10,7 +10,22 @@ my @enemy;
 
 my $dummy=$::relation{greenbird};
 my @rankings=();
-foreach my $name(keys %::relation) {
+
+print AWheader("alliance ranking [\U$ENV{REMOTE_USER}\E]");
+
+my $aid=alliancetag2id($ENV{REMOTE_USER});
+my @members=();
+if($aid) {
+	@members=allianceid2members($aid);
+	foreach (@members) {
+		$_=playerid2name($_);
+	}
+}
+
+my $prevname;
+foreach my $name(sort keys %::relation, @members) {
+	if(defined($prevname) && "\L$prevname" eq "\L$name") {next}
+	$prevname=$name;
 	my @rel=getrelation($name);
 	if(!defined($rel[0])) {next}
 	my $id=playername2id($name);
@@ -35,9 +50,7 @@ foreach my $name(keys %::relation) {
 	}
 }
 
-my $head=AWheader("alliance ranking [\U$ENV{REMOTE_USER}\E]");
-#$head=~s!<a href="!$&/cgi-bin/!g;
-print $head,code( join(br."\n", reverse sort @rankings)),
+print code( join(br."\n", reverse sort @rankings)),
 #p,h1("enemy list"),
 #join("",@enemy),
 end_html();
