@@ -19,12 +19,13 @@ if($aid) {
 	@members=allianceid2members($aid);
 	foreach (@members) {
 		$_=playerid2name($_);
+		$_="\L$_";
 	}
 }
 
 my $prevname;
-foreach my $name(sort keys %::relation, @members) {
-	if(defined($prevname) && "\L$prevname" eq "\L$name") {next}
+foreach my $name(sort (keys %::relation, @members)) {
+	if(defined($prevname) && ($prevname eq $name)) {next}
 	$prevname=$name;
 	my @rel=getrelation($name);
 	if(!defined($rel[0])) {next}
