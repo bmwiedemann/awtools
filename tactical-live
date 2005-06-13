@@ -2,6 +2,7 @@
 use strict;
 use CGI ":standard";
 
+my $max=1600;
 if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
 my $title="live tactical map [\U$ENV{REMOTE_USER}\E]";
 my %options;
@@ -14,12 +15,12 @@ require "cgicommon.pm";
 for my $p (qw'map xs ys xe ye scale') {
 	$options{$p}=param($p);
 }
-if($options{map}==1 && defined($options{xs}) && $options{scale}>0 && $options{scale}<5) {
+my $xsize=$options{xe};
+my $ysize=$options{ye};
+if(defined($options{xs}) && $options{scale}>0 && $options{scale}<5 && $xsize>0 && $ysize>0 && $xsize*$ysize<=$max) { # validity checks
+ if($options{map}==1) {
 	use bytes;
 	require "awdraw.pm";
-	my $xsize=$options{xe};
-	my $ysize=$options{ye};
-	my $max=1600;
 	if($xsize>0 && $ysize>0 && $xsize*$ysize<=$max) {
 		$options{xs}-=$xsize>>1;
 		$options{ys}-=$ysize>>1;
@@ -28,8 +29,9 @@ if($options{map}==1 && defined($options{xs}) && $options{scale}>0 && $options{sc
 		print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>$size), $png;
 		exit 0;
 	}
-}
-if($options{map}==2 && $options{scale}>0 && $options{scale}<5) {
+	$options{map}==0;
+ }
+ if($options{map}==2) {
   my $xsize=$options{xe}>>1;
   my $ysize=$options{ye}>>1;
   param("xs", $options{xs}-$xsize);
@@ -63,6 +65,7 @@ function getMouseXY(e) {
 //--></script>%
 	,end_form, end_html;
 	exit(0);
+ }
 }
 	my $s=5;
 	print AWheader($title),start_form('get'),
