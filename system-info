@@ -99,7 +99,8 @@ if(param()) {
 	if(!$system && $options{id}) { $system=$options{id} }
 	if(!$system) {
 		print AWheader2('system not found');
-		print "no system $options{name} at $x,$y";
+		print "no system $options{name} at $x,$y".br,
+		 a({-href=>"$ENV{HTTP_REFERER}"},"go back");
 	} else {
 		($x,$y)=systemid2coord($system);
 		my $sysname=systemid2name($system);
