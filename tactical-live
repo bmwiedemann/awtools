@@ -11,10 +11,10 @@ require "awmapcgi.pm";
 #require "standard.pm";
 require "cgicommon.pm";
 
-for my $p (qw'map xs ys xe ye') {
+for my $p (qw'map xs ys xe ye scale') {
 	$options{$p}=param($p);
 }
-if($options{map}==1 && defined($options{xs})) {
+if($options{map}==1 && defined($options{xs}) && $options{scale}>0 && $options{scale}<5) {
 	use bytes;
 	require "awdraw.pm";
 	my $xsize=$options{xe};
@@ -23,13 +23,13 @@ if($options{map}==1 && defined($options{xs})) {
 	if($xsize>0 && $ysize>0 && $xsize*$ysize<=$max) {
 		$options{xs}-=$xsize>>1;
 		$options{ys}-=$ysize>>1;
-		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize-1)->png();
+		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize-1, $options{scale})->png();
 		my $size=length($png);
 		print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>$size), $png;
 		exit 0;
 	}
 }
-if($options{map}==2) {
+if($options{map}==2 && $options{scale}>0 && $options{scale}<5) {
   my $xsize=$options{xe}>>1;
   my $ysize=$options{ye}>>1;
   param("xs", $options{xs}-$xsize);
@@ -38,9 +38,10 @@ if($options{map}==2) {
 	start_html(-title=>$title , -style=>"/tactical.css"), 
 	#AWheader2($title),
 	start_form('get', "coord"),
-	qq!<input type="image" src="?map=1&amp;xs=$options{xs}&amp;ys=$options{ys}&amp;xe=$options{xe}&amp;ye=$options{ye}" />!,
+	qq!<input type="image" src="?map=1&amp;xs=$options{xs}&amp;ys=$options{ys}&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;scale=$options{scale}" />!,
 	hidden("xs"),
 	hidden("ys"),
+	hidden("scale"),
 qq%<script language="JavaScript1.2" type="text/javascript">
 <!--
 var IE = document.all?true:false
@@ -56,7 +57,7 @@ function getMouseXY(e) {
     tempX = e.pageX
     tempY = e.pageY
   }
-  window.status="("+Math.floor((tempX-0)/$::pixelpersystem+($options{xs}-$xsize))+","+Math.floor((tempY-0)/$::pixelpersystem+($options{ys}-$ysize))+")"
+  window.status="("+Math.floor((tempX-0)/$options{scale}/$::pixelpersystem+($options{xs}-$xsize))+","+Math.floor((tempY-0)/$options{scale}/$::pixelpersystem+($options{ys}-$ysize))+")"
   return true
 }
 //--></script>%
@@ -69,6 +70,7 @@ function getMouseXY(e) {
 	 awmapcoordinput(),
 	 #textfield(-name=>"xs", -size=>$s)," x&nbsp;&nbsp; ",textfield(-name=>"ys", -size=>$s)," y",br,
 	 #textfield(-name=>"xe", -size=>$s)," x&nbsp;&nbsp; ",textfield(-name=>"ye", -size=>$s)," y",br,
+	 popup_menu(-name=>'scale',-values=>[1..4])." scaling factor".br,
 	 submit(-name=>"draw", -class=>'smbutton'),
 	 end_form, end_html;
 

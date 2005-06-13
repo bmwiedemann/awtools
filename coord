@@ -5,7 +5,7 @@ use CGI ":standard";
 
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
-for my $p (qw'x y xs ys') {
+for my $p (qw'x y xs ys scale') {
   $options{$p}=param($p);
 }
 if(defined($options{x}) && defined($options{y})) {
@@ -14,7 +14,8 @@ if(defined($options{x}) && defined($options{y})) {
 		$::mapxoff=$options{xs};
 		$::mapyoff=$options{ys};
 	}
-	my($x,$y)=imgtomap($options{x}, $options{y});
+	if(!$options{scale}) {$options{scale}=1}
+	my($x,$y)=imgtomap($options{x}/$options{scale}, $options{y}/$options{scale});
 	my $target=$ENV{SCRIPT_NAME};
 	$target=~s/coord/system-info/;
 	print redirect("http://$ENV{HTTP_HOST}$target?mapx=$x&mapy=$y");
