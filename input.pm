@@ -47,7 +47,7 @@ sub getrelation($;$) { my($name)=@_;
 		my $rel2=$::relation{"\L$atag"};
 		if($rel2) { 
 			$rel2=~/^(\d+) (\w+) /s;
-			return ($1,$2,$info,0,$hadentry,$lname);
+			return ($1,$atag,$info,0,$hadentry,$lname);
 		}
 		if(!$rel) { return undef }
 		last;
