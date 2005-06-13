@@ -14,8 +14,9 @@ sub mrelationcolor($) { my($name)=@_;
 sub mrelationcolorid($) {
 	mrelationcolor(playerid2name($_[0])); 
 }
-sub mapimage($$$$;$) {
-my ($mapxstart, $mapystart, $mapxend, $mapyend, $initdraw)=@_;
+sub mapimage($$$$;$$) {
+my ($mapxstart, $mapystart, $mapxend, $mapyend, $scale, $initdraw)=@_;
+if(!$scale) {$scale=1}
 $mapxend++;
 $mapyend++;
 our $pixelpersystem=13;
@@ -34,7 +35,7 @@ our $imagesizey=$mapsizey*$pixelpersystem+1;
 
 
 # Create the main image
-my $img = new GD::Image($imagesizex, $imagesizey);
+my $img = new GD::Image($imagesizex*$scale, $imagesizey*$scale);
 mapcoloralloc($img);
 
 sub gridtest($) { $_[0]%10<=1 ? $::lightgridcolor:$::darkgridcolor }
@@ -56,9 +57,9 @@ $initdraw && &$initdraw($img);
 
 	# grid
 	my $gridcolor=gridtest($x);
-	$img->line($px,$py, $px,$pye, $gridcolor);
+	$img->filledRectangle($px*$scale,$py*$scale, ($px+1)*$scale-1,($pye+1)*$scale-1, $gridcolor);
 	$gridcolor=gridtest($y);
-	$img->line($px,$py, $pxe,$py, $gridcolor);
+	$img->filledRectangle($px*$scale,$py*$scale, ($pxe+1)*$scale-1,($py+1)*$scale-1, $gridcolor);
 	my $id=systemcoord2id($x,$y);
 	if(defined($id)) {
 		for(my $i=1; $i<=12; $i++) {
@@ -68,9 +69,9 @@ $initdraw && &$initdraw($img);
 			if(defined($ownerid) && $ownerid>2) {
 				$color=mrelationcolorid($ownerid);
 			} else {$color="white"}
-			$img->rectangle($px2,$py2, $px3,$py2, $::colorindex{$color});
+			$img->filledRectangle($px2*$scale,$py2*$scale, ($px3+1)*$scale-1,($py2+1)*$scale-1, $::colorindex{$color});
 			if(planet2siege($planet)) {
-				$img->rectangle($pxe-5,$py2, $px3,$py2, $::colorindex{"red"});
+				$img->filledRectangle(($pxe-5)*$scale,$py2*$scale, ($px3+1)*$scale-1,($py2+1)*$scale-1, $::colorindex{"red"});
 			}
 		}
 	}
