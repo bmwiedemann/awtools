@@ -1,15 +1,17 @@
 d=`date +%d-%m-%Y`
+mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-allies=fun tgd xr la tbgsaf guest
+allies=fun tgd xr la tbgsaf guest dude
 #allies=
 #winterwolf arnaken manindamix
 all: TA.candidate
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
 links:
-	ln -f index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim /srv/www/cgi-bin/aw/
+	ln -f index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord /srv/www/cgi-bin/aw/
+	ln -f topwars /srv/www/cgi-bin/aw/topallis
 system-ids.txt:
 	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
 updatecsv: dumpdbs
@@ -21,6 +23,8 @@ updatecsv: dumpdbs
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
 	for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
 	perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
+	perl detectalliancerelation.pl > html/beta10/alliancerelation-${mydate}
+	ln -f html/beta10/alliancerelation-${mydate} html/beta10/alliancerelation
 updatemap: updatemaponly updaterank af-relations.txt tgd-relations.txt
 updatemaponly:
 	for a in $(allies) ; do \
@@ -71,5 +75,5 @@ access:
 	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm
 
 tgz:
-	tar -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done system-info relations relations-bulk planet-info login tactical{,-large,-live} alliance fleets feedupdate index.html sim arrival ranking distsqr feed/*.pm LICENSE Makefile
+	tar -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done system-info relations relations-bulk planet-info login tactical{,-large,-live} alliance fleets feedupdate index.html sim arrival ranking distsqr topwars coord feed/*.pm LICENSE Makefile
 	mv ../bmw-awtools.tar.gz html/
