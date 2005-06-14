@@ -34,7 +34,7 @@ sub drawaxis($) {my($img)=@_;
 	$img->line(0,$ih, $imagesize,$ih,$::axiscolor);
 	$img->line($ih,0, $ih,$imagesize,$::axiscolor);
 }
-my $img=mapimage($mapxoff,$mapyoff, $mapxoff+$mapsize,$mapyoff+$mapsize, \&drawaxis);
+my $img=mapimage($mapxoff,$mapyoff, $mapxoff+$mapsize,$mapyoff+$mapsize, 1, \&drawaxis);
 writeimg($img, "$out.png");
 exit 0;
 
