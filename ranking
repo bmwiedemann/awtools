@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-
+use strict;
 use CGI ":standard";
 #$ENV{REMOTE_USER}="af";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
@@ -34,11 +34,11 @@ foreach my $name(sort (keys %::relation, @members)) {
 	my $points=$::player{$id}{points};
 #	printf("%.3i(%.4i) $name($id)\n",$points,$::player{$id}{rank});
 	my $p=$::player{$id};
-	if($rel[0]<=3) {
+#	if($rel[0]<=3) {
 		#my $aid=$$p{tag};
 		#my $atag=$aid && allianceid2tag($aid);
-		push @enemy, qq!<a href="/cgi-bin/relations?name=$name">$name ($id)</a> \n!.br;
-	}
+#		push @enemy, qq!<a href="/cgi-bin/relations?name=$name">$name ($id)</a> \n!.br;
+#	}
 	if($rel[0]==9) {
 		my $entry="";
 		foreach my $k (qw"points rank culture science level name") {
@@ -54,4 +54,4 @@ foreach my $name(sort (keys %::relation, @members)) {
 print code( join(br."\n", reverse sort @rankings)),
 #p,h1("enemy list"),
 #join("",@enemy),
-end_html();
+AWtail();
