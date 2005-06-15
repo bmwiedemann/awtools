@@ -73,7 +73,7 @@ function getMouseXY(e) {
 	 awmapcoordinput(),
 	 #textfield(-name=>"xs", -size=>$s)," x&nbsp;&nbsp; ",textfield(-name=>"ys", -size=>$s)," y",br,
 	 #textfield(-name=>"xe", -size=>$s)," x&nbsp;&nbsp; ",textfield(-name=>"ye", -size=>$s)," y",br,
-	 popup_menu(-name=>'scale',-values=>[1..4])." scaling factor".br,
+	 popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4])." scaling factor".br,
 	 submit(-name=>"draw", -class=>'smbutton'),
 	 end_form, end_html;
 
