@@ -21,8 +21,9 @@ if(param()) {
  if($options{did}) { ($options{dx},$options{dy})=systemid2coord($options{did}); }
  my $dx=$options{sx}-$options{dx};
  my $dy=$options{sy}-$options{dy};
- print "from ($options{sx},$options{sy}) to ($options{dx},$options{dy}) is distance ($dx,$dy) so <br>\n";
- print "distsqr=".($dx**2+$dy**2);
+ print "from ($options{sx},$options{sy}) to ($options{dx},$options{dy}) is distance ($dx,$dy) so \n".br;
+ my $d=$dx**2+$dy**2;
+ print a({href=>"arrival?distance=$d"},"distsqr=$d");
 } else { 
   my $s=4;
   print start_form('get'),
