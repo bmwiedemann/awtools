@@ -10,7 +10,7 @@ all: TA.candidate
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
 links:
-	ln -f index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord /srv/www/cgi-bin/aw/
+	ln -f index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord holes /srv/www/cgi-bin/aw/
 	ln -f topwars /srv/www/cgi-bin/aw/topallis
 system-ids.txt:
 	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
@@ -37,8 +37,9 @@ updatemap2only:
 updaterank:
 	for a in $(allies) ; do \
 		REMOTE_USER=$$a perl rank.pl > html/ranking.$$a.html ; \
-		REMOTE_USER=$$a perl holes.pl > html/$$a-holes.html ; \
+		REMOTE_USER=$$a perl holes2.pl > holesdir/$$a ; \
 	done
+		#REMOTE_USER=$$a perl holes.pl > html/$$a-holes.html ; \
 	
 drawall:
 	for f in www1.astrowars.com/export/history/starmap* ; do ./drawmap.pl $$f ; done
@@ -75,5 +76,5 @@ access:
 	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm
 
 tgz:
-	tar -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done system-info relations relations-bulk planet-info login tactical{,-large,-live} alliance fleets feedupdate index.html sim arrival ranking distsqr topwars coord feed/*.pm LICENSE Makefile
+	tar -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done system-info relations relations-bulk planet-info login tactical{,-large,-live} alliance fleets feedupdate index.html sim arrival ranking distsqr topwars coord holes feed/*.pm LICENSE Makefile
 	mv ../bmw-awtools.tar.gz html/
