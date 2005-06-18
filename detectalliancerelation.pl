@@ -5,22 +5,28 @@ require "input.pm";
 my %relation;
 my %nsystems;
 my %conq;
+my %killedpop;
 
 #print STDERR "importing old data...\n";
 my @olddata;
+my @oldpopdata;
 for my $day (1..7) {
 	my %oldday;
+	my %olddaypop;
 	my @t=localtime(time()-3600*24*$day);
 	my ($d,$m,$y)=(sprintf("%.2i",$t[3]),sprintf("%.2i",$t[4]+1), $t[5]+1900);
-	open(F, "tar -Oxjf www1.astrowars.com/export/history/all$d-$m-$y.tar.bz2 planets.csv |");
+	open(F, "tar -Oxjf www1.astrowars.com/export/history/all$d-$m-$y.tar.bz2 planets.csv |") or next;
 	my $dummy=<F>;
 	while(<F>) {
 		next if m/^\s*$/;
 		my @a=split("\t");
-		$oldday{"$a[0]#$a[1]"}=$a[4];
+		my $sidpid="$a[0]#$a[1]";
+		$oldday{$sidpid}=$a[4];
+		$olddaypop{$sidpid}=$a[2];
 #		print "$a[0]#$a[1] $a[4]\n";
 	}
 	push @olddata, \%oldday;
+	push @oldpopdata, \%olddaypop;
 }
 #print STDERR "scanning systems...\n";
 
@@ -41,6 +47,7 @@ for my $sid (1..6000) {
 	if($::alliances{$aid}{points}<270 && allianceid2members($aid)<8) {next}
 	$allis{$aid}++;
 	my $sidpid="$sid#$plid";
+	my $n=0;
 	foreach my $oldowner (@olddata) {
 		my $o2=$$oldowner{$sidpid};
 		last unless $o2 && $o2>2;
@@ -48,12 +55,15 @@ for my $sid (1..6000) {
 			my $aid2=playerid2alliance($o2);
 			last unless $aid2;
 			my $rel="$aid,$aid2";
+#			if($aid==82 && $aid2==62) {print "$sidpid ${$oldpopdata[$n]}{$sidpid}\n"}
 			$conq{$rel}++;
+			$killedpop{$rel}+=${$oldpopdata[$n]}{$sidpid};
 			$relation{$rel}+=0; # force entry
 			$nsystems{$rel}+=0;
 #print "$sidpid $aid2->$aid\n";
 			last;
 		}
+		$n++;
 	}
  }
  foreach my $a1 (keys %allis) {
@@ -75,12 +85,15 @@ sub sortfunc { return $nsystems{$b}<=>$nsystems{$a} || $relation{$b}<=>$relation
 foreach my $rel (sort sortfunc keys %relation) {
 	my @a=split(",",$rel);
 	if($a[0]>=$a[1]) {next}
+	my $rrel="$a[1],$a[0]"; # reverse relation
 	my $conq1=$conq{$rel}||0;
-	my $conq2=$conq{"$a[1],$a[0]"}||0;
+	my $conq2=$conq{$rrel}||0;
 	my $conq=$conq1+$conq2;
+	my $pop1=$killedpop{$rel}||0;
+	my $pop2=$killedpop{$rrel}||0;
 	my $n=$nsystems{$rel}||4;
 	$a[0]=allianceid2tag($a[0]);
 	$a[1]=allianceid2tag($a[1]);
 	my $f=sprintf "%.4f",$relation{$rel}/$n-3-$conq/($n**0.25); # friendship rating
-	print "$a[0] -- $a[1]; // $relation{$rel} $nsystems{$rel} $conq1 $conq2 $f\n";
+	print "$a[0] -- $a[1]; // $relation{$rel} $nsystems{$rel} $conq1 $conq2 $pop1 $pop2 $f\n";
 }
