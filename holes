@@ -10,7 +10,10 @@ sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 print AWheader("holes list [\U$ENV{REMOTE_USER}\E]");
 
 my $filename="holesdir/$ENV{REMOTE_USER}";
-open(F, "<", $filename) or print "data not found";
+unless(open(F, "<", $filename)) {
+	print "data not found";
+	exit 0;
+}
 my @holes=<F>;
 close F;
 
