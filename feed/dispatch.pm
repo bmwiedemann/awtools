@@ -2,7 +2,7 @@ sub feed_dispatch($) { local $_=$_[0];
 	if(! m!<title>([^<>]*)</title>!) { 
 		my @race;
 		if($::options{name}) { require './feed/plain_race.pm' }
-		print "no title found\n"; exit 0;
+		print "no title found\n"; return -1;
 	}
 	my $title=$1;
 	my $aw="Astro Wars";
@@ -19,7 +19,7 @@ sub feed_dispatch($) { local $_=$_[0];
 	}
         if($::deliverytime<-60 || $::deliverytime>50*60) {
                 print "data is outdated or wrong timezone? (delivery took $::deliverytime seconds)";
-                exit(0);
+                return -2;
         }
 
 	if($title=~m!Alliance / Detail!) {
@@ -41,6 +41,7 @@ sub feed_dispatch($) { local $_=$_[0];
 	} else {
 		print "this input (title=$title) is not supported (yet) or not recognized\n";
 	}
+	return 0;
 }
 
 1;
