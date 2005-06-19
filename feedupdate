@@ -7,7 +7,7 @@ require "cgicommon.pm";
 
 our %options;
 my $title="AW feed update";
-my $debug=1;
+my $debug=0;
 print AWheader($title);
 foreach my $p (qw(tz html file debug name url)) {
 	$options{$p}=param($p);
@@ -16,11 +16,11 @@ if(param()) {
 	chdir("/home/bernhard/code/cvs/perl/awcalc");
 	my $html=$options{html};
 	if(upload('file')) {
-		print "uploaded file $options{file}<br>\n";
+		print "uploaded file $options{file}\n".br;
 		my $bytes_read=read(upload('file'), $html, 40000);
 		#print $bytes_read;
 	}
-	print "input ",length($html)," bytes<br>";
+	print "input ",length($html)," bytes".br;
 	if($debug) {
 		open(DEBUG, "> /tmp/debug");
 		print DEBUG time(),"\n";
@@ -30,7 +30,6 @@ if(param()) {
 	}
 	require './feed/dispatch.pm';
 	feed_dispatch($html);
-	#print "$html";
 } else {
 	my $uc=cookie('user');
 	if(!$options{name}) {param("name",$uc)}
