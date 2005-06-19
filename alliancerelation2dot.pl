@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
-my $entries=160;
+my $aentries=100;
+my $eentries=85;
 my @groups=(
 #[qw{HNU HND GPS MAD}], 
 #[qw{LA LD FO SP}],
@@ -12,6 +13,7 @@ my @groups=(
 #[qw{NEMO OMEN}],
 #[qw{THE NSA BKA PEYO}]
 );
+my $relre=qr!^([^ ]+) -- ([^ ;]+); // (\d+) (\d+) (\d+) (\d+) ([+-]?\d+)!;
 my %group;
 {
  my $n=0;
@@ -35,13 +37,14 @@ sub huefunc($) {my ($pop)=@_;
 sub replacefunc($$$$) {my ($rel,$n,$conq1,$conq2)=@_;
 	my $l="";
 	my $fr=$n?$rel/$n:2; # average minimum pop
-	my $min=-0.1;
+	my $min=0.1;
 	if(!$n) {$n=1}
-	$fr-=3+($conq1+$conq2)/$n**0.25;
-	my $saturation=($n/11)*(1-$min)+$min;
+	my $c=($conq1+$conq2)/$n**0.25;
+	$fr-=3+$c;
+	my $saturation=(($n+$c)/13)*(1-$min)+$min;
 	$saturation=($saturation>1)?1:($saturation<0?0:$saturation);
-	my $c='"'.join(",",huefunc($fr),$saturation,1).'"';
-	return qq! [color=$c$l];!;
+	my $col='"'.join(",",huefunc($fr),$saturation,1).'"';
+	return qq! [color=$col$l];!;
 }
 
 print "graph alliances {\n";
@@ -52,12 +55,12 @@ my @edges;
   @edges=split("\n",$edges);
 }
 my %allis;
-foreach(@edges[0..$entries-1]) {
+foreach(@edges) {
 	next unless /^([^ ]+) -- ([^ ;]+)/;
 	$allis{$1}++;
 	$allis{$2}++;
 }
-sub max($$) {return $_[0]>$_[1]?$_[0]:$_[1]}
+sub max($$) {my($a,$b)=@_; $a|=0; $b|=0; return $a>$b?$a:$b}
 sub sortfunc {
 	return 0 unless $a=~/^([^ ]+) -- ([^ ;]+)/;
 	my $max=max($allis{$1},$allis{$2});
@@ -66,9 +69,16 @@ sub sortfunc {
 	return $max2<=>$max;
 }
 
+sub sortfunc2 {
+	my @a=split(" ",$a);
+	my @b=split(" ",$b);
+	return $a[8]<=>$b[8];
+}
+my @eedges=(sort sortfunc2 @edges)[0..$eentries-1];
+
 my @newedges;
-foreach(sort sortfunc @edges[0..$entries-1]) {
-	next unless m!^([^ ]+) -- ([^ ;]+); // (\d+) (\d+) (\d+) (\d+) ([+-]?\d+)!;
+foreach(sort sortfunc (@edges[0..$aentries-1], @eedges)) {
+	next unless m/$relre/;
 	my ($a1,$a2,$rel,$n,$conq1,$conq2)=($1,$2,$3,$4,$5,$6);
 	#s!; //(\d+) ([+-]?\d+)!replacefunc($1,$2)!e;
 	for($a1,$a2) {
