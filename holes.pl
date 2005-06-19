@@ -11,7 +11,7 @@ my $head=AWheader2("holes list [\U$ENV{REMOTE_USER}\E]");
 #$head=~s!index!/cgi-bin/index!;
 $head=~s!<a href="!$&/cgi-bin/!g;
 print $head.
-"sys: members:friends:others<br>\n";
+"sys: members:friends:others\n".br;
 for my $sid (1..4600) {
 	my $friend=0;
 	my $other=0;
