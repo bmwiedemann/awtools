@@ -5,7 +5,7 @@ chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "standard.pm";
 require "cgicommon.pm";
 
-my $sortopts="-k9";
+my $sortopts="-k11";
 my $titlestr;
 if($0=~/topwars/) {
 	$titlestr=" wars";
@@ -18,7 +18,9 @@ my $title="AW $n largest alliance$titlestr";
 print AWheader($title);
 my $filename="html/beta10/alliancerelation";
 my $mtime=gmtime((stat($filename))[9]);
-print "Last Update $mtime GMT\n".br;
+print "extracted from ".a({-href=>"/beta10/alliancerelation"},"alliancerelation data").br.
+	"Last Update $mtime GMT\n".br.
+	"alli -- alli // sum(minpop) shared-systems taken-planets lost-planets killed-pop lost-pop friendlyness";
 
 my $data=`sort $sortopts -n $filename | head -$n`;
 print pre($data);
