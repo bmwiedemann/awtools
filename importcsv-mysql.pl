@@ -130,6 +130,7 @@ CREATE TABLE `transfers` (
 `splayer` INT ( 16 ) NOT NULL,
 `dplayer` INT ( 16 ) NOT NULL,
 `amount` SMALLINT ( 10 ) NOT NULL,
+`fees` SMALLINT ( 10 ) NOT NULL,
 UNIQUE `uniq` ( `time` , `dplayer` , `splayer` , `alli` ),
 PRIMARY KEY ( `tid` )
 );!);

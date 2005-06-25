@@ -240,9 +240,9 @@ sub dbfleetadd {
 sub dbplayeriradd {
 #tie %relation,'Tie::DBI',$dbh,'relations','id',{CLOBBER=>2};
 }
-sub dbtransferadd($$$$) { my($time,$splayerid,$dplayerid,$amount)=@_;
+sub dbtransferadd($$$$$) { my($time,$splayerid,$dplayerid,$amount,$fees)=@_;
 	my $alli=$dbh->quote($ENV{REMOTE_USER});
-	$dbh->do(qq!INSERT INTO `transfers` VALUES ('', $alli, $time, $splayerid, $dplayerid, $amount);!);
+	$dbh->do(qq!INSERT INTO `transfers` VALUES ('', $alli, $time, $splayerid, $dplayerid, $amount, $fees);!);
 }
 
 

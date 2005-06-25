@@ -17,6 +17,7 @@ my %rawtb;
 my $lastdate=0;
 my $off=3600*3; # update is at 03:00 GMT
 sub addinterest($) { my($date)=@_;
+   # ascending time is assumed
    my $days=int(($date-$off)/86400)-int(($lastdate-$off)/86400);
    return if $days==0;
    foreach my $entry (keys(%tb)) {
@@ -26,12 +27,12 @@ sub addinterest($) { my($date)=@_;
 }
 
 for my $entry (@$transfers) {
-   my ($tid,$alli,$time,$splayerid,$dplayerid,$amount)=(@$entry);
-   push @transfers, $time." ".gmtime($time)." $splayerid->$dplayerid : $amount";
+   my ($tid,$alli,$time,$splayerid,$dplayerid,$amount,$fees)=(@$entry);
+   push @transfers, $time." ".gmtime($time)." $splayerid->$dplayerid : $amount+$fees";
    addinterest($time);
-   $tb{$splayerid}+=$amount;
+   $tb{$splayerid}+=$amount+$fees;
    $tb{$dplayerid}-=$amount;
-   $rawtb{$splayerid}+=$amount;
+   $rawtb{$splayerid}+=$amount+$fees;
    $rawtb{$dplayerid}-=$amount;
 }
 addinterest(time());
