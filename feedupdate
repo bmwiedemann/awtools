@@ -25,7 +25,9 @@ if(param()) {
 		open(DEBUG, "> /tmp/debug");
 		print DEBUG time(),"\n";
 		foreach(keys(%options)) {
-			print DEBUG "$_=$options{$_}\n";
+			my $entry=$_."=";
+			if($options{$_}){$entry.=$options{$_}}
+			print DEBUG $entry,"\n";
 		}
 	}
 	require './feed/dispatch.pm';
