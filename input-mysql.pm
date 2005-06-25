@@ -231,5 +231,19 @@ sub sidpid2planet($) {my ($sidpid)=@_;
 	my @p=split('#',$sidpid);
 	return getplanet($p[0],$p[1])#$::planets{$p[0]}[$p[1]-1];
 }
+sub dbfleetaddinit($) { my($pid)=@_;
+#tie %planetinfo,'Tie::DBI',$dbh,'planetinfos','id',{CLOBBER=>2};
+}
+sub dbfleetadd {
+
+}
+sub dbplayeriradd {
+#tie %relation,'Tie::DBI',$dbh,'relations','id',{CLOBBER=>2};
+}
+sub dbtransferadd($$$$) { my($time,$splayerid,$dplayerid,$amount)=@_;
+	my $alli=$dbh->quote($ENV{REMOTE_USER});
+	$dbh->do(qq!INSERT INTO `transfers` VALUES ('', $alli, $time, $splayerid, $dplayerid, $amount);!);
+}
+
 
 1;
