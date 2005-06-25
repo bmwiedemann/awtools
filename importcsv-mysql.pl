@@ -122,6 +122,17 @@ INDEX (`status`),
 INDEX (`owner`),
 PRIMARY KEY ( `fid` )
 );!);
+$dbh->do(qq!
+CREATE TABLE `transfers` (
+`tid` INT ( 14 ) NOT NULL AUTO_INCREMENT,
+`alli` VARCHAR( 7 ) NOT NULL,
+`time` INT ( 16 ) NOT NULL,
+`splayer` INT ( 16 ) NOT NULL,
+`dplayer` INT ( 16 ) NOT NULL,
+`amount` SMALLINT ( 10 ) NOT NULL,
+UNIQUE `uniq` ( `time` , `dplayer` , `splayer` , `alli` ),
+PRIMARY KEY ( `tid` )
+);!);
 #exit 0;
 }
 
