@@ -3,14 +3,15 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-allies=fun tgd xr la tbgsaf guest dude
+allies=af tgd xr la tbgsaf guest
+tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord holes transfers
 #allies=
 #winterwolf arnaken manindamix
 all: TA.candidate
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
 links:
-	ln -f index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord holes /srv/www/cgi-bin/aw/
+	ln -f ${tools} /srv/www/cgi-bin/aw/
 	ln -f topwars /srv/www/cgi-bin/aw/topallis
 system-ids.txt:
 	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
@@ -71,10 +72,10 @@ access:
 	cp -ia ../dbm/empty.dbm ~/db/$a-planets.dbm
 	mkdir large-$a
 	/usr/sbin/htpasswd2 ~/.htpasswd $a
-	vi /srv/www/cgi-bin/aw/.htaccess
+	#vi /srv/www/cgi-bin/aw/.htaccess
 	-chmod 664 ~/db/$a*.dbm
 	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm
 
 tgz:
-	tar -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done system-info relations relations-bulk planet-info login tactical{,-large,-live} alliance fleets feedupdate index.html sim arrival ranking distsqr topwars coord holes feed/*.pm LICENSE Makefile
+	tar --exclude=dbconf.pm -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done ${tools} feed/*.pm LICENSE Makefile
 	mv ../bmw-awtools.tar.gz html/

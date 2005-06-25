@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input-mysql.pm";
+require "cgicommon.pm";
+
+print AWheader("transfer records [\U$ENV{REMOTE_USER}\E]");
+
+my @transfers;
+my $alliuser=$ENV{REMOTE_USER};
+(undef)=($::dbh); # dummy to avoid warning;
+my $transfers=$::dbh->selectall_arrayref(qq{SELECT * FROM `transfers` ORDER BY `time` ASC});
+$transfers=filterpersonal($transfers);
+my %tb;
+my %rawtb;
+my $lastdate=0;
+my $off=3600*3; # update is at 03:00 GMT
+sub addinterest($) { my($date)=@_;
+   my $days=int(($date-$off)/86400)-int(($lastdate-$off)/86400);
+   return if $days==0;
+   foreach my $entry (keys(%tb)) {
+      $tb{$entry}=$tb{$entry}*1.04**$days;
+   }
+   $lastdate=$date;
+}
+
+for my $entry (@$transfers) {
+   my ($tid,$alli,$time,$splayerid,$dplayerid,$amount)=(@$entry);
+   push @transfers, $time." ".gmtime($time)." $splayerid->$dplayerid : $amount";
+   addinterest($time);
+   $tb{$splayerid}+=$amount;
+   $tb{$dplayerid}-=$amount;
+   $rawtb{$splayerid}+=$amount;
+   $rawtb{$dplayerid}-=$amount;
+}
+addinterest(time());
+
+my @toptrans;
+sub sortfunc { return $tb{$a}<=>$tb{$b}}
+for my $entry (sort sortfunc keys(%tb)) {
+   my $name=playerid2name($entry);
+   if(!$name) {$name=$entry}
+   push @toptrans, sprintf("%s: %.2fA\$ from %.2fA\$",
+         a({href=>"relations?name=$name"},"$name($entry)"),$tb{$entry},$rawtb{$entry});
+}
+
+print code( join(br."\n",  @transfers)),
+   p.h2("top transfers"),
+   join(br."\n", @toptrans),
+AWtail();
