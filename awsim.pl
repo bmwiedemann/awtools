@@ -10,22 +10,27 @@ our @buildings=qw"hf rf gc rl sb";
 our $updatetime=4; # update each quarter hour
 #our %racebonus=qw(pop 0.13 pp 0.05 cul 0.05 sci 0.11); beta7
 #our %racebonus=qw(pop 0.10 pp 0.04 cul 0.04 sci 0.10); beta8
-our %racebonus=qw(pop 0.08 pp 0.04 cul 0.04 sci 0.09);
+our %racebonus=qw(pop 0.07 pp 0.04 cul 0.04 sci 0.08);
 %options=qw(
 init 2
 initialp 3
-tactic 3
+tactic 6
 turns 400
 print 4
+activeturns 4
 adprice 0.94
 social 0.5
+trades 1
+maxbuilding 14
+cdturns 0.66
 ); # simulate 8 weeks
-our %artifact=qw(BM1 3300 BM2 12000 BM3 25000);
+our %artifact=qw(BM1 3300 BM2 12000 BM3 25000 CD1 3400 CD2 12500 CD3 28000);
 our %artifactbonus=qw(BM cul CP pop CD pp AL sci);
 
 #growth = 9(x-1)^2+9(x-1)+3
+#prod = 5*1.5^(n-1)
 
-my @options=qw"tactic|t=i init|i=i initialp=i turns=i print|p=i pop=i pp=i cul=i sci=i social=f help|h|?";
+my @options=qw"trader! tactic|t=i init|i=i initialp=i turns=i print|p=i pop=i pp=i cul=i sci=i maxbuilding=i activeturns=i social=f trades=f cdturns=f help|h|?";
 my $result=GetOptions(\%options, @options);
 if(!$result or @ARGV or $options{help}) {
   print "usage $0 [--param=value]\n\tallowable params: @options\n";
@@ -62,6 +67,20 @@ $cul[0]=0;
 for my $l (0..99) {$prod[$l]=5*1.5**($l-1)}
 for my $v (@sci,@pop,@prod) {$v=int($v+0.5);if($debug){print "$v\n"}}
 
+sub min($$) {return $_[0]<$_[1]?$_[0]:$_[1]}
+sub max($$) {return $_[0]>$_[1]?$_[0]:$_[1]}
+sub maketradeagreement(%) { my($player)=@_;
+   $$player{tas}++;
+   if(!$options{trader}) {$$player{ad}-=20000;}
+}
+sub buyartifact(%$) { my($player,$art)=@_;
+   if(!$art) {return}
+   my $cost=$artifact{$art};
+   if($$player{ad}<$cost) {return}
+   my $prevvalue=$artifact{$$player{artifact}} || 0;
+   $$player{ad}+=$prevvalue-$cost;
+   $$player{artifact}=$art;
+}
 sub buildcost($) { my($level)=@_;
   my $cost=$prod[$level+1];
   my $su=900;
@@ -85,6 +104,11 @@ sub spend_all()
 		$player{ad}+=$$planet{pp}*$options{adprice};
 		$$planet{pp}=0;
 	}
+   return 1;
+}
+
+sub gettradebonus($$) { my($turn,$taplanets)=@_;
+   return 0.01*$options{trades}*$taplanets;
 }
 
 sub update()
@@ -93,8 +117,13 @@ sub update()
   my $maxpop=$player{social};
   if($maxpop<10) {$maxpop=5+$maxpop/2}
   $maxpop=int($maxpop);
+  my $taplanets=0;
+  for my $planet(@planet) {
+    my $pop=int($$planet{pop});
+    if($pop>=10) {$taplanets++}
+  }
   foreach(qw(pop pp sci cul)) {
-    $bonus{$_}=$player{"race$_"}+$player{tas}*0.07;
+    $bonus{$_}=$player{"race$_"}+$player{tas}*gettradebonus($turn,$taplanets);
   }
   if($player{artifact}=~/(.*)(\d)/) {
     my $whichbonus=$artifactbonus{$1};
@@ -203,7 +232,9 @@ foreach(qw(pop pp cul sci)) {
 }
 
 for $turn(0..$options{turns}) {
-  spend1();
+  if($turn%$options{activeturns}==0) {
+     spend1();
+  }
   printstate() if($turn % $options{print}==0);
   update();
 }
