@@ -44,7 +44,7 @@ sub spend1()
 { 
   $player{artifact}=~/(\d)$/;
   my $artifactlevel=$1 || 0;
-  my $wantartlevel=min(3,int(($turn-2000)/1400)+1);
+  my $wantartlevel=min(3,int(($turn-2000)/1400+1)); # after turn 2000 buy every 1400 turns
   my $wantart="BM$wantartlevel";
   if($turn>$options{turns}*$options{cdturns}) {$wantart="CD$wantartlevel"}
   if($wantart ne $player{artifact} && $wantartlevel<=3 && $wantartlevel>=1) {
