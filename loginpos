@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+print header();
+use WWW::Mechanize;
+#use WWW::Mechanize::FormFiller;
+#use URI::URL;
+
+
+my $uri1='http://www.astrowars.com/forums/';
+my $agent = WWW::Mechanize->new( autocheck => 1 );
+#my $formfiller = WWW::Mechanize::FormFiller->new();
+$agent->env_proxy();
+
+  $agent->get($uri1);
+#    $agent->form(1) if $agent->forms and scalar @{$agent->forms};
+  $_=$agent->content;
+  /The newest registered user is <b><a href="([^"]*)"/;
+  $_=$1;
+  s/&amp;/&/;
+  $agent->get($uri1.$_);
+  #$agent->follow(qr((?-xism:sianodel)));
+  $agent->follow(qr((?-xism:Public)));
+  $_=$agent->content;
+  m!<html><head><title>([^ ]*)!;
+  print "$1\n";
+  m!<a href ="/about/starmap.php\?dx=([+-]?\d+)&dy=([+-]?\d+)"!;
+  print "($1,$2)\n";
+
