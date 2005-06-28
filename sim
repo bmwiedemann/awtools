@@ -11,7 +11,7 @@ my @params=();
 foreach(qw(turns print tactic pop pp cul sci social trades initialp maxbuilding cdturns activeturns)) {
    if(param($_)) {push(@params, "--$_=".param($_));}
 }
-foreach(qw(trader)){
+foreach(qw(trader startuplab)){
    if(param($_)) {push(@params, "--$_");}
 }
 if(@params && param("turns")<=9999) {
@@ -20,12 +20,13 @@ if(@params && param("turns")<=9999) {
 	print "</pre>\n";
 } else {
 	my $s=5;
-	my @default=(7300,7300,6);
+	my @default=(7000,7000,6);
 #	my @default=(400,40,3);
 	print start_form('get'), 
    i("simulation options"),br,
 	textfield(-name=>'turns', -value=>$default[0], -size=>$s, -class=>'text'), " how many turns (of 15 min) to simulate", br,
 	textfield(-name=>'print', -value=>$default[1], -size=>$s, -class=>'text'), " print only each n turns", br,
+	textfield(-name=>'initialp', -value=>72, -size=>$s, -class=>'text'), " starting time in hours (initial starting points depend on this (default: 72h=3d=144PP))", br,
 #textfield(-name=>'tactic', -value=>$default[2], -size=>$s, -class=>'text'), " use tactic (1..6)", 
    hidden('tactic',6),
    p,
@@ -35,14 +36,14 @@ if(@params && param("turns")<=9999) {
 	textfield(-name=>'cul', -value=>0, -size=>$s, -class=>'text'), " culture bonus", br,
 	textfield(-name=>'pp', -value=>0, -size=>$s, -class=>'text'), " production bonus", br,
    checkbox(-name=>'trader', -label=>'trader'),br,
+   checkbox(-name=>'startuplab', -label=>'initial RL12'),br,
    p,
    i("style of play components"),br,
 	textfield(-name=>'social', -value=>0.3, -size=>$s, -class=>'text'), " how much research to put in social science (default: 30%) ", br,
    textfield(-name=>'trades', -value=>1, -size=>$s, -class=>'text'), " trade partner factor (default 100% - same player as oneself)", br,
    textfield(-name=>'cdturns', -value=>0.8, -size=>$s, -class=>'text'), " when to switch from BM to CD (default: after 4/5 of round)", br,
-   textfield(-name=>'maxbuilding', -value=>13, -size=>$s, -class=>'text'), " maximum building level",br
-	textfield(-name=>'activeturns', -value=>24, -size=>$s, -class=>'text'), " only login every n turns of 15 minutes (default 24=6h)", br,
-	textfield(-name=>'initialp', -value=>144, -size=>$s, -class=>'text'), " initial starting points (default: 144 after 3 days)", br,
+   textfield(-name=>'maxbuilding', -value=>14, -size=>$s, -class=>'text'), " maximum building level",br
+	textfield(-name=>'activeturns', -value=>24, -size=>$s, -class=>'text'), " only login+build every n turns of 15 minutes (default 24=6h)", br,
 	submit(-class=>'smbutton'), end_form, 
 }
 print end_html;

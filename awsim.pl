@@ -12,7 +12,7 @@ our $updatetime=4; # update each quarter hour
 #our %racebonus=qw(pop 0.10 pp 0.04 cul 0.04 sci 0.10); beta8
 our %racebonus=qw(pop 0.07 pp 0.04 cul 0.04 sci 0.08);
 %options=qw(
-init 2
+init 1
 initialp 3
 tactic 6
 turns 400
@@ -30,13 +30,13 @@ our %artifactbonus=qw(BM cul CP pop CD pp AL sci);
 #growth = 9(x-1)^2+9(x-1)+3
 #prod = 5*1.5^(n-1)
 
-my @options=qw"trader! tactic|t=i init|i=i initialp=i turns=i print|p=i pop=i pp=i cul=i sci=i maxbuilding=i activeturns=i social=f trades=f cdturns=f help|h|?";
+my @options=qw"trader! startuplab! tactic|t=i init|i=i initialp=i turns=i print|p=i pop=i pp=i cul=i sci=i maxbuilding=i activeturns=i social=f trades=f cdturns=f help|h|?";
 my $result=GetOptions(\%options, @options);
 if(!$result or @ARGV or $options{help}) {
   print "usage $0 [--param=value]\n\tallowable params: @options\n";
   exit(0);
 }
-if($options{initialp}>250) {$options{initialp}=250}
+#if($options{initialp}>250) {$options{initialp}=250}
 
 open(IN, "< input") or die $!;
 
@@ -202,7 +202,7 @@ sub finish(){
     $pkt+=6*($sci-20);
   }
   spend_all();
-  printf "total points: %.2f sci: %.2f a\$: %i\n", $pkt, $sci, $player{ad};
+  printf "total points: %.2f sci: %.2f A\$: %i\n", $pkt, $sci, $player{ad};
 }
 sub initplanet {my ($p)=@_;
 $$p{pp}=0;
@@ -235,7 +235,7 @@ for $turn(0..$options{turns}) {
   if($turn%$options{activeturns}==0) {
      spend1();
   }
-  printstate() if($turn % $options{print}==0);
+  printstate() if($turn % $options{print}==0 || $turn==$options{turns});
   update();
 }
 finish();
