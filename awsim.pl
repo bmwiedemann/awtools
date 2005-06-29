@@ -122,8 +122,10 @@ sub update()
     my $pop=int($$planet{pop});
     if($pop>=10) {$taplanets++}
   }
+  my $tr=$player{tas}*gettradebonus($turn,$taplanets);
+  $player{tr}=$tr;
   foreach(qw(pop pp sci cul)) {
-    $bonus{$_}=$player{"race$_"}+$player{tas}*gettradebonus($turn,$taplanets);
+    $bonus{$_}=$player{"race$_"}+$tr;
   }
   if($player{artifact}=~/(.*)(\d)/) {
     my $whichbonus=$artifactbonus{$1};
@@ -175,7 +177,7 @@ sub printstate()
   }
   #while(my @a=each(%player)) {
     #printf "$a[0]:%.2f ",$a[1];
-  foreach(qw"pp sci social cul ad tas") {
+  foreach(qw"pp sci social cul ad tas tr") {
     printf "$_:%.2f ", $player{$_};
   }
   print "art:$player{artifact}\n";
@@ -202,7 +204,7 @@ sub finish(){
     $pkt+=6*($sci-20);
   }
   spend_all();
-  printf "total points: %.2f sci: %.2f A\$: %i\n", $pkt, $sci, $player{ad};
+  printf "total points: %.2f sci: %.2f cul: %.2f A\$: %i\n", $pkt, $sci, $player{cul}, $player{ad};
 }
 sub initplanet {my ($p)=@_;
 $$p{pp}=0;
