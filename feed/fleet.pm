@@ -22,7 +22,7 @@ for(;(@a=m!<tr[^>]*><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small
 	my @fleet=@a[3..7];
 	my $details="@fleet";
 	my $time=parseawdate($a[0]);
-	my $sid="$a[1]#$a[2]";
+	my $sid="$system#$planetid";
 	print "targeted: ".planetlink($sid)." $details<br>\n";
 	dbfleetadd($system,$planetid,$pid, $name, $time, 2, \@fleet);
 }
@@ -33,7 +33,7 @@ for(;(@a=m!<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td
 	else {print "unable to get ID of \"$system\" <br>";next}
 	my @fleet=@a[2..6];
 	my $details="@fleet";
-	my $sid="$system#$a[1]";
+	my $sid="$system#$planetid";
 	print "defending fleet: ".planetlink($sid)." $details<br>\n";
 	dbfleetadd($system,$planetid,$pid, $name, $time, 1, \@fleet);
 }
