@@ -22,5 +22,6 @@ $player{racesci}=1+0.11*0;
 $player{cul}+=$init/$cul[2];
 $player{sci}+=$init;
 $player{pp}+=$init;
+$player{social}+=addsci($player{social}, $init*$options{social});
 
 1;

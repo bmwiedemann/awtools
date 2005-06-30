@@ -69,6 +69,14 @@ for my $v (@sci,@pop,@prod) {$v=int($v+0.5);if($debug){print "$v\n"}}
 
 sub min($$) {return $_[0]<$_[1]?$_[0]:$_[1]}
 sub max($$) {return $_[0]>$_[1]?$_[0]:$_[1]}
+sub addsci($$) { my($sci,$scip)=@_;
+   while((my $needed=$sci[$sci+1]) && $scip>0) {
+      my $s=min($needed,$scip);
+      $sci+=$s/$needed;
+      $scip-=$s;
+   }
+   return $sci;
+}
 sub maketradeagreement(%) { my($player)=@_;
    $$player{tas}++;
    if(!$options{trader}) {$$player{ad}-=20000;}
