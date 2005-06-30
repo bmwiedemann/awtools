@@ -69,6 +69,15 @@ for my $v (@sci,@pop,@prod) {$v=int($v+0.5);if($debug){print "$v\n"}}
 
 sub min($$) {return $_[0]<$_[1]?$_[0]:$_[1]}
 sub max($$) {return $_[0]>$_[1]?$_[0]:$_[1]}
+sub addcul($$) { my($cul,$culp)=@_;
+   while((my $needed=$cul[$cul+1]) && $culp>0) {
+      my $s=min($needed,$culp);
+      $cul+=$s/$needed;
+      $culp-=$s;
+   }
+   return $cul;
+}
+sub addcul2(%$) {my($player,$culp)=@_; $$player{cul}=addcul($$player{cul}, $culp); }
 sub addsci($$) { my($sci,$scip)=@_;
    while((my $needed=$sci[$sci+1]) && $scip>0) {
       my $s=min($needed,$scip);

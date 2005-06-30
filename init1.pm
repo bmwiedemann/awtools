@@ -19,9 +19,9 @@ $player{racepop}=1+0.13*0;
 $player{racepp}=1+0.05*0;
 $player{racecul}=1+0.05*0;
 $player{racesci}=1+0.11*0;
-$player{cul}+=$init/$cul[2];
+addcul2(\%player, $init);
 $player{sci}+=$init;
 $player{pp}+=$init;
-$player{social}+=addsci($player{social}, $init*$options{social});
+$player{social}=addsci($player{social}, $init*$options{social});
 
 1;
