@@ -4,7 +4,7 @@ awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 allies=af tgd xr la tbgsaf guest
-tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord holes transfers
+tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord holes
 #allies=
 #winterwolf arnaken manindamix
 all: TA.candidate
@@ -77,5 +77,5 @@ access:
 	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm
 
 tgz:
-	tar --exclude=dbconf.pm -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done ${tools} feed/*.pm LICENSE Makefile
+	tar --exclude=DBConf.pm -czf ../bmw-awtools.tar.gz *.pl *.pm TA.in TA.done ${tools} feed/*.pm LICENSE Makefile
 	mv ../bmw-awtools.tar.gz html/

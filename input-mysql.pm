@@ -4,13 +4,12 @@
 use DBI;
 use Tie::DBI;
 use strict "vars";
+use DBConf;
 require "standard.pm";
-require "dbconf.pm";
 require "access.pm";
 my $head="Content-type: text/plain\015\012";
 our (%planets,%alliances,%starmap,%player,%playerid,$dbh,$readalli);
-(undef,undef,undef)=($::connectionInfo,$::dbuser,$::dbpasswd); #dummy
-$dbh = DBI->connect($::connectionInfo,$::dbuser,$::dbpasswd);
+$dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
 tie %planets,'Tie::DBI',$dbh,'planets','sidpid',{CLOBBER=>1};
 tie %player,'Tie::DBI',$dbh,'player','pid',{CLOBBER=>1};
