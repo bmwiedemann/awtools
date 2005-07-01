@@ -43,7 +43,7 @@ sub AWheader2($) { my($title)=@_;
 }
 sub AWheader($) { my($title)=@_; header().AWheader2($title);}
 sub AWtail() {
-	my $t = tv_interval($start_time);
+	my $t = sprintf("%.3f",tv_interval($start_time));
 	return hr()."request took $t seconds".end_html();
 }
 
