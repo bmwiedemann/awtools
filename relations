@@ -3,7 +3,7 @@ use strict;
 use CGI ":standard";
 
 my $readonly=0;
-if($ENV{REMOTE_USER} eq "is") {$ENV{REMOTE_USER}="fun"; $readonly=1;} # TODO: only for beta10
+#if($ENV{REMOTE_USER} eq "is") {$ENV{REMOTE_USER}="fun"; $readonly=1;} # TODO: only for beta10
 my $title="manage relation [\U$ENV{REMOTE_USER}\E]";
 my %options;
 chdir "/home/bernhard/code/cvs/perl/awcalc";
@@ -49,7 +49,7 @@ if($options{name}) {
 	if(!$rel[4]) {
 		$options{alliance}=$atag || "unknown";
 		$options{comment}="";
-		#print "<br>debug: @rel <br>";
+		#print br."debug: @rel ".br;
 		$options{relation}=$atag?0:($rel[0]||4);
 		$options{realrelation}=$options{relation};
 		$new=span({-style=>'color: red'},"user unknown - add new entry");
@@ -59,7 +59,7 @@ if($options{name}) {
 	
 	
 	$atag=$atag?" ".a({-href=>"alliance?alliance=$atag"},"[$atag]"):"";
-	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), a({-href=>"http://azgharde.free.fr/aw/player.php?name=".$user}, "azgharde"),br;
+	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde"),br;
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},

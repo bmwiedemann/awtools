@@ -22,7 +22,7 @@ if($options{alliance}) {
 		exit(0);
 	}
 	my $rellink=qq! <a href="relations?name=$alli"><img src="/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
-	print a({-href=>"http://$::server/rankings/alliances/$alli.php"},"$alli (AW)").$rellink." ".a({-href=>"http://azgharde.free.fr/aw/alliances.php?tag=$alli"},"azgharde").br;
+	print a({-href=>"http://$::server/rankings/alliances/$alli.php"},"$alli (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").br;
 	print "$alli members",br,start_table();
 	print "<tr align=\"center\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td></tr>\n";
 	my @totalprod=(0,0,0);
