@@ -13,7 +13,7 @@ for my $p (qw'map') {
 	$options{$p}=param($p);
 }
 if($options{map}) {
-	my $f="tactical-$ENV{REMOTE_USER}.png";
+	my $f="datadir/tactical-$ENV{REMOTE_USER}.png";
 	open(F, "< $f") or die $!;
 	my $size=(stat($f))[7];
 	my $modified=(stat(_))[9];

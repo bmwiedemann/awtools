@@ -15,7 +15,7 @@ our $ih=$imagesize/2;
 #my $fileend=$file;
 #$fileend=~s".*/"";
 #$fileend=~s/(\d\d)-(\d\d)-(\d+)\.tar\.bz2/$3-$2-$1/;
-my $out="tactical-$ENV{REMOTE_USER}";
+my $out="datadir/tactical-$ENV{REMOTE_USER}";
 my $c=25; # base color
 
 
