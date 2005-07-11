@@ -21,7 +21,7 @@ my $name=$::options{name};
 			next;
 		}
 		if(!$debug) {
-			dbtransferadd($time,$splayerid,$dplayerid,$amount);
+#dbtransferadd($time,$splayerid,$dplayerid,$amount,int($amount/2));
 		} else { print "not added".br}
 	}
 }
