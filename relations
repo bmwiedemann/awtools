@@ -39,7 +39,7 @@ if(!$readonly && defined($options{relation})) {
 	print span({-style=>'color: darkgreen'},"$mod $options{name}"),br;
 }
 
-if($options{name}) {
+if($options{name} && $options{name} ne "unknown") {
 	my $user=$options{name};
 	$user =~ y/A-Z/a-z/;
 	my $new="edit existing entry";
@@ -129,6 +129,8 @@ if($options{name}) {
 	}
 } else {
 	print start_form('get'), textfield(-name=>'name', -class=>'text'), " user name", br,
+   "or",br,
+   textfield(-name=>'id', -class=>'text'), " user ID",br,
 	 submit(-name=>"query", -class=>'smbutton')
 }
 print end_form, AWtail();
