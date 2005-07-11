@@ -12,10 +12,10 @@ our (%planets,%alliances,%starmap,%player,%playerid,$dbh,$readalli);
 $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
 tie %planets,'Tie::DBI',$dbh,'planets','sidpid',{CLOBBER=>1};
-tie %player,'Tie::DBI',$dbh,'player','pid',{CLOBBER=>1};
-tie %playerid,'Tie::DBI',$dbh,'player','name',{CLOBBER=>1};
-tie %alliances,'Tie::DBI',$dbh,'alliances','aid',{CLOBBER=>1};
-tie %starmap,'Tie::DBI',$dbh,'starmap','sid',{CLOBBER=>1};
+tie %player,'Tie::DBI',$dbh,'player','pid',{CLOBBER=>0};
+tie %playerid,'Tie::DBI',$dbh,'player','name',{CLOBBER=>0};
+tie %alliances,'Tie::DBI',$dbh,'alliances','aid',{CLOBBER=>0};
+tie %starmap,'Tie::DBI',$dbh,'starmap','sid',{CLOBBER=>0};
 #tie %relation,'Tie::DBI',$dbh,'relations','id',{CLOBBER=>2};
 #tie %planetinfo,'Tie::DBI',$dbh,'planetinfos','id',{CLOBBER=>2};
 #tie %logins,'Tie::DBI',$dbh,'logins','lid',{CLOBBER=>2};
@@ -101,7 +101,8 @@ sub setrelation($%) { my($id,$options)=@_;
 }
 
 sub playername2id($) { my($name)=@_;
-	$::playerid{"\L$name"}{pid};
+   $name="\L$name";
+	$::playerid{$name}?$::playerid{$name}{pid}:undef;
 }
 sub playerid2name($) { my($id)=@_;
 	if(!defined($id)) {return "unknown"}
