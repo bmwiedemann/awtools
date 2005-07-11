@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+use strict;
+use CGI ":standard";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+
+my $alli=$ENV{REMOTE_USER};
+open(IN, "<", "datadir/spies-$alli");
+my @spies=<IN>;
+close(IN);
+foreach(@spies) {$_=[split(" ",$_)]}
+
+sub sortfunc {
+   return ($$b[2]-$$b[4] <=> $$a[2]-$$a[4]);
+}
+
+print AWheader("possible spying [\U$alli]");
+foreach(sort sortfunc @spies) {
+	my($ename,$epid,$esl,$pid,$sl)=@$_;
+   my $name=playerid2name($pid);
+   my $bio=(relation2science($::relation{"\L$name"}))[1];
+   print a({-href=>"relations?name=$ename"},"$ename=$epid(science=$esl)")," &gt; ",a({-href=>"relations?name=$name"},"$name=$pid(".($bio?"bio":"science")."=$sl)").br;
+}
+print AWtail();

@@ -3,8 +3,8 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-allies=af tgd xr la tbgsaf guest
-tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord holes
+allies=af tgd xr la guest
+tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord holes loginpos antispy
 #allies=
 #winterwolf arnaken manindamix
 all: TA.candidate
@@ -24,13 +24,15 @@ updatecsv: dumpdbs
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
 	for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
 	perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
-	perl detectalliancerelation.pl > html/beta10/alliancerelation-${mydate}
-	ln -f html/beta10/alliancerelation-${mydate} html/beta10/alliancerelation
+	#perl detectalliancerelation.pl > html/beta10/alliancerelation-${mydate}
+	#ln -f html/beta10/alliancerelation-${mydate} html/beta10/alliancerelation
+	perl importcsv-mysql.pl
+
 updatemap: updatemaponly updaterank af-relations.txt tgd-relations.txt
 updatemaponly:
 	for a in $(allies) ; do \
 	REMOTE_USER=$$a /usr/bin/nice -n +12 perl drawtactical.pl ; done
-updatemap2: cleandbs updatemap2only
+updatemap2: cleandbs updatemap2only updatespy
 updatemap2only:
 	for a in $(allies) ; do \
 		REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \
@@ -40,7 +42,12 @@ updaterank:
 		REMOTE_USER=$$a perl rank.pl > html/ranking.$$a.html ; \
 		REMOTE_USER=$$a perl holes2.pl > holesdir/$$a ; \
 	done
-		#REMOTE_USER=$$a perl holes.pl > html/$$a-holes.html ; \
+		#REMOTE_USER=$$a perl holes.pl > html/$$a-holes.html ; 
+
+updatespy:
+	for a in $(allies) ; do \
+		REMOTE_USER=$$a perl findspy.pl > datadir/spies-$$a ; \
+	done
 	
 drawall:
 	for f in www1.astrowars.com/export/history/starmap* ; do ./drawmap.pl $$f ; done
@@ -70,8 +77,8 @@ TA.candidate: TA.in TA.done TA.pl
 access:
 	cp -ia ../dbm/empty.dbm ~/db/$a-relation.dbm
 	cp -ia ../dbm/empty.dbm ~/db/$a-planets.dbm
-	mkdir large-$a
-	/usr/sbin/htpasswd2 ~/.htpasswd $a
+	mkdir -p large-$a
+	#/usr/sbin/htpasswd2 ~/.htpasswd $a
 	#vi /srv/www/cgi-bin/aw/.htaccess
 	-chmod 664 ~/db/$a*.dbm
 	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm
