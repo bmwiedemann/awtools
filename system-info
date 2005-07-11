@@ -30,7 +30,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 }
 sub mkhash($) { my($tag)=@_;
 	if($options{uniq} && $options{uniq}!~/\./) {$options{uniq}=".$options{uniq}."} else {$options{uniq}=""}
-	my $token="$tag$options{uniq}$options{expires}#$options{id}#sucret10";
+	my $token="$tag$options{uniq}$options{expires}#$options{id}#sekretge1";
 	return md5_hex($token);
 }
 sub auth_ok($) { my($auth)=@_;
@@ -71,6 +71,8 @@ if(param()) {
 	for my $p (qw'x y mapx mapy id name export auth expires uniq') {
 	  $options{$p}=param($p);
 	}
+   $options{name}=~s/\s+$//;
+   $options{name}=~s/^\s+//;
 	if($options{export}==2) {
 		my $u=$ENV{REMOTE_USER};
 		my $expiryinfo="whole beta";
