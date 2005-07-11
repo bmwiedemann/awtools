@@ -28,7 +28,7 @@ sub addinterest($) { my($date)=@_;
 
 for my $entry (@$transfers) {
    my ($tid,$alli,$time,$splayerid,$dplayerid,$amount,$fees)=(@$entry);
-   push @transfers, $time." ".gmtime($time)." $splayerid->$dplayerid : $amount+$fees";
+   push @transfers, $time." (".i(scalar gmtime($time)).") $splayerid->$dplayerid : $amount+$fees";
    addinterest($time);
    $tb{$splayerid}+=$amount+$fees;
    $tb{$dplayerid}-=$amount;
