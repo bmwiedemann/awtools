@@ -6,7 +6,7 @@ require "cgicommon.pm";
 print AWheader('tools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(sim planet-info distsqr ranking holes topwars topallis)) {
+foreach(qw(sim planet-info distsqr ranking holes antispy topwars topallis)) {
 	print a({-href=>$_},$_),br;
 }
 print p;
@@ -21,6 +21,6 @@ print a({href=>"/strongestfleet-1.html"},"strongest fleets"),"+history",br,
  a({href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
  a({href=>"http://www1.astrowars.com/rankings/"},"AW rankings"),br,
  a({href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
- a({href=>"http://www.astrowars.com/about/battlecalculator/"},"AW battle calculator"),br,
+ a({href=>"/battlecalculator.html"},"AW battle calculator"),br,
  a({href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
  end_html;
