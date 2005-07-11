@@ -23,7 +23,10 @@ $agent->env_proxy();
   $agent->follow(qr((?-xism:Public)));
   $_=$agent->content;
   m!<html><head><title>([^ ]*)!;
-  print "$1\n";
+  my $name=$1;
   m!<a href ="/about/starmap.php\?dx=([+-]?\d+)&dy=([+-]?\d+)"!;
-  print "($1,$2)\n";
+  my ($x,$y)=($1,$2);
+  my $time = gmtime();
+  print "$time $name\n",
+      "($x,$y)\n";
 
