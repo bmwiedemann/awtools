@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+# this code is Copyright Bernhard M. Wiedemann and licensed under GNU GPL
 use strict;
 my $aentries=100;
 my $eentries=85;
