@@ -15,14 +15,17 @@ require "awmapcgi.pm";
 require "cgicommon.pm";
 
 chdir "large-$ENV{REMOTE_USER}";
-for my $p (qw'xs xe ys ye x y') {
+for my $p (qw'xs xe ys ye x y fast') {
 	$options{$p}=param($p);
 }
 if(defined($options{x}) && defined($options{y})) {
 	my $f="star$options{x},$options{y}.png";
 	my $size=(stat($f))[7];
 	my $modified=(stat($f))[9];
-	print header(-type=>'image/png', -expires=>'+1d', -last_modified=>$modified, -content_lenth=>$size);
+   my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime($modified);
+   $year+=1900;
+   $modified=sprintf("$::weekday[$wday], %.2i $::month[$mon] $year %.2i:%.2i:%.2i GMT", $mday, $hour, $min, $sec);
+	print header(-type=>'image/png', -expires=>'+3h', -last_modified=>$modified, -content_lenth=>$size);#, Connection=>"keep-alive", Keep_Alive=>300);
 	undef($/);
 	open(F,"< $f") or die $!;
 	print <F>;
@@ -50,9 +53,13 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 				if($my%10<=1) {$n|=1}
 				if($mx%10==0||$my%10==0) {$n=3}
 				$f="/$n.gif";
-				$link=qq!<a href="?xs=$mx&ys=$my&xe=$options{xe}&ye=$options{ye}">!;
+				$link=qq!<a href="?xs=$mx&ys=$my&xe=$options{xe}&ye=$options{ye}&fast=$options{fast}">!;
 			} else {
 				$f="?x=$mx&y=$my";
+            if($options{fast}) {
+               $f="bmw/tactical-large.pl?x=$mx&y=$my";
+               #$f="http://aw.lsmod.de:2349/tactical-large.pl?x=$mx&y=$my";
+            }
 				$link=qq!<a href="system-info?mapx=$mx&mapy=$my">!;}
 			my $formatstr="";
 			if($my==$ys || $mx==$xs) {$formatstr=qq! height="$imgsize" width=$imgsize"!}
@@ -63,22 +70,9 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	print "</table>";
 } else {
 	print header(), AWheader2($title);
-	my @pos=(0,0);
-	my @s=(29,25);
-	if($ENV{REMOTE_USER} eq "af") { @pos=(20,-51); }#$s[1]=37; }
-	elsif($ENV{REMOTE_USER} eq "fun") { @pos=(20,-51); }
-	elsif($ENV{REMOTE_USER} eq "tbgsaf") { @pos=(20,-54); }
-	elsif($ENV{REMOTE_USER} eq "tgd") { @pos=(57,20); $s[1]+=10; }
-	elsif($ENV{REMOTE_USER} eq "xr") { @pos=(-60,60) }
-	elsif($ENV{REMOTE_USER} eq "la") { @pos=(26,30) }
-	elsif($ENV{REMOTE_USER} eq "blub") { @pos=(57,39) }
-        my $awuid=playername2id(cookie('user'));
-        if($awuid>2) {
-		my $home=playerid2home($awuid);
-		@pos=systemid2coord($home);
-	}
 	print start_form('get'), 
 	 awmapcoordinput(),
+    checkbox(-name=>'fast', -label=>'fast', -checked=>1, -value=>'1'), " - uncheck when images are missing",br,
 	 submit(-name=>"draw", -class=>'smbutton'), end_form();
 }
 print end_html;
