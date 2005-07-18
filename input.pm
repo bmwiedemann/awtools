@@ -184,6 +184,8 @@ sub dbfleetadd($$$$$$@) { my($sid,$pid,$plid,$name,$time,$type,$fleet)=@_;
 	}
 }
 sub dbfleetaddfinish() {
+	untie %planetinfo;
+	tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY) or print "error accessing DB\n";
 }
 
 sub dbplayeriradd { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
@@ -197,4 +199,17 @@ sub dbplayeriradd { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 		else {print "<br />$name new:",$newentry;}
 	}
 }
+
+sub dblinkadd { my($sid,$url)=@_;
+   my $type;
+   if($url=~m!http://xtasisrebellion.free.fr/phpnuke/modules.php\?name=Forums&file=viewtopic&t=(\d+)!) { $type="XR" }
+   elsif($url=~m!http://forum.rebelstudentalliance.co.uk/index.php\?showtopic=(\d+)!) { $type="RSA" }
+   return unless($sid && $type);
+   $url=$&;
+   my $sidpid=sidpid22sidpid3($sid,0);
+   my $oldentry=$planetinfo{$sidpid};
+   return if($oldentry);
+   $planetinfo{$sidpid}=qq(0 0 see also <a href="$url">this $type forum thread</a>);
+}
+
 1;
