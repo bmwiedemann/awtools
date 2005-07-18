@@ -4,13 +4,16 @@ use strict;
 use CGI ":standard";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "input.pm";
+require "cgicommon.pm";
 
+my $m=3; # SL margin
 my $alli=$ENV{REMOTE_USER};
 open(IN, "<", "datadir/spies-$alli");
 my @spies=<IN>;
 close(IN);
 foreach(@spies) {$_=[split(" ",$_)]}
 
+sub getbio {if($_[0] && $_[0]>100){return $_[1]} return $_[0]}
 sub sortfunc {
    return ($$b[2]-$$b[4] <=> $$a[2]-$$a[4]);
 }
@@ -18,8 +21,14 @@ sub sortfunc {
 print AWheader("possible spying [\U$alli]");
 foreach(sort sortfunc @spies) {
 	my($ename,$epid,$esl,$pid,$sl)=@$_;
+   my @erel=getrelation($ename);
+   my @esci=relation2science($erel[2]);
+   my $ebio=getbio(@esci);
    my $name=playerid2name($pid);
-   my $bio=(relation2science($::relation{"\L$name"}))[1];
-   print a({-href=>"relations?name=$ename"},"$ename=$epid(science=$esl)")," &gt; ",a({-href=>"relations?name=$name"},"$name=$pid(".($bio?"bio":"science")."=$sl)").br;
+   my @rel=getrelation($name);
+   my $bio=getbio(relation2science($rel[2]));
+   next if($ebio && (($bio && $ebio+int((time-$esci[0])/86400)<$bio+$m) || $sl && $ebio+int((time-$esci[0])/86400)<$sl+$m));
+   $ebio|="?";
+   print a({-href=>"relations?name=$ename"},"$ename=$epid(science=$esl,bio=$ebio)")," &gt; ",a({-href=>"relations?name=$name"},"$name=$pid(".($bio?"bio":"science")."=$sl)").br;
 }
 print AWtail();
