@@ -12,7 +12,9 @@ qx'perl -e \'
       }
    }
    foreach(@members){
-      my $bio=(relation2science($::relation{"\L$_"}))[1];
+      my @sci=relation2science($::relation{"\L$_"});
+      if($sci[0]>100){shift(@sci)}
+      my $bio=$sci[0];
       print "$_ $bio\n"
    };\'
 ');
@@ -38,9 +40,9 @@ foreach my $name (@members) {
    my ($x,$y)=systemid2coord($sid);
    push(@coords,[$x,$y]);
    my $sl=$::player{$pid}{science};
-   if(!$bio){$bio=$sl}
+   if(!$bio){$bio=4}#$sl}
    $bio{$pid}=$bio;
-   if($sl<$minsci) {$minsci=$sl}
+   if($bio<$minsci) {$minsci=$bio}
 }
 my (@minxy,@maxxy);
 foreach(@coords) {
