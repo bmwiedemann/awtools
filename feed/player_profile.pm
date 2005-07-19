@@ -3,7 +3,7 @@ my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 use DB_File;
 #require "standard.pm";
 my %relation;
-my %timevalue=(second=>1, minute=>60, hour=>3600, day=>86400);
+my %timevalue=(""=>1, "N/A"=>1, second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 

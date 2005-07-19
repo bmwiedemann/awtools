@@ -6,7 +6,7 @@ sub feed_dispatch($) { local $_=$_[0];
 	}
 	my $title=$1;
 	my $aw="Astro Wars";
-	our @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
+	return unless our @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
 	$title=shift(@time);
 	our $deliverytime;
 	{
