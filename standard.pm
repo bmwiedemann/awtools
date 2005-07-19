@@ -9,7 +9,7 @@ our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
 our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
-our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue","Trade Balance");
+our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue");
 our @racestr=qw(growth science culture production speed attack defense);
 our @racebonus=qw(0.08 0.09 0.04 0.04 0.19 0.15 0.16);
 our $magicstring="automagic:";
