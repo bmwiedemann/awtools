@@ -3,4 +3,6 @@ use strict;
 use CGI ":standard";
 
 print header(-type=>"text/html", -status=>"401 Authorization Required", WWW_Authenticate=> 'Basic realm="greenbird\'s AW scripts"'),
-"You are now logged out.";
+"You are now logged out.",br
+"you may ".a({-href=>"index.html"},"login here")
+;
