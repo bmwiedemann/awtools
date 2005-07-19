@@ -104,6 +104,13 @@ if(param()) {
 		print "no system $options{name} at $x,$y".br,
 		 a({-href=>"$ENV{HTTP_REFERER}"},"go back");
 	} else {
+      if($ENV{HTTP_REFERER}) {
+         dbfleetaddinit(0);
+#         if($ENV{HTTP_REFERER}=~m/xtasisrebellion/){
+#         open(DEBUG, "> /tmp/debug"); print DEBUG "$system, $ENV{HTTP_REFERER}";}
+         dblinkadd($system, $ENV{HTTP_REFERER});
+         dbfleetaddfinish();
+      }
 		($x,$y)=systemid2coord($system);
 		my $sysname=systemid2name($system);
 		print AWheader2("($x,$y) $sysname system info [\U$ENV{REMOTE_USER}\E]");
@@ -119,7 +126,11 @@ if(param()) {
 		if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
-			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&amp;ys=$y&amp;xe=29&amp;ye=19">tactical</a> <a href="http://$::server/about/starmap.php?dx=$x&amp;dy=$y">starmap</a> <a href="http://$::server/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
+         if($sysinfo) {
+            $sysinfo=~s!^<br />!!;
+            $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
+         }
+			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&amp;ys=$y&amp;xe=29&amp;ye=19&amp;fast=1">tactical</a> <a href="http://$::server/about/starmap.php?dx=$x&amp;dy=$y">starmap</a> <a href="http://$::server/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
 			"planets here: <ul>";
 		} else {
 			$output.="[url=http://$::server/about/starmap.php?dx=$x&amp;dy=$y]starmap[/url] [url=http://$::server/0/Map/Detail.php/?nr=$system]Map/Details[/url] [url=http://$::bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
@@ -158,6 +169,7 @@ if(param()) {
 				if($options{export}) {
 					$info=qq![color=$scolor]$::planetstatusstring{$status} [/color] [color=$rcolor]$atag $name [/color]: $pinfo!;
 				} else {
+               $pinfo=~s!\n!<br />!g;
 					$info=" ".span({-style=>"color: $scolor"},$::planetstatusstring{$status})." ".span({-style=>"color: $rcolor"},$atag." ".$name).": ".$pinfo;
 				}
 			}
