@@ -1,28 +1,24 @@
 
 sub parseincomings($) {local $_=$_[0];
 my @a;
-for(;(@a=m!([^>]*)</td><td[^>]*>\s*<b>Attention(.*?) going to attack <b>([^<]+)</b>.<br>We suppose its the Fleet of <a href=/0/Player/Profile.php/\?id=(\d+)>([^<]+)</a>((?:[^>]*</td><td[^>]*> <b>Attention)?.*)!);$_=$a[5]) {
+for(;(@a=m!([^>]*)</td><td[^>]*>\s*<b>Attention(.*?) going to attack <b>[^<]+</b>\s*\[(\d+)\] (\d+)\!<br>We suppose its the Fleet of <a href=/0/Player/Profile.php/\?id=(\d+)>([^<]+)</a>.((?:[^>]*</td><td[^>]*> <b>Attention)?.*)!);$_=$a[6]) {
+   my ($awdatetime,$fleets,$systemid,$planetid,$epid,$ename)=@a;
+#print join("<br />\n",@a[0..5]);
 	my @fleet=(0,0,0,0,0);
-	my $pid=$a[3];
-	my $sid;
-	my $planetid;
-	my $systemid;
-	my $enemyname=$a[4];
 	my $shipn=0;
 	foreach my $ship (qw(Transports Colony Destroyer Cruiser Battleship)) {
-		if($a[1]=~/(\d+) $ship/) {
+		if($fleets=~/(\d+) $ship/) {
 			$fleet[$shipn]=$1;
 		}
 		$shipn++;
 	}
-	my $time=parseawdate($a[0]);
-	if($a[2]=~/(.+) (\d+)$/) {
-		$sid=systemname2id($1);
-		if($sid){$systemid=$sid;$planetid=$2;$sid.="#$2"}
-	}
-	if(!$sid) {next}
+	my $time=parseawdate($awdatetime);
+	$sid="$systemid#$planetid";
 	print "incoming: ".planetlink($sid)." @fleet<br>\n";
-	dbfleetadd($systemid,$planetid,$pid, $enemyname, $time, 1, \@fleet);
+   if(!$::options{debug}) {
+      print "added";
+      dbfleetadd($systemid,$planetid,$epid, $ename, $time, 1, \@fleet);
+   }
 }
 }
 1;
