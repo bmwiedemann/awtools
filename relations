@@ -94,11 +94,16 @@ if($options{name} && $options{name} ne "unknown") {
 		if(defined($race[0])) {
 			print p,"race:",br;
 			my $n=0;
+         my $sum=0;
 			foreach(@race) {
+            $sum+=$_;
 				my $bonus=$::racebonus[$n]*100*$_;
 				if($bonus>=0) {$bonus="+".$bonus}
-				print "$bonus% $::racestr[$n++] ($_)<br />\n";
+				print "$bonus% $::racestr[$n++] ($_)".br;
 			}
+         if($sum<=-9) {print "Banker".br;$sum+=9}
+         if($sum<=-6) {print "Trader".br;$sum+=6}
+         if($sum<=-1) {print "Startup Lab".br;$sum+=1}
 		}
 		my @prod=relation2production($options{comment});
 		if(defined($prod[0])) {
@@ -131,7 +136,7 @@ if($options{name} && $options{name} ne "unknown") {
 	print start_form('get'), textfield(-name=>'name', -class=>'text'), " user name", br,
    "or",br,
    textfield(-name=>'id', -class=>'text'), " user ID",br,
-	 submit(-name=>"query", -class=>'smbutton')
+	 submit(-name=>"query", -class=>'smbutton'),reset(-class=>'smbutton');
 }
 print end_form, AWtail();
 #foreach(keys %ENV) {  print "$_ $ENV{$_}<br>";}
