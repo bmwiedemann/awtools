@@ -57,9 +57,44 @@ if($options{name} && $options{name} ne "unknown") {
 		($options{relation},$options{alliance},$options{comment},$options{realrelation})=@rel;
 	}
 	
-	
+	my $extralinks="";
+   do {
+      my @race=relation2race($options{comment});
+      my @science=relation2science($options{comment});
+      if($id<=2) {last}
+      my $p=$::player{$id};
+      if(!$p) {last}
+      my $sl=$$p{science};
+      my ($eatt,$edef,$emath,$ephys,$epl)=(4,4,$sl,$sl,$$p{level});
+      if($science[0]) { 
+         if($science[0]>100) {shift @science}
+         ($emath,$ephys)=@science[3,4];
+      }
+      if($race[0]) { 
+         ($eatt,$edef)=@race[5,6];
+      }
+      my($oatt,$odef,$omath,$ophys,$opl)=(0,0,0,0,0);
+      my $awuser=cookie('user');
+      my $oid=playername2id($awuser);
+      if($oid && $oid>2) {
+         $opl=$::player{$oid}{level};
+         @rel=getrelation($awuser);
+         @race=relation2race($rel[2]);
+         @science=relation2science($rel[2]);
+         if($science[0]) { 
+            if($science[0]>100) {shift @science}
+            ($omath,$ophys)=@science[3,4];
+         }
+         if($race[0]) { 
+            ($oatt,$odef)=@race[5,6];
+         }
+      }
+      $extralinks=" ".
+         a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/shield.png",-alt=>"defend"})).
+         a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/sword.png",-alt=>"attack"}))." ";
+   } while(0);
 	$atag=$atag?" ".a({-href=>"alliance?alliance=$atag"},"[$atag]"):"";
-	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde"),br;
+	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde"),br;
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
@@ -103,7 +138,7 @@ if($options{name} && $options{name} ne "unknown") {
 			}
          if($sum<=-9) {print "Banker".br;$sum+=9}
          if($sum<=-6) {print "Trader".br;$sum+=6}
-         if($sum<=-1) {print "Startup Lab".br;$sum+=1}
+         if($sum<=-1) {print "Start Up Lab".br;$sum+=1}
 		}
 		my @prod=relation2production($options{comment});
 		if(defined($prod[0])) {
