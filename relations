@@ -58,12 +58,11 @@ if($options{name} && $options{name} ne "unknown") {
 	}
 	
 	my $extralinks="";
-   do {
+   {
+      my @rel;
       my @race=relation2race($options{comment});
       my @science=relation2science($options{comment});
-      if($id<=2) {last}
-      my $p=$::player{$id};
-      if(!$p) {last}
+      if($id>2 && (my $p=$::player{$id})) {
       my $sl=$$p{science};
       my ($eatt,$edef,$emath,$ephys,$epl)=(4,4,$sl,$sl,$$p{level});
       if($science[0]) { 
@@ -92,7 +91,8 @@ if($options{name} && $options{name} ne "unknown") {
       $extralinks=" ".
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/shield.png",-alt=>"defend"})).
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/sword.png",-alt=>"attack"}))." ";
-   } while(0);
+      }
+   }
 	$atag=$atag?" ".a({-href=>"alliance?alliance=$atag"},"[$atag]"):"";
 	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde"),br;
 	print hidden(-name=>'name', $user);
@@ -114,7 +114,7 @@ if($options{name} && $options{name} ne "unknown") {
 			$pop+=planet2opop($pp);
 			push(@planets, $pp);
 		}
-		print br,"pl=$level sl=$::player{$id}{science} cl=$::player{$id}{culture} points=$::player{$id}{points} (".3*$level."+$pop+".($::player{$id}{points}-$pop-3*$level).") logins=$::player{$id}{logins} from=$::player{$id}{from} joined=".(gmtime($::player{$id}{joined}))." ";
+		print br,"pl=$level sl=$::player{$id}{science} cl=$::player{$id}{culture} points=$::player{$id}{points} (".2*$level."+$pop+".($::player{$id}{points}-$pop-2*$level).") logins=$::player{$id}{logins} from=$::player{$id}{from} joined=".(gmtime($::player{$id}{joined}))." ";
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
@@ -159,7 +159,8 @@ if($options{name} && $options{name} ne "unknown") {
 			}
 			print ":<br />\n";
 			foreach(@sci) {
-				print "$::sciencestr[$n++] $_<br />\n";
+            if($_>200) {print "ETC: ".gmtime($_).br;next}
+				print "$::sciencestr[$n++] $_\n".br;
 			}
 		}
 		while($options{comment}=~/login:(\d+):(\d+)(.*)/s) {
