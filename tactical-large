@@ -35,7 +35,8 @@ if(defined($options{x}) && defined($options{y})) {
 my $style="/tactical-large.css";#qq%\nimg {border:0;}%; #body {margin-left:0px; margin-top:0px;}
 if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))
 {
-	print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style);
+#print header(-expires=>'+1d'), start_html(-title=>$title, -style=>$style);
+   print AWheader($title, qq(<style type="text/css"><!-- img {border:0;} --></style>));
 	my $xe=round($options{xs}+$options{xe}/2);
 	my $ye=round($options{ys}+$options{ye}/2);
 	my $xs=round($options{xs}-$options{xe}/2);
@@ -53,17 +54,17 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 				if($my%10<=1) {$n|=1}
 				if($mx%10==0||$my%10==0) {$n=3}
 				$f="/$n.gif";
-				$link=qq!<a href="?xs=$mx&ys=$my&xe=$options{xe}&ye=$options{ye}&fast=$options{fast}">!;
+				$link=qq!<a href="?xs=$mx&amp;ys=$my&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;fast=$options{fast}">!;
 			} else {
-				$f="?x=$mx&y=$my";
+				$f="?x=$mx&amp;y=$my";
             if($options{fast}) {
-               $f="bmw/tactical-large.pl?x=$mx&y=$my";
+               $f="bmw/tactical-large.pl?x=$mx&amp;y=$my";
                #$f="http://aw.lsmod.de:2349/tactical-large.pl?x=$mx&y=$my";
             }
-				$link=qq!<a href="system-info?mapx=$mx&mapy=$my">!;}
+				$link=qq!<a href="system-info?mapx=$mx&amp;mapy=$my">!;}
 			my $formatstr="";
-			if($my==$ys || $mx==$xs) {$formatstr=qq! height="$imgsize" width=$imgsize"!}
-			print qq!<td>$link<img src="$f"$formatstr>$linkend</td>!;
+			if($my==$ys || $mx==$xs) {$formatstr=qq! height="$imgsize" width="$imgsize"!}
+			print qq!<td>$link<img src="$f"$formatstr alt="" />$linkend</td>!;
 		}
 		print "</tr>\n";
 	}
