@@ -6,6 +6,7 @@ require "standard.pm";
 require "cgicommon.pm";
 
 my $sortopts="-k11";
+my $round="gold1";
 my $titlestr;
 if($0=~/topwars/) {
 	$titlestr=" wars";
@@ -16,9 +17,9 @@ if($0=~/topwars/) {
 my $n=50;
 my $title="AW $n largest alliance$titlestr";
 print AWheader($title);
-my $filename="html/beta10/alliancerelation";
+my $filename="html/$round/alliancerelation";
 my $mtime=gmtime((stat($filename))[9]);
-print "extracted from ".a({-href=>"/beta10/alliancerelation"},"alliancerelation data").br.
+print "extracted from ".a({-href=>"/$round/alliancerelation"},"alliancerelation data").br.
 	"Last Update $mtime GMT\n".br.
 	"alli -- alli // sum(minpop) shared-systems taken-planets lost-planets killed-pop lost-pop friendlyness";
 
