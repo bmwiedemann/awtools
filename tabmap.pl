@@ -49,7 +49,7 @@ drawgrid($gc1,$gc1,$im);
 writeimg($im, "$out-none3$suf");
 
 sub gridtest($$) { my($x,$y)=@_; my($c1,$c2)=($gc2,$gc2);
-$y++; #FIXME: workaround for strange bug
+#$y++; #FIXME: workaround for strange bug
 if($x%10==0 || $y%10==0) {return ($gc1,$gc1)}
 if($x%10<=1) {$c2=$gc1}
 if($y%10<=1) {$c1=$gc1}
