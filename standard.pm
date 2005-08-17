@@ -11,18 +11,20 @@ our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue");
 our @racestr=qw(growth science culture production speed attack defense);
-our @racebonus=qw(0.08 0.09 0.04 0.04 0.19 0.15 0.16);
+our @racebonus=qw(0.07 0.08 0.04 0.04 0.19 0.15 0.16);
 our $magicstring="automagic:";
 our %artifact=("BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HOR"=>15);
-our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "turquoise", "lightgreen", "green");
+our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "turquoise", "LimeGreen", "green");
 our @statuscolor=qw(black black blue cyan red green orange green);
 
 our $start_time = [gettimeofday()];
 
 
-sub AWheader2($) { my($title)=@_;
+sub AWheader2($;$) { my($title,$extra)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
+   my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"})];
+   if($extra) {push(@$heads,$extra);}
 	$owncgi=~s!/cgi-bin/!!;
 	foreach my $item (qw(index.html login arrival tactical tactical-large tactical-live relations alliance system-info fleets feedupdate)) {
 		my %h=(href=>$item);
@@ -37,11 +39,11 @@ sub AWheader2($) { my($title)=@_;
 	local $^W=0; #disable warnings for next line
 	start_html(-title=>$title, -style=>"/$style.css", 
 	# -head=>qq!<link rel="icon" href="/favicon.ico" type="image/ico" />!).
-	 -head=>Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"})).
+	 -head=>$heads).
 	div({-align=>'justify',-class=>'header'},#a({href=>"index.html"}, "AW tools index").
-	$links). h1($title);
+	$links). h1($title)."\n";
 }
-sub AWheader($) { my($title)=@_; header().AWheader2($title);}
+sub AWheader($;$) { my($title,$extra)=@_; header().AWheader2($title,$extra);}
 sub AWtail() {
 	my $t = sprintf("%.3f",tv_interval($start_time));
 	return hr()."request took $t seconds".end_html();
@@ -87,7 +89,12 @@ sub systemlink($) { my($id)=@_;
 sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 	foreach($race,$sci,$trade) {next unless defined $_; if(!@$_){$_=undef}}
 	if($race) {$race="race:".join(",",@$race);} else {undef $race}
-	if($sci) {$sci="science:".time().",".join(",",@$sci);} else {undef $sci}
+	if($sci) {
+      my @oldsci=relation2science($oldentry);
+      if($oldsci[0]>100) {shift @oldsci}
+      for my $i(0..7) { $oldsci[$i]=$$sci[$i] if defined($$sci[$i]);}
+      $sci="science:".time().",".join(",",@oldsci);
+   } else {undef $sci}
 	if($trade) {$trade="trade:".join(",",@$trade);} else {undef $trade}
 	if($prod) {$prod="production:".join(",",@$prod);} else {undef $prod}
 	if(!$oldentry) {$oldentry="0 UNKNOWN "}
