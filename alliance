@@ -21,12 +21,17 @@ if($options{alliance}) {
 		print "unknown alliance";
 		exit(0);
 	}
+   my $forumlink=$::alliances{$aid}{url}||"";
+   my $allitag=$::alliances{$aid}{tag}||"";
+   my $alliname=$::alliances{$aid}{name}||"";
+   if($forumlink) {$forumlink=" URL:".a({-href=>$forumlink}, $forumlink)}
 	my $rellink=qq! <a href="relations?name=$alli"><img src="/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
-	print a({-href=>"http://$::server/rankings/alliances/$alli.php"},"$alli (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").br;
-	print "$alli members",br,start_table();
+	print a({-href=>"http://$::server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n";
+   my @members=allianceid2members($aid);
+	print "$alli members (".scalar @members.")",br,start_table();
 	print "<tr align=\"center\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td></tr>\n";
 	my @totalprod=(0,0,0);
-	for my $pid (allianceid2members($aid)) {
+	for my $pid (@members) {
 		my $p=$::player{$pid};
 		next if ! defined($p);
 		next if $$p{alliance} ne $aid;
