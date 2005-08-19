@@ -2,7 +2,7 @@
 use strict;
 use CGI ":standard";
 
-my $max=1600;
+my $max=2000;
 if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
 my $title="live tactical map [\U$ENV{REMOTE_USER}\E]";
 my %options;
@@ -71,10 +71,8 @@ function getMouseXY(e) {
 	print AWheader($title),start_form('get'),
 	 hidden("map",2),
 	 awmapcoordinput(),
-	 #textfield(-name=>"xs", -size=>$s)," x&nbsp;&nbsp; ",textfield(-name=>"ys", -size=>$s)," y",br,
-	 #textfield(-name=>"xe", -size=>$s)," x&nbsp;&nbsp; ",textfield(-name=>"ye", -size=>$s)," y",br,
 	 popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4])." scaling factor".br,
-	 submit(-name=>"draw", -class=>'smbutton'),
+	 submit(-name=>"draw", -class=>'smbutton'), " (up to $max squares)";
 	 end_form, end_html;
 
 
