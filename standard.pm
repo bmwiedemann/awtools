@@ -5,6 +5,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 our $server="www1.astrowars.com";
 our $bmwserver="aw.lsmod.de";
 our $style;
+our $timezone;
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
 our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
@@ -25,6 +26,7 @@ sub AWheader2($;$) { my($title,$extra)=@_;
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
    my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"})];
    if($extra) {push(@$heads,$extra);}
+   push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/common.css" />!);
 	$owncgi=~s!/cgi-bin/!!;
 	foreach my $item (qw(index.html login arrival tactical tactical-large tactical-live relations alliance system-info fleets feedupdate)) {
 		my %h=(href=>$item);
@@ -147,7 +149,11 @@ sub relation2race($) { local $_=$_[0];
 	return undef unless($_);
 	return undef unless(/automagic/);
 	return undef unless(/race:([0-9,+-]*)/);
-	return split(",", $1);
+	my @race=split(",", $1);
+   my $sum=0;
+   foreach my $r (@race) {$sum+=$r}
+   push(@race,$sum);
+   return @race;
 }
 sub relation2science($) { local $_=$_[0];
 	return undef unless($_);
@@ -185,6 +191,9 @@ sub relation2production($) { local $_=$_[0];
 sub gmdate($) {
 	my @a=gmtime($_[0]); $a[5]+=1900;
 	return "$month[$a[4]] $a[3] $a[5]";
+}
+sub AWtime($) { my($t)=@_;
+   return scalar gmtime($t)." GMT = ".scalar gmtime($t+3600*$::timezone)." GMT+$::timezone";
 }
 
 sub sb2cv($) { my($sb)=@_;
