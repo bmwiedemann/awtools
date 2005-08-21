@@ -6,7 +6,12 @@ require "input.pm";
 require "cgicommon.pm";
 
 my %options;
-print AWheader("alliance info");
+my $align="left";
+print AWheader("alliance info", 
+      "<style> td { font-family: monospace; 
+      border-left: 1px solid gray;  
+      border-bottom: 1px solid gray; } </style>
+");
 #print header, start_html($title), h1($title);
 for my $p (qw'alliance') {
 	$options{$p}=param($p);
@@ -29,13 +34,13 @@ if($options{alliance}) {
 	print a({-href=>"http://$::server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n";
    my @members=allianceid2members($aid);
 	print "$alli members (".scalar @members.")",br,start_table();
-	print "<tr align=\"center\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td></tr>\n";
+	print "<tr align=\"$align\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td><td>intel</td></tr>\n";
 	my @totalprod=(0,0,0);
 	for my $pid (@members) {
 		my $p=$::player{$pid};
 		next if ! defined($p);
 		next if $$p{alliance} ne $aid;
-		print "<tr align=\"center\">";
+		print "<tr align=\"$align\">";
 		my $name=playerid2name($pid);
 		my $alink="";
 		my $planets=playerid2planets($pid);
@@ -43,13 +48,18 @@ if($options{alliance}) {
 		my ($x,$y)=systemid2coord($$p{home_id});
 		my $home="$$p{home_id}($x,$y)";
 		my @rel=getrelation($name);
+      my @race=relation2race($rel[2]);
+      my @science=relation2science($rel[2]);
 		my @prod=relation2production($rel[2]);
 		{ my $n=0;
                         foreach(@prod[0..2]) { $_*=$prod[$n+5]; $totalprod[$n]+=$_; $n++}
                 }
 		if($own) { $alink=alliancedetailslink($n) }
+      my $intel="-";
+      if(defined($science[0]) && $science[0]>100) {$intel=int((time()-$science[0])/3600/24)."d"}
+      if(defined($race[0])) {$race[7]="+".-$race[7];$intel=join("",@race)." ".$intel;}
 		print "<td>",profilelink($pid), $alink, "</td><td>", qq!<a href="relations?name=$name">$name ($pid)</a></td>
-		<td><a href="system-info?id=$$p{home_id}">$home</a></td><td>$$p{level}</td><td>$$p{science}</td><td>$planets/$$p{culture}</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>!.playerid2country($pid).qq!</td><td>$joined</td>!;
+		<td><a href="system-info?id=$$p{home_id}">$home</a></td><td>$$p{level}</td><td>$$p{science}</td><td>$planets/$$p{culture}</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>!.playerid2country($pid).qq!</td><td>$joined</td><td>$intel</td>!;
 		$n++;
 		print "</tr>\n";
 	}
