@@ -100,7 +100,7 @@ if($options{name} && $options{name} ne "unknown") {
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
 		-labels=>\%::relationname), " relation", br,
 	textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
-	 submit("submit")." ".a({href=>"?"},"new query")." "
+	 submit(-name=>"submit", -class=>"smbutton")." ".a({href=>"?"},"new query")." "
 	 #.submit(-name=>"submit", -value=>"delete")
 	;
 	if($id>2) {
@@ -127,11 +127,10 @@ if($options{name} && $options{name} ne "unknown") {
 		print "</ul>\n";
 		my @race=relation2race($options{comment});
 		if(defined($race[0])) {
-			print p,"race:",br;
+			print p,"race: ",br;
 			my $n=0;
-         my $sum=0;
+         my $sum=pop(@race);
 			foreach(@race) {
-            $sum+=$_;
 				my $bonus=$::racebonus[$n]*100*$_;
 				if($bonus>=0) {$bonus="+".$bonus}
 				print "$bonus% $::racestr[$n++] ($_)".br;
@@ -159,7 +158,7 @@ if($options{name} && $options{name} ne "unknown") {
 			}
 			print ":<br />\n";
 			foreach(@sci) {
-            if($_>200) {print "ETC: ".gmtime($_).br;next}
+            if($_>200) {print "ETC: ".AWtime($_).br;next}
 				print "$::sciencestr[$n++] $_\n".br;
 			}
 		}
