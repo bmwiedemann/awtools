@@ -78,7 +78,7 @@ if(param()) {
 		my $expiryinfo="whole beta";
 		if(!$options{expires}) {$options{expires}=""}
 		else {$expiryinfo="$options{expires} days";$options{expires}=time+$options{expires}*3600*24;}
-		my $l="http://guest:guest\@aw.lsmod.de/cgi-bin/public/system-info?id=$options{id}&amp;expires=$options{expires}&amp;uniq=$options{uniq}&amp;auth=$u%23".mkhash($u);
+		my $l="http://guest:guest\@aw.lsmod.de/cgi-bin/system-info?id=$options{id}&amp;expires=$options{expires}&amp;uniq=$options{uniq}&amp;auth=$u%23".mkhash($u);
 		print AWheader2("export for system $options{id}").
 		qq!This is an anonymous read-only access URL. It is valid for $expiryinfo - give only to trusted friends.<br /> <a href="$l">copy this link</a> or try $l <br />note: for IE leave out the guest:guest\@!,p,
 		"set expiry time: ", start_form('get'),
@@ -167,9 +167,12 @@ if(param()) {
 				my $rcolor=getrelationcolor($rel[0]);
 				my $atag=getatag($rel[1]);
 				if($options{export}) {
+               $pinfo=~s!$::magicstring([^:]*)!$::magicstring."[color=".getrelationcolor((getrelation($1))[0])."]".$1."[/color]"!geo;
 					$info=qq![color=$scolor]$::planetstatusstring{$status} [/color] [color=$rcolor]$atag $name [/color]: $pinfo!;
 				} else {
                $pinfo=~s!\n!<br />!g;
+               $pinfo=~s/$::magicstring([^:]*)/$::magicstring.span({-style=>
+                     "color: ".getrelationcolor((getrelation($1))[0])},$1)/geo;
 					$info=" ".span({-style=>"color: $scolor"},$::planetstatusstring{$status})." ".span({-style=>"color: $rcolor"},$atag." ".$name).": ".$pinfo;
 				}
 			}
