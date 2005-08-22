@@ -3,13 +3,13 @@ print "news feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 my $name=$::options{name};
 
-{
-	require "input-mysql.pm";
+if(0){
+#	require "input-mysql.pm";
 	local $_=$_;
 	my $dplayerid=playername2id($name);
 	if(!$dplayerid) {
 		print "error, unknown reporting player: '$name'\n";
-		return;
+		return 1;
 	}
 	for(;(@a=m!<tr[^>]*><td[^>]*>([^>]*)</td><td[^>]*>Your attacking fleet was defeated by <a href=/0/Player/Profile.php/\?id=(\d+)>([^>]*)</a> [^>]*You killed about (\d+)%.</td></tr>(.*)!); $_=$a[4]) {
 		my ($time,$pid,$splayer,$amount)=@a;
