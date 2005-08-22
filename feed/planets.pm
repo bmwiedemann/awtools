@@ -3,7 +3,7 @@ print "planets feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
-require "./input.pm";
+require "input.pm";
 my $name=$::options{name};
 my $pid=playername2id($name);
 if(!$pid) {print "user $name not found<br>\n";return 1}
@@ -36,6 +36,7 @@ for(;(@a=m!<tr[^>]*><td[^>]*><a [^>]*>([^<]+) (\d+)</a></td><td>(\d+)</td><td>(.
 		delete $own{$sid}; # strike out of lost-list cause still have
 		next;
 	}
+   if($nplanets<3) {print "sanity check failed - not changing".br;last}
 	print "new planet ".a({-href=>"system-info?id=$system"},$sid).br;
 	my $entry=$data{$sid};
 	my $newentry="5 $pid ";
