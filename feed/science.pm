@@ -7,6 +7,7 @@ if($debug) {print "debug mode - no modifications done<br>\n"}
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 require "input.pm";
 my $name="\L$::options{name}";
+print a({-href=>"relations?name=$name"}, $::options{name}).br;
 
 
 my @science;
