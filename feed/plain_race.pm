@@ -2,6 +2,10 @@ use strict;
 use DB_File;
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 
+if(0 && $::options{name}=~m/BananaBird/i) {
+   if(m/^\s*(\w*)\s/s) { $::options{name}=$1 }
+   else {return 1}
+}
 my $racere="";
 my $sciencere="";
 my @science;
@@ -22,7 +26,7 @@ if(@science=/$sciencere/) {
 }
 if(@race || @science) {
 	my %relation;
-	require "./input.pm";
+	require "input.pm";
 	if(!playername2id($name)) {print "player $name not found<br>\n"; exit 0;}
 	tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
 	my $oldentry=$relation{$name};
