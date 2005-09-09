@@ -34,7 +34,7 @@ if($options{alliance}) {
 	print a({-href=>"http://$::server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n";
    my @members=allianceid2members($aid);
 	print "$alli members (".scalar @members.")",br,start_table();
-	print "<tr align=\"$align\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>points(rank)</td><td>log</td><td>from</td><td>joined</td><td>intel</td></tr>\n";
+	print "<tr align=\"$align\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>pts(rank)</td><td>log</td><td>from</td><td>joined</td><td>intel</td></tr>\n";
 	my @totalprod=(0,0,0);
 	for my $pid (@members) {
 		my $p=$::player{$pid};
@@ -56,10 +56,26 @@ if($options{alliance}) {
                 }
 		if($own) { $alink=alliancedetailslink($n) }
       my $intel="-";
-      if(defined($science[0]) && $science[0]>100) {$intel=int((time()-$science[0])/3600/24)."d"}
+      my $bio25=0;
+      if(defined($science[0]) && $science[0]>100) {
+         $intel=int((time()-$science[0])/3600/24)."d";
+         if($science[1]>=25) {$bio25=1}
+         if($science[8]) {
+            my $diff=$science[8]-time();
+            my $etc=sprintf(" %.1fh",(int($science[8])-time())/3600);
+            if($diff<24*3600) { $intel.=span({-style=>"color:red"},$etc)}
+            else {$intel.=$etc;}
+            
+         }
+      }
       if(defined($race[0])) {$race[7]="+".-$race[7];$intel=join("",@race)." ".$intel;}
+      if($bio25) {$intel=div({-style=>"color:green"},$intel)}
+      my $cplanets="$planets/$$p{culture}";
+      my $planetscolor="";
+      if($$p{culture}-$planets>1) {$planetscolor=' style="color:red"'}
+      if($$p{culture}-$planets==1) {$planetscolor=' style="color:brown"'}
 		print "<td>",profilelink($pid), $alink, "</td><td>", qq!<a href="relations?name=$name">$name ($pid)</a></td>
-		<td><a href="system-info?id=$$p{home_id}">$home</a></td><td>$$p{level}</td><td>$$p{science}</td><td>$planets/$$p{culture}</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>!.playerid2country($pid).qq!</td><td>$joined</td><td>$intel</td>!;
+		<td><a href="system-info?id=$$p{home_id}">$home</a></td><td>$$p{level}</td><td>$$p{science}</td><td$planetscolor>$cplanets</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>!.playerid2country($pid).qq!</td><td>$joined</td><td>$intel</td>!;
 		$n++;
 		print "</tr>\n";
 	}
