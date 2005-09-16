@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+use strict;
+use CGI qw":standard *table";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+require "cgicommon.pm";
+
+my %options;
+my $align="left";
+print AWheader("alliance info");
+#print header, start_html($title), h1($title);
+for my $p (qw'alliance') {
+	$options{$p}=param($p);
+}
+
+if($options{alliance}) {
+	my $alli="\U$options{alliance}\E";
+	my $aid=alliancetag2id($alli);
+	my $own=("\L$alli" eq $ENV{REMOTE_USER});
+   my @members=allianceid2members($aid);
+   for my $n (0..(scalar @members -1)) {
+   	print qq'<iframe width="95%" height="700" src="http://www1.astrowars.com/0/Alliance/Detail.php/?id=$n"></iframe><br />';
+   }
+} else {
+	print start_form('get'), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
+	 submit(-name=>"query", -class=>'smbutton'),end_form
+}
+print end_html;
