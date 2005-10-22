@@ -14,11 +14,17 @@ for(;(@a=m!([^>]*)</td><td[^>]*>\s*<b>Attention(.*?) going to attack <b>[^<]+</b
 	}
 	my $time=parseawdate($awdatetime);
 	$sid="$systemid#$planetid";
-	print "incoming: ".planetlink($sid)." @fleet<br>\n";
+	print "incoming: ".planetlink($sid)." @fleet\n";
    if(!$::options{debug}) {
       print "added";
-      dbfleetadd($systemid,$planetid,$epid, $ename, $time, 1, \@fleet);
+      my $res=dbfleetadd($systemid,$planetid,$epid, $ename, $time, 1, \@fleet);
+      if(1 && $fleet[0]) {
+#my @rel=getrelation("bananabird");
+#        my $r=$rel[0]||1;
+         print " important incoming of '$ename'";
+      }
    }
+   print br;
 }
 }
 1;

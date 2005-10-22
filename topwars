@@ -6,7 +6,7 @@ require "standard.pm";
 require "cgicommon.pm";
 
 my $sortopts="-k11";
-my $round="gold1";
+my $round="gold2";
 my $titlestr;
 if($0=~/topwars/) {
 	$titlestr=" wars";

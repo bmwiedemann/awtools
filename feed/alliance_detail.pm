@@ -1,10 +1,11 @@
+use strict;
 my $ironly=0;
 my $debug=$::options{debug};
 print "alliance_detail\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 my $dbname2="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
-use DB_File;
+#use DB_File;
 require "./input.pm";
 if(!/<tr><td><center>([^<]*)<br>/) {return 1;}
 my $name=$1;
@@ -13,8 +14,7 @@ if(!$pid) {print "user $name not found<br>\n";return 1}
 print qq!user <a href="relations?name=$name">$name($pid)</a><br>\n!;
 my $name2="\L$name";
 
-my %data2;
-tie(%relation, "DB_File", $dbname2) or print "error accessing DB\n";
+#tie(%relation, "DB_File", $dbname2) or print "error accessing DB\n";
 
 my @science;
 foreach my $sci (@::sciencestr) {
@@ -36,12 +36,17 @@ foreach my $prod (qw(Production Science Culture)) {
 }
 if(m,Artifact</td><td>([^<]*)<,) {my $val=$1;$val=~s/ //;push(@prod,$val)}
 if(m,Trade Revenue</td><td>(\d+)%,) {push(@prod,$1)}
+foreach my $resource (qw(AD PP)) {
+   next if ! m,$resource</td><td>(-?\d+),;
+   push(@prod,$1);
+}
 
-my $oldentry=$relation{$name2};
-my $newentry=addplayerir($oldentry,\@science,\@race,undef,undef,\@prod);
-if($debug){ print "$oldentry @race @science @prod new:$newentry\n<br>" }
-else {$relation{$name2}=$newentry}
-untie %relation;
+dbplayeriradd($name2, \@science,\@race,undef,undef,\@prod);
+#my $oldentry=$relation{$name2};
+#my $newentry=addplayerir($oldentry,\@science,\@race,undef,undef,\@prod);
+#if($debug){ print "$oldentry @race @science @prod new:$newentry\n<br>" }
+#else {$relation{$name2}=$newentry}
+#untie %relation;
 
 if($ironly){exit 0}
 
@@ -58,7 +63,7 @@ for(;(@a=m!<tr([^>]*)><td[^>]*>(\d+)</td><td>(\d+)</td>(?:<td>(?:\d+)</td>){6}<t
 	my $own=1;
 	if($a[0]=~/602020/) {$localname="unknown"; $localpid=2; $own=0; }
         print "defending fleet: ".planetlink($sid)." $details<br>\n";
-        dbfleetadd($system,$planetid,$localpid, $localname, $time, $own, \@fleet);
+        dbfleetadd($system,$planetid,$localpid, $localname, undef, $own, \@fleet);
 }
 
 # own fleets on foreign planet

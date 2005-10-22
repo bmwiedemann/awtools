@@ -5,6 +5,8 @@ use DB_File;
 
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "input.pm";
+require "cgicommon.pm";
+
 
 my $title="add relation";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
@@ -41,11 +43,11 @@ if(1) {
 	
 	print start_form, "enter one on each line", br;
 	print textarea(-name=>'user', "all\nmembers"), br;
-	print textfield('alliance', $options{alliance}), " alliance membership (e.g. unknown, TZAR, ES)", br,
+	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{relation},
 		-labels=>\%::relationname), " relation", br,
 	textarea('comment', $options{comment}), " who added him, why, contact etc...", br,
-	submit("submit all - really sure?")
+	submit(-name=>"submit all - really sure?", -class=>'smbutton')
 } 
 else {
 	print start_form('get'), textfield(-name=>'user'), " user name", br,

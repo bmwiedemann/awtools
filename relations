@@ -88,13 +88,14 @@ if($options{name} && $options{name} ne "unknown") {
             ($oatt,$odef)=@race[5,6];
          }
       }
+      $epl=$opl=0; # while bonus is not really working
       $extralinks=" ".
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/shield.png",-alt=>"defend"})).
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/sword.png",-alt=>"attack"}))." ";
       }
    }
 	$atag=$atag?" ".a({-href=>"alliance?alliance=$atag"},"[$atag]"):"";
-	print start_form, "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde"),br;
+	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois"),br;
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
@@ -102,11 +103,13 @@ if($options{name} && $options{name} ne "unknown") {
 	textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
 	 submit(-name=>"submit", -class=>"smbutton")." ".a({href=>"?"},"new query")." "
 	 #.submit(-name=>"submit", -value=>"delete")
+       .AWfocus("form.relation")
 	;
 	if($id>2) {
 		my @pl=playerid2planets($id);
 		my $planets=@pl;
-		my $level=$::player{$id}{level};
+      my $pl=$::player{$id};
+		my $level=$$pl{level};
 		my $pop=0;
 		my @planets;
 		foreach my $p (@pl) {
@@ -114,15 +117,16 @@ if($options{name} && $options{name} ne "unknown") {
 			$pop+=planet2opop($pp);
 			push(@planets, $pp);
 		}
-		print br,"pl=$level sl=$::player{$id}{science} cl=$::player{$id}{culture} points=$::player{$id}{points} (".2*$level."+$pop+".($::player{$id}{points}-$pop-2*$level).") logins=$::player{$id}{logins} from=$::player{$id}{from} joined=".(gmtime($::player{$id}{joined}))." ";
+		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".2*$level."+$pop+".($$pl{points}-$pop-2*$level).") trade=$$pl{trade}% logins=$$pl{logins} from=$$pl{from} joined=".(gmtime($$pl{joined}))." ";
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
 		foreach my $pp (sort planetpopsort @planets) {
 			my $sid=planet2sid($pp);
+         my $s=planet2siege($pp);
 			my ($x,$y)=systemid2coord($sid);
-			print qq! <li><a href="system-info?id=$sid">!.systemid2name($sid);
-			printf qq!</a> ($x,$y) #%i : pop=%i SB=%i </li>\n!, planet2pid($pp), planet2pop($pp), planet2sb($pp);
+			my $link=a({-href=>"system-info?id=$sid"},systemid2name($sid));
+			print li({-style=>"font-family: monospace;".($s?" background-color: red;":"")},sprintf(qq!(%2i,%2i) #%2i : pop=%2i SB=%2i $link\n!, $x, $y, planet2pid($pp), planet2pop($pp), planet2sb($pp)));
 		}
 		print "</ul>\n";
 		my @race=relation2race($options{comment});
@@ -140,13 +144,16 @@ if($options{name} && $options{name} ne "unknown") {
          if($sum<=-1) {print "Start Up Lab".br;$sum+=1}
 		}
 		my @prod=relation2production($options{comment});
+      my $bonus=pop(@prod);
 		if(defined($prod[0])) {
 			print p,"production:",br;
 			my $n=0;
 			foreach(@prod[0..2]) {
-				my $total=int($_*$prod[5+$n]*24);
-				print "$_ * $prod[5+$n++] = $total/day<br />\n";
+				my $total=int($_*$$bonus[$n]*24);
+				print "$_ * $$bonus[$n++] = $total/day\n".br;
 			}
+         if($prod[5]) {print "AD $prod[5]".br}
+         if($prod[6]) {print "PP $prod[6]".br}
 		}
 		my @sci=relation2science($options{comment});
 		if(defined($sci[0])) {
@@ -162,15 +169,15 @@ if($options{name} && $options{name} ne "unknown") {
 				print "$::sciencestr[$n++] $_\n".br;
 			}
 		}
-		while($options{comment}=~/login:(\d+):(\d+)(.*)/s) {
-			$options{comment}=$3;
-			print br,"login $1: ", scalar gmtime($2), " GMT";
+		while($options{comment}=~/login:(\d+):(\d+)([^ ]*)(.*)/s) {
+			$options{comment}=$4;
+			print br,"login $1: ", scalar gmtime($2), " GMT ; idle+accuracy $3";
 		}
 	}
 } else {
-	print start_form('get'), textfield(-name=>'name', -class=>'text'), " user name", br,
+	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'name', -class=>'text'), " user name", br,
    "or",br,
-   textfield(-name=>'id', -class=>'text'), " user ID",br,
+   textfield(-name=>'id', -class=>'text').AWfocus("form.name"), " user ID",br,
 	 submit(-name=>"query", -class=>'smbutton'),reset(-class=>'smbutton');
 }
 print end_form, AWtail();

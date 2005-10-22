@@ -68,7 +68,7 @@ function getMouseXY(e) {
  }
 }
 	my $s=5;
-	print AWheader($title),start_form('get'),
+	print AWheader($title),start_form(-method=>'get', -name=>"form"),
 	 hidden("map",2),
 	 awmapcoordinput(),
 	 popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4])." scaling factor".br,

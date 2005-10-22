@@ -4,7 +4,7 @@ use strict;
 use CGI ":standard";
 my $title="fleets [\U$ENV{REMOTE_USER}\E]";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "./input.pm";
+require "input.pm";
 require "cgicommon.pm";
 print AWheader($title);
 
@@ -25,6 +25,7 @@ foreach my $p (keys %::planetinfo) {
 	$p=~/^(\d+)#/;
 	my $sid=$1;
 	(my $penc=$p)=~s/#/%23/;
+   $info=~s!^!<br />!mg;
 	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> $info<br />\n!;
 	#my $str=qq!<a href="/cgi-bin/system-info?id=$sid">$p</a> $info<br />\n!;
 	push(@out,$str);

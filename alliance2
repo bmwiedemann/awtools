@@ -18,6 +18,7 @@ if($options{alliance}) {
 	my $aid=alliancetag2id($alli);
 	my $own=("\L$alli" eq $ENV{REMOTE_USER});
    my @members=allianceid2members($aid);
+   print "showing all \U$ENV{REMOTE_USER}\E alliance pages on one page (does not work with some browser versions)".br;
    for my $n (0..(scalar @members -1)) {
    	print qq'<iframe width="95%" height="700" src="http://www1.astrowars.com/0/Alliance/Detail.php/?id=$n"></iframe><br />';
    }

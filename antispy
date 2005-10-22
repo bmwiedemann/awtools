@@ -24,11 +24,16 @@ foreach(sort sortfunc @spies) {
    my @erel=getrelation($ename);
    my @esci=relation2science($erel[2]);
    my $ebio=getbio(@esci);
+   my $eeffbio;
+   if($ebio) {
+      $eeffbio=$ebio+int((time-$esci[0])/86400); # estimation of current value
+      if($eeffbio>$esl) { $eeffbio=$esl }
+   }
    my $name=playerid2name($pid);
    my @rel=getrelation($name);
    my $bio=getbio(relation2science($rel[2]));
-   next if($ebio && (($bio && $ebio+int((time-$esci[0])/86400)<$bio+$m) || $sl && $ebio+int((time-$esci[0])/86400)<$sl+$m));
-   $ebio|="?";
+   next if($eeffbio && (($bio && $eeffbio<$bio+$m) || $sl && $eeffbio<$sl+$m));
+   if(!$ebio) {$ebio="?"};
    print a({-href=>"relations?name=$ename"},"$ename=$epid(science=$esl,bio=$ebio)")," &gt; ",a({-href=>"relations?name=$name"},"$name=$pid(".($bio?"bio":"science")."=$sl)").br;
 }
 print AWtail();

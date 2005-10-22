@@ -11,6 +11,14 @@ require "cgicommon.pm";
 my $awuser=cookie('user');
 my $refsys=cookie('refsys');
 
+sub tlink(@) { my($a)=@_;
+   if($options{export}) {
+      return "[url=".$$a[0]."]".$$a[1]."[/url]";
+   } else {
+      return a({-href=>$$a[0]},$$a[1]);
+   }
+}
+
 sub spinfo($) { my($id)=@_; # short player info string
 	if($id==2) {return "unknown"}
 	if($id==0) {return "free planet"}
@@ -123,17 +131,20 @@ if(param()) {
 		}
 		my $syslevel=systemid2level($system);
 		my $output="$bs$sysname($x,$y)$be${eol}Id=$system level=$syslevel ";
-		if(!$options{export}) {
+      my @nstarmaplink=("http://neron92.free.fr/AW_Tools/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
+      my @lstarmaplink=("http://lefois.de/aw/tool/map.php?R_pid=&R_sysid=$system&lb=1&coord=1&details=1","lefoisstarmap");
+      my @mapdetailslink=("http://$::server/0/Map/Detail.php/?nr=$system","Map/Details");
+      if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
          if($sysinfo) {
             $sysinfo=~s!^<br />!!;
             $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
          }
-			tprint $output, $eol, qq! <a href="tactical-large?xs=$x&amp;ys=$y&amp;xe=29&amp;ye=19&amp;fast=1">tactical</a> <a href="http://$::server/about/starmap.php?dx=$x&amp;dy=$y">starmap</a> <a href="http://$::server/0/Map/Detail.php/?nr=$system">map/details</a>!,br,$sysinfo,
+			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink),br,$sysinfo,
 			"planets here: <ul>";
 		} else {
-			$output.="[url=http://$::server/about/starmap.php?dx=$x&amp;dy=$y]starmap[/url] [url=http://$::server/0/Map/Detail.php/?nr=$system]Map/Details[/url] [url=http://$::bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
+			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$::bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
 		}
 		my ($refdist,$refp,$refid,$refe,$refs);
 		if($refsys) {
@@ -212,8 +223,8 @@ if(param()) {
 	}
 } else { 
   print AWheader2("AW system info");
-  print start_form('get'),
-   textfield(-name=>'mapx', -class=>'text'), " x", br,
+  print start_form(-method=>'get', -name=>"form"),
+   textfield(-name=>'mapx', -class=>'text').AWfocus("form.mapx"), " x", br,
    textfield(-name=>'mapy', -class=>'text'), " y (e.g. x=0 y=0 for Rana)", br,
    "or",br,
    textfield(-name=>'id', -class=>'text'), " system id", br,

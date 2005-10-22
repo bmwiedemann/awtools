@@ -3,12 +3,14 @@
 use MLDBM qw(DB_File Storable);
 use Fcntl;
 use strict;
-our (%alliances,%starmap,%player,%playerid,%planets);
+our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade);
 tie %alliances, "MLDBM", "newdb/alliances.mldbm", O_RDWR|O_CREAT, 0666 or die $!;
 tie %starmap, "MLDBM", "newdb/starmap.mldbm", O_RDWR|O_CREAT, 0666;
 tie %player, "MLDBM", "newdb/player.mldbm", O_RDWR|O_CREAT, 0666;
 tie %playerid, "MLDBM", "newdb/playerid.mldbm", O_RDWR|O_CREAT, 0666;
 tie %planets, "MLDBM", "newdb/planets.mldbm", O_RDWR|O_CREAT, 0666;
+tie %battles, "MLDBM", "newdb/battles.mldbm", O_RDWR|O_CREAT, 0666;
+tie %trade, "MLDBM", "newdb/trade.mldbm", O_RDWR|O_CREAT, 0666;
 my @origin;
 #my @playersat; # who has planets at ID
 my @playerplanets; #where does he have his
@@ -21,8 +23,32 @@ sub dumphash { my ($h)=@_;
 		print "$_=$$h{$_}\n";
 	}
 }
+sub trade { my($id1,$id2)=@_;
+   my $id1t=$trade{$id1};
+   my @id1=$id1t?@$id1t :();
+   my $id2t=$trade{$id2};
+   my @id2=$id2t?@$id2t :();
+   push @id1, $id2;
+   push @id2, $id1;
+   $trade{$id1}=\@id1;
+   $trade{$id2}=\@id2;
+}
+
+sub battles { #rank points id science culture level home_id logins from joined alliance name
+	my %h=();
+	my $id;
+#	splice(@_,7,1);
+	for(my $i=0; $i<=$#elements; ++$i) {
+		if($elements[$i] eq "id") {$id=$_[$i]}
+		else {$h{$elements[$i]}=$_[$i];}
+	}
+	$battles{$id}=\%h;
+}
+
+
+
 sub starmap { my($x,$y,$level,$id,$name)=@_;
-	if(!$name) {print "$x $y\n"; $name="undefined"}
+	if(!$name) {print "$id ($x, $y)\n"; $name="undefined"}
 	$name=~s/\s+/ /;
 	my %h=("x"=>$x, "y"=>$y, "level"=>$level, "name"=>$name, "origin" => \@{$origin[$id]});
 	$starmap{$id}=\%h;
@@ -88,7 +114,7 @@ sub planets {
 
 print "reading CSV files\n";
 #for my $f (@::files) {
-for my $f (qw(planets player alliances starmap)) {
+for my $f (qw(planets player alliances starmap trade battles)) {
 	my $file="$f.csv";
 	my $head=1;
 	$firstline=1;

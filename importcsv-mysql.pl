@@ -8,7 +8,7 @@ use DBConf;
 # make connection to database
 my $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
-if(1) { # create tables
+if(0) { # create tables
 $dbh->do(qq!
 CREATE TABLE starmap (
 sid INT( 16 ) UNSIGNED NOT NULL ,

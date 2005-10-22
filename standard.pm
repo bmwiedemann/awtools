@@ -20,6 +20,13 @@ our @statuscolor=qw(black black blue cyan red green orange green);
 
 our $start_time = [gettimeofday()];
 
+sub bmwround($) { my($number)=@_;
+   return int($number + .5 * ($number <=> 0));
+}
+sub bmwmod($$) { my($number,$mod)=@_; my $sign=($number <=> 0);
+   my $off=50;
+   return ((($number*$sign + $off)%$mod - $off) *$sign );
+}
 
 sub AWheader2($;$) { my($title,$extra)=@_;
 	my $links="";
@@ -50,6 +57,14 @@ sub AWtail() {
 	my $t = sprintf("%.3f",tv_interval($start_time));
 	return hr()."request took $t seconds".end_html();
 }
+sub AWfocus($) { my($elem)=@_;
+    return
+   qq'<script language="javascript" type="text/javascript">
+     document.$elem.focus();
+     document.$elem.select();
+   </script>';
+}
+
 
 sub mon2id($) {my($m)=@_;
         for(my $i=0; $i<12; $i++) {
@@ -93,7 +108,7 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 	if($race) {$race="race:".join(",",@$race);} else {undef $race}
 	if($sci) {
       my @oldsci=relation2science($oldentry);
-      if($oldsci[0]>100) {shift @oldsci}
+      if($oldsci[0] && $oldsci[0]>100) {shift @oldsci}
       for my $i(0..7) { $oldsci[$i]=$$sci[$i] if defined($$sci[$i]);}
       $sci="science:".time().",".join(",",@oldsci);
    } else {undef $sci}
@@ -110,15 +125,30 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 	if($sci && $magic!~s/science:[-+,.0-9]*/$sci/) {$magic=~s/automagic:/$&\n$sci /}
 	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic=~s/automagic:/$&\n$race /}
 	if($newlogin) {
-		my @l2;
-		@l2=($newlogin=~/(\d+):(\d+)\+(\d+)/);
+		my @l2=@$newlogin;
 		my $add=1;
-		if($oldentry=~/$l2[0]:(\d+)\+(\d+)/) {
-			my $diff=abs($l2[1]-$1);
-			#print "debug: $1 + $2 @l2 diff $diff";
-			if($diff<$l2[2]) { $add=0; }
+		if($oldentry=~/$l2[0]:(\d+):(\d+):(\d+)/) {
+         my @l1=($l2[0],$1,$2,$3);
+         my @l3=@l1;
+         # adjust start+idle times
+         if($l2[1]<$l1[1]) {$l3[1]=$l2[1]; $l3[3]-=$l1[1]-$l2[1] }
+         if($l2[1]+$l2[2] > $l1[1]+$l1[2]) {
+            $l3[2]=$l2[1]+$l2[2]-$l3[1];
+            my $maxerr=$l2[3]-($l2[1]-$l1[1]);
+            if($maxerr>0 && $l3[3]>$maxerr) {$l3[3]=$maxerr}
+         }
+         if($l3[1]<$l1[1]) {
+            my $tdiff=$l3[1]+$l3[2]-($l1[1]+$l1[2]);
+            if($tdiff<$l3[3]) { $l3[3]=$tdiff }
+         }
+         
+#my $diff=abs($l2[1]-$l1[1]);
+#			print "debug: @l1 + @l2 -> @l3";
+#			if($diff<$l2[3]) { $add=0; }
+         $magic=~s/ login:$l2[0]:[^ ]*//;
+         @l2=@l3;
 		}
-		$magic.=" login:".$newlogin if $add;
+		$magic.=" login:".join(":",@l2) if $add;
 	}
 	chomp($rest);
 	return $rest."\n".$magic;
@@ -183,7 +213,7 @@ sub relation2production($) { local $_=$_[0];
 	$bonus[1]+=$race[1]; # sci
 	$bonus[2]+=$race[2]; # cul
 	$bonus[3]+=$race[0]; # grow
-	push(@prod, @bonus);
+	push(@prod, \@bonus);
 #	for(my $i=0; $i<3; ++$i){ $prod[$i]+=$bonus[$i]; }
 	return @prod;
 }
@@ -193,7 +223,10 @@ sub gmdate($) {
 	return "$month[$a[4]] $a[3] $a[5]";
 }
 sub AWtime($) { my($t)=@_;
-   return scalar gmtime($t)." GMT = ".scalar gmtime($t+3600*$::timezone)." GMT+$::timezone";
+   my $diff = $t-time();
+   my $tz=$::timezone;
+   if($tz>=0){$tz="+$tz"}
+   return sprintf("%.1fh %s = ",abs($diff)/3600,($diff>0?"from now":"ago")). scalar gmtime($t)." GMT = ".scalar gmtime($t+3600*$::timezone)." GMT$tz";
 }
 
 sub sb2cv($) { my($sb)=@_;

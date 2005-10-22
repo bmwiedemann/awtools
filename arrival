@@ -25,17 +25,18 @@ if(param()) {
 	my $time=traveltime(\%options);
 	my $h=int($time);
 	my $m=int(($time-$h)*60);
-	print h2("results")."distance/planets: ".sprintf("%.2f",sqrt($options{distance}))."=&radic;".span({-style=>"text-decoration:overline;"},$options{distance})." / $options{planet}".br."energy/speed: $options{energy} / $options{racespeed}".br."allied destination: ".($options{own}?"yes":"no").p;
+	print h2("results")."distance/planets: ".sprintf("%.2f",sqrt($options{distance}))."=&radic;".span({-style=>"text-decoration:overline;"},$options{distance})." / $options{planet}".br."energy/speed: $options{energy} / $options{racespeed}".br."allied destination: ".($options{own}?"yes":"no").br.br;
 	printf "time %.3fh = %2i:%.2i".br, $time, $h, $m;
-	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime(time()+$time*3600);
-	$year+=1900;$mon++;
-	printf "ETA %.2i.%.2i.%i %2i:%.2i:%.2i GMT".br, $mday,$mon,$year, $hour,$min,$sec;
+#	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = 
+   print "ETA ".AWtime(time()+$time*3600);
+#	$year+=1900;$mon++;
+#	printf "ETA %.2i.%.2i.%i %2i:%.2i:%.2i GMT".br, $mday,$mon,$year, $hour,$min,$sec;
 } 
 
 sub printform { 
 	my $s=5;
-	print start_form('get'),
-	textfield(-name=>'planet', -size=>$s, -class=>'text'), " Planet difference", br,
+	print start_form(-method=>'get', -name=>"form"),
+	textfield(-name=>'planet', -size=>$s, -class=>'text'), " Planet difference", br.AWfocus("form.planet"),
 	textfield(-name=>'distance', -size=>$s, -class=>'text'), " ",a({-href=>"distsqr"},"Distance squared"), br,
 	textfield(-name=>'energy', -size=>$s, -class=>'text'), " Energy level", br,
 	popup_menu(-name=>'racespeed', -values=>[-4..4], -default=>0), " Race speed modifier", br,

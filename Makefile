@@ -3,10 +3,10 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-allies=af tgd xr la guest
-tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance system-info planet-info fleets feedupdate ranking sim topwars coord holes loginpos antispy
+allies=af tgd xr guest sw affeed gda love idle gods
+tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance{,2} system-info planet-info fleets feedupdate ranking sim topwars coord holes battles loginpos antispy logout
 #allies=
-#winterwolf arnaken manindamix
+#winterwolf arnaken manindamix tabouuu
 all: TA.candidate
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
@@ -19,20 +19,20 @@ updatecsv: dumpdbs
 	wget -x -nc -o/dev/null http://${f2}
 	tar xjf ${f2}
 	umask 2 ; perl importcsv.pl && ( mv db/* olddb ; mv newdb/* db )
-	cp -a tactical-af.png olddb/tactical-af-$d.png
+	#-cp -a tactical-af.png olddb/tactical-af-$d.png
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
 	for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
 	perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
-	#perl detectalliancerelation.pl > html/beta10/alliancerelation-${mydate}
-	#ln -f html/beta10/alliancerelation-${mydate} html/beta10/alliancerelation
+	perl detectalliancerelation.pl > html/gold2/alliancerelation-${mydate}
+	ln -f html/gold2/alliancerelation-${mydate} html/gold2/alliancerelation
 	perl importcsv-mysql.pl
 
 updatemap: updatemaponly updaterank af-relations.txt tgd-relations.txt
 updatemaponly:
 	for a in $(allies) ; do \
 	REMOTE_USER=$$a /usr/bin/nice -n +12 perl drawtactical.pl ; done
-updatemap2: cleandbs updatemap2only updatespy
+updatemap2: cleandbs updatemap2only updatemaponly updatespy
 updatemap2only:
 	for a in $(allies) ; do \
 		REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \
@@ -78,7 +78,7 @@ access:
 	cp -ia ../dbm/empty.dbm ~/db/$a-relation.dbm
 	cp -ia ../dbm/empty.dbm ~/db/$a-planets.dbm
 	mkdir -p large-$a
-	#/usr/sbin/htpasswd2 ~/.htpasswd $a
+	/usr/sbin/htpasswd2 ~/.htpasswd $a
 	#vi /srv/www/cgi-bin/aw/.htaccess
 	-chmod 664 ~/db/$a*.dbm
 	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm

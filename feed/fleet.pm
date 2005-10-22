@@ -2,7 +2,6 @@ my $debug=$::options{debug};
 print "fleet feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
-use DB_File;
 require "input.pm";
 my $name=$::options{name};
 my $pid=playername2id($name);

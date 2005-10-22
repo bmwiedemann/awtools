@@ -29,7 +29,7 @@ if(defined($u)) {
 	print header(-cookie=>\@cookies).AWheader2("logged in as $u ($ref)");
 } else { print AWheader("login"); }
 
-print start_form('get'), textfield(-name=>'user', -class=>'text'), " user name", br,
+print start_form(-method=>'get', -name=>"form"), textfield(-name=>'user', -class=>'text'), " user name", br.AWfocus("form.user"),
 textfield(-name=>'ref', -class=>'text'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
 popup_menu(-name=>'style', -values=>[qw(green blue aw plain)]), " color theme for AWtools", br,
 popup_menu(-name=>'tz', -values=>[-11..12]), " timezone for AWtools", br,

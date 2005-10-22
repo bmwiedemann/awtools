@@ -2,23 +2,26 @@
 
 use MLDBM qw(DB_File Storable);
 use DB_File;
-use Fcntl;
+use DB_File::Lock;
+use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use strict "vars";
 require "standard.pm";
 my $head="Content-type: text/plain\015\012";
-our (%alliances,%starmap,%player,%playerid,%planets,%relation,%planetinfo);
+our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%relation,%planetinfo);
 tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666 or die $!;
 tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
 tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
 tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
 tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
+tie %battles, "MLDBM", "db/battles.mldbm", O_RDONLY, 0666;
+tie %trade, "MLDBM", "db/trade.mldbm", O_RDONLY, 0666;
 our ($dbnamer,$dbnamep);
 if($ENV{REMOTE_USER}) {
 	$dbnamer="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 	$dbnamep="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 #if($ENV{REMOTE_USER} ne "guest") {
-	tie(%relation, "DB_File", $dbnamer, O_RDONLY);# or print $head,"\nerror accessing DB\n";
-	tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY);# or print $head,"\nerror accessing DB\n";
+	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
+	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
 }
 
 sub getrelation($;$) { my($name)=@_;
@@ -57,7 +60,7 @@ sub getrelation($;$) { my($name)=@_;
 }
 sub setrelation($%) { my($id,$options)=@_;
 	untie %relation;
-	tie(%relation, "DB_File", $dbnamer) or die $!;
+	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or die $!;
 	if(!$id) {$id=$$options{name}}
 	#print "set '$id', '$options' $dbnamer ";
 	if(!$options) {delete $relation{$id}; }
@@ -88,6 +91,16 @@ sub getplanet($$) { my($sid,$pid)=@_;
 	if(!$sys) {return undef}
 	$$sys[$pid-1];
 }
+
+sub playerid2link($) { my($id)=@_;
+   my $name=playerid2name($id);
+   my @rel=getrelation($name);
+   my $col=getrelationcolor($rel[0]);
+   my $alli="";
+   if($rel[1]) {$alli=" [$rel[1]]"}
+   return a({-href=>"relations?id=$id", -style=>"color:$col"}, "$name ($id)$alli");
+}
+
 sub getplanetinfo($$;$) { my($sid,$pid)=@_;
 	my $id="$sid#$pid";
 	my $pinfo=$::planetinfo{$id};
@@ -97,13 +110,15 @@ sub getplanetinfo($$;$) { my($sid,$pid)=@_;
 }
 sub setplanetinfo($%) { my($id,$options)=@_;
 	untie %planetinfo;
-	tie(%planetinfo, "DB_File", $dbnamep) or die $!;
+	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or die $!;
 	if(!$id) {$id=$$options{sidpid}}
 	#print "set '$id', '$options' $dbnamep ";
 	if(!$options) {delete $planetinfo{$id}; }
 	else {
 		$planetinfo{$id}="$$options{status} $$options{who} $$options{info}";
 	}
+	untie %planetinfo;
+	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 sub systemname2id($) { my($name)=@_;
 	$name=~s/\s+/ /;
@@ -172,38 +187,45 @@ sub sidpid22sidpid3($$) { "$_[0]#$_[1]" }
 
 sub dbfleetaddinit($) { my($pid)=@_;
 	untie %planetinfo;
-	tie(%planetinfo, "DB_File", $dbnamep) or print "error accessing DB\n";
+	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
 }
 sub dbfleetadd($$$$$$@) { my($sid,$pid,$plid,$name,$time,$type,$fleet)=@_;
 	my $sidpid=sidpid22sidpid3($sid,$pid);
 	my $oldentry=$planetinfo{$sidpid};
 	my $newentry=addfleet($oldentry,$plid, $name, $time, $type, $fleet);
 	if($newentry) {
-		if(!$::options{debug}) {$planetinfo{$sidpid}=$newentry}
+		if(!$::options{debug}) {
+         $planetinfo{$sidpid}=$newentry;
+         return !$oldentry || $newentry ne $oldentry;
+      }
 		else {print "$sid#$pid: $newentry <br />\n"}
 	}
+   return 0;
 }
 sub dbfleetaddfinish() {
 	untie %planetinfo;
-	tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY) or print "error accessing DB\n";
+	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 
 sub dbplayeriradd { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 	$name="\L$name";
 	untie %relation;
-	tie(%relation, "DB_File", $dbnamer) or print "error accessing DB\n";
+	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
 	my $oldentry=$relation{$name};
 	my $newentry=addplayerir($oldentry, $sci,$race,$newlogin,$trade,$prod);
 	if($newentry) {
 		if(!$::options{debug}) {$relation{$name}=$newentry;}
 		else {print "<br />$name new:",$newentry;}
 	}
+	untie %relation;
+	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 
 sub dblinkadd { my($sid,$url)=@_;
    my $type;
    if($url=~m!http://xtasisrebellion.free.fr/phpnuke/modules.php\?name=Forums&file=viewtopic&t=(\d+)!) { $type="XR" }
    elsif($url=~m!http://forum.rebelstudentalliance.co.uk/index.php\?showtopic=(\d+)!) { $type="RSA" }
+   elsif($url=~m!http://(?:www.)vbbyjc.com/phpBB2/viewtopic.php\?t=(\d+)!) { $type="SW" }
    return unless($sid && $type);
    $url=$&;
    my $sidpid=sidpid22sidpid3($sid,0);

@@ -34,13 +34,14 @@ if($options{status}) {
 	my ($sid,$pid)=($1,$2);
 	my @pinfo=getplanetinfo($sid,$pid,1);
 	my $mod=(@pinfo)? "modified" : "added";
+   my $plinfo;
 	if($options{submit}=~/delete/) {
-		setplanetinfo($pinfo[3],undef);
 		$mod="deleted";
 	} else {
 		#$options{info}=$options{comment};
-		setplanetinfo($pinfo[3],{"sidpid"=>sidpid22sidpid3($sid,$pid), "status"=>$options{status}, "who"=>$options{who}, "info"=>$options{comment}});
+		$plinfo={"sidpid"=>sidpid22sidpid3($sid,$pid), "status"=>$options{status}, "who"=>$options{who}, "info"=>$options{comment}};
 	}
+	setplanetinfo($pinfo[3], $plinfo);
 	print span({-style=>'color: darkgreen'},"$mod $options{id}"),br;
 }
 
@@ -63,15 +64,16 @@ if($options{id}) {
 		$link=qq! - <a href="relations?name=$name">info on $name</a>!;
 	}
 
-	print start_form, "$new: ". span({-style=>'color: '.getstatuscolor($options{status})},systemid2name($sid)."($id)")." ", systemlink($sid), br,
+	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getstatuscolor($options{status})},systemid2name($sid)."($id)")." ", systemlink($sid), br,
 		popup_menu(-name=>'status', -values=>[1..7], -default=>$options{status},
 		-labels=>\%::planetstatusstring), " status", br,
 		textfield(-name=>'who', -value=>$options{who}, -class=>'text'), " user-id or user-name of the one who does the above $link", br,
-		textarea(-name=>'comment', -value=>$options{comment}, -rows=>9, -cols=>40, -class=>'text'), " ETA, fleet, etc...", br,
+		textarea(-name=>'comment', -value=>"\n".$options{comment}, -rows=>9, -cols=>40, -class=>'text'), " ETA, fleet, etc...", br,
 		hidden(-name=>'id', $id),
-		submit(-name=>"submit", -class=>'smbutton'), qq! <a href="?">new query</a> !, submit(-name=>"submit",-value=>"delete entry", -class=>'smbutton');
+		submit(-name=>"submit", -class=>'smbutton'), qq! <a href="?">new query</a> !, submit(-name=>"submit",-value=>"delete entry", -class=>'smbutton').
+         AWfocus("form.status");
 } else {
-	print start_form('get'), textfield(-name=>'id', -class=>'text'), " ID: system#planet", br,
+	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'id', -class=>'text'), " ID: system#planet".AWfocus("form.id"), br,
 	 submit(-name=>"query", -class=>'smbutton')
 }
 print end_form, end_html;

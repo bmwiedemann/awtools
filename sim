@@ -20,9 +20,9 @@ if(@params && param("turns")<=9999) {
 	print "</pre>\n";
 } else {
 	my $s=5;
-	my @default=(7000,7000,6);
+	my @default=(7300,7300,6);
 #	my @default=(400,40,3);
-	print start_form('get'), 
+	print start_form(-method=>'get', -name=>"form"), 
    i("simulation options"),br,
 	textfield(-name=>'turns', -value=>$default[0], -size=>$s, -class=>'text'), " how many turns (of 15 min) to simulate", br,
 	textfield(-name=>'print', -value=>$default[1], -size=>$s, -class=>'text'), " print only each n turns", br,

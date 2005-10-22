@@ -26,7 +26,7 @@ my @memberids;
 my %member;
 my $minsci=100;
 my $scidiff=3;
-my $AUdiff=10;
+my $AUdiff=20;
 my $distmargin=1;
 foreach my $name (@members) {
    $name=~/(.*) (\d*)/;

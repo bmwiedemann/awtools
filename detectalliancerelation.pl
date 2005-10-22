@@ -3,6 +3,7 @@
 use strict;
 require "input.pm";
 
+if(scalar keys %::alliances<10) {exit 0}
 my %relation;
 my %nsystems;
 my %conq;
@@ -96,5 +97,7 @@ foreach my $rel (sort sortfunc keys %relation) {
 	$a[0]=allianceid2tag($a[0]);
 	$a[1]=allianceid2tag($a[1]);
 	my $f=sprintf "%.4f",$relation{$rel}/$n-3-$conq/($n**0.25); # friendship rating
-	print "$a[0] -- $a[1]; // $relation{$rel} $nsystems{$rel} $conq1 $conq2 $pop1 $pop2 $f\n";
+   my $allis="$a[0] -- $a[1]; //";
+   while(length($allis)<16) {$allis.="/"}
+	print "$allis $relation{$rel} $nsystems{$rel} $conq1 $conq2 $pop1 $pop2 $f\n";
 }

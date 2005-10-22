@@ -1,7 +1,6 @@
 use strict;
-my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
-use DB_File;
-#require "standard.pm";
+require "input.pm";
+#my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %relation;
 my %timevalue=(""=>1, "N/A"=>1, second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};
@@ -26,8 +25,7 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 		print "version outdated or wrong timezone? (delivery $::deliverytime seconds)";
 		exit(0);
 	}
-	$idlei+=$::deliverytime;
-	my $lastonline=time()-$idlei;
+	my $lastonline=time()-$idlei-$::deliverytime;
 	my $inaccuracy=$timevalue{$timestr}+1;
 	
         m,Logins</td><td>(\d+),; my $logins=$1;
@@ -57,26 +55,13 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 	}
 	my $lastonlinegmt=gmtime($lastonline);
 	print qq! <a href="relations?name=$name">name=$name</a> idle=$idle last=&quot;$lastonlinegmt&quot; logins=$logins pl=$pl sl=$sl cl=$cl\n<br>!;
-	tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
-	$name="\L$name";
-	my $oldentry=$relation{$name};
-	#if(!$oldentry) {$oldentry="4 UNKNOWN "}
-	#$oldentry=~/(\d+ \w+ .*)(?=$::magicstring)(.*)/s; 
-	#my ($rest,$magic)=($1,$2);
-	#if($oldentry!~/$::magicstring/) {$magic=""; $rest=$oldentry;}
-	#print "$dbname:$name $oldentry $rest + magic:$magic";
-	#my $prevlogins="";
-	#my $race="";
-	#if($magic=~/(login:.*)/) {$prevlogins=$1." ";}
-	#if($magic=~/(race:[-+,0-9]+)/) {$race=$1." ";}
-	#if(!$race) {$race="race:".join(",",@race)." "}
-	#my $newentry="${prevlogins}login:$logins:$lastonline+$inaccuracy";
-#"${magicstring}";
-	#chomp($rest);
-	#$newentry="$rest\n${::magicstring}pl=$pl sl=$sl cl=$cl$science $race$newentry";
-	my $newentry=addplayerir($oldentry, \@science, \@race, "$logins:$lastonline+$inaccuracy");
-	if(!$debug) {$relation{$name}=$newentry;}
-	else {print "<br>new:",$newentry;}
+#tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
+#	$name="\L$name";
+   dbplayeriradd($name, \@science, \@race, [$logins,$lastonline,$idlei,$inaccuracy]);
+#	my $oldentry=$relation{$name};
+#	my $newentry=addplayerir($oldentry, \@science, \@race, [$logins,$lastonline,$idlei,$inaccuracy]);
+#	if(!$debug) {$relation{$name}=$newentry;}
+#	else {print "<br>new:",$newentry;}
 }
 
 1;

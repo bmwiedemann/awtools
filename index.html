@@ -3,10 +3,10 @@ use CGI ":standard";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "standard.pm";
 require "cgicommon.pm";
-print AWheader('tools index');
+print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(sim planet-info distsqr ranking holes antispy topwars topallis)) {
+foreach(qw(logout sim planet-info distsqr ranking holes battles antispy topwars topallis)) {
 	print a({-href=>$_},$_),br;
 }
 print p;
@@ -23,4 +23,5 @@ print a({href=>"/strongestfleet-1.html"},"strongest fleets"),"+history",br,
  a({href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
  a({href=>"/battlecalculator.html"},"AW battle calculator"),br,
  a({href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
+ a({href=>"http://azgharde.celeonet.fr/tools/index.php"},"other tools"),br,
  end_html;

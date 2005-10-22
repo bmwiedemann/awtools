@@ -26,7 +26,7 @@ if(param()) {
  print a({href=>"arrival?distance=$d"},"distsqr=$d");
 } else { 
   my $s=4;
-  print start_form('get'),
+  print start_form(-method=>'get', -name=>"form"),
    textfield(-name=>'sx', -size=>$s, -class=>'text'), " x ", textfield(-name=>'sy', -size=>$s, -class=>'text'), " y - or id: ", textfield(-name=>'sid', -size=>$s+1, -class=>'text'), " starting location", br,
    textfield(-name=>'dx', -size=>$s, -class=>'text'), " x ", textfield(-name=>'dy', -size=>$s, -class=>'text'), " y - or id: ", textfield(-name=>'did', -size=>$s+1, -class=>'text'), " destination location", br,
    submit(-class=>'smbutton'), end_form;

@@ -8,7 +8,7 @@ require "cgicommon.pm";
 my %options;
 my $align="left";
 print AWheader("alliance info", 
-      "<style> td { font-family: monospace; 
+      "<style> th, td { font-family: monospace; 
       border-left: 1px solid gray;  
       border-bottom: 1px solid gray; } </style>
 ");
@@ -26,6 +26,10 @@ if($options{alliance}) {
 		print "unknown alliance";
 		exit(0);
 	}
+   my %pointsdb;
+   tie(%pointsdb, "DB_File", "/home/bernhard/db/points.dbm");
+   my @alliancepoints;
+
    my $forumlink=$::alliances{$aid}{url}||"";
    my $allitag=$::alliances{$aid}{tag}||"";
    my $alliname=$::alliances{$aid}{name}||"";
@@ -34,14 +38,20 @@ if($options{alliance}) {
 	print a({-href=>"http://$::server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n";
    my @members=allianceid2members($aid);
 	print "$alli members (".scalar @members.")",br,start_table();
-	print "<tr align=\"$align\"><td>links</td><td>name</td><td>home</td><td>pl</td><td>sl</td><td>cl</td><td>pts(rank)</td><td>log</td><td>from</td><td>joined</td><td>intel</td></tr>\n";
+	print "<tr align=\"$align\">".th("links").th("name").th("home").th("pl").th("sl").th("cl").th("pts(rank)").th("log").th("from").th("joined").th("intel")."</tr>\n";
 	my @totalprod=(0,0,0);
+	my @totalres=(0,0);
+   my $totalcul=0;
+   my $totalpl=0;
 	for my $pid (@members) {
 		my $p=$::player{$pid};
 		next if ! defined($p);
 		next if $$p{alliance} ne $aid;
 		print "<tr align=\"$align\">";
 		my $name=playerid2name($pid);
+      if($pointsdb{$name}) {
+         push(@alliancepoints, $pointsdb{$name});
+      }
 		my $alink="";
 		my $planets=playerid2planets($pid);
 		my $joined=gmtime($$p{joined});#." ".$$p{joined};
@@ -51,8 +61,10 @@ if($options{alliance}) {
       my @race=relation2race($rel[2]);
       my @science=relation2science($rel[2]);
 		my @prod=relation2production($rel[2]);
+      my $bonus=pop(@prod);
 		{ my $n=0;
-                        foreach(@prod[0..2]) { $_*=$prod[$n+5]; $totalprod[$n]+=$_; $n++}
+                        foreach(@prod[0..2]) { $_*=$$bonus[$n]; $totalprod[$n]+=$_; $n++}
+                        for(0..1) { $totalres[$_]+=$prod[$_+5];}
                 }
 		if($own) { $alink=alliancedetailslink($n) }
       my $intel="-";
@@ -63,14 +75,16 @@ if($options{alliance}) {
          if($science[8]) {
             my $diff=$science[8]-time();
             my $etc=sprintf(" %.1fh",(int($science[8])-time())/3600);
-            if($diff<24*3600) { $intel.=span({-style=>"color:red"},$etc)}
+            if($diff<24*3600 && ($diff<-60*3600 || $diff>-20*3600)) { $intel.=span({-style=>"color:red"},$etc)}
             else {$intel.=$etc;}
             
          }
       }
-      if(defined($race[0])) {$race[7]="+".-$race[7];$intel=join("",@race)." ".$intel;}
+      if(defined($race[0])) {$race[7]=".+".-$race[7];$intel=join("",@race)." ".$intel;}
       if($bio25) {$intel=div({-style=>"color:green"},$intel)}
       my $cplanets="$planets/$$p{culture}";
+      $totalcul+=$$p{culture};
+      $totalpl+=$$p{level};
       my $planetscolor="";
       if($$p{culture}-$planets>1) {$planetscolor=' style="color:red"'}
       if($$p{culture}-$planets==1) {$planetscolor=' style="color:brown"'}
@@ -80,9 +94,24 @@ if($options{alliance}) {
 		print "</tr>\n";
 	}
 	print end_table();
-	if($totalprod[0]) { print "total hourly production/science/culture: ".join(", ", @totalprod);}
+   if(scalar @alliancepoints == scalar @members) {
+      my $counted=@members;
+      if($counted>=10) {$counted-=int(($counted-5)/5)}
+      @alliancepoints = reverse sort @alliancepoints;
+#print "$counted: @alliancepoints\n".br;
+      my $sum=0;
+      foreach(@alliancepoints[0..$counted-1]) { $sum+=$_ }
+      printf "current alliance score: %.2f".br,($sum/$counted);
+      
+   }
+   print "average culture: ".($totalcul/@members).br;
+   print "average PL: ".($totalpl/@members).br;
+	if($totalprod[0]) {
+      print "total hourly production/science/culture: ".join(", ", @totalprod).br;
+      print "total saved A\$ / PP: ".join(", ", @totalres).br;
+   }
 } else {
-	print start_form('get'), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
-	 submit(-name=>"query", -class=>'smbutton'),end_form
+	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
+	 submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.alliance");
 }
 print end_html;

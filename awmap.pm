@@ -1,5 +1,6 @@
 $::pixelpersystem=13; # for 12 planet status lines
-$::mapsize=131;
+$::mapsize=141;
+if($ENV{REMOTE_USER} eq "xr") {$::mapsize+=10}
 $::mapxoff=-int(($mapsize-1)/2);
 $::mapyoff=-int(($mapsize-1)/2);
 
