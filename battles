@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+
+use strict;
+use CGI ":standard";
+my $title="yesterday's battles";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+require "cgicommon.pm";
+print AWheader($title);
+
+my %bat=%::battles;
+%bat=%::battles;
+sub sortfunc { return 
+   -(($bat{$a}{cv_att}+$bat{$a}{cv_def}<=>$bat{$b}{cv_att}+$bat{$b}{cv_def}) || 
+     ($bat{$a}{time}<=>$bat{$b}{time}));
+}
+
+print "<pre>time attCV defCV sys#planet attacker defender".br;
+foreach my $id (sort sortfunc keys %bat) {
+   
+   my %b=%{$bat{$id}};
+   my $att=$b{att_id};
+   my $def=$b{def_id};
+   printf("%s: %3i %3i <a href=\"system-info?id=$b{system_id}\">%4i#%2i</a>  %20s %s %20s\n", 
+         AWtime($b{time}),$b{cv_att}, $b{cv_def}, $b{system_id}, $b{planet_id}, playerid2link($att), $b{win_id}==$b{att_id}?">":"<" ,playerid2link($def));
+}
+print "</pre>";
+#print (sort sortfunc @out);
+print AWtail();
