@@ -103,7 +103,7 @@ if($options{name} && $options{name} ne "unknown") {
 	textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
 	 submit(-name=>"submit", -class=>"smbutton")." ".a({href=>"?"},"new query")." "
 	 #.submit(-name=>"submit", -value=>"delete")
-       .AWfocus("form.relation")
+    #.AWfocus("form.relation")
 	;
 	if($id>2) {
 		my @pl=playerid2planets($id);
@@ -171,7 +171,15 @@ if($options{name} && $options{name} ne "unknown") {
 		}
 		while($options{comment}=~/login:(\d+):(\d+)([^ ]*)(.*)/s) {
 			$options{comment}=$4;
-			print br,"login $1: ", scalar gmtime($2), " GMT ; idle+accuracy $3";
+         my($login,$time,$extra)=($1,$2,$3);
+         my $color;
+         if($extra=~/:(\d{5,}):/) { $color="darkred";
+            if($1>60000) { $color="red" }
+         }
+         if($color) {
+            $extra=span({-style=>"color:$color"},$extra);
+         }
+			print br,"login $login: ", scalar gmtime($time), " GMT ; idle+accuracy $extra";
 		}
 	}
 } else {
