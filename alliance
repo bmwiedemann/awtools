@@ -104,11 +104,11 @@ if($options{alliance}) {
       printf "current alliance score: %.2f".br,($sum/$counted);
       
    }
-   print "average culture: ".($totalcul/@members).br;
-   print "average PL: ".($totalpl/@members).br;
+   printf "average culture: %.2f".br,($totalcul/@members);
+   printf "average PL: %.2f".br,($totalpl/@members);
 	if($totalprod[0]) {
-      print "total hourly production/science/culture: ".join(", ", @totalprod).br;
-      print "total saved A\$ / PP: ".join(", ", @totalres).br;
+      print "total hourly production/science/culture: ".join(" / ", @totalprod).br;
+      print "total saved A\$ / PP: ".join(" / ", @totalres).br;
    }
 } else {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
