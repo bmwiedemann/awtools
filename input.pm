@@ -7,6 +7,8 @@ use strict "vars";
 require "standard.pm";
 my $head="Content-type: text/plain\015\012";
 our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%relation,%planetinfo);
+our $adprice=0.93;
+
 tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666 or die $!;
 tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
 tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
@@ -183,6 +185,29 @@ sub sidpid2planet($) {my ($sidpid)=@_;
 }
 sub getplanet2($) { sidpid2planet($_[0]) }
 sub sidpid22sidpid3($$) { "$_[0]#$_[1]" }
+
+sub gettradepartners($$) { my($maxta,$minad)=@_;
+  my @result;
+  foreach my $name (keys %relation) {
+    my($rel)=$relation{$name};
+    if(!$rel) {next}
+    my($prod,undef,undef,undef,undef,$ad,$pp,$bonus)=relation2production($rel);
+    if(!defined($prod)) {next}
+    $ad+=$pp*$adprice;
+    if($ad<$minad) {next}
+    my $trades=0;
+    if($rel=~/trade:([^ ]*)/) {
+       my $tas=$1;
+       my @a=split(/,/, $tas);
+       $trades=@a;
+    }
+    if($trades>$maxta) {next}
+#print("$name : ad: $ad \n<br />");
+    push(@result,[$name,$ad, $prod*$$bonus[0], $trades]);
+  }
+  return @result;
+}
+
 
 sub dbfleetaddinit($) { my($pid)=@_;
 	untie %planetinfo;

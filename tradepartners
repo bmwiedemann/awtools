@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+use strict;
+use CGI qw":standard *table";
+my $title="trade partners [\U$ENV{REMOTE_USER}\E]";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+require "cgicommon.pm";
+print AWheader($title);
+
+my $sortkey=4;
+sub sortfunc { return $$a[$sortkey]<=>$$b[$sortkey] }
+
+#print "test";
+my @tap=gettradepartners(4, 5000);
+foreach my $entry (@tap) {
+   my ($name, $ad, $prod, $partners)=@$entry;
+   my $time=(20000-$ad)/$prod;
+   push(@$entry, sprintf("%.2f",$time));
+}
+
+print ("<table><tr>".th("name").th("ready in")."</tr>\n");
+
+foreach my $entry (sort sortfunc @tap) {
+   my ($name, $ad, $prod, $partners, $time)=@$entry;
+#print "@$entry\n".br;
+   print "<tr>".td($name).td($time." h")."</tr>\n";
+}
+print "</table>";
+
+print AWtail();

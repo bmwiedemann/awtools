@@ -198,7 +198,7 @@ sub relation2production($) { local $_=$_[0];
 	my @prod=split(",", $1);
 	my @race=relation2race($_[0]);
 	return undef unless @race;
-	for(my $i=0; $i<@race; ++$i){$race[$i]=$race[$i]*$racebonus[$i]}
+	for(my $i=0; $i<7; ++$i){$race[$i]+=0;$race[$i]*=$racebonus[$i]}
 	my $a=$prod[3];
 	my $t=1+$prod[4]*0.01;
 	my @bonus=($t,$t,$t,$t);

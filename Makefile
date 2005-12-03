@@ -4,7 +4,7 @@ awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 allies=af tgd xr guest sw affeed gda love idle gods
-tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance{,2} system-info planet-info fleets feedupdate ranking sim topwars coord holes battles loginpos antispy logout
+tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance{,2} system-info planet-info fleets feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners logout
 #allies=
 #winterwolf arnaken manindamix tabouuu
 all: TA.candidate
