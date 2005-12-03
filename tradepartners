@@ -13,18 +13,24 @@ sub sortfunc { return $$a[$sortkey]<=>$$b[$sortkey] }
 
 #print "test";
 my @tap=gettradepartners(4, 5000);
+my @tap2;
 foreach my $entry (@tap) {
    my ($name, $ad, $prod, $partners)=@$entry;
+   my $pid=playername2id($name);
+   if(!$pid) {next}
+   $name=playerid2name($pid);
+   $$entry[0]=$name;
    my $time=(20000-$ad)/$prod;
    push(@$entry, sprintf("%.2f",$time));
+   push(@tap2, $entry);
 }
 
 print ("<table><tr>".th("name").th("ready in")."</tr>\n");
 
-foreach my $entry (sort sortfunc @tap) {
+foreach my $entry (sort sortfunc @tap2) {
    my ($name, $ad, $prod, $partners, $time)=@$entry;
 #print "@$entry\n".br;
-   print "<tr>".td($name).td($time." h")."</tr>\n";
+   print "<tr>".td(a({-href=>"relations?name=$name"},$name)).td($time." h")."</tr>\n";
 }
 print "</table>";
 
