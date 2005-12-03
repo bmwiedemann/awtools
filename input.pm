@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
 use MLDBM qw(DB_File Storable);
-use DB_File;
 use DB_File::Lock;
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use strict "vars";
@@ -207,7 +206,7 @@ sub dbfleetaddfinish() {
 	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 
-sub dbplayeriradd { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
+sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 	$name="\L$name";
 	untie %relation;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
