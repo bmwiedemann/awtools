@@ -31,4 +31,5 @@ dbfleetaddinit(undef);
 
 require 'feed/libincoming.pm';
 parseincomings($_);
+dbfleetaddfinish();
 1;

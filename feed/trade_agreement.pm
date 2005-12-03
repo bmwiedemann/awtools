@@ -1,8 +1,7 @@
 use strict;
-my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
-use DB_File;
-#require "standard.pm";
-my %relation;
+#my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
+require "input.pm";
+#my %relation;
 my %timevalue=(second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -18,13 +17,13 @@ _=$a[1]) {
 }
 
 {
-	print qq! <a href="relations?name=$name">name=$name</a><br>\n!;
-	tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
-	$name="\L$name";
-	my $oldentry=$relation{$name};
-	my $newentry=addplayerir($oldentry, undef, undef, undef, \@trade);
-	if(!$debug) {$relation{$name}=$newentry;}
-	else {print "<br>new:",$newentry;}
+	print " ".a({-href=>"relations?name=$name"},"name=$name").br();
+#	tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
+#   $name="\L$name";
+#	my $oldentry=$relation{$name};
+	dbplayeriradd($name, undef, undef, undef, \@trade);
+#	if(!$debug) {$relation{$name}=$newentry;}
+#	else {print "<br>new:",$newentry;}
 }
 
 1;

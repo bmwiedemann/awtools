@@ -1,8 +1,10 @@
+exit 0; # dont use atm
+
 my $debug=$::options{debug};
 print "planets feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
-my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
+#my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 require "input.pm";
 my $name=$::options{name};
 my $pid=playername2id($name);
@@ -17,7 +19,7 @@ foreach my $p (@{$::player{$pid}{planets}}) {
 }
 
 our %data;
-tie(%data, "DB_File", $dbname) or print "error accessing DB\n";
+#tie(%data, "DB_File", $dbname) or print "error accessing DB\n";
 
 return unless /Production Points(.*)/s;
 $_=$1;

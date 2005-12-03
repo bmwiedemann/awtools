@@ -4,9 +4,9 @@ my $debug=$::options{debug};
 print "alliance_detail\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
-my $dbname2="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
+#my $dbname2="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 #use DB_File;
-require "./input.pm";
+require "input.pm";
 if(!/<tr><td><center>([^<]*)<br>/) {return 1;}
 my $name=$1;
 my $pid=playername2id($name);

@@ -2,16 +2,17 @@ use strict;
 require "input.pm";
 #my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 my %relation;
-my %timevalue=(""=>1, "N/A"=>1, second=>1, minute=>60, hour=>3600, day=>86400);
+my %timevalue=(""=>1, second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 print "player feed<br>\n";
-m,>\s*([^ <]+)(?: \(\d+[^)<]*\)</font>)?(?:<br><small>Premium Member</small>)?</b></center>,; my $name=$1;
+m,>\s*([^<]+)(?: \(\d+[^)<]*\)</font>)?(?:<br><small>Premium Member</small>)?</b></center>,; my $name=$1;
 if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+days?|),){
 	my $idle="$1 $2";
 	my $idlei=$1;
 	my $timestr=$2; $timestr=~s/s$//; $timestr=~s/^\s*//;
+   $idlei=~s!N/A!1!;
 	$idlei*=$timevalue{$timestr};
 	#my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime();
 	#$hour+=$::options{tz};
