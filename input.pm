@@ -193,6 +193,8 @@ sub gettradepartners($$) { my($maxta,$minad)=@_;
     if(!$rel) {next}
     my($prod,undef,undef,undef,undef,$ad,$pp,$bonus)=relation2production($rel);
     if(!defined($prod)) {next}
+    my @sci=relation2science($rel);
+    if($sci[0]<time()-2*24*3600) {next}
     $ad+=$pp*$adprice;
     if($ad<$minad) {next}
     my $trades=0;
