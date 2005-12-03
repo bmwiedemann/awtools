@@ -1,0 +1,23 @@
+fix player/planets index after feeding (e.g. with mysql)
+muffin Feed+Mangle (Upload+Download) filter
+trade tool listing players with $TAs<n  and A$+PP>15k
+include battles.csv 7-day history in alliancerelation-detector
+#better idle-time tracking (start-end)
+anon export for relations
+fleets (and others) with local times instead of GMT. not for BB-export
+fleet tracker
+correlate strongest fleet to best guarded
+merge strongest fleets history to catch moving fleets or see growth/loss
+#RSA thread link - auto from referer. e.g. use $::planetinfo{"$sid#0"}
+#add battlecalc link to relations - def/att from race or just worst-case
+Arnaken: could you sum up the fleets of everyone ie at the end of the fleet page ?
+RSA-TD: Actually you know what I thought of, possible to code the best planets into your tool? As in it will show up where best planets are?
+
+possibly improve muffin AWLink to fetch info from aw.lsmod.de on demand
+#muffin: clickable system-IDs in Alliance/Detail (mouseover "AWTools")
+
+If you click on a system and et the system info (in the tools) you would also get a list of which alliance members who could see that particular system.
+
+
+changing the map look to look more "AW-like" - much like Mob's tools... I really think that would encourage people to use the tools more than they do today...
+
