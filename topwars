@@ -5,7 +5,7 @@ chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "standard.pm";
 require "cgicommon.pm";
 
-my $sortopts="-k11";
+my $sortopts="-k15";
 my $round="gold2";
 my $titlestr;
 if($0=~/topwars/) {
@@ -21,7 +21,7 @@ my $filename="html/$round/alliancerelation";
 my $mtime=gmtime((stat($filename))[9]);
 print "extracted from ".a({-href=>"/$round/alliancerelation"},"alliancerelation data").br.
 	"Last Update $mtime GMT\n".br.
-	"alli -- alli // sum(minpop) shared-systems taken-planets lost-planets killed-pop lost-pop friendlyness";
+	"alli -- alli // sum(minpop) shared-systems taken-planets lost-planets killed-pop lost-pop killed-CV lost-CV battling-CV #battles friendlyness";
 
 my $data=`sort $sortopts -n $filename | head -$n`;
 print pre($data);

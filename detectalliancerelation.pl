@@ -8,27 +8,51 @@ my %relation;
 my %nsystems;
 my %conq;
 my %killedpop;
+my %battlecv;
+my %battlenum;
+my %killedcv;
 
 #print STDERR "importing old data...\n";
 my @olddata;
 my @oldpopdata;
-for my $day (1..7) {
-	my %oldday;
-	my %olddaypop;
-	my @t=localtime(time()-3600*24*$day);
-	my ($d,$m,$y)=(sprintf("%.2i",$t[3]),sprintf("%.2i",$t[4]+1), $t[5]+1900);
-	open(F, "tar -Oxjf www1.astrowars.com/export/history/all$d-$m-$y.tar.bz2 planets.csv |") or next;
-	my $dummy=<F>;
-	while(<F>) {
-		next if m/^\s*$/;
-		my @a=split("\t");
-		my $sidpid="$a[0]#$a[1]";
-		$oldday{$sidpid}=$a[4];
-		$olddaypop{$sidpid}=$a[2];
+for my $day (0..7) {
+   my @t=localtime(time()-3600*24*$day);
+   my ($d,$m,$y)=(sprintf("%.2i",$t[3]),sprintf("%.2i",$t[4]+1), $t[5]+1900);
+   if($day) {
+      my %oldday;
+      my %olddaypop;
+      open(F, "tar -Oxjf www1.astrowars.com/export/history/all$d-$m-$y.tar.bz2 planets.csv |") or next;
+      my $dummy=<F>;
+      while(<F>) {
+         next if m/^\s*$/;
+         my @a=split("\t");
+         my $sidpid="$a[0]#$a[1]";
+         $oldday{$sidpid}=$a[4];
+         $olddaypop{$sidpid}=$a[2];
 #		print "$a[0]#$a[1] $a[4]\n";
-	}
-	push @olddata, \%oldday;
-	push @oldpopdata, \%olddaypop;
+      }
+      push @olddata, \%oldday;
+      push @oldpopdata, \%olddaypop;
+   }
+   open(F, "tar -Oxjf www1.astrowars.com/export/history/all$d-$m-$y.tar.bz2 battles.csv |") or next;
+   my $dummy=<F>;
+   my $n=0;
+   while(<F>) {
+      my(undef, $cv_def, $cv_att, $att_id, $def_id, $win_id)=split("\t");
+      if($def_id<=2) {next}
+      my $aid1=playerid2alliance($att_id);
+      my $aid2=playerid2alliance($def_id);
+      if(!$aid1 || !$aid2) {next}
+      my $key="$aid1,$aid2";
+      if($aid1>$aid2) {$key="$aid2,$aid1";}
+      $battlecv{$key}+=$cv_att+$cv_def;
+      $battlenum{$key}++;
+#$killedcv{$key}+=$win_id==$def_id?$cv_att : $cv_def;
+      if($win_id==$def_id) { $killedcv{"$aid1,$aid2"}+=$cv_att }
+      else { $killedcv{"$aid2,$aid1"}+=$cv_def }
+#print "$key $battlecv{$key} $killedcv{$key} $cv_def, $cv_att, $att_id, $def_id, $win_id\n";
+#      if($n++>10) {exit 0;last;}
+   }
 }
 #print STDERR "scanning systems...\n";
 
@@ -99,5 +123,9 @@ foreach my $rel (sort sortfunc keys %relation) {
 	my $f=sprintf "%.4f",$relation{$rel}/$n-3-$conq/($n**0.25); # friendship rating
    my $allis="$a[0] -- $a[1]; //";
    while(length($allis)<16) {$allis.="/"}
-	print "$allis $relation{$rel} $nsystems{$rel} $conq1 $conq2 $pop1 $pop2 $f\n";
+   my $battlecv=$battlecv{$rel}||0;
+   my $battlenum=$battlenum{$rel}||0;
+   my $killedcv=$killedcv{$rel}||0;
+   my $killedcv2=$killedcv{$rrel}||0;
+	print "$allis $relation{$rel} $nsystems{$rel} $conq1 $conq2 $pop1 $pop2 $killedcv $killedcv2 $battlecv $battlenum $f\n";
 }
