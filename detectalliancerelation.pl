@@ -11,6 +11,9 @@ my %killedpop;
 my %battlecv;
 my %battlenum;
 my %killedcv;
+my $maxkilledcv=0;
+
+sub max($$) {$_[0]>$_[1]?$_[0]:$_[1]}
 
 #print STDERR "importing old data...\n";
 my @olddata;
@@ -48,8 +51,10 @@ for my $day (0..7) {
       $battlecv{$key}+=$cv_att+$cv_def;
       $battlenum{$key}++;
 #$killedcv{$key}+=$win_id==$def_id?$cv_att : $cv_def;
-      if($win_id==$def_id) { $killedcv{"$aid1,$aid2"}+=$cv_att }
-      else { $killedcv{"$aid2,$aid1"}+=$cv_def }
+      my $killedcv;
+      if($win_id==$def_id) { $killedcv{"$aid1,$aid2"}+=$cv_att; $killedcv=$cv_att }
+      else { $killedcv{"$aid2,$aid1"}+=$cv_def; $killedcv=$cv_def }
+      if($killedcv>$maxkilledcv) {$maxkilledcv=$killedcv}
 #print "$key $battlecv{$key} $killedcv{$key} $cv_def, $cv_att, $att_id, $def_id, $win_id\n";
 #      if($n++>10) {exit 0;last;}
    }
@@ -118,14 +123,15 @@ foreach my $rel (sort sortfunc keys %relation) {
 	my $pop1=$killedpop{$rel}||0;
 	my $pop2=$killedpop{$rrel}||0;
 	my $n=$nsystems{$rel}||4;
-	$a[0]=allianceid2tag($a[0]);
-	$a[1]=allianceid2tag($a[1]);
-	my $f=sprintf "%.4f",$relation{$rel}/$n-3-$conq/($n**0.25); # friendship rating
-   my $allis="$a[0] -- $a[1]; //";
-   while(length($allis)<16) {$allis.="/"}
    my $battlecv=$battlecv{$rel}||0;
    my $battlenum=$battlenum{$rel}||0;
    my $killedcv=$killedcv{$rel}||0;
    my $killedcv2=$killedcv{$rrel}||0;
-	print "$allis $relation{$rel} $nsystems{$rel} $conq1 $conq2 $pop1 $pop2 $killedcv $killedcv2 $battlecv $battlenum $f\n";
+	$a[0]=allianceid2tag($a[0]);
+	$a[1]=allianceid2tag($a[1]);
+   my $cvpoints=1.5*max(0, $killedcv+$killedcv2-$maxkilledcv/2)/($maxkilledcv+1);
+	my $f=sprintf "%.4f",$relation{$rel}/$n-3-$conq/($n**0.25) -$cvpoints; # friendship rating
+   my $allis="$a[0] -- $a[1]; //";
+   while(length($allis)<16) {$allis.="/"}
+	print "$allis $relation{$rel} $nsystems{$rel} $conq1 $conq2 $pop1 $pop2 $killedcv2 $killedcv $battlecv $battlenum $f\n";
 }
