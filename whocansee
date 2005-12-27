@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use strict;
+use CGI ":standard";
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+require "cgicommon.pm";
+
+my $alli=$ENV{REMOTE_USER};
+my $sysid=param('sid');
+my @sysxy=systemid2coord($sysid);
+if(!defined($sysxy[0])) {
+   print AWheader("$sysid not found");
+   exit(0);
+}
+
+open(IN, "whocansee.pl $sysid |") or die $!;
+my @data=<IN>;
+close(IN);
+foreach(@data) {$_=[split(" ",$_)]}
+
+print AWheader("Who can see ".a({-href=>"system-info?id=$sysid"},$sysid)." [\U$alli]");
+print "<table>".th("who").th("home").th("bio").th("dist");
+foreach(@data) {
+	my($x,$y,$ename,$epid,$esl,$ebio)=@$_;
+   my @erel=getrelation($ename);
+   my @esci=relation2science($erel[2]);
+   my $distsqr=($x-$sysxy[0])**2 + ($y-$sysxy[1])**2;
+   my $dist=sprintf("%.2f", sqrt($distsqr));
+   print "<tr>".td(playerid2link($epid)).td("($x,$y)").td($ebio).td($dist)."</tr>\n";
+#   print playerid2link($epid)." ($x,$y) bio:$ebio distance:$dist".br;
+}
+print "</table>";
+print AWtail();
+
