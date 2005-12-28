@@ -1,6 +1,6 @@
 # this file defines functions to output a sorted table.
 
-sub display_player($) { 
+sub display_pid($) { 
    playerid2link($_[0]);
 }
 
@@ -25,7 +25,10 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
             # TODO  test if new value is already present -> drop old
             unshift(@newkeys, $n*($_*2-1));
             my $sortval=join(".",@newkeys);
-            $sortlinks.=a({-href=>"?sort=$sortval"},img({-src=>"/images/ico_arrow_$updown.gif", -alt=>"sort $updown", -style=>"border:0"}));
+            my $oldparams=$ENV{QUERY_STRING};
+            $oldparams=~s/sort=[-.0-9]*&?//;
+            if($oldparams) {$oldparams="&$oldparams"}
+            $sortlinks.=a({-href=>"?sort=$sortval$oldparams"},img({-src=>"/images/ico_arrow_$updown.gif", -alt=>"sort $updown", -style=>"border:0"}));
          }
          $headerstr.=th($_.$sortlinks);
       }

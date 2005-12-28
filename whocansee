@@ -5,9 +5,15 @@ use CGI ":standard";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "input.pm";
 require "cgicommon.pm";
+require "sort_table.pm";
 
 my $alli=$ENV{REMOTE_USER};
-my $sysid=param('sid');
+my %options;
+for my $p (qw'sort sid') {
+   $options{$p}=param($p);
+}
+if(!defined $options{sort}){$options{sort}="-6.5";}
+my $sysid=$options{sid};
 my @sysxy=systemid2coord($sysid);
 if(!defined($sysxy[0])) {
    print AWheader("$sysid not found");
@@ -19,17 +25,21 @@ my @data=<IN>;
 close(IN);
 foreach(@data) {$_=[split(" ",$_)]}
 
-print AWheader("Who can see ".a({-href=>"system-info?id=$sysid"},$sysid)." [\U$alli]");
-print "<table>".th("who").th("home").th("bio").th("dist");
-foreach(@data) {
-	my($x,$y,$ename,$epid,$esl,$ebio)=@$_;
-   my @erel=getrelation($ename);
-   my @esci=relation2science($erel[2]);
-   my $distsqr=($x-$sysxy[0])**2 + ($y-$sysxy[1])**2;
-   my $dist=sprintf("%.2f", sqrt($distsqr));
-   print "<tr>".td(playerid2link($epid)).td("($x,$y)").td($ebio).td($dist)."</tr>\n";
-#   print playerid2link($epid)." ($x,$y) bio:$ebio distance:$dist".br;
-}
-print "</table>";
-print AWtail();
+print header().AWheader3("Who can see $sysid [\U$alli]", 
+      "Who can see system ".a({-href=>"system-info?id=$sysid"},$sysid)." [\U$alli]");
+#      " system ".a({-href=>"system-info?id=$sysid"},$sysid);
 
+
+my @data2;
+foreach(@data) {
+	my($x,$y,$ename,$epid,$esl,$ebio,$rel)=@$_;
+   my $dist=sprintf("%.2f", sqrt(($x-$sysxy[0])**2 + ($y-$sysxy[1])**2));
+   push(@data2, [$epid, $x, $y, $ebio, $dist, $rel]);
+}
+ 
+print sort_table([qw(who x y bio dist relation)],
+         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_string],
+         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+         sort_param_to_keys($options{sort}), \@data2);
+
+print AWtail();
