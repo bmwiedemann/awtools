@@ -14,8 +14,8 @@ our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Re
 our @racestr=qw(growth science culture production speed attack defense);
 our @racebonus=qw(0.07 0.08 0.04 0.04 0.19 0.15 0.16);
 our $magicstring="automagic:";
-our %artifact=("BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HOR"=>15);
-our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "turquoise", "LimeGreen", "green");
+our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HOR"=>15);
+our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "darkturquoise", "LimeGreen", "green");
 our @statuscolor=qw(black black blue cyan red green orange green);
 
 our $start_time = [gettimeofday()];
@@ -28,7 +28,7 @@ sub bmwmod($$) { my($number,$mod)=@_; my $sign=($number <=> 0);
    return ((($number*$sign + $off)%$mod - $off) *$sign );
 }
 
-sub AWheader2($;$) { my($title,$extra)=@_;
+sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
    my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"})];
@@ -50,8 +50,9 @@ sub AWheader2($;$) { my($title,$extra)=@_;
 	# -head=>qq!<link rel="icon" href="/favicon.ico" type="image/ico" />!).
 	 -head=>$heads).
 	div({-align=>'justify',-class=>'header'},#a({href=>"index.html"}, "AW tools index").
-	$links). h1($title)."\n";
+	$links)."\n". h1($title2)."\n";
 }
+sub AWheader2($;$) { my($title,$extra)=@_; AWheader3($title, $title, $extra);}
 sub AWheader($;$) { my($title,$extra)=@_; header().AWheader2($title,$extra);}
 sub AWtail() {
 	my $t = sprintf("%.3f",tv_interval($start_time));
@@ -100,6 +101,10 @@ sub alliancedetailslink($) { my($id)=@_;
 }
 sub systemlink($) { my($id)=@_;
         qq!<a href="system-info?id=$id">info for system $id</a>\n!;
+}
+
+sub alliancelink($) { my($atag)=@_;
+   a({-href=>"alliance?alliance=$atag&omit=9+12"},"[$atag]");
 }
 
 
@@ -203,7 +208,7 @@ sub relation2production($) { local $_=$_[0];
 	my $t=1+$prod[4]*0.01;
 	my @bonus=($t,$t,$t,$t);
 	if($a=~/(\w+)(\d)/) {
-		my $effect=$artifact{$1};
+		my $effect=$artifact{$1}||0;
 		for(my $i=0; $i<@race; ++$i) {
 			if((1<<$i) & $effect)
 			{$race[$i]+=0.1*$2}
@@ -227,6 +232,9 @@ sub AWtime($) { my($t)=@_;
    my $tz=$::timezone;
    if($tz>=0){$tz="+$tz"}
    return sprintf("%.1fh %s = ",abs($diff)/3600,($diff>0?"from now":"ago")). scalar gmtime($t)." GMT = ".scalar gmtime($t+3600*$::timezone)." GMT$tz";
+}
+sub AWisodatetime($) { my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($_[0]);
+   sprintf("%i-%.2i-%.2i %.2i:%.2i:%.2i", $year+1900, $mon+1, $mday, $hour, $min, $sec);
 }
 
 sub sb2cv($) { my($sb)=@_;

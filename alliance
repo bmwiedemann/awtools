@@ -4,20 +4,34 @@ use CGI qw":standard *table";
 chdir "/home/bernhard/code/cvs/perl/awcalc";
 require "input.pm";
 require "cgicommon.pm";
+require "sort_table.pm";
 
 my %options;
-my $align="left";
-print AWheader("alliance info", 
+for my $p (qw'alliance sort omit') {
+	$options{$p}=param($p);
+}
+print AWheader("\U$options{alliance}\E alliance info [\U$ENV{REMOTE_USER}]", 
       "<style> th, td { font-family: monospace; 
       border-left: 1px solid gray;  
       border-bottom: 1px solid gray; } </style>
 ");
-#print header, start_html($title), h1($title);
-for my $p (qw'alliance') {
-	$options{$p}=param($p);
+if(!defined $options{sort}){$options{sort}="14.2";}
+
+sub display_needplanets{ my($n)=@_;
+      my $planetscolor="";
+      if($n>1) {$planetscolor=' style="color:red"'}
+      if($n==1) {$planetscolor=' style="color:brown"'}
+      return "<span $planetscolor>$n</span>";
 }
 
 if($options{alliance}) {
+   my @displayfuncs=
+         (\&display_string, \&display_pid, \&display_sid, 
+           \&display_string, \&display_string, \&display_string, \&display_needplanets, \&display_string, \&display_string, \&display_string, \&display_string, 
+           \&AWisodatetime, \&display_string, \&display_string);
+   foreach(split / /, $options{omit}) {
+      $displayfuncs[$_-1]=undef;
+   }
 	my $n=0;
 	my $alli="\U$options{alliance}\E";
 	my $aid=alliancetag2id($alli);
@@ -30,15 +44,17 @@ if($options{alliance}) {
    tie(%pointsdb, "DB_File", "/home/bernhard/db/points.dbm");
    my @alliancepoints;
 
+# header
    my $forumlink=$::alliances{$aid}{url}||"";
    my $allitag=$::alliances{$aid}{tag}||"";
    my $alliname=$::alliances{$aid}{name}||"";
    if($forumlink) {$forumlink=" URL:".a({-href=>$forumlink}, $forumlink)}
 	my $rellink=qq! <a href="relations?name=$alli"><img src="/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
-	print a({-href=>"http://$::server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n";
    my @members=allianceid2members($aid);
-	print "$alli members (".scalar @members.")",br,start_table();
-	print "<tr align=\"$align\">".th("links").th("name").th("home").th("pl").th("sl").th("cl").th("pts(rank)").th("log").th("from").th("joined").th("intel")."</tr>\n";
+	print a({-href=>"http://$::server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n$alli members (".scalar @members.")";
+
+   my @members2;
+   
 	my @totalprod=(0,0,0);
 	my @totalres=(0,0);
    my $totalcul=0;
@@ -47,11 +63,11 @@ if($options{alliance}) {
 		my $p=$::player{$pid};
 		next if ! defined($p);
 		next if $$p{alliance} ne $aid;
-		print "<tr align=\"$align\">";
 		my $name=playerid2name($pid);
       if($pointsdb{$name}) {
          push(@alliancepoints, $pointsdb{$name});
       }
+      my $etc="";
 		my $alink="";
 		my $planets=playerid2planets($pid);
 		my $joined=gmtime($$p{joined});#." ".$$p{joined};
@@ -74,9 +90,9 @@ if($options{alliance}) {
          if($science[1]>=25) {$bio25=1}
          if($science[8]) {
             my $diff=$science[8]-time();
-            my $etc=sprintf(" %.1fh",(int($science[8])-time())/3600);
-            if($diff<24*3600 && ($diff<-60*3600 || $diff>-20*3600)) { $intel.=span({-style=>"color:red"},$etc)}
-            else {$intel.=$etc;}
+            $etc=sprintf(" %.1fh",(int($science[8])-time())/3600);
+#if($diff<24*3600 && ($diff<-60*3600 || $diff>-20*3600)) { $intel.=span({-style=>"color:red"},$etc)}
+#           else {$intel.=$etc;}
             
          }
       }
@@ -85,15 +101,19 @@ if($options{alliance}) {
       my $cplanets="$planets/$$p{culture}";
       $totalcul+=$$p{culture};
       $totalpl+=$$p{level};
-      my $planetscolor="";
-      if($$p{culture}-$planets>1) {$planetscolor=' style="color:red"'}
-      if($$p{culture}-$planets==1) {$planetscolor=' style="color:brown"'}
-		print "<td>",profilelink($pid), $alink, "</td><td>", qq!<a href="relations?name=$name">$name ($pid)</a></td>
-		<td><a href="system-info?id=$$p{home_id}">$home</a></td><td>$$p{level}</td><td>$$p{science}</td><td$planetscolor>$cplanets</td><td>$$p{points}(#$$p{rank})</td><td>$$p{logins}</td><td>!.playerid2country($pid).qq!</td><td>$joined</td><td>$intel</td>!;
+      my $needplanets=$$p{culture}-$planets;
+      my $links=profilelink($pid). $alink;
+      push(@members2, [$links, $pid, $$p{home_id}, $$p{level}, $$p{science}, $$p{culture}, $needplanets, "$$p{points}(#$$p{rank})", $n, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc]);
 		$n++;
-		print "</tr>\n";
 	}
-	print end_table();
+	print sort_table([qw"links name home pl sl cl need pts(rank) arank log from joined intel ETC"],
+         \@displayfuncs,
+         [\&sort_string, \&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_string,
+           \&sort_num, \&sort_string, \&sort_num],
+         sort_param_to_keys($options{sort}), \@members2 );
+
+
+# footer
    if(scalar @alliancepoints == scalar @members) {
       my $counted=@members;
       if($counted>=10) {$counted-=int(($counted-5)/5)}
@@ -112,6 +132,7 @@ if($options{alliance}) {
    }
 } else {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
+    textfield(-name=>'omit', -class=>'text', -value=>"9 12"), " omit field # (space separated list)", br, br,
 	 submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.alliance");
 }
-print end_html;
+print AWtail();

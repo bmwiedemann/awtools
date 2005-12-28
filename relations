@@ -95,8 +95,8 @@ if($options{name} && $options{name} ne "unknown") {
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/images/sword.png",-alt=>"attack"}))." ";
       }
    }
-	$atag=$atag?" ".a({-href=>"alliance?alliance=$atag"},"[$atag]"):"";
-	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois"),br;
+	$atag=$atag?" ".alliancelink($atag):"";
+	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles"),br;
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},

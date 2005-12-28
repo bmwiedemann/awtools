@@ -3,6 +3,10 @@
 sub display_pid($) { 
    playerid2link($_[0]);
 }
+sub display_sid($) { my($sid)=@_;
+   my ($x,$y)=systemid2coord($sid);
+   a({-href=>"system-info?id=$sid"},"$sid($x,$y)");
+}
 
 sub display_string($) { $_[0]; }
 
@@ -18,7 +22,7 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
       my $n=0;
       foreach(@$header) {
          next if not defined $$displayfunc[$n++];
-         my $sortlinks;
+         my $sortlinks="";
          for(0,1) {
             my $updown=$_?"up":"dn";
             my @newkeys=@$sortkeys;
@@ -35,11 +39,13 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
    }
    $headerstr.="</tr>\n";
    my $outstr="";
+   my $line=0;
    foreach my $row (sort 
          {
             foreach(@$sortkeys) {
                my $sk=abs($_)-1; # actual sort key
                my $sf=$$sortfunc[$sk];
+               if(!$sf) {$sf=\&sort_string}
                my $cmp=&$sf($$a[$sk], $$b[$sk]);
                if($cmp) {
                   return $cmp if $_>0;
@@ -49,7 +55,7 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
             return 0;
          }
          @$data) {
-      $outstr.="<tr>";
+      $outstr.="<tr class=".((++$line&1)?"odd":"even").">";
       my $n=0;
       foreach my $element (@$row) {
          my $df=$$displayfunc[$n++];
@@ -58,7 +64,7 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
       }
       $outstr.="</tr>\n";
    }
-   return $headerstr.$outstr."</table";
+   return $headerstr.$outstr."</table>";
 }
 
 # this takes a CGI argument and converts it into a sortkeys arrayref 

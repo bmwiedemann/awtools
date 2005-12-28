@@ -6,16 +6,24 @@ require "cgicommon.pm";
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout sim planet-info distsqr ranking holes battles antispy topwars topallis)) {
-	print a({-href=>$_},$_),br;
+foreach(qw(logout sim planet-info distsqr tradepartners ranking holes battles antispy topwars topallis)) {
+	print a({-href=>$_},$_)," &nbsp; ";
 }
+
 print p;
 #print qq!<a href="/ranking.$ENV{REMOTE_USER}.html">\U$ENV{REMOTE_USER}\E alliance ranking</a>!,br;
 #print a({href=>"/$ENV{REMOTE_USER}-holes.html"},"\U$ENV{REMOTE_USER}\E holes"),br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
-print a({href=>"/strongestfleet-1.html"},"strongest fleets"),"+history",br,
+my $reldate="051206";
+print a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,
+ a({href=>"http://$bmwserver/gold2/alliancerelation-$reldate.png"},"alliance relations")."
+ (".a({href=>"http://$bmwserver/gold2/alliancerelation-$reldate.svg"},"svg").")",br,
+ a({href=>"http://$bmwserver/customize_race.html"},"race helper"),br,
 # a({href=>"/beta10/alliancerelation"},"alliance relation data")." &gt; ".a({href=>"topwars"},"top wars").", ".a({href=>"topallis"},"top allis"),
- p,a({href=>"/manual.html"},"manual"),p,
+ p,a({href=>"/manual.html"},"manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog") ,br,
+"color codes ". a({href=>"system-info?legend=1"}, "for relations"), 
+" ".a({href=>"planet-info?legend=1"}, "for planet/plannings"),
+p,
 
  h2("extra links"),
  a({href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
@@ -23,5 +31,8 @@ print a({href=>"/strongestfleet-1.html"},"strongest fleets"),"+history",br,
  a({href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
  a({href=>"/battlecalculator.html"},"AW battle calculator"),br,
  a({href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
- a({href=>"http://azgharde.celeonet.fr/tools/index.php"},"other tools"),br,
+ "other tools: ".a({href=>"http://azgharde.celeonet.fr/tools/index.php"},"azgharde")," ",
+ a({href=>"http://lefois.de/aw/tool/index.php"}, "Lefois"), " ",
+ a({href=>"http://neron92.free.fr/AW_Tools/index.php"}, "neron92"), " ",
+ a({href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",
  end_html;

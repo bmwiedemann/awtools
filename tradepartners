@@ -14,7 +14,7 @@ my %options;
 for my $p (qw'sort') {
    $options{$p}=param($p);
 }
-if(!defined $options{sort}){$options{sort}="4.5";}
+if(!defined $options{sort}){$options{sort}="-7.4.5";}
 
 #print "test";
 my @tap=gettradepartners(4, 5000);
@@ -24,19 +24,18 @@ foreach my $entry (@tap) {
    my $pid=playername2id($name);
    if(!$pid) {next}
    $name=playerid2name($pid);
+   my @rel=getrelation($name);
    $$entry[0]=$name;
    my $time=(20000-$ad)/$prod;
    $$entry[1]=int($ad);
    $$entry[2]=int($prod);
-   push(@$entry, sprintf("%.2f",$time), $pid);
+   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
    push(@tap2, $entry);
 }
 
-my $sortkeys=sort_param_to_keys($options{sort});
-
-print sort_table([qw(name ad prod/h partners ready*h who)], 
-         [undef, \&display_string, \&display_string, \&display_string, \&display_string, \&display_pid],
-         [\&sort_string, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_pid],
-         $sortkeys, \@tap2 );
+print sort_table([qw(name ad prod/h partners ready(h) who relation)], 
+         [undef, \&display_string, \&display_string, \&display_string, \&display_string, \&display_pid, \&display_string],
+         [\&sort_string, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_pid, \&sort_num],
+         sort_param_to_keys($options{sort}), \@tap2 );
 
 print AWtail();
