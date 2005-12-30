@@ -1,8 +1,8 @@
 #!/usr/bin/perl
+#BEGIN{ $ENV{REMOTE_USER}="idle"; }
+
 use strict;
 use DBAccess;
-
-#$ENV{REMOTE_USER}="idle";
 require "input.pm";
 
 my $sysid = shift @ARGV;
@@ -33,6 +33,6 @@ foreach(@$allplayers) {
 #   next if($rel[0]<9);
 #print "@$_\n";
 #next if $member{$epid};
-   print "$ex $ey $ename $epid $esl $bio\n";
+   print "$ex $ey $ename $epid $esl $bio $rel[0]\n";
 }
 
