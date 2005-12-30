@@ -8,7 +8,11 @@ if($::options{url}=~/id=(\d+)/) {
    $url=~s/(id=)\d+/$1/;
    my $previd=$id-1;
    my $nextid=$id+1;
-   s%<br><table border=0%<br><a href="$url$previd">prev</a> <a href="$url$nextid">next</a>$&%;
+   my $prevstring="";
+   if($previd>=0) { $prevstring=qq'<a href="$url$previd">prev</a>'; }
+   s%<br><table border=0%<br>$prevstring <a href="$url$nextid">next</a>$&%;
 }
+
+require "mangle/special_color_incomings.pm";
 
 1;

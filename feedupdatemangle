@@ -55,6 +55,6 @@ print AWheader($title);
 	filefield(-name=>'file', -class=>'file'), " or upload a downloaded HTML file", br.AWfocus("form.html"),
 #	checkbox('debug'), br,
 	submit(-name=>'add data', -class=>'smbutton'), reset(-class=>'smbutton'), end_form, 
-   print end_html;
+   end_html;
 }
 
