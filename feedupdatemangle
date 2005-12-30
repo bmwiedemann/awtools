@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+#print "Content-Type: text/html\n\n";
+
+alarm 10;
+
+if($ENV{REMOTE_USER} eq "affeed") {$ENV{REMOTE_USER}="af"}
+
+chdir "/home/bernhard/code/cvs/perl/awcalc";
+require "input.pm";
+require "cgicommon.pm";
+
+our %options;
+my $title="AW feed update";
+my $debug=0;
+foreach my $p (qw(tz html file debug name url)) {
+	$options{$p}=param($p);
+}
+if(param()) {
+	chdir("/home/bernhard/code/cvs/perl/awcalc");
+	my $html=$options{html};
+	if(upload('file')) {
+#print "uploaded file $options{file}\n".br;
+		my $bytes_read=read(upload('file'), $html, 40000);
+		#print $bytes_read;
+	}
+#	print "input ",length($html)," bytes".br;
+	if($debug) {
+		open(DEBUG, ">> /tmp/debug");
+		print DEBUG time(),"\n";
+		foreach(keys(%options)) {
+			my $entry=$_."=";
+			if($options{$_}){$entry.=$options{$_}}
+			print DEBUG $entry,"\n";
+		}
+	}
+   $_=$html;
+   require "./mangle/dispatch.pm";
+  
+   print header(), $_;
+   open(STDOUT, "> /dev/null");
+	require './feed/dispatch.pm';
+	feed_dispatch($html);
+} else {
+print AWheader($title);
+	my $uc=cookie('user');
+	if(!$options{name}) {param("name",$uc)}
+   if($::timezone){}#dummy
+	print start_form(-method=>'post',-enctype=>"multipart/form-data", -name=>"form"),
+	textfield(-name=>'tz', -value=>$::timezone, -class=>'text'), " timezone of subject: GMT+n", br,
+	textfield(-name=>'name',-value=>'', -class=>'text'), " who reports (e.g. for own fleet movements)", br,
+	textarea(-name=>'html',-value=>"", -cols=>40, -rows=>9, -class=>'text'), " copy+paste HTML source here", br,
+	filefield(-name=>'file', -class=>'file'), " or upload a downloaded HTML file", br.AWfocus("form.html"),
+#	checkbox('debug'), br,
+	submit(-name=>'add data', -class=>'smbutton'), reset(-class=>'smbutton'), end_form, 
+   print end_html;
+}
+
