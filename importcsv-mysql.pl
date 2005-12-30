@@ -118,6 +118,7 @@ CREATE TABLE `fleets` (
 `cs` SMALLINT (5) ,
 `bs` SMALLINT (5) ,
 `cv` INT( 6 ) NOT NULL ,
+`xcv` INT( 6 ) NOT NULL ,
 `info` VARCHAR( 200 ) NULL ,
 INDEX ( alli ),
 INDEX (`status`),

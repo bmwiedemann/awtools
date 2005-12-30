@@ -2,6 +2,8 @@
 use strict;
 use CGI ":standard";
 
+alarm 10;
+
 if($ENV{REMOTE_USER} eq "affeed") {$ENV{REMOTE_USER}="af"}
 
 chdir "/home/bernhard/code/cvs/perl/awcalc";

@@ -36,7 +36,7 @@ our $darkgridcolor=$img->colorAllocate(getrgb("gray34"));
 }
 
 sub writeimg($) { my($img,$name)=@_;
-  open(OUT, "> $name") or die $!;
+  open(OUT, "> $name") or die "failed writing $name: $!";
   binmode OUT;
   print OUT $img->png();
   close OUT;

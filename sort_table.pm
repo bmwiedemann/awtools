@@ -34,6 +34,7 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
             if($oldparams) {$oldparams="&$oldparams"}
             $sortlinks.=a({-href=>"?sort=$sortval$oldparams"},img({-src=>"/images/ico_arrow_$updown.gif", -alt=>"sort $updown", -style=>"border:0"}));
          }
+         if(! defined ($$sortfunc[$n-1])) {$sortlinks=""}
          $headerstr.=th($_.$sortlinks);
       }
    }
