@@ -54,6 +54,7 @@ if($options{alliance}) {
 	print a({-href=>"http://$::server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n$alli members (".scalar @members.")";
 
    my @members2;
+   my @membernames;
    
 	my @totalprod=(0,0,0);
 	my @totalres=(0,0);
@@ -64,6 +65,8 @@ if($options{alliance}) {
 		next if ! defined($p);
 		next if $$p{alliance} ne $aid;
 		my $name=playerid2name($pid);
+      push(@membernames, $name);
+
       if($pointsdb{$name}) {
          push(@alliancepoints, $pointsdb{$name});
       }
@@ -106,9 +109,10 @@ if($options{alliance}) {
       push(@members2, [$links, $pid, $$p{home_id}, $$p{level}, $$p{science}, $$p{culture}, $needplanets, "$$p{points}(#$$p{rank})", $n, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc]);
 		$n++;
 	}
+   print " ".a({-href=>"relations-bulk?user=".join("%0a",@membernames)."&alliance=$options{alliance}"},"edit relations for all members");
 	print sort_table([qw"links name home pl sl cl need pts(rank) arank log from joined intel ETC"],
          \@displayfuncs,
-         [\&sort_string, \&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_string,
+         [undef, \&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_string,
            \&sort_num, \&sort_string, \&sort_num],
          sort_param_to_keys($options{sort}), \@members2 );
 
