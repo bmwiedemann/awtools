@@ -9,6 +9,7 @@ sub feed_dispatch($) { local $_=$_[0];
    if($title=~/- profile - $aw/) { require './feed/profile.pm'; return 0}
 	return unless our @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
 	$title=shift(@time);
+   $module=title2pm($title);
 	our $deliverytime;
 	{
 		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime();
@@ -24,31 +25,19 @@ sub feed_dispatch($) { local $_=$_[0];
          $deliverytime-=$adjust*3600;
          print "timezone adjusted to $::options{tz}, delivery $deliverytime s\n".br;
       }
+      if($::deliverytime<-60 || $::deliverytime>50*60) {
+         print "data is outdated or wrong timezone? (delivery took $::deliverytime seconds)";
+         return -2;
+      }
 	}
-        if($::deliverytime<-60 || $::deliverytime>50*60) {
-                print "data is outdated or wrong timezone? (delivery took $::deliverytime seconds)";
-                return -2;
-        }
 
-	if($title=~m!Alliance / Detail!) {
-		require './feed/alliance_detail.pm';
-	} elsif ($title=~m!Player / Profile!) {
-		require './feed/player.pm';
-	} elsif ($title=~m!Map / Detail!) {
-		require './feed/map_detail.pm';
-	} elsif ($title=~m!Fleet!) {
-		require './feed/fleet.pm';
-	} elsif ($title=~m!$aw Trade / Agreement!) {
-		require './feed/trade_agreement.pm';
-	} elsif ($title=~m!$aw Science!) {
-		require './feed/science.pm';
-	} elsif ($title=~m!^ $aw Planets$!) {
-		require './feed/planets.pm';
-	} elsif ($title=~m!$aw News!) {
-		require './feed/news.pm';
-	} else {
+   my $include="feed/$module.pm";
+   print "$module feed".br;
+   if(-e $include) {
+      require $include;
+   } else {
 		print "this input (title=$title) is not supported (yet) or not recognized\n";
-	}
+   }
 	return 0;
 }
 

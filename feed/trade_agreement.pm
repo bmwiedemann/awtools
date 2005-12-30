@@ -2,12 +2,9 @@ use strict;
 #my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 require "input.pm";
 #my %relation;
-my %timevalue=(second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 my $name=$::options{name};
-
-print "trade agreements feed<br>\n";
 
 my @a;
 my @trade=();

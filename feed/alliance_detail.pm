@@ -1,7 +1,6 @@
 use strict;
 my $ironly=0;
 my $debug=$::options{debug};
-print "alliance_detail\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 #my $dbname2="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
@@ -13,6 +12,9 @@ my $pid=playername2id($name);
 if(!$pid) {print "user $name not found<br>\n";return 1}
 print qq!user <a href="relations?name=$name">$name($pid)</a><br>\n!;
 my $name2="\L$name";
+
+m/Trade Revenue(.*)/;
+my $tradehtml=$1;
 
 #tie(%relation, "DB_File", $dbname2) or print "error accessing DB\n";
 
@@ -41,7 +43,18 @@ foreach my $resource (qw(AD PP)) {
    push(@prod,$1);
 }
 
-dbplayeriradd($name2, \@science,\@race,undef,undef,\@prod);
+my @trade;
+{
+local $_=$tradehtml;
+for(;(my @a=m!<a [^>]*>([^>]+)</a><br>(.*)!); $_=$a[1]) {
+   push(@trade,$1);
+}
+#dbplayeriradd($name, undef, undef, undef, \@trade);
+print "<br>trades: @trade<br>";
+}
+
+
+dbplayeriradd($name2, \@science,\@race,undef,\@trade,\@prod);
 #my $oldentry=$relation{$name2};
 #my $newentry=addplayerir($oldentry,\@science,\@race,undef,undef,\@prod);
 #if($debug){ print "$oldentry @race @science @prod new:$newentry\n<br>" }
@@ -89,5 +102,6 @@ for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</
 require 'feed/libincoming.pm';
 parseincomings($_);
 dbfleetaddfinish();
+
 print "<br>done\n";
 1;

@@ -4,18 +4,20 @@ our $bmwlink=qq%<a href="http://$::bmwserver/cgi-bin%;
 
 sub manglefilter { my($urlarg)=@_;
    my $title="";
-   my $urlarg2=lc($urlarg);
-   $urlarg2=~s/\?.*//;
-   $urlarg2=~s/(?:\.php)?\/*$//;
-   $urlarg2=~s/\//_/g;
+#   my $urlarg2=lc($urlarg);
+#   $urlarg2=~s/\?.*//;
+#   $urlarg2=~s/(?:\.php)?\/*$//;
+#   $urlarg2=~s/\//_/g;
+   my $module="";
    if(m&<title>([^<]*)</title>&) {
       $title=$1;
-      my $include="mangle/$urlarg2.pm";
+      $module=title2pm($title);
+      my $include="mangle/$module.pm";
       if(-e $include) {
          require $include;
-         $urlarg2="<br>mangling applied: $urlarg2"; # for the log
+         $module="<br>mangling applied: $module"; # for the log
       }
-      else {$urlarg2="<br>no special mangling for: $urlarg2"}
+      else {$module="<br>no special mangling for: $module"}
 
 # add main AWTool link
       s%Fleet</a></td>%$&<td>|</td><td><a href="http://$::bmwserver/cgi-bin/index.html">AWTools</a></td>%;
@@ -31,7 +33,7 @@ sub manglefilter { my($urlarg)=@_;
    s/pagead2.googlesyndication.com/localhost/g;
 
 # add disclaimer
-   s%</body>%disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again. $urlarg2 $&%;
+   s%</body>%disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again. $module $&%;
 
    s%<br>\s*(<TABLE)%$1%;
 }

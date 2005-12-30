@@ -98,8 +98,10 @@ sub playerid2link($) { my($id)=@_;
    my @rel=getrelation($name);
    my $col=getrelationcolor($rel[0]);
    my $alli="";
-   if($rel[1]) {$alli=" [$rel[1]]"}
-   return a({-href=>"relations?id=$id", -style=>"color:$col"}, "$name ($id)$alli");
+   my $atag=playerid2tag($id);
+   if($atag) {$alli="[$atag] "}
+   elsif($rel[1]) {$alli="[$rel[1]] "}
+   return a({-href=>"relations?id=$id", -style=>"color:$col"}, "$alli$name");
 }
 
 sub getplanetinfo($$;$) { my($sid,$pid)=@_;

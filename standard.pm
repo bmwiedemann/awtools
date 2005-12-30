@@ -241,4 +241,15 @@ sub sb2cv($) { my($sb)=@_;
 	return int(-4+4*1.5**$sb+0.5);
 }
 
+# create a file string from a URL
+sub title2pm($) { my($title)=@_;
+   $title=~s/\s?Astro Wars //;
+   $title=~s/ - \d+:\d+:\d+//;
+   $title=~s/\?.*//;
+   $title=~s/ //g;
+   $title=~s/(?:\.php)?\/*$//;
+   $title=~s/\//_/g;
+   return lc($title);
+}
+
 1;

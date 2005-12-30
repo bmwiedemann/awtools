@@ -6,7 +6,6 @@ my %timevalue=(""=>1, second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
-print "player feed<br>\n";
 m,>\s*([^<]+)(?: \(\d+[^)<]*\)</font>)?(?:<br><small>Premium Member</small>)?</b></center>,; my $name=$1;
 if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+days?|),){
 	my $idle="$1 $2";
