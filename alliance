@@ -110,7 +110,7 @@ if($options{alliance}) {
 		$n++;
 	}
    print " ".a({-href=>"relations-bulk?user=".join("%0a",@membernames)."&alliance=$options{alliance}"},"edit relations for all members");
-	print sort_table([qw"links name home pl sl cl need pts(rank) arank log from joined intel ETC"],
+	print sort_table([qw"links name home pl sl cl", '<span title="number of planets needed">need</span>', qw"pts(rank) arank log from joined intel ETC"],
          \@displayfuncs,
          [undef, \&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_string,
            \&sort_num, \&sort_string, \&sort_num],

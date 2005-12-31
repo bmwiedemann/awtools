@@ -5,6 +5,7 @@ our $bmwlink=qq%<a href="http://$::bmwserver/cgi-bin%;
 sub manglefilter { 
    my $title="";
    my $module="";
+   my $alli="\U$ENV{REMOTE_USER}";
    if(m&<title>([^<]*)</title>&) {
       $title=$1;
       $module=title2pm($title);
@@ -30,7 +31,7 @@ sub manglefilter {
    s/pagead2.googlesyndication.com/localhost/g;
 
 # add disclaimer
-   s%</body>%</center>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again. $module $&%;
+   s%</body>%</center>disclaimer: this page was mangled by greenbird's code (in context of $alli alliance data). <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again. $module $&%;
 
    s%<br>\s*(<TABLE)%$1%;
 }

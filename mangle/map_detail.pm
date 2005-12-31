@@ -1,5 +1,7 @@
 $::options{url}=~/nr=(\d+)/;
 my $id=$1;
-s%(Planets at)%$1 $::bmwlink/system-info?id=$id">id=$id</a>%;
+my $link=qq($::bmwlink/system-info?id=$id">);
+s%(Planets at)%$1 ${link}id=$id</a>%;
+s%Map / Detail</b></td>%$&<td>${link}AWtools($id)</td><td>|</td>%;
 
 1;
