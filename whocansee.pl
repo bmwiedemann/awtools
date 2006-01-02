@@ -1,9 +1,11 @@
 #!/usr/bin/perl
-#BEGIN{ $ENV{REMOTE_USER}="idle"; }
+BEGIN {if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="idle"; }}
 
 use strict;
 use DBAccess;
-require "input.pm";
+use awstandard;
+use awinput;
+awinput_init();
 
 my $sysid = shift @ARGV;
 my @sysxy = systemid2coord($sysid);#(59,-12);

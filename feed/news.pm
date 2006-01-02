@@ -1,10 +1,8 @@
 my $debug=$::options{debug};
-print "news feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 my $name=$::options{name};
 
 if(0){
-#	require "input-mysql.pm";
 	local $_=$_;
 	my $dplayerid=playername2id($name);
 	if(!$dplayerid) {
@@ -25,7 +23,6 @@ if(0){
 		} else { print "not added".br}
 	}
 }
-require "input.pm";
 
 dbfleetaddinit(undef);
 

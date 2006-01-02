@@ -2,12 +2,14 @@
 use strict;
 use CGI ":standard";
 
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awmap;
+awstandard_init();
+
 if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
 my $title="tactical map [\U$ENV{REMOTE_USER}\E]";
 my %options;
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "standard.pm";
-require "awmap.pm";
 
 for my $p (qw'map') {
 	$options{$p}=param($p);

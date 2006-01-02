@@ -4,15 +4,17 @@ use strict;
 
 my @members=split("\n",
 qx'perl -e \'
-   require "input.pm";
-   foreach my $name (keys %::relation) {
+use awstandard;
+use awinput;
+awinput_init();
+   foreach my $name (keys %relation) {
       my @rel=getrelation($name);
       if($rel[0]==9) {
          push(@members,$name);
       }
    }
    foreach(@members){
-      my @sci=relation2science($::relation{"\L$_"});
+      my @sci=relation2science($relation{"\L$_"});
       if($sci[0]>100){shift(@sci)}
       my $bio=$sci[0];
       print "$_ $bio\n"

@@ -2,10 +2,11 @@
 
 use strict;
 use CGI ":standard";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
-require "sort_table.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+use sort_table;
+awinput_init();
 
 my $alli=$ENV{REMOTE_USER};
 my %options;

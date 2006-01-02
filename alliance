@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 use strict;
 use CGI qw":standard *table";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
-require "sort_table.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
+use sort_table;
 
 my %options;
 for my $p (qw'alliance sort omit') {
@@ -45,13 +46,13 @@ if($options{alliance}) {
    my @alliancepoints;
 
 # header
-   my $forumlink=$::alliances{$aid}{url}||"";
-   my $allitag=$::alliances{$aid}{tag}||"";
-   my $alliname=$::alliances{$aid}{name}||"";
+   my $forumlink=$alliances{$aid}{url}||"";
+   my $allitag=$alliances{$aid}{tag}||"";
+   my $alliname=$alliances{$aid}{name}||"";
    if($forumlink) {$forumlink=" URL:".a({-href=>$forumlink}, $forumlink)}
 	my $rellink=qq! <a href="relations?name=$alli"><img src="/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
    my @members=allianceid2members($aid);
-	print a({-href=>"http://$::server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n$alli members (".scalar @members.")";
+	print a({-href=>"http://$server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n$alli members (".scalar @members.")";
 
    my @members2;
    my @membernames;
@@ -61,7 +62,7 @@ if($options{alliance}) {
    my $totalcul=0;
    my $totalpl=0;
 	for my $pid (@members) {
-		my $p=$::player{$pid};
+		my $p=$player{$pid};
 		next if ! defined($p);
 		next if $$p{alliance} ne $aid;
 		my $name=playerid2name($pid);

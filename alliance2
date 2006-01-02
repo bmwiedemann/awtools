@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 use strict;
 use CGI qw":standard *table";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
 
 my %options;
 my $align="left";
@@ -26,4 +27,4 @@ if($options{alliance}) {
 	print start_form('get'), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
 	 submit(-name=>"query", -class=>'smbutton'),end_form
 }
-print end_html;
+print AWtail();

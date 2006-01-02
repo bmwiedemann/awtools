@@ -38,7 +38,7 @@ sub manglefilter {
 
 
 
-if($::options{url}!~m%/images/%) {
+if(!$::options{url} || $::options{url}!~m%/images/%) {
    manglefilter();
 }
 

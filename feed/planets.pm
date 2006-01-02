@@ -4,17 +4,15 @@ my $debug=$::options{debug};
 print "planets feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
-#my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
-require "input.pm";
 my $name=$::options{name};
 my $pid=playername2id($name);
 if(!$pid) {print "user $name not found<br>\n";return 1}
 print "user ".a({-href=>"relations?name=$name"},"$name($pid)").br;
 
 my %own=();
-foreach my $p (@{$::player{$pid}{planets}}) {
+foreach my $p (@{$player{$pid}{planets}}) {
 	my @p=split("#",$p);
-	#my $pp=$::planets{$p[0]}[$p[1]-1];
+	#my $pp=$planets{$p[0]}[$p[1]-1];
 	$own{$p}=1;
 }
 
@@ -48,7 +46,7 @@ for(;(@a=m!<tr[^>]*><td[^>]*><a [^>]*>([^<]+) (\d+)</a></td><td>(\d+)</td><td>(.
 	else {$data{$sid}=$entry}
 }
 
-if($nerrors==0 && abs($nplanets-@{$::player{$pid}{planets}})<4) {
+if($nerrors==0 && abs($nplanets-@{$player{$pid}{planets}})<4) {
  foreach $sid (keys %own) {
 	next unless($own{$sid});
 	$sid=~/(\d+)#/;

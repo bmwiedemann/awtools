@@ -3,7 +3,8 @@ if(1){
 if($debug) {print "debug mode - no modifications done<br>\n"}
 my $name=$::options{name};
 
-require "input.pm";
+#open(OUT, ">", "html/x/$ENV{REMOTE_USER}-incomings.html");
+#print OUT $_; close OUT;
 
 dbfleetaddinit(undef);
 

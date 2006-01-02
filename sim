@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "standard.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+awstandard_init();
 
 my $title="AW economic simulation";
 print AWheader($title);
@@ -46,5 +46,5 @@ if(@params && param("turns")<=9999) {
 	textfield(-name=>'activeturns', -value=>24, -size=>$s, -class=>'text'), " only login+build every n turns of 15 minutes (default 24=6h)", br,
 	submit(-class=>'smbutton'), end_form, 
 }
-print end_html;
+print AWtail();
 

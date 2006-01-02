@@ -2,13 +2,13 @@
 use strict;
 use CGI ":standard";
 #$ENV{REMOTE_USER}="af";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
 #open ENEMY, "> html/enemies.$ENV{REMOTE_USER}.html" or die $!;
 my @enemy;
 
-my $dummy=$::relation{greenbird};
 my @rankings=();
 
 print AWheader("alliance ranking [\U$ENV{REMOTE_USER}\E]");
@@ -24,16 +24,16 @@ if($aid) {
 }
 
 my $prevname;
-foreach my $name(sort (keys %::relation, @members)) {
+foreach my $name(sort (keys %relation, @members)) {
 	if(defined($prevname) && ($prevname eq $name)) {next}
 	$prevname=$name;
 	my @rel=getrelation($name);
 	if(!defined($rel[0])) {next}
 	my $id=playername2id($name);
 	next unless $id;
-	my $points=$::player{$id}{points};
-#	printf("%.3i(%.4i) $name($id)\n",$points,$::player{$id}{rank});
-	my $p=$::player{$id};
+	my $points=$player{$id}{points};
+#	printf("%.3i(%.4i) $name($id)\n",$points,$player{$id}{rank});
+	my $p=$player{$id};
 #	if($rel[0]<=3) {
 		#my $aid=$$p{tag};
 		#my $atag=$aid && allianceid2tag($aid);

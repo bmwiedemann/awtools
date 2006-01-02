@@ -4,9 +4,10 @@ use CGI ":standard";
 
 my $title="manage planet info";
 my %options;
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
 
 print AWheader($title);
 for my $p (qw'id status who comment legend submit') {
@@ -16,7 +17,7 @@ if(param("legend")) {
         print "legend: "; 
         for my $n (1..7) {
                 my $color=getstatuscolor($n);
-                print span({-style=>'color: '.$color}, br."$n $color = $::planetstatusstring{$n}\n");
+                print span({-style=>'color: '.$color}, br."$n $color = $planetstatusstring{$n}\n");
         }
         print end_html;
         exit 0; 
@@ -66,7 +67,7 @@ if($options{id}) {
 
 	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getstatuscolor($options{status})},systemid2name($sid)."($id)")." ", systemlink($sid), br,
 		popup_menu(-name=>'status', -values=>[1..7], -default=>$options{status},
-		-labels=>\%::planetstatusstring), " status", br,
+		-labels=>\%planetstatusstring), " status", br,
 		textfield(-name=>'who', -value=>$options{who}, -class=>'text'), " user-id or user-name of the one who does the above $link", br,
 		textarea(-name=>'comment', -value=>"\n".$options{comment}, -rows=>9, -cols=>40, -class=>'text'), " ETA, fleet, etc...", br,
 		hidden(-name=>'id', $id),
@@ -76,4 +77,4 @@ if($options{id}) {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'id', -class=>'text'), " ID: system#planet".AWfocus("form.id"), br,
 	 submit(-name=>"query", -class=>'smbutton')
 }
-print end_form, end_html;
+print end_form, AWtail();

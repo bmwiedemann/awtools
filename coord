@@ -2,20 +2,20 @@
 
 use strict;
 use CGI ":standard";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awmap;
 
 my %options;
-chdir "/home/bernhard/code/cvs/perl/awcalc";
 for my $p (qw'x y xs ys scale') {
   $options{$p}=param($p);
 }
 if(defined($options{x}) && defined($options{y})) {
-	require "awmap.pm";
 	if(defined($options{xs})) {
 		$::mapxoff=$options{xs};
 		$::mapyoff=$options{ys};
 	}
 	if(!$options{scale}) {$options{scale}=1}
-	my($x,$y)=imgtomap($options{x}/$options{scale}, $options{y}/$options{scale});
+	my($x,$y)=awmap::imgtomap($options{x}/$options{scale}, $options{y}/$options{scale}, $::mapxoff, $::mapyoff);
 	my $target=$ENV{SCRIPT_NAME};
 	$target=~s/coord/system-info/;
 	print redirect("http://$ENV{HTTP_HOST}$target?mapx=$x&mapy=$y");

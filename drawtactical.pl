@@ -2,13 +2,18 @@
 #
 # draw AW map
 #
+BEGIN {if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="idle"; }}
+
 use GD;
 use strict;
+use awstandard;
+use awinput;
+use awmap;
+use awdraw;
+use mapcommon;
+awinput_init();
 
-if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
 our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff);
-require "awmap.pm";
-require "mapcommon.pm";
 our $imagesize=$mapsize*$pixelpersystem+1;
 our $ih=$imagesize/2;
 #my $file=shift(@ARGV) || die "need input\n";
@@ -22,8 +27,6 @@ my $c=25; # base color
 #system(qw"tar xjf",$file);
 #print "reading csv...\n";
 #our @files=qw(starmap);
-require "input.pm";
-require "awdraw.pm";
 
 # Create the main image
 #my $img = new GD::Image($imagesize, $imagesize);
@@ -31,16 +34,16 @@ require "awdraw.pm";
 print "Drawing...\n";
 
 sub drawaxis($) {my($img)=@_;
-	$img->line(0,$ih, $imagesize,$ih,$::axiscolor);
-	$img->line($ih,0, $ih,$imagesize,$::axiscolor);
+	$img->line(0,$ih, $imagesize,$ih,$mapcommon::axiscolor);
+	$img->line($ih,0, $ih,$imagesize,$mapcommon::axiscolor);
 }
-my $img=mapimage($mapxoff,$mapyoff, $mapxoff+$mapsize,$mapyoff+$mapsize, 1, \&drawaxis);
-writeimg($img, "$out.png");
+my $img=awdraw::mapimage($mapxoff,$mapyoff, $mapxoff+$mapsize,$mapyoff+$mapsize, 1, \&drawaxis);
+mapcommon::writeimg($img, "$out.png");
 exit 0;
 
 for(my $x=$mapxoff; $x-$mapxoff<$mapsize; $x++) {
   for(my $y=$mapyoff; $y-$mapyoff<$mapsize; $y++) {
-	my ($px,$py)=maptoimg($x,$y);
+	my ($px,$py)=awmap::maptoimg($x,$y);
 	my $pxe=$px+$pixelpersystem;
 	my $pye=$py+$pixelpersystem;
 	my $v; # value

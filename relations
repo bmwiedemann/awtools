@@ -4,11 +4,14 @@ use CGI ":standard";
 
 my $readonly=0;
 #if($ENV{REMOTE_USER} eq "is") {$ENV{REMOTE_USER}="fun"; $readonly=1;} # TODO: only for beta10
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+use arrival;
+awinput_init();
+
 my $title="manage relation [\U$ENV{REMOTE_USER}\E]";
 my %options;
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
 
 sub planetpopsort {return planet2pop($b)<=>planet2pop($a)}
 
@@ -62,7 +65,7 @@ if($options{name} && $options{name} ne "unknown") {
       my @rel;
       my @race=relation2race($options{comment});
       my @science=relation2science($options{comment});
-      if($id>2 && (my $p=$::player{$id})) {
+      if($id>2 && (my $p=$player{$id})) {
       my $sl=$$p{science};
       my ($eatt,$edef,$emath,$ephys,$epl)=(4,4,$sl,$sl,$$p{level});
       if($science[0]) { 
@@ -76,7 +79,7 @@ if($options{name} && $options{name} ne "unknown") {
       my $awuser=cookie('user');
       my $oid=playername2id($awuser);
       if($oid && $oid>2) {
-         $opl=$::player{$oid}{level};
+         $opl=$player{$oid}{level};
          @rel=getrelation($awuser);
          @race=relation2race($rel[2]);
          @science=relation2science($rel[2]);
@@ -100,7 +103,7 @@ if($options{name} && $options{name} ne "unknown") {
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
-		-labels=>\%::relationname), " relation", br,
+		-labels=>\%awstandard::relationname), " relation", br,
 	textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
 	 submit(-name=>"submit", -class=>"smbutton")." ".a({href=>"?"},"new query")." "
 	 #.submit(-name=>"submit", -value=>"delete")
@@ -109,7 +112,7 @@ if($options{name} && $options{name} ne "unknown") {
 	if($id>2) {
 		my @pl=playerid2planets($id);
 		my $planets=@pl;
-      my $pl=$::player{$id};
+      my $pl=$player{$id};
 		my $level=$$pl{level};
 		my $pop=0;
 		my @planets;
@@ -136,9 +139,9 @@ if($options{name} && $options{name} ne "unknown") {
 			my $n=0;
          my $sum=pop(@race);
 			foreach(@race) {
-				my $bonus=$::racebonus[$n]*100*$_;
+				my $bonus=$awstandard::racebonus[$n]*100*$_;
 				if($bonus>=0) {$bonus="+".$bonus}
-				print "$bonus% $::racestr[$n++] ($_)".br;
+				print "$bonus% $awstandard::racestr[$n++] ($_)".br;
 			}
          if($sum<=-9) {print "Banker".br;$sum+=9}
          if($sum<=-6) {print "Trader".br;$sum+=6}
@@ -167,9 +170,12 @@ if($options{name} && $options{name} ne "unknown") {
 			print ":<br />\n";
 			foreach(@sci) {
             if($_>200) {print "ETC: ".AWtime($_).br;next}
-				print "$::sciencestr[$n++] $_\n".br;
+				print "$awstandard::sciencestr[$n++] $_\n".br;
 			}
 		}
+      if(0) {
+         printf("xEnergy=%.2f ", arrival::effectiveenergy(1,2));
+      }
 		while($options{comment}=~/login:(\d+):(\d+)([^ ]*)(.*)/s) {
 			$options{comment}=$4;
          my($login,$time,$extra)=($1,$2,$3);

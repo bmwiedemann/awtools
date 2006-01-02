@@ -5,7 +5,6 @@ if($debug) {print "debug mode - no modifications done<br>\n"}
 
 #my $dbname2="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 #use DB_File;
-require "input.pm";
 if(!/<tr><td><center>([^<]*)<br>/) {return 1;}
 my $name=$1;
 my $pid=playername2id($name);
@@ -19,14 +18,14 @@ my $tradehtml=$1;
 #tie(%relation, "DB_File", $dbname2) or print "error accessing DB\n";
 
 my @science;
-foreach my $sci (@::sciencestr) {
+foreach my $sci (@awstandard::sciencestr) {
 	next if ! m,$sci</td><td>(\d+),;
 	push(@science,$1);
 }
 my @race;
 {
 	my $racere="";
-	foreach my $r (@::racestr) {
+	foreach my $r (@awstandard::racestr) {
 		$racere.=qr"<li>[+-]\d+% $r \(([+-]\d)\)</li>";
 	}
 	if(/$racere/) {@race=($1,$2,$3,$4,$5,$6,$7);}

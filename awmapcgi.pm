@@ -1,5 +1,8 @@
+package awmapcgi;
 use strict;
-require "input.pm";
+use awstandard;
+use awinput;
+use CGI ":standard";
 
 sub awmapcoordinput() {
 	my @pos=(0,0);

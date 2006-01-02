@@ -4,7 +4,7 @@ awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 allies=af tgd xr guest sw affeed gda love idle gods
-tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance{,2} system-info planet-info fleets feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners logout
+tools=index.html login arrival distsqr tactical{,-large,-live} relations relations-bulk alliance{,2} system-info planet-info fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners whocansee permanentranking logout
 #allies=
 #winterwolf arnaken manindamix tabouuu
 all: TA.candidate
@@ -39,9 +39,9 @@ updatemap2only:
 	done
 updaterank:
 	for a in $(allies) ; do \
-		REMOTE_USER=$$a perl rank.pl > html/ranking.$$a.html ; \
 		REMOTE_USER=$$a perl holes2.pl > holesdir/$$a ; \
 	done
+#		REMOTE_USER=$$a perl rank.pl > html/ranking.$$a.html ; \
 		#REMOTE_USER=$$a perl holes.pl > html/$$a-holes.html ; 
 
 updatespy:

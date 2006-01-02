@@ -5,14 +5,12 @@ my $debug=$::options{debug};
 print "science feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
-#my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
-require "input.pm";
 my $name="\L$::options{name}";
 print a({-href=>"relations?name=$name"}, $::options{name}).br();
 
 
 my @science;
-foreach my $sci (@::sciencestr) {
+foreach my $sci (@awstandard::sciencestr) {
 	if(m!$sci</a> </td><td>(\d+)</td><td><img src="/images/dot.gif" height="10" width="(\d+)"><img src="/images/leer.gif" height="10" width="(\d+)"!) {
 		my $sl=$1;#+($2/($2+$3));
       if($debug) {

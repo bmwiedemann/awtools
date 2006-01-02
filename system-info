@@ -4,12 +4,15 @@ use strict;
 use CGI ":standard";
 use Digest::MD5 "md5_hex";
 
-my %options;
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "standard.pm";
-require "cgicommon.pm";
-my $awuser=cookie('user');
-my $refsys=cookie('refsys');
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+#use awmap;
+awstandard_init();
+
+our %options;
+our $awuser=cookie('user');
+our $refsys=cookie('refsys');
 
 sub tlink(@) { my($a)=@_;
    if($options{export}) {
@@ -22,8 +25,8 @@ sub tlink(@) { my($a)=@_;
 sub spinfo($) { my($id)=@_; # short player info string
 	if($id==2) {return "unknown"}
 	if($id==0) {return "free planet"}
-	my $name=$::player{$id}{name};
-	my $aid=$::player{$id}{alliance};
+	my $name=$player{$id}{name};
+	my $aid=$player{$id}{alliance};
 	my @rel=getrelation($name);
 	my $color=getrelationcolor($rel[0]);
 	my $alliancestr="";
@@ -39,6 +42,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 sub mkhash($) { my($tag)=@_;
 	if($options{uniq} && $options{uniq}!~/\./) {$options{uniq}=".$options{uniq}."} else {$options{uniq}=""}
 	my $token="$tag$options{uniq}$options{expires}#$options{id}#sekretge1";
+#   print " md5($token) ";
 	return md5_hex($token);
 }
 sub auth_ok($) { my($auth)=@_;
@@ -56,19 +60,18 @@ sub tprint { unless($options{export}){print @_} }
 for my $p (qw'x y') {
   $options{$p}=param($p);
 }
-if(defined($options{x}) && defined($options{y})) {
-	require "awmap.pm";
-	my($x,$y)=imgtomap($options{x}, $options{y});
-	print redirect("http://$ENV{HTTP_HOST}$ENV{SCRIPT_NAME}?mapx=$x&mapy=$y");
-	exit(0);
-}
+#if(defined($options{x}) && defined($options{y})) {
+#	my($x,$y)=awmap::imgtomap($options{x}, $options{y});
+#	print redirect("http://$ENV{HTTP_HOST}$ENV{SCRIPT_NAME}?mapx=$x&mapy=$y");
+#	exit(0);
+#}
 print header;
 
 if(param("legend")) {
 	print AWheader2('legend of AW relations');
 	for my $n (1..9) {
 		my $color=getrelationcolor($n);
-		print span({-style=>'color: '.$color}, br."$n $color = $::relationname{$n}\n");
+		print span({-style=>'color: '.$color}, br."$n $color = $relationname{$n}\n");
 	}
 	print end_html;
 	exit 0;
@@ -98,12 +101,11 @@ if(param()) {
 		exit 0;
 	}
 	if(!auth_ok($options{auth})) {
-	#	print "incorrect auth\n";
+#		print "incorrect auth\n";
 	}
-	require "input.pm";
-	require "awmap.pm";
+   awinput_init();
 	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
-	elsif(defined($options{x})) { ($x,$y)=imgtomap($options{x}, $options{y}) }
+#	elsif(defined($options{x})) { ($x,$y)=awmap::imgtomap($options{x}, $options{y}) }
 	if(defined($x)) { $system=systemcoord2id($x,$y) }
 	if(!$system && $options{name}) { $system=systemname2id($options{name}) }
 	if(!$system && $options{id}) { $system=$options{id} }
@@ -133,7 +135,7 @@ if(param()) {
 		my $output="$bs$sysname($x,$y)$be${eol}Id=$system level=$syslevel ";
       my @nstarmaplink=("http://neron92.free.fr/AW_Tools/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
       my @lstarmaplink=("http://lefois.de/aw/tool/map.php?R_pid=&R_sysid=$system&lb=1&coord=1&details=1","lefoisstarmap");
-      my @mapdetailslink=("http://$::server/0/Map/Detail.php/?nr=$system","Map/Details");
+      my @mapdetailslink=("http://$server/0/Map/Detail.php/?nr=$system","Map/Details");
       if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
@@ -144,7 +146,7 @@ if(param()) {
 			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,$sysinfo,
 			"planets here: <ul>";
 		} else {
-			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$::bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
+			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
 		}
 		my ($refdist,$refp,$refid,$refe,$refs);
 		if($refsys) {
@@ -178,13 +180,13 @@ if(param()) {
 				my $rcolor=getrelationcolor($rel[0]);
 				my $atag=getatag($rel[1]);
 				if($options{export}) {
-               $pinfo=~s!$::magicstring([^:]*)!$::magicstring."[color=".getrelationcolor((getrelation($1))[0])."]".$1."[/color]"!geo;
-					$info=qq![color=$scolor]$::planetstatusstring{$status} [/color] [color=$rcolor]$atag $name [/color]: $pinfo!;
+               $pinfo=~s!$magicstring([^:]*)!$magicstring."[color=".getrelationcolor((getrelation($1))[0])."]".$1."[/color]"!geo;
+					$info=qq![color=$scolor]$planetstatusstring{$status} [/color] [color=$rcolor]$atag $name [/color]: $pinfo!;
 				} else {
                $pinfo=~s!\n!<br />!g;
-               $pinfo=~s/$::magicstring([^:]*)/$::magicstring.span({-style=>
+               $pinfo=~s/$magicstring([^:]*)/$magicstring.span({-style=>
                      "color: ".getrelationcolor((getrelation($1))[0])},$1)/geo;
-					$info=" ".span({-style=>"color: $scolor"},$::planetstatusstring{$status})." ".span({-style=>"color: $rcolor"},$atag." ".$name).": ".$pinfo;
+					$info=" ".span({-style=>"color: $scolor"},$planetstatusstring{$status})." ".span({-style=>"color: $rcolor"},$atag." ".$name).": ".$pinfo;
 				}
 			}
 			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" title="edit planet-info" alt="planet info"/></a> !;

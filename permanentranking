@@ -1,11 +1,10 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "standard.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+awstandard_init();
+
 print AWheader("permanent alliance ranking")."<pre>";
-
 system("cut -f2,7 alliances.csv|sort -r -k 2|grep -v 0\\\$");
-
 print "</pre>".AWtail();

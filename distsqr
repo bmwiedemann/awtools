@@ -2,10 +2,10 @@
 
 use strict;
 use CGI ":standard";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-#require "arrival.pm";
-require "standard.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
 
 my %options=qw;
 ;;
@@ -16,7 +16,7 @@ if(param()) {
  for my $p (qw'dx dy sx sy sid did') {
   $options{$p}=param($p);
  }
- require "input.pm";
+# require "input.pm";
  if($options{sid}) { ($options{sx},$options{sy})=systemid2coord($options{sid}); }
  if($options{did}) { ($options{dx},$options{dy})=systemid2coord($options{did}); }
  my $dx=$options{sx}-$options{dx};
@@ -33,3 +33,4 @@ if(param()) {
 }
 print end_html;
 
+awinput::awinput_finish();

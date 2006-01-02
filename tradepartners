@@ -1,12 +1,14 @@
 #!/usr/bin/perl -w
 
 use strict;
-use CGI qw":standard *table";
+use CGI qw":standard";
 my $title="trade partners [\U$ENV{REMOTE_USER}\E]";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
-require "sort_table.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
+use sort_table;
+
 print AWheader($title);
 
 my %options;

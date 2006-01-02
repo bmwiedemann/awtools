@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w 
 use CGI ":standard";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "standard.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+awstandard_init();
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
@@ -37,4 +37,4 @@ p,
  a({href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",
  a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
  a({href=>"http://astrostats.reseaulocal.fr/"}, "Astrostats"), " ",
- end_html;
+ AWtail;

@@ -2,12 +2,18 @@
 #
 # draw AW map
 #
+BEGIN {if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="idle"; }}
 use GD;
 use strict;
+use awstandard;
+use awinput;
+use awmap;
+use mapcommon;
 
-if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="af"; }
+awinput_init();
+
 our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff, $mapxend, $mapyend);
-require "awmap.pm";
+
 my $suf=".png";
 my $scale=2;
 my $extra=30;
@@ -24,15 +30,13 @@ if($ENV{REMOTE_USER} eq "af") {$mapxoff=-100}
 my $out="large-$ENV{REMOTE_USER}/star";
 my $c=25; # base color
 
-require "input.pm";
-require "mapcommon.pm";
 
 # Create the main image
 my $im = new GD::Image($pixelpersystem, $pixelpersystem);
 print "Drawing...\n";
-mapcoloralloc($im);
-my ($gc1,$gc2)=($::lightgridcolor, $::darkgridcolor); # grid color
-($gc1,$gc2)=($::lightgridcolor, $::darkgridcolor); # avoid warning
+mapcommon::mapcoloralloc($im);
+my ($gc1,$gc2)=($mapcommon::lightgridcolor, $mapcommon::darkgridcolor); # grid color
+($gc1,$gc2)=($mapcommon::lightgridcolor, $mapcommon::darkgridcolor); # avoid warning
 
 sub drawgrid { my($c1,$c2,$im)=@_;
 	$im->rectangle(0,0, $pixelpersystem,$scale-1, $c1);
@@ -40,13 +44,13 @@ sub drawgrid { my($c1,$c2,$im)=@_;
 }
 
 drawgrid($gc2,$gc2,$im);
-writeimg($im, "$out-none0$suf");
+mapcommon::writeimg($im, "$out-none0$suf");
 drawgrid($gc1,$gc2,$im);
-writeimg($im, "$out-none1$suf");
+mapcommon::writeimg($im, "$out-none1$suf");
 drawgrid($gc2,$gc1,$im);
-writeimg($im, "$out-none2$suf");
+mapcommon::writeimg($im, "$out-none2$suf");
 drawgrid($gc1,$gc1,$im);
-writeimg($im, "$out-none3$suf");
+mapcommon::writeimg($im, "$out-none3$suf");
 
 sub gridtest($$) { my($x,$y)=@_; my($c1,$c2)=($gc2,$gc2);
 #$y++; #FIXME: workaround for strange bug
@@ -79,7 +83,7 @@ for(my $x=$mapxoff; $x<$mapxend; $x++) {
 	#	print "$x,$y $px,$py\n";
 
 		my $img=new GD::Image($pixelpersystem, $pixelpersystem);
-		mapcoloralloc($img);
+      mapcommon::mapcoloralloc($img);
 
 		# grid
 		drawgrid(gridtest($x,$y),$img);
@@ -101,18 +105,18 @@ for(my $x=$mapxoff; $x<$mapxend; $x++) {
 			} else {$statuscolor=undef}
 			for my $j (0..$scale-1) {
 				my $py3=$py2+$j;
-				$img->line($px2,$py3, $px3,$py3, $::colorindex{$color});
+				$img->line($px2,$py3, $px3,$py3, $mapcommon::colorindex{$color});
 				my $px5=$pxe+$scale-int($pixelpersystem/2);
 				if($statuscolor) {
-					$img->line($px5,$py3, $px3,$py3, $::colorindex{$statuscolor});
+					$img->line($px5,$py3, $px3,$py3, $mapcommon::colorindex{$statuscolor});
 				}
 				if(planet2siege($planet)) {
 					my $px4=$pxe-3*$scale;
-					$img->rectangle($px4,$py3, $px3,$py3+$scale-1, $::colorindex{red});
+					$img->rectangle($px4,$py3, $px3,$py3+$scale-1, $mapcommon::colorindex{red});
 				}
 			}
 		}
-		writeimg($img, "$out$x,$y$suf");
+      mapcommon::writeimg($img, "$out$x,$y$suf");
 	}
 }}
 

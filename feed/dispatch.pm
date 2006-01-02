@@ -1,4 +1,10 @@
+BEGIN {alarm 20;}
+use awinput;
+
+my $debug=1;
+
 sub feed_dispatch($) { local $_=$_[0];
+   awinput_init();
 	if(! m!<title>([^<>]*)</title>!) { 
 		my @race;
 		if($::options{name}) { require './feed/plain_race.pm' }
@@ -34,10 +40,16 @@ sub feed_dispatch($) { local $_=$_[0];
    my $include="feed/$module.pm";
    print "$module feed".br;
    if(-e $include) {
+      if($debug) {
+         open(DEBUG, ">>", "/tmp/awfeeddebug") or die $!;
+         print DEBUG localtime()." name=$::options{name} tz=$::options{tz} $include\n";
+         close(DEBUG);
+      }
       require $include;
    } else {
 		print "this input (title=$title) is not supported (yet) or not recognized\n";
    }
+   awinput::awinput_finish();
 	return 0;
 }
 

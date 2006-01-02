@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+use strict;
 
 my $debug=$::options{debug};
 print "map_detail\n<br>";
@@ -6,18 +6,16 @@ if($debug) {print "debug mode - no modifications done<br>\n"}
 
 use MLDBM qw(DB_File Storable);
 use Fcntl;
-use strict;
 #our (%alliances,%starmap,%player,%playerid,%planets);
-require "input.pm";
 #tie %player, "MLDBM", "newdb/player.mldbm", O_RDWR|O_CREAT, 0666;
-untie %::planets;
-tie %::planets, "MLDBM", "db/planets.mldbm", O_RDWR|O_CREAT, 0666 or print "can not write DB: $!";
+untie %planets;
+tie %planets, "MLDBM", "db/planets.mldbm", O_RDWR|O_CREAT, 0666 or print "can not write DB: $!";
 
 exit 1 if(!m!Planets at <b>([^<]*)</b> \((-?\d+)/(-?\d+)\)!);
 my ($sysname,$x,$y)=($1,$2,$3);
 my $sid=systemcoord2id($x,$y); #systemname2id($sysname);
 if ($::options{url}=~m/\?nr=(\d+)/) {$sid=$1}
-my $system=$::planets{$sid};
+my $system=$planets{$sid};
 exit 1 if ! $system;
 my @system=@$system;
 print qq!update on <a href="system-info?id=$sid">$sysname</a> ($x,$y)<br>\n!;
@@ -43,7 +41,7 @@ for(;(@a=m!<tr bgcolor=".(\d{6})"[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+
 	$$p{sb}=$sb;
 }
 if(!$debug) {
-	$::planets{$sid}=\@system;
+	$planets{$sid}=\@system;
 }
 
 1;

@@ -3,13 +3,13 @@
 use strict;
 use CGI ":standard";
 my $title="yesterday's battles";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
 print AWheader($title);
 
-my %bat=%::battles;
-%bat=%::battles;
+our %bat=%battles;
 sub sortfunc { return 
    -(($bat{$a}{cv_att}+$bat{$a}{cv_def}<=>$bat{$b}{cv_att}+$bat{$b}{cv_def}) || 
      ($bat{$a}{time}<=>$bat{$b}{time}));

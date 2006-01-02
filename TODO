@@ -1,11 +1,12 @@
+fleet tracker (remove old ones on feeding)
+incoming-intercept + defence tool
 fix player/planets index after feeding (e.g. with mysql)
 muffin Feed+Mangle (Upload+Download) filter
-trade tool listing players with $TAs<n  and A$+PP>15k
+#trade tool listing players with $TAs<n  and A$+PP>15k
 include battles.csv 7-day history in alliancerelation-detector
 #better idle-time tracking (start-end)
 anon export for relations
 fleets (and others) with local times instead of GMT. not for BB-export
-fleet tracker
 correlate strongest fleet to best guarded
 merge strongest fleets history to catch moving fleets or see growth/loss
 #RSA thread link - auto from referer. e.g. use $::planetinfo{"$sid#0"}

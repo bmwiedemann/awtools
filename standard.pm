@@ -75,7 +75,10 @@ sub mon2id($) {my($m)=@_;
 
 sub parseawdate($) {my($d)=@_;
         return undef if($d!~/(\d\d):(\d\d):(\d\d)\s-\s(\w{3})\s(\d+)/);
-        return timegm($3,$2,$1,$5, mon2id($4), (gmtime())[5]);
+        my ($curmon,$year)=(gmtime())[4,5];
+        my $mon=mon2id($4);
+        if($mon<$curmon-6){$year++}
+        return timegm($3,$2,$1,$5, $mon, $year);
 }
 
 sub getrelationcolor($) { my($rel)=@_;

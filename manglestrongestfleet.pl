@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 use strict;
-$ENV{REMOTE_USER}="guest";
-require "input.pm";
+BEGIN {$ENV{REMOTE_USER}="guest";}
+use awstandard;
+use awinput;
+awinput_init();
 
 my $sname="strongestfleet";
 my $fleetfile=shift();
@@ -33,7 +35,7 @@ for(;(@a=m!<tr[^>]*><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>
 	my $plid=playername2id($name);
 	if(!$plid) { next }
 	my $atag="";
-	my $aid=$::player{$plid}{alliance};
+	my $aid=$player{$plid}{alliance};
 	if($aid) {$atag=allianceid2tag($aid);}
 	#print "aid $aid $atag $plid\n";
 	#my @rel=getrelation($name);

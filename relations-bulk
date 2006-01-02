@@ -3,10 +3,10 @@ use strict;
 use CGI ":standard";
 use DB_File;
 
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
-
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
 
 my $title="add relation";
 my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
@@ -24,7 +24,7 @@ if(defined($options{relation})) {
 	$options{user}=~s/[\r\n\t ]+/ /g;
 	my $i=0;
 	foreach my $user(split(" ", $options{user})) {
-		$i++; print "user $i: $user\n<br>";
+		$i++; print "user $i: ".a({-href=>"relations?name=$user"},$user).br;
 		if($user=~m/^\s*$/) {next}
 #		if($user !~ /^[-_. a-z0-9\[\]]*$/) { print 'illegal character in user name'; exit(0);}
 		$options{relation}+=0;
@@ -46,7 +46,7 @@ if(1) {
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{relation},
 		-labels=>\%::relationname), " relation", br,
-	textarea('comment', $options{comment}), " who added him, why, contact etc...", br,
+	textarea('comment', $options{comment}), " who added him, why, contact etc... (will be prepended)", br,
 	submit(-name=>"submit all - really sure?", -class=>'smbutton')
 } 
 else {
@@ -54,5 +54,4 @@ else {
 	 submit("query")
 }
 print end_form, end_html;
-#foreach(keys %ENV) {  print "$_ $ENV{$_}<br>";}
 

@@ -1,19 +1,24 @@
-# this file defines functions to output a sorted table.
+package sort_table;
+use strict;
+require 5.002;
 
-sub display_pid($) { 
-   playerid2link($_[0]);
-}
-sub display_sid($) { my($sid)=@_;
-   my ($x,$y)=systemid2coord($sid);
-   a({-href=>"system-info?id=$sid"},"$sid($x,$y)");
-}
+require Exporter;
+our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+$VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
+@ISA = qw(Exporter);
+@EXPORT = qw(
+&display_string &sort_num &sort_string &sort_table &sort_param_to_keys
+);
+use awstandard;
+use CGI qw":standard";
+
+# this file defines functions to output a sorted table.
 
 sub display_string($) { $_[0]; }
 
 
 sub sort_num($$) {$_[0]<=>$_[1]}
 sub sort_string($$) {$_[0] cmp $_[1]}
-sub sort_pid($$) {lc(playerid2name($_[0])) cmp lc(playerid2name($_[1]))}
 
 
 sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
@@ -56,12 +61,12 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
             return 0;
          }
          @$data) {
-      $outstr.="<tr class=".((++$line&1)?"odd":"even").">";
+      $outstr.="<tr class=\"".((++$line&1)?"odd":"even")."\">";
       my $n=0;
       foreach my $element (@$row) {
          my $df=$$displayfunc[$n++];
          next if not defined $df;
-         $outstr.=td(&$df($element));
+         $outstr.=td({-class=>"sort"},&$df($element));
       }
       $outstr.="</tr>\n";
    }

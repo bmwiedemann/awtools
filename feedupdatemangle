@@ -4,22 +4,18 @@ use CGI ":standard";
 
 #print "Content-Type: text/html\n\n";
 
-alarm 10;
-
-if($ENV{REMOTE_USER} eq "affeed") {$ENV{REMOTE_USER}="af"}
-
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "input.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awinput_init();
 
 our %options;
-my $title="AW feed update";
+my $title="mangling AW feed update";
 my $debug=0;
 foreach my $p (qw(tz html file debug name url)) {
 	$options{$p}=param($p);
 }
 if(param()) {
-	chdir("/home/bernhard/code/cvs/perl/awcalc");
 	my $html=$options{html};
 	if(upload('file')) {
 #print "uploaded file $options{file}\n".br;
@@ -57,4 +53,4 @@ print AWheader($title);
 	submit(-name=>'add data', -class=>'smbutton'), reset(-class=>'smbutton'), end_form, 
    end_html;
 }
-
+awinput::awinput_finish();

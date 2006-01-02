@@ -1,6 +1,5 @@
 use strict;
 #my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
-require "input.pm";
 #my %relation;
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}

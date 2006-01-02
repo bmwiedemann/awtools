@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-chdir "/home/bernhard/code/cvs/perl/awcalc";
-require "standard.pm";
-require "cgicommon.pm";
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+awstandard_init();
 
 sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 

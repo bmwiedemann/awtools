@@ -1,7 +1,4 @@
 use strict;
-require "input.pm";
-#my $dbname="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
-my %relation;
 my %timevalue=(""=>1, second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -37,7 +34,7 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
         m,Culturelevel</td><td>(\d+),; my $cl=$1;
 	#my $science="";
 	my @science;
-	foreach my $sci (@::sciencestr) {
+	foreach my $sci (@awstandard::sciencestr) {
 		next if ! m,$sci</td><td>([+-]?\d+),; #$sci{$sci}=$1;
 		#my $val=$1;
 		push(@science,$1);
@@ -48,7 +45,7 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 	my @race;
 	{
 		my $racere="";
-		foreach my $r (@::racestr) {
+		foreach my $r (@awstandard::racestr) {
 			$racere.=qr"<li>[+-]\d+% $r \(([+-]\d)\)</li>";
 		}
 		if(/$racere/) {@race=($1,$2,$3,$4,$5,$6,$7);print "race: @race<br>\n"}

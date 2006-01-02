@@ -2,7 +2,9 @@
 
 use strict;
 use CGI ":standard";
-require "input.pm";
+use awstandard;
+use awinput;
+awinput_init();
 
 sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 

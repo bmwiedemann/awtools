@@ -2,6 +2,8 @@
 
 use strict;
 use Getopt::Long;
+#BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use arrival;
 
 my %options=qw;
 racespeed 0
@@ -13,10 +15,7 @@ own 0
 
 my @options=qw"racespeed|r=i energy|e=i planet|p=i distance|d=i own|o";
 GetOptions(\%options, @options);
-my $path=".";
-require "$path/arrival.pm";
-
-my $time=traveltime(\%options);
+my $time=arrival::traveltime(\%options);
 
 my $h=int($time);
 my $m=int(($time-$h)*60);
