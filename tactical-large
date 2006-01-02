@@ -58,7 +58,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 			} else {
 				$f="?x=$mx&amp;y=$my";
             if($options{fast}) {
-               $f="/awperl/tactical-large?x=$mx&amp;y=$my";
+               $f="/awperl/tactical-large-tile?x=$mx&amp;y=$my";
                #$f="http://aw.lsmod.de:2349/tactical-large.pl?x=$mx&y=$my";
             }
 				$link=qq!<a href="system-info?mapx=$mx&amp;mapy=$my">!;}

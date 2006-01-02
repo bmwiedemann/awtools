@@ -10,6 +10,7 @@ my ($size,$modified)=(stat($f))[7,9];
 open(F,"<", $f) or die $!;
 undef($/);
 my $image=<F>;
+close(F);
 
 my $r = shift;
    $r->content_type('image/png');
