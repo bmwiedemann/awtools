@@ -1,6 +1,7 @@
 use strict;
+use awstandard;
 
-our $bmwlink=qq%<a href="http://$::bmwserver/cgi-bin%;
+$::bmwlink=qq%<a href="http://$bmwserver/cgi-bin%;
 
 sub manglefilter { 
    my $title="";
@@ -18,7 +19,7 @@ sub manglefilter {
       $module=qq'<p style="color:gray">$module</p>';
 
 # add main AWTool link
-      s%Fleet</a></td>%$&<td>|</td><td><a href="http://$::bmwserver/cgi-bin/index.html">AWTools</a></td>%;
+      s%Fleet</a></td>%$&<td>|</td><td><a href="$::bmwlink/index.html">AWTools</a></td>%;
 
 # colorize player links
       require "./mangle/color.pm";
@@ -28,7 +29,7 @@ sub manglefilter {
 # remove ads
    s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
 # disable ad
-   s/pagead2.googlesyndication.com/localhost/g;
+   s/(pagead2.googlesyndication.com)|(games.advertbox.com)|(oz.valueclick.com)|(optimize.doubleclick.net)/localhost/g;
 
 # add disclaimer
    s%</body>%</center>disclaimer: this page was mangled by greenbird's code (in context of $alli alliance data). <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again. $module $&%;
