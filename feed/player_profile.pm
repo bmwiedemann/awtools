@@ -20,7 +20,7 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 	#if($deliverytime<(-24*60+50)*60) {$deliverytime+=24*60*60}
 	if($::deliverytime<-60 || $::deliverytime>50*60) {
 		print "version outdated or wrong timezone? (delivery $::deliverytime seconds)";
-		exit(0);
+		goto end;
 	}
 	my $lastonline=time()-$idlei-$::deliverytime;
 	my $inaccuracy=$timevalue{$timestr}+1;
@@ -61,4 +61,6 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 #	else {print "<br>new:",$newentry;}
 }
 
+
+end:
 1;

@@ -2,7 +2,6 @@
 
 if(0) {
 my $debug=$::options{debug};
-print "planets feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 my $name=$::options{name};

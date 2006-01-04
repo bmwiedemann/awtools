@@ -14,7 +14,7 @@ sub manglefilter {
       $module=title2pm($title);
       my $include="mangle/$module.pm";
       if(-e $include) {
-         require $include;
+         do $include;
          $module="mangling applied: $module"; # for the log
       }
       else {$module="no special mangling for: $module"}
@@ -24,7 +24,7 @@ sub manglefilter {
       s%Fleet</a></td>%$&<td>|</td><td><a href="$::bmwlink/index.html">AWTools</a></td>%;
 
 # colorize player links
-      require "./mangle/color.pm";
+      require "mangle/color.pm"; mangle_player_color();
 
    }
 

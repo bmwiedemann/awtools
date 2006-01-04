@@ -1,21 +1,21 @@
 package feed::dispatch;
+# package assumes awinput_init has already run
 use awstandard;
 use awinput;
 use CGI ":standard";
 
-my $debug=1;
+my $debug=0;
 
 sub feed_dispatch($%) { (local $_, my $options)=@_;
    %::options=%$options;
-   awinput_init();
 	if(! m!<title>([^<>]*)</title>!) { 
 		my @race;
-		if($::options{name}) { require './feed/plain_race.pm' }
+		if($::options{name}) { require './feed/plain_race.pm'; feed_plain_race(); }
 		print "no title found\n"; return -1;
 	}
 	my $title=$1;
 	my $aw="Astro Wars";
-   if($title=~/- profile - $aw/) { require './feed/profile.pm'; return 0}
+   if($title=~/- profile - $aw/) { require './feed/profile.pm'; feed_profile(); return 0}
 	return unless @::time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
 	$title=shift(@::time);
    $module=title2pm($title);
@@ -48,11 +48,10 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
          print DEBUG localtime()." name=$::options{name} tz=$::options{tz} $include\n";
          close(DEBUG);
       }
-      require $include;
+      do $include;
    } else {
 		print "this input (title=$title) is not supported (yet) or not recognized\n";
    }
-   awinput::awinput_finish();
 	return 0;
 }
 

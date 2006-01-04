@@ -1,4 +1,5 @@
 use strict;
+our %planets; # imported from awinput
 
 my $debug=$::options{debug};
 print "map_detail\n<br>";
@@ -11,12 +12,15 @@ use Fcntl;
 untie %planets;
 tie %planets, "MLDBM", "db/planets.mldbm", O_RDWR|O_CREAT, 0666 or print "can not write DB: $!";
 
-exit 1 if(!m!Planets at <b>([^<]*)</b> \((-?\d+)/(-?\d+)\)!);
+filter();
+
+sub filter() {
+return if(!m!Planets at <b>([^<]*)</b> \((-?\d+)/(-?\d+)\)!);
 my ($sysname,$x,$y)=($1,$2,$3);
 my $sid=systemcoord2id($x,$y); #systemname2id($sysname);
 if ($::options{url}=~m/\?nr=(\d+)/) {$sid=$1}
 my $system=$planets{$sid};
-exit 1 if ! $system;
+return if ! $system;
 my @system=@$system;
 print qq!update on <a href="system-info?id=$sid">$sysname</a> ($x,$y)<br>\n!;
 m/Population.*?Starbase.*?Owner(.*)/s;
@@ -42,6 +46,7 @@ for(;(@a=m!<tr bgcolor=".(\d{6})"[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+
 }
 if(!$debug) {
 	$planets{$sid}=\@system;
+}
 }
 
 1;

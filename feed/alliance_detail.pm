@@ -60,7 +60,7 @@ dbplayeriradd($name2, \@science,\@race,undef,\@trade,\@prod);
 #else {$relation{$name2}=$newentry}
 #untie %relation;
 
-if($ironly){exit 0}
+if(!$ironly){
 
 dbfleetaddinit($pid);
 my @a;
@@ -103,4 +103,5 @@ parseincomings($_);
 dbfleetaddfinish();
 
 print "<br>done\n";
+}
 1;

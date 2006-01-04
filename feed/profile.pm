@@ -1,3 +1,4 @@
+sub feed_profile() {
 print "profile feed\n";
 
 m/<html><head><title>(\S*)/;
@@ -12,6 +13,7 @@ if(m!>Points: (\d+)</td>!) {
    
    print "Points: $points\n";
    $pointsdb{$name}=$points;
+}
 }
 
 1;

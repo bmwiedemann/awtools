@@ -1,5 +1,4 @@
 my $debug=$::options{debug};
-print "fleet feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 my $name=$::options{name};

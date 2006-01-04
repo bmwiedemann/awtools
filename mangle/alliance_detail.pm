@@ -13,6 +13,6 @@ if($::options{url}=~/id=(\d+)/) {
    s%<br><table border=0%<br>$prevstring <a href="$url$nextid">next</a>$&%;
 }
 
-require "mangle/special_color_incomings.pm";
+require "mangle/special_color_incomings.pm"; mangle_incoming();
 
 1;

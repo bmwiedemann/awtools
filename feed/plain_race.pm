@@ -1,5 +1,6 @@
 use strict;
 
+sub feed_plain_race() {
 if(1 && $::options{name}=~m/greenbird/i) {
    if(m/^\s*(\w*)\s/s) { $::options{name}=$1 }
    else {return 1}
@@ -23,8 +24,8 @@ if(@science=/$sciencere/) {
 	print "science: @science<br>\n";
 }
 if(@race || @science) {
-	if(!playername2id($name)) {print "player $name not found<br>\n"; exit 0;}
-	dbplayeriradd($name, \@science, \@race);
-	exit 0;
+	if(!playername2id($name)) {print "player $name not found<br>\n"}
+   else { dbplayeriradd($name, \@science, \@race); }
+}
 }
 1;

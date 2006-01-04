@@ -6,6 +6,7 @@ if($ENV{REMOTE_USER} eq "affeed") {$ENV{REMOTE_USER}="af"}
 
 BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
 use awstandard;
+use awinput;
 use feed::dispatch;
 awstandard_init();
 
@@ -35,6 +36,7 @@ if(param()) {
 		}
 	}
 #require 'feed/dispatch.pm';
+   awinput_init();
    feed::dispatch::feed_dispatch($html, \%::options);
 } else {
 	my $uc=cookie('user');
@@ -47,5 +49,5 @@ if(param()) {
 #	checkbox('debug'), br,
 	submit(-name=>'add data', -class=>'smbutton'), reset(-class=>'smbutton'), end_form, 
 }
-print end_html;
+print AWtail;
 
