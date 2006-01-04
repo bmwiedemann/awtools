@@ -24,7 +24,7 @@ if(!defined($sysxy[0])) {
 open(IN, "whocansee.pl $sysid |") or die $!;
 my @data=<IN>;
 close(IN);
-foreach(@data) {$_=[split(" ",$_)]}
+foreach(@data) {$_=[split(/ /,$_)]}
 
 print header().AWheader3("Who can see $sysid [\U$alli]", 
       "Who can see system ".a({-href=>"system-info?id=$sysid"},$sysid)." [\U$alli]");

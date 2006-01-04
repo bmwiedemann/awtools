@@ -29,7 +29,7 @@ foreach(@$allplayers) {
    next if(!$rel[2]);
    my @sci=relation2science($rel[2]);
    if($sci[0]>100){shift(@sci)}
-   my $bio=$sci[0];
+   my $bio=$sci[0]||0;
    next if(abs($ex-$sysxy[0])*2>$bio);
    next if(abs($ey-$sysxy[1])*2>$bio);
 #   next if($rel[0]<9);
