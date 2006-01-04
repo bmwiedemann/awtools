@@ -15,7 +15,9 @@ sub manglefilter {
       my $include="mangle/$module.pm";
       if(-e $include) {
          do $include;
-         $module="mangling applied: $module"; # for the log
+         if($@) {$module="error in $module: $@";}
+         else { $module="mangling applied: $module"; # for the log
+         }
       }
       else {$module="no special mangling for: $module"}
       $module=qq'<p style="color:gray">$module</p>';
