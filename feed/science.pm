@@ -2,7 +2,6 @@
 use strict;
 
 my $debug=$::options{debug};
-print "science feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 my $name="\L$::options{name}";
@@ -29,7 +28,7 @@ if(my @a=m!Culture</a>.*INPUT type="text" value="(\d+):(\d+):(\d+)" size="8" nam
 if(@science<9 && m!href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a> <b>([+-]\d+)%!) {
    my ($culperh,$culbonus)=($1,1+$2/100);
 #print "cul: $culperh,$culbonus<br>";
-   if(m!Culture.*/images/leer.gif" height="10" width="\d+"></td><td>(\d+)<!) {
+   if($culperh && m!Culture.*/images/leer.gif" height="10" width="\d+"></td><td>(\d+)<!) {
       my $culleft=$1;
       my $etc=time()-$::deliverytime+$culleft*3600/($culperh*$culbonus);
       print $culleft*3600/($culperh*$culbonus).br();

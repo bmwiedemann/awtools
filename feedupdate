@@ -6,11 +6,13 @@ if($ENV{REMOTE_USER} eq "affeed") {$ENV{REMOTE_USER}="af"}
 
 BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
 use awstandard;
+use feed::dispatch;
 awstandard_init();
 
 my $title="AW feed update";
 my $debug=0;
 print AWheader($title);
+%::options=();
 foreach my $p (qw(tz html file debug name url)) {
 	$::options{$p}=param($p);
 }
@@ -32,8 +34,8 @@ if(param()) {
 			print DEBUG $entry,"\n";
 		}
 	}
-	require 'feed/dispatch.pm';
-	feed_dispatch($html);
+#require 'feed/dispatch.pm';
+   feed::dispatch::feed_dispatch($html, \%::options);
 } else {
 	my $uc=cookie('user');
 	if(!$::options{name}) {param("name",$uc)}

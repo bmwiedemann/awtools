@@ -1,9 +1,12 @@
-BEGIN {alarm 20;}
+package feed::dispatch;
+use awstandard;
 use awinput;
+use CGI ":standard";
 
 my $debug=1;
 
-sub feed_dispatch($) { local $_=$_[0];
+sub feed_dispatch($%) { (local $_, my $options)=@_;
+   %::options=%$options;
    awinput_init();
 	if(! m!<title>([^<>]*)</title>!) { 
 		my @race;
@@ -13,23 +16,23 @@ sub feed_dispatch($) { local $_=$_[0];
 	my $title=$1;
 	my $aw="Astro Wars";
    if($title=~/- profile - $aw/) { require './feed/profile.pm'; return 0}
-	return unless our @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
-	$title=shift(@time);
+	return unless @::time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
+	$title=shift(@::time);
    $module=title2pm($title);
-	our $deliverytime;
+#our $deliverytime;
 	{
 		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime();
 		$hour+=$::options{tz};
 		my $servertime=$hour*3600+$min*60+$sec;
 		my $localtime=$::time[0]*3600+$::time[1]*60+$::time[2];
-		$deliverytime=($servertime-$localtime);
-		if($deliverytime<(-24*60+50)*60) {$deliverytime+=24*60*60}
-		if($deliverytime>(24*60-50)*60) {$deliverytime-=24*60*60}
-      if(abs(bmwmod($deliverytime,3600))<30) {
-         my $adjust=bmwround($deliverytime/3600);
+		$::deliverytime=($servertime-$localtime);
+		if($::deliverytime<(-24*60+50)*60) {$::deliverytime+=24*60*60}
+		if($::deliverytime>(24*60-50)*60) {$::deliverytime-=24*60*60}
+      if(abs(bmwmod($::deliverytime,3600))<30) {
+         my $adjust=bmwround($::deliverytime/3600);
          $::options{tz}-=$adjust;
-         $deliverytime-=$adjust*3600;
-         print "timezone adjusted to $::options{tz}, delivery $deliverytime s\n".br;
+         $::deliverytime-=$adjust*3600;
+         print "timezone adjusted to $::options{tz}, delivery $::deliverytime s\n".br;
       }
       if($::deliverytime<-60 || $::deliverytime>50*60) {
          print "data is outdated or wrong timezone? (delivery took $::deliverytime seconds)";

@@ -1,5 +1,6 @@
-exit 0; # dont use atm
+#exit 0; # dont use atm
 
+if(0) {
 my $debug=$::options{debug};
 print "planets feed\n<br>";
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -59,6 +60,7 @@ if($nerrors==0 && abs($nplanets-@{$player{$pid}{planets}})<4) {
 	if($debug) {print "new: ".$entry.br;}
 	else {$data{$sid}=$entry} # seemed to be buggy -> test
  }
+}
 }
 
 1;

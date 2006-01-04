@@ -1,5 +1,7 @@
+package mangle::dispatch;
 use strict;
 use awstandard;
+use awinput;
 
 $::bmwlink=qq%<a href="http://$bmwserver/cgi-bin%;
 
@@ -29,18 +31,20 @@ sub manglefilter {
 # remove ads
    s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
 # disable ad
-   s/(pagead2.googlesyndication.com)|(games.advertbox.com)|(oz.valueclick.com)|(optimize.doubleclick.net)/localhost/g;
+   s/(?:pagead2\.googlesyndication\.com)|(?:games\.advertbox\.com)|(?:oz\.valueclick\.com)|(?:optimize\.doubleclick\.net)/localhost/g;
 
 # add disclaimer
-   s%</body>%</center>disclaimer: this page was mangled by greenbird's code (in context of $alli alliance data). <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again. $module $&%;
+   if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
+   s%</body>%</center>disclaimer: this page was mangled by greenbird's code (for $::options{name} in context of $alli alliance data). <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again. $module $&%;
 
    s%<br>\s*(<TABLE)%$1%;
 }
 
-
-
-if(!$::options{url} || $::options{url}!~m%/images/%) {
-   manglefilter();
+sub mangle_dispatch(%) { my($options)=@_;
+   %::options=%$options;
+   if(!$::options{url} || $::options{url}!~m%/images/%) {
+      manglefilter();
+   }
 }
 
 1;
