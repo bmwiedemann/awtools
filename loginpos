@@ -15,18 +15,16 @@ $agent->env_proxy();
   $agent->get($uri1);
 #    $agent->form(1) if $agent->forms and scalar @{$agent->forms};
   $_=$agent->content;
-  /The newest registered user is <b><a href="([^"]*)"/;
-  $_=$1;
-  s/&amp;/&/;
-  $agent->get($uri1.$_);
-  #$agent->follow(qr((?-xism:sianodel)));
-  $agent->follow(qr((?-xism:Public)));
+  /The newest registered user is <b><a href="[^"]*u=(\d+)([^"]*)"/;
+  my $pid=$1;
+  $agent->get("http://www1.astrowars.com/about/playerprofile.php?id=$pid");
+#  $agent->follow(qr((?-xism:Public)));
   $_=$agent->content;
   m!<html><head><title>([^ ]*)!;
   my $name=$1;
   m!<a href ="/about/starmap.php\?dx=([+-]?\d+)&dy=([+-]?\d+)"!;
   my ($x,$y)=($1,$2);
   my $time = gmtime();
-  print "$time $name\n",
+  print "$time $pid $name\n",
       "($x,$y)\n";
 
