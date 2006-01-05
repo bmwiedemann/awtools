@@ -23,7 +23,7 @@ sub manglefilter {
       $module=qq'<p style="color:gray">$module</p>';
 
 # add main AWTool link
-      s%Fleet</a></td>%$&<td>|</td><td><a href="$::bmwlink/index.html">AWTools</a></td>%;
+      s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a></td>%;
 
 # colorize player links
       require "mangle/color.pm"; mangle_player_color();
