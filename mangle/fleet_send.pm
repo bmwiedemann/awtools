@@ -2,6 +2,9 @@ use strict;
 use CGI;
 use awstandard;
 
+my $align=' align="right" style="padding:0px; color:#4978ff"';
+my $delim=": &nbsp;";
+
 if($::options{post}) {
    my $cgi=new CGI($::options{post});
 # add echo of fleet
@@ -22,7 +25,9 @@ if($::options{post}) {
    my $tz;
    if(m/<title>(.*)/) {
       $tz=awstandard::guesstimezone($1);
-      $extrainfo.="Your timezone: UTC+$tz s<br>";
+      my $tzh=sprintf("%i",$tz/3600);
+      if($tz>=0) {$tzh="+$tzh"}
+      $extrainfo.="<tr><td$align>Your timezone$delim</td><td> UTC$tzh </td></tr>";
    }
    my $extrainfo2="";
    if(m/Calculated arrival time: ([^<]*)/) {
@@ -33,20 +38,21 @@ if($::options{post}) {
          $altime-=$tz;
          $suf="UTC";
          my $t=$altime-$time;
-         $flighttime=sprintf("Flight time: %is = %.2fh = %i:%.2i:%.2i<br>", $t, $t/3600, $t/3600, $t/60%60, $t%60);
+         $flighttime=sprintf("<tr><td$align>Flight time$delim</td><td> %is = %.2fh = %i:%.2i:%.2i</td></tr>", $t, $t/3600, $t/3600, $t/60%60, $t%60);
       }
-      $extrainfo2.="Arrival time: ".AWisodatetime($altime)." $suf <br>$flighttime";
+      $extrainfo2.="<tr><td$align>Arrival time$delim</td><td> ".AWisodatetime($altime)." $suf </td></tr>$flighttime";
    }
 # add echo of destination
    my $destsid=$cgi->param("destination");
    my $destpid=$cgi->param("planet");
    my $srcsid=$cgi->param("nr");
    my $srcpid=$cgi->param("id");
-   my $destname=systemid2name($destsid)||"";
-   my $srcname=systemid2name($srcsid)||"";
+   my $destname=display_sid2($destsid);
+   my $srcname=display_sid2($srcsid);
    $time=AWisodatetime($time);
    
-   s/<b>Calculated/Fleet: $fleet<br>From: $srcsid#$srcpid = $srcname #$srcpid<br>To: $destsid#$destpid = $destname #$destpid<br>${extrainfo}Launch time: $time UTC<br>$extrainfo2$&/;
+# add everything only here to the output HTML:
+   s%<b>Calculated%<table><tr><td$align>Fleet$delim</td><td> $fleet</td></tr><tr><td$align>From$delim</td><td> $srcsid#$srcpid = $srcname #$srcpid</td></tr><tr><td$align>To$delim</td><td> $destsid#$destpid = $destname #$destpid</td></tr>${extrainfo}<tr><td$align>Launch time$delim</td><td> $time UTC</td></tr>$extrainfo2</table>$&%;
 
 # add submit to send
    my $form="<form method=\"post\">";
@@ -54,8 +60,8 @@ if($::options{post}) {
       next if $p eq "calc";
       $form.="\n<input type=\"hidden\" name=\"$p\" value=\"".($cgi->param($p)).'">';
    }
-   $form.="<input type=\"submit\" value=\"Launch !!!\" class=smbutton></form>";
-   s%</small>% $& or click $form%;
+   $form.="<label for=\"launch\"> Or click <input type=\"submit\" id=\"launch\" value=\"Launch !!!\" class=smbutton></label></form>";
+   s%</small>% $& $form%;
 #   $_.="post: ".$::options{post};
 }
 
