@@ -76,7 +76,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	$links)."\n". h1($title2)."\n";
 }
 sub AWheader2($;$) { my($title,$extra)=@_; AWheader3($title, $title, $extra);}
-sub AWheader($;$) { my($title,$extra)=@_; header().AWheader2($title,$extra);}
+sub AWheader($;$) { my($title,$extra)=@_; header(-connection=>"Keep-Alive", -keep_alive=>"timeout=15, max=99").AWheader2($title,$extra);}
 sub AWtail() {
    eval "awinput::awinput_finish()";
 	my $t = sprintf("%.3f",tv_interval($start_time));
@@ -301,5 +301,12 @@ sub title2pm($) { my($title)=@_;
    return lc($title);
 }
 
+sub urldecode { my($string) = @_;
+# convert all '+' to ' '
+   $string =~ s/\+/ /g;    
+# Convert %XX from hex numbers to ASCII 
+   $string =~ s/%([0-9a-fA-F][0-9a-fA-F])/pack("c",hex($1))/eg; 
+   return($string);
+}
 
 1;
