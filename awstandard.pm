@@ -97,12 +97,20 @@ sub mon2id($) {my($m)=@_;
         }
 }
 
+# input: AW style time string
+# output: UNIX timestamp
 sub parseawdate($) {my($d)=@_;
-        return undef if($d!~/(\d\d):(\d\d):(\d\d)\s-\s(\w{3})\s(\d+)/);
+        my @val;
+        if(my @v=($d=~/(\d\d):(\d\d):(\d\d)\s-\s(\w{3})\s(\d+)/)) {
+           @val=@v;
+        } elsif(@v=($d=~/(\w{3})\s(\d+)\s-\s(\d\d):(\d\d):(\d\d)/)) {
+           @val=@v[2,3,4,0,1];
+        } else { return undef }
+#if($d!~/(\d\d):(\d\d):(\d\d)\s-\s(\w{3})\s(\d+)/);
         my ($curmon,$year)=(gmtime())[4,5];
-        my $mon=mon2id($4);
+        my $mon=mon2id($val[3]);
         if($mon<$curmon-6){$year++}
-        return timegm($3,$2,$1,$5, $mon, $year);
+        return timegm($val[2],$val[1],$val[0],$val[4], $mon, $year);
 }
 
 sub getrelationcolor($) { my($rel)=@_;
@@ -255,12 +263,25 @@ sub gmdate($) {
 	my @a=gmtime($_[0]); $a[5]+=1900;
 	return "$month[$a[4]] $a[3] $a[5]";
 }
+
+# input AW title string
+# output timezone shift relative to UTC in seconds (e.g. CET=3600)
+sub guesstimezone($) {my($title)=@_;
+   my $utc=time();
+   return undef unless $title=~m/(\d\d):(\d\d):(\d\d)/;
+   my $localt=$1*3600+$2*60+$3;
+   my $diff=$localt-($utc%86400);
+   return ($diff+86400/2)%86400-86400/2;
+}
+
 sub AWtime($) { my($t)=@_;
    my $diff = $t-time();
    my $tz=$timezone;
    if($tz>=0){$tz="+$tz"}
    return sprintf("%.1fh %s = ",abs($diff)/3600,($diff>0?"from now":"ago")). scalar gmtime($t)." GMT = ".scalar gmtime($t+3600*$timezone)." GMT$tz";
 }
+# input: UNIX timestamp
+# input: ISO format date string (like 2005-12-31)
 sub AWisodatetime($) { my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($_[0]);
    sprintf("%i-%.2i-%.2i %.2i:%.2i:%.2i", $year+1900, $mon+1, $mday, $hour, $min, $sec);
 }
