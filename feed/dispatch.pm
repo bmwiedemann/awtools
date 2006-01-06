@@ -16,19 +16,18 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
 	my $title=$1;
 	my $aw="Astro Wars";
    if($title=~/- profile - $aw/) { require './feed/profile.pm'; feed_profile(); return 0}
-	return unless @::time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
-	$title=shift(@::time);
+   my @time;
+	return unless @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
+	$title=shift(@time);
    $module=title2pm($title);
 #our $deliverytime;
 	{
-		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime();
-		$hour+=$::options{tz};
-		my $servertime=$hour*3600+$min*60+$sec;
-		my $localtime=$::time[0]*3600+$::time[1]*60+$::time[2];
-		$::deliverytime=($servertime-$localtime);
+      my $gtz=awstandard::guesstimezone(join(":",@time));
+      print "guessed timezone: UTC+$gtz s".br;
+		$::deliverytime=$::options{tz}*3600 - $gtz;
 		if($::deliverytime<(-24*60+50)*60) {$::deliverytime+=24*60*60}
 		if($::deliverytime>(24*60-50)*60) {$::deliverytime-=24*60*60}
-      if(abs(bmwmod($::deliverytime,3600))<30) {
+      if(abs(bmwmod($::deliverytime,3600))<50) {
          my $adjust=bmwround($::deliverytime/3600);
          $::options{tz}-=$adjust;
          $::deliverytime-=$adjust*3600;
