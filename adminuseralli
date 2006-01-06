@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use strict;
+use CGI ":standard";
+use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
+use Digest::MD5 "md5_hex";
+
+BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+use awstandard;
+use awinput;
+awstandard_init();
+
+print AWheader("admin");
+
+my %options;
+my %db;
+for my $p (qw'pw user alli') {
+   $options{$p}=lc(param($p));
+}
+if($options{user} && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3daac7e9') {
+   awinput::opendb(O_RDWR|O_CREAT, "/home/aw/db2/useralli.dbm", \%db);
+   if($options{alli}) {
+#      my $x=awstandard::urldecode($options{user});
+      $db{$options{user}}=$options{alli};
+      print "added $options{user}=$options{alli}";
+   } else {
+      delete $db{$options{user}};
+      print "deleted $options{user}";
+   } 
+} 
+
+# form
+print start_form(-method=>'get', -name=>"form"), 
+      textfield(-name=>'user', -class=>'text'), " user name", br.AWfocus("form.user"),
+      textfield(-name=>'alli', -class=>'text'), " allli",
+      password_field(-name=>'pw', -class=>'text'), " pw",
+      submit(-class=>'smbutton'),
+      end_form;
+
+print AWtail();
