@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 $style=cookie('style');
 
@@ -21,6 +21,7 @@ if(!defined($stylep) && $stylec) {param("style",$stylec);$stylep=$stylec}
 if(!defined($tz) && $tzc) {param("tz",$tzc);$tz=$tzc}
 if(!defined($tz)) {param("tz",2)}
 if(defined($u)) {
+   $ref||="";
    my @cookies;
 	push(@cookies, cookie(-name=>'user', -value=>$u, -expires=>'+90d'));
 	push(@cookies, cookie(-name=>'refsys', -value=>$ref, -expires=>'+90d'));
@@ -33,6 +34,7 @@ print start_form(-method=>'get', -name=>"form"), textfield(-name=>'user', -class
 textfield(-name=>'ref', -class=>'text'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
 popup_menu(-name=>'style', -values=>[qw(green blue aw plain)]), " color theme for AWtools", br,
 popup_menu(-name=>'tz', -values=>[-11..12]), " timezone for AWtools", br,
-submit(-name=>"submit", -class=>'smbutton'), end_form, "",
+submit(-name=>"submit", -class=>'smbutton'), end_form, br,
+   "This tool sets cookies which are stored in your browser and used by some of my other tools.",
 end_html;
 
