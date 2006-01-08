@@ -2,6 +2,7 @@ package mangle::dispatch;
 use strict;
 use awstandard;
 use awinput;
+use DBAccess;
 
 $::bmwlink="<a href=\"http://$bmwserver/cgi-bin";
 
@@ -11,6 +12,11 @@ sub manglefilter {
    my $title="";
    my $module="";
    my $alli="\U$ENV{REMOTE_USER}";
+   
+   if($gameuri && $::options{name} && $::options{url}=~m%^http://www1.astrowars.com/register/login.php% #&& (my $session=${$::options{headers}}{Cookie})) { # reset click counter now
+      ) {
+         $dbh->do("DELETE FROM `usersession` WHERE name = ".$dbh->quote($::options{name}));
+   }
    if($gameuri && m&<title>([^<]*)</title>&) {
       $title=$1;
       $module=title2pm($title);
@@ -25,21 +31,22 @@ sub manglefilter {
       $module=qq'<p style="color:gray">$module</p>';
 
 # add main AWTool link
-      if($ingameuri && (my $session=${$::options{headers}}{Cookie})) {
+      if(1 && $ingameuri && (my $session=${$::options{headers}}{Cookie})) {
          $session=~s/^.*PHPSESSID=([^; ]*).*/$1/;
-         my $bsid=pack("H*",$session);
-         #$bsid =~ s/([0-9a-fA-F][0-9a-fA-F])/pack("c",hex($1))/eg;
-         my %sessions;
-         tie %sessions,'Tie::DBI',$DBAccess::dbh, 'usersession', 'sessionid',{CLOBBER=>1};
-         my $s=$sessions{$bsid};
-         if(!$s) {
-            $s={"sessionid"=>$bsid, "name"=>$::options{name}, "nclick"=>0, "firstclick"=>time()};
+         my $nclicks="";
+         if(1) {
+            my %sessions;
+            tie %sessions,'Tie::DBI',$dbh, 'usersession', 'sessionid',{CLOBBER=>1};
+            my $s=$sessions{$session};
+            if(!$s) {
+               $s={"sessionid"=>$session, "name"=>$::options{name}, "nclick"=>0, "firstclick"=>time()};
+            }
+            $nclicks=$$s{nclick}+1;
+            $$s{nclick}=$nclicks;
+            $$s{lastclick}=time();
+            $sessions{$session}=$s;
+            if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          }
-         my $nclicks=$$s{nclick}+1;
-         $$s{nclick}=$nclicks;
-         $$s{lastclick}=time();
-         $sessions{$bsid}=$s;
-         if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a> $nclicks</td>%;
 #         $::bmwlink/authaw?session=$session">AWTools...
       }
