@@ -27,7 +27,7 @@ use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use awstandard;
 my $head="Content-type: text/plain\015\012";
 
-sub awinput_init() {
+sub awinput_init(;$) { my($nolock)=@_;
    awstandard_init();
    chdir "/home/aw/db";
    tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666 or die $!;
@@ -42,8 +42,13 @@ sub awinput_init() {
       $dbnamep="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 #     if($ENV{REMOTE_USER} ne "guest") {
       alarm($alarmtime); # make sure locks are free'd
-      tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
-      tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
+      if($nolock) {
+         tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
+         tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY, 0, $DB_HASH);
+      } else {
+         tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
+         tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
+      }
    }
 }
 

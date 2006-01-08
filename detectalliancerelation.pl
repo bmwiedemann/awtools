@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 # this code is Copyright Bernhard M. Wiedemann and licensed under GNU GPL
 use strict;
-require "input.pm";
+use awinput;
+awinput_init(1);
 
 if(scalar keys %::alliances<10) {exit 0}
 my %relation;

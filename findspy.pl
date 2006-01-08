@@ -2,11 +2,11 @@
 use strict;
 #$ENV{REMOTE_USER}="af";
 
-my @members=split("\n",
-qx'perl -e \'
+my @members;
+use DBAccess;
 use awstandard;
 use awinput;
-awinput_init();
+awinput_init(1);
    foreach my $name (keys %relation) {
       my @rel=getrelation($name);
       if($rel[0]==9) {
@@ -17,11 +17,11 @@ awinput_init();
       my @sci=relation2science($relation{"\L$_"});
       if($sci[0]>100){shift(@sci)}
       my $bio=$sci[0];
-      print "$_ $bio\n"
-   };\'
-');
-#print "@members \n";exit 0;
-require "input-mysql.pm";
+      $_.=" $bio\n"
+   }
+
+#print @members,"\n";exit 0;
+#require "input-mysql.pm";
 my @coords=();
 my %bio;
 my @memberids;

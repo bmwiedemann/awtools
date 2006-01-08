@@ -11,7 +11,7 @@ use awinput;
 use awmap;
 use awdraw;
 use mapcommon;
-awinput_init();
+awinput_init(1);
 
 our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff);
 our $imagesize=$mapsize*$pixelpersystem+1;

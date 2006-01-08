@@ -3,7 +3,7 @@ use strict;
 use CGI ":standard";
 use DBAccess;
 use awinput;
-awinput_init();
+awinput_init(1);
 
 sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 

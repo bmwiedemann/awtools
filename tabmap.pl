@@ -10,7 +10,7 @@ use awinput;
 use awmap;
 use mapcommon;
 
-awinput_init();
+awinput_init(1);
 
 our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff, $mapxend, $mapyend);
 
