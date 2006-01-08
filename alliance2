@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use CGI qw":standard *table";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awinput_init();
@@ -24,7 +24,7 @@ if($options{alliance}) {
    	print qq'<iframe width="95%" height="700" src="http://www1.astrowars.com/0/Alliance/Detail.php/?id=$n"></iframe><br />';
    }
 } else {
-	print start_form('get'), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
+	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'alliance', -class=>'text'), " alliance tag", AWfocus("form.alliance"), br,
 	 submit(-name=>"query", -class=>'smbutton'),end_form
 }
 print AWtail();
