@@ -8,13 +8,13 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%relation,%planetinfo,
    $dbnamer,$dbnamep);
 our $adprice=0.93;
-our $alarmtime=60;
+our $alarmtime=99;
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
 &awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &gettradepartners &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd
-&display_pid &display_sid &sort_pid
+&display_pid &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
 
@@ -45,6 +45,11 @@ sub awinput_init() {
       tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
       tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
    }
+}
+
+sub opendb($$%) {my($mode,$file,$db)=@_;
+   tie(%$db, "DB_File::Lock", $file, $mode, 0, $DB_HASH, ($mode==O_RDONLY)?'read':'write');
+#   or print $head,"\nerror accessing DB\n";
 }
 
 # release locks allocated in awinput_finish
@@ -175,7 +180,7 @@ sub allianceid2tag($) { my($id)=@_;
 	$alliances{$id}?$alliances{$id}{tag}:undef;
 }
 sub allianceid2members($) { my($id)=@_;
-        $alliances{$id}?@{$alliances{$id}{m}}:undef;
+        $alliances{$id}?@{$alliances{$id}{m}}||():undef;
 }
 sub alliancetag2id($) { my($tag)=@_;
         $alliances{"\L$tag"}	#?$::alliances{$id}{tag}:undef;
@@ -299,6 +304,13 @@ sub display_sid($) { my($sid)=@_;
    my ($x,$y)=systemid2coord($sid);
    a({-href=>"system-info?id=$sid"},"$sid($x,$y)");
 }
+sub display_sid2($) { my($sid)=@_;
+   my $name=systemid2name($sid);
+   return "" if ! $name;
+   my ($x,$y)=systemid2coord($sid);
+   return a({-href=>"http://$bmwserver/cgi-bin/system-info?id=$sid"},"$name ($x,$y)");
+}
+
 sub sort_pid($$) {lc(playerid2name($_[0])) cmp lc(playerid2name($_[1]))}
 
 1;
