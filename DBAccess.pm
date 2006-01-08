@@ -2,9 +2,10 @@ package DBAccess;
 use DBI;
 use Tie::DBI;
 use DBConf;
+require Exporter;
 use vars qw(@ISA @EXPORT);
 
-@ISA = ();
+@ISA = qw(Exporter);
 @EXPORT = qw($dbh);
 
 our $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
