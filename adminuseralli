@@ -4,7 +4,7 @@ use CGI ":standard";
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use Digest::MD5 "md5_hex";
 
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awstandard_init();
@@ -31,8 +31,8 @@ if($options{user} && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3
 # form
 print start_form(-method=>'get', -name=>"form"), 
       textfield(-name=>'user', -class=>'text'), " user name", br.AWfocus("form.user"),
-      textfield(-name=>'alli', -class=>'text'), " allli",
-      password_field(-name=>'pw', -class=>'text'), " pw",
+      textfield(-name=>'alli', -class=>'text'), " alli",br,
+      password_field(-name=>'pw', -class=>'text'), " pw",br,
       submit(-class=>'smbutton'),
       end_form;
 
