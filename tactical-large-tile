@@ -1,22 +1,31 @@
 #!/usr/bin/perl -w
 use strict;
+use warnings;
 use mod_perl;
 use constant MP2 => ($mod_perl::VERSION >= 1.99);
 use Apache::RequestRec ();
+#use Apache2::RequestIO ();
 chdir "/home/aw/db/large-$ENV{REMOTE_USER}";
 my ($x,$y)=$ENV{QUERY_STRING}=~m/x=([^=]*)&y=([^=]*)/;
 my $f="star$x,$y.png";
 my ($size,$modified)=(stat($f))[7,9];
-open(F,"<", $f) or die $!;
-undef($/);
-my $image=<F>;
-close(F);
 
 my $r = shift;
+if(!open(F,"<", $f)) {
+   $r->content_type('text/plain');
+   $r->print("error opening $f\n".$!);
+} else {
+   undef($/);
+   my $image=<F>;
+   close(F);
+
    $r->content_type('image/png');
    $r->set_content_length($size);
    $r->set_keepalive();
    $r->headers_out->set("max-age"=>3600);
+#   $r->headers_out->set("debug"=>1);
    $r->set_last_modified($modified);
    $r->print($image);
+}
 
+1;
