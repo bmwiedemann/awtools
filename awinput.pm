@@ -133,6 +133,7 @@ sub getplanet($$) { my($sid,$pid)=@_;
 }
 
 sub playerid2link($) { my($id)=@_;
+   if($id==0) {return "free planet"}
    my $name=playerid2name($id);
    my @rel=getrelation($name);
    my $col=getrelationcolor($rel[0]);
@@ -185,7 +186,7 @@ sub allianceid2tag($) { my($id)=@_;
 	$alliances{$id}?$alliances{$id}{tag}:undef;
 }
 sub allianceid2members($) { my($id)=@_;
-        $alliances{$id}?@{$alliances{$id}{m}}||():undef;
+        $alliances{$id}?@{$alliances{$id}{m}}:undef;
 }
 sub alliancetag2id($) { my($tag)=@_;
         $alliances{"\L$tag"}	#?$::alliances{$id}{tag}:undef;
@@ -251,6 +252,27 @@ sub gettradepartners($$) { my($maxta,$minad)=@_;
   return @result;
 }
 
+sub playername2alli($) {my ($user)=@_;
+   my %alliuser;
+   awinput::opendb(O_RDONLY, "/home/aw/db2/useralli.dbm", \%alliuser);
+   my $alli=$alliuser{lc $user};
+   untie(%alliuser);
+   if(!$alli) {
+      local $ENV{REMOTE_USER};
+#awinput_init();
+      tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666;
+      tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
+      tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
+      my $pid=playername2id($user);
+      if($pid && $pid>2) {
+         my $aid=playerid2alliance($pid);
+         $alli=lc(playerid2tag($pid));
+      }
+ 
+#     awinput::awinput_finish();
+   }
+   return $alli;
+}
 
 sub dbfleetaddinit($) { my($pid)=@_;
 	untie %planetinfo;
