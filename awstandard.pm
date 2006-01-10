@@ -57,8 +57,8 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
    my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"})];
    if($extra) {push(@$heads,$extra);}
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/common.css" />!);
-	$owncgi=~s!/cgi-bin/!!;
-	foreach my $item (qw(index.html login arrival tactical tactical-large tactical-live relations alliance system-info fleets feedupdate)) {
+	$owncgi=~s!/cgi-bin/(?:modperl/)?!!;
+	foreach my $item (qw(index.html preferences arrival tactical tactical-large tactical-live relations alliance system-info fleets feedupdate)) {
 		my %h=(href=>$item);
 		if($item eq $owncgi) {
 			$h{class}='headeractive';
@@ -123,6 +123,9 @@ sub getstatuscolor($) { my($s)=@_; if(!$s) {$s=1}
 }
 # http://www.iconbazaar.com/color_tables/lepihce.html
 
+sub planetstatus($) {my($status)=@_;
+   return "<span style=\"color:$statuscolor[$status]\">$planetstatusstring{$status}</span>";
+}
 sub planetlink($) {my ($id)=@_;
         my $escaped=$id;
         $escaped=~s/#/%23/;
@@ -191,6 +194,7 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 		$magic.=" login:".join(":",@l2) if $add;
 	}
 	chomp($rest);
+   $rest=~s/[\n\r][\n\r]+/\n/g;
 	return $rest."\n".$magic;
 }
 
