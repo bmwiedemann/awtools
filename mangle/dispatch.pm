@@ -1,5 +1,6 @@
 package mangle::dispatch;
 use strict;
+use Fcntl ':flock';
 use awstandard;
 use awinput;
 use DBAccess;
@@ -41,6 +42,8 @@ sub manglefilter { my($options)=@_;
          my $nclicks="";
          if($session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/) {
             my $time=time();
+            open(LOCKF, ">", "/tmp/wwwlocks/dbh");
+            flock(LOCKF,LOCK_EX);
             my $result=$dbh->do("UPDATE `usersession` SET `nclick` = `nclick` + 1 , `lastclick` = '$time' WHERE `sessionid` = '$session' LIMIT 1;");
             if($result ne "0E0") {
                my $ref=$dbh->selectall_arrayref("SELECT `nclick` FROM `usersession` WHERE `sessionid` = '$session';");
@@ -49,6 +52,7 @@ sub manglefilter { my($options)=@_;
               $nclicks=0;
               $dbh->do("INSERT INTO `usersession` VALUES ( '$session', '$$options{name}', '0', '$time', '$time');");
             }
+            flock(LOCKF,LOCK_UN);
             if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
             $info{clicks}=$nclicks;
          }
