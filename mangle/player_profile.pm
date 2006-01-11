@@ -12,9 +12,9 @@ if($rel[0]) {
       my $race=join(",",@race);
       my $science=join(",",@science[1..6]);
       my $etc=$science[8];
-      if($etc) {$etc="<tr><td bgcolor=\"#303030\">ETC</td><td>".AWisodatetime($etc)."</td></tr>";}
+      if($etc) {$etc=AWisodatetime($etc);$etc="<tr><td bgcolor=\"#303030\">ETC</td><td>$etc</td></tr>";}
       if(!m/Intelligence Report/) {
-         s%</table></td></tr></table>%$& \n</td><td><table border="0" cellspacing="1" bgcolor="#404040"><tr><td>\n<table border="0" cellpadding="2" bgcolor="#101010">\n<tr><td colspan="2" bgcolor="#202060"><b>Tools Intelligence Report</b></td></tr><tr><td bgcolor="#303030">age</td><td>$intel</td></tr><tr><td bgcolor="#303030">race</td><td>$race</td></tr><tr><td bgcolor="#303030">science</td><td>$science</td></tr></table></td></tr></table>%;
+         s%</table></td></tr></table>%$&<br> \n</td><td><table border="0" cellspacing="1" bgcolor="#404040"><tr><td>\n<table border="0" cellpadding="2" bgcolor="#101010">\n<tr><td colspan="2" bgcolor="#202060"><b>Tools Intelligence Report</b></td></tr><tr><td bgcolor="#303030">age</td><td>$intel</td></tr><tr><td bgcolor="#303030">race</td><td>$race</td></tr><tr><td bgcolor="#303030">science</td><td>$science</td></tr></table></td></tr></table><br>%;
       }
       if($etc){s%<tr><td bgcolor="#303030">Culturelevel</td><td>\d+</td></tr>%$& $etc%;}
    }
