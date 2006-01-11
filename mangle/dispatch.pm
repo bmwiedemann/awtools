@@ -6,7 +6,8 @@ use DBAccess;
 
 $::bmwlink="<a href=\"http://$bmwserver/cgi-bin";
 
-sub manglefilter { 
+sub manglefilter { my($options)=@_;
+   %::options=%$options;
    my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$::options{name});
    my $gameuri=defined($::options{url}) && $::options{url}=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $::options{url}=~m%^http://www1\.astrowars\.com/0/%;
@@ -75,9 +76,8 @@ sub manglefilter {
 }
 
 sub mangle_dispatch(%) { my($options)=@_;
-   %::options=%$options;
-   if(!$::options{url} || $::options{url}!~m%/images/%) {
-      manglefilter();
+   if(!$$options{url} || $$options{url}!~m%/images/%) {
+      manglefilter($options);
    }
 }
 
