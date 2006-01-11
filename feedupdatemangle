@@ -4,17 +4,17 @@ use CGI ":standard";
 
 #print "Content-Type: text/html\n\n";
 
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 use mangle::dispatch;
 use feed::dispatch;
 awinput_init();
 
-my %options;
+my %options=qw(proxy muffin);
 my $title="mangling AW feed update";
 my $debug=0;
-foreach my $p (qw(tz html file debug name url)) {
+foreach my $p (qw(tz html file debug name url cookie post)) {
 	$options{$p}=param($p);
 }
 if(param()) {
@@ -34,6 +34,7 @@ if(param()) {
 			print DEBUG $entry,"\n";
 		}
 	}
+   if($options{cookie}) { $options{headers}={Cookie=>$options{cookie}}; }
    $_=$html;
 #   require "./mangle/dispatch.pm";
    mangle::dispatch::mangle_dispatch(\%options);
