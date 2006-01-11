@@ -1,5 +1,5 @@
 # add system ID tool links
-s%(<tr align=center bgcolor=#\d+><td>)(\d+)(</td><td)%$1<a href="http://$::bmwserver/cgi-bin/system-info?id=$2">$2</a>$3%g;
+s%(<tr align=center bgcolor=#\d+><td>)(\d+)(</td><td)%$1$::bmwlink/system-info?id=$2">$2</a>$3%g;
 
 # add next and prev buttons
 if($::options{url}=~/id=(\d+)/) {
