@@ -8,18 +8,18 @@ $::bmwlink="<a href=\"http://$bmwserver/cgi-bin";
 
 sub manglefilter { my($options)=@_;
    %::options=%$options;
-   my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$::options{name});
-   my $gameuri=defined($::options{url}) && $::options{url}=~m%^http://www1\.astrowars\.com/%;
-   my $ingameuri=$gameuri && $::options{url}=~m%^http://www1\.astrowars\.com/0/%;
+   my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy});
+   my $gameuri=defined($$options{url}) && $$options{url}=~m%^http://www1\.astrowars\.com/%;
+   my $ingameuri=$gameuri && $$options{url}=~m%^http://www1\.astrowars\.com/0/%;
    my $title="";
    my $module="";
    my $alli="\U$ENV{REMOTE_USER}";
    
-   if($gameuri && $::options{name} && $::options{url}=~m%^http://www1.astrowars.com/register/login.php% && (my $session=${$::options{headers}}{Cookie})) { # reset click counter now
+   if($gameuri && $$options{name} && $$options{url}=~m%^http://www1.astrowars.com/register/login.php% && (my $session=${$$options{headers}}{Cookie})) { # reset click counter now
          $session=~s/^.*PHPSESSID=([^; ]*).*/$1/;
          $dbh->do("UPDATE `usersession` SET `nclick` = '0' WHERE `sessionid` = ".$dbh->quote($session));
    }
-   if($::options{url}=~m%^http://www\.astrowars\.com/about/battlecalculator%) {
+   if($$options{url}=~m%^http://www\.astrowars\.com/about/battlecalculator%) {
       s/(form action="" method=")post/$1get/;
    }
    if($gameuri && m&<title>([^<]*)</title>&) {
@@ -37,7 +37,7 @@ sub manglefilter { my($options)=@_;
       $info{page}=$module;
 
 # add main AWTool link
-      if(1 && $ingameuri && (my $session=${$::options{headers}}{Cookie})) {
+      if(1 && $ingameuri && (my $session=${$$options{headers}}{Cookie})) {
          my $nclicks="";
          if($session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/) {
             my $time=time();
@@ -47,7 +47,7 @@ sub manglefilter { my($options)=@_;
                $nclicks=$$ref[0][0];
             } else { #insert
               $nclicks=0;
-              $dbh->do("INSERT INTO `usersession` VALUES ( '$session', '$::options{name}', '0', '$time', '$time');");
+              $dbh->do("INSERT INTO `usersession` VALUES ( '$session', '$$options{name}', '0', '$time', '$time');");
             }
             if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
             $info{clicks}=$nclicks;
