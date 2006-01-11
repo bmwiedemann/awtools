@@ -5,10 +5,11 @@ use awstandard;
 use awinput;
 use DBAccess;
 
-$::bmwlink="<a href=\"http://$bmwserver/cgi-bin";
+my $origbmwlink="<a href=\"http://$bmwserver/cgi-bin";
 
 sub manglefilter { my($options)=@_;
    %::options=%$options;
+   $::bmwlink=$origbmwlink;
    my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy});
    my $gameuri=defined($$options{url}) && $$options{url}=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $$options{url}=~m%^http://www1\.astrowars\.com/0/%;
@@ -26,16 +27,6 @@ sub manglefilter { my($options)=@_;
    if($gameuri && m&<title>([^<]*)</title>&) {
       $title=$1;
       $module=title2pm($title);
-      my $include="mangle/$module.pm";
-      if(-e $include) {
-         do $include;
-         if($@) {$module="error in $module: $@";}
-         else { $module="filtered $module"; # for the log
-         }
-      }
-      else {$module="$module"}
-#      $module="($module)"; #qq'<span style="color:gray">($module)</span>';
-      $info{page}=$module;
 
 # add main AWTool link
       if(1 && $ingameuri && (my $session=${$$options{headers}}{Cookie})) {
@@ -55,10 +46,23 @@ sub manglefilter { my($options)=@_;
             flock(LOCKF,LOCK_UN);
             if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
             $info{clicks}=$nclicks;
+            $::bmwlink="$origbmwlink/authaw?session=$session&uri=/cgi-bin";
          }
-#s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a> $nclicks</td>%;
-         s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/authaw?session=$session">AWTools</a></td>%;
+         s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a></td>%;
+#         s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/authaw?session=$session">AWTools</a></td>%;
       }
+      
+      my $include="mangle/$module.pm";
+      if(-e $include) {
+         do $include;
+         if($@) {$module="error in $module: $@";}
+         else { $module="filtered $module"; # for the log
+         }
+      }
+      else {$module="$module"}
+#      $module="($module)"; #qq'<span style="color:gray">($module)</span>';
+      $info{page}=$module;
+
 
 # colorize player links
       require "mangle/special_color.pm"; mangle_player_color();
