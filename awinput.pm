@@ -27,6 +27,8 @@ use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use awstandard;
 my $head="Content-type: text/plain\015\012";
 
+my %allowedalli=("af"=>1, "tgd"=>1, "xr"=>1, "love"=>1, "kk"=>1, ""=>0);
+
 sub awinput_init(;$) { my($nolock)=@_;
    awstandard_init();
    chdir "/home/aw/db";
@@ -107,6 +109,7 @@ sub setrelation($%) { my($id,$options)=@_;
 	else {
 		$relation{$id}="$$options{status} $$options{atag} $$options{info}";
 	}
+	untie %relation;
 }
 
 sub playername2id($) { my($name)=@_;
@@ -259,7 +262,6 @@ sub playername2alli($) {my ($user)=@_;
    untie(%alliuser);
    if(!$alli) {
       local $ENV{REMOTE_USER};
-#awinput_init();
       tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666;
       tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
       tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
@@ -267,9 +269,8 @@ sub playername2alli($) {my ($user)=@_;
       if($pid && $pid>2) {
          my $aid=playerid2alliance($pid);
          $alli=lc(playerid2tag($pid));
+         if(!$allowedalli{$alli}) {$alli=""}
       }
- 
-#     awinput::awinput_finish();
    }
    return $alli;
 }
@@ -299,6 +300,7 @@ sub dbfleetaddfinish() {
 sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 	$name="\L$name";
 	untie %relation;
+	untie %planetinfo;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
 	my $oldentry=$relation{$name};
 	my $newentry=addplayerir($oldentry, $sci,$race,$newlogin,$trade,$prod);
@@ -308,6 +310,7 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 	}
 	untie %relation;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
+	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 
 sub dblinkadd { my($sid,$url)=@_;
