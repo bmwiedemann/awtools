@@ -1,6 +1,5 @@
 package mangle::dispatch;
 use strict;
-use Fcntl ':flock';
 use awstandard;
 use awinput;
 use DBAccess;
@@ -24,6 +23,9 @@ sub manglefilter { my($options)=@_;
    if($$options{url}=~m%^http://www\.astrowars\.com/about/battlecalculator%) {
       s/(form action="" method=")post/$1get/;
    }
+   if($gameuri && $$options{url}=~m%^http://www1\.astrowars\.com/rankings/alliances/(\w+)\.php%) { my $tag=$1;
+      s%^</td></tr></table>%$& $::bmwlink/alliance?alliance=$tag">AWtools($tag)</a><br>%m;
+   }
    if($gameuri && m&<title>([^<]*)</title>&) {
       $title=$1;
       $module=title2pm($title);
@@ -33,17 +35,14 @@ sub manglefilter { my($options)=@_;
          my $nclicks="";
          if($session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/) {
             my $time=time();
-            open(LOCKF, ">", "/tmp/wwwlocks/dbh");
-            flock(LOCKF,LOCK_EX);
             my $result=$dbh->do("UPDATE `usersession` SET `nclick` = `nclick` + 1 , `lastclick` = '$time' WHERE `sessionid` = '$session' LIMIT 1;");
-            if($result ne "0E0") {
+            if($result>0) {
                my $ref=$dbh->selectall_arrayref("SELECT `nclick` FROM `usersession` WHERE `sessionid` = '$session';");
                $nclicks=$$ref[0][0];
             } else { #insert
               $nclicks=0;
               $dbh->do("INSERT INTO `usersession` VALUES ( '$session', '$$options{name}', '0', '$time', '$time');");
             }
-            flock(LOCKF,LOCK_UN);
             if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
             $info{clicks}=$nclicks;
             $::bmwlink="$origbmwlink/authaw?session=$session&uri=/cgi-bin";
@@ -76,9 +75,18 @@ sub manglefilter { my($options)=@_;
 #   s%<br>\s*(<TABLE)%$1%; # remove some blanks
 
 # add footer + disclaimer
+   my $online="";
+   if($alli) {
+      my $reltime=time()-300;
+      my $who=$dbh->selectall_arrayref("SELECT usersession.name FROM `usersession`,`player`,`alliances` WHERE `lastclick` > $reltime  AND usersession.name != '$$options{name}' AND `aid` = `alliance` AND  usersession.name = player.name AND `tag` LIKE '$alli'");
+      foreach my $row (@$who) {
+         $online.=$$row[0]." ";
+      }
+      if($online){$online="allies online: $online<br>"}
+   }
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span style=\"color:gray\">$_=</span>$info{$_}"} sort keys %info));
-   my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$info</p>";
+   my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$online$info</p>";
    s%</body>%</center>$gbcontent $&%;
 
 }
