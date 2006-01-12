@@ -77,12 +77,14 @@ sub manglefilter { my($options)=@_;
 # add footer + disclaimer
    my $online="";
    if($alli) {
-      my $reltime=time()-300;
-      my $who=$dbh->selectall_arrayref("SELECT usersession.name FROM `usersession`,`player`,`alliances` WHERE `lastclick` > $reltime  AND usersession.name != '$$options{name}' AND `aid` = `alliance` AND  usersession.name = player.name AND `tag` LIKE '$alli'");
+      my $reltime=time()-360;
+      my $who=$dbh->selectall_arrayref("SELECT usersession.name FROM `usersession`,`player`,`alliances` WHERE `lastclick` > $reltime AND `aid` = `alliance` AND  usersession.name = player.name AND `tag` LIKE '$alli' AND usersession.name != '$$options{name}'");
       foreach my $row (@$who) {
          $online.=$$row[0]." ";
       }
-      if($online){$online="allies online: $online<br>"}
+      if($online){
+         $online="<span style=\"color:gray\">allies online:</span> $online<br>"
+      }
    }
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span style=\"color:gray\">$_=</span>$info{$_}"} sort keys %info));
