@@ -34,6 +34,7 @@ our @statuscolor=qw(black black blue cyan red green orange green);
 our $start_time;
 
 sub awstandard_init() {
+   chdir "/home/aw/db";
    $style=cookie('style');
    $timezone=cookie('tz');
    if(!defined($timezone)) {$timezone=1}
@@ -49,6 +50,12 @@ sub bmwround($) { my($number)=@_;
 sub bmwmod($$) { my($number,$mod)=@_; my $sign=($number <=> 0);
    my $off=50;
    return ((($number*$sign + $off)%$mod - $off) *$sign );
+}
+
+sub awdiag($) { my ($str)=@_;
+   open(LOG, ">>/tmp/aw.log");
+   print LOG (scalar localtime()." $str\n");
+   close(LOG);
 }
 
 sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
@@ -67,7 +74,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 		}
 		$links.="|&nbsp;".a(\%h,$item)." ";
 	}
-	if(!$style) {$style='green'}
+	if(!$style) {$style='blue'}
 	local $^W=0; #disable warnings for next line
 	start_html(-title=>$title, -style=>"/$style.css", 
 	# -head=>qq!<link rel="icon" href="/favicon.ico" type="image/ico" />!).
