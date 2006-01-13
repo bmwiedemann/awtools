@@ -17,7 +17,7 @@ sub manglefilter { my($options)=@_;
    my $alli="\U$ENV{REMOTE_USER}";
    
    if($gameuri && $$options{name} && $$options{url}=~m%^http://www1.astrowars.com/register/login.php% && (my $session=${$$options{headers}}{Cookie})) { # reset click counter now
-         $session=~s/^.*PHPSESSID=([^; ]*).*/$1/;
+         $session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/;
          $dbh->do("UPDATE `usersession` SET `nclick` = '0' WHERE `sessionid` = ".$dbh->quote($session));
    }
    if($$options{url}=~m%^http://www\.astrowars\.com/about/battlecalculator%) {
@@ -35,10 +35,12 @@ sub manglefilter { my($options)=@_;
          my $nclicks="";
          if($session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/) {
             my $time=time();
-            my $result=$dbh->do("UPDATE `usersession` SET `nclick` = `nclick` + 1 , `lastclick` = '$time' WHERE `sessionid` = '$session' LIMIT 1;");
+            my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = `nclick` + 1 , `lastclick` = ? WHERE `sessionid` = ? LIMIT 1;");
+            my $result=$sth->execute($time, $session);
             if($result>0) {
-               my $ref=$dbh->selectall_arrayref("SELECT `nclick` FROM `usersession` WHERE `sessionid` = '$session';");
-               $nclicks=$$ref[0][0];
+               my $sth2=$dbh->prepare_cached("SELECT `nclick` FROM `usersession` WHERE `sessionid` = ?");
+               my $aref=$dbh->selectall_arrayref($sth2, {}, $session);
+               $nclicks=$$aref[0][0];
             } else { #insert
               $nclicks=0;
               $dbh->do("INSERT INTO `usersession` VALUES ( '$session', '$$options{name}', '0', '$time', '$time');");
@@ -76,12 +78,25 @@ sub manglefilter { my($options)=@_;
 
 # add footer + disclaimer
    my $online="";
-   if($alli) {
-      my $reltime=time()-360;
-      my $who=$dbh->selectall_arrayref("SELECT usersession.name FROM `usersession`,`player`,`alliances` WHERE `lastclick` > $reltime AND `aid` = `alliance` AND  usersession.name = player.name AND `tag` LIKE '$alli' AND usersession.name != '$$options{name}'");
-      foreach my $row (@$who) {
-         $online.=$$row[0]." ";
+   if($alli && $$options{name}) {
+      my $now=time();
+      my $reltime=$now-60*25;
+      my $sth=$dbh->prepare_cached("SELECT usersession.name,`lastclick` 
+            FROM `usersession`,`player`,`alliances` 
+            WHERE `lastclick` > ? AND `aid` = `alliance` AND usersession.name = player.name AND `tag` LIKE ? AND usersession.name != ?
+            ORDER BY lastclick DESC;");
+      $sth->execute($reltime, $alli, $$options{name});
+      my @who2;
+      while ( my @row = $sth->fetchrow_array ) {
+#      foreach my $row (@$who) {
+         my ($name,$time)=@row;
+         my $diff=15-int(($now-$time)/60/2);
+         if($diff<4) {$diff=4}
+         my $c=sprintf("%x", $diff);
+#if($time<$now-60*6) {
+         push(@who2,"<span style=\"color:#$c$c$c\">$name</span>");
       }
+      $online=join(", ", @who2);
       if($online){
          $online="<span style=\"color:gray\">allies online:</span> $online<br>"
       }
