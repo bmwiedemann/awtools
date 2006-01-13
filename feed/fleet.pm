@@ -7,7 +7,7 @@ if(!$pid) {print "user $name not found<br>\n";return 1}
 print a({href=>"relations?name=$name"},"user $name($pid)").br;
 
 
-dbfleetaddinit($pid);
+dbfleetaddinit($pid, 1);
 my @a;
 for(;(@a=m!<tr[^>]*><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small>([^<]*)\s(\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
 	my ($system,$planetid)=@a[1..2];

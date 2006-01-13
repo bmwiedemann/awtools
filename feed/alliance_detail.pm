@@ -62,7 +62,7 @@ dbplayeriradd($name2, \@science,\@race,undef,\@trade,\@prod);
 
 if(!$ironly){
 
-dbfleetaddinit($pid);
+dbfleetaddinit($pid, 3);
 my @a;
 # defending fleet
 for(;(@a=m!<tr([^>]*)><td[^>]*>(\d+)</td><td>(\d+)</td>(?:<td>(?:\d+)</td>){6}<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {

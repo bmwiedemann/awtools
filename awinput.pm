@@ -27,11 +27,11 @@ use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use awstandard;
 my $head="Content-type: text/plain\015\012";
 
-my %allowedalli=("af"=>1, "tgd"=>1, "xr"=>1, "love"=>1, "kk"=>1, ""=>0);
+my %allowedalli=("af"=>1, "tgd"=>1, "xr"=>1, "love"=>1, "kk"=>1, "wink"=>1, ""=>0);
 
 sub awinput_init(;$) { my($nolock)=@_;
    awstandard_init();
-   chdir "/home/aw/db";
+#chdir "/home/aw/db"; # done by awstandard_init
    tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666 or die $!;
    tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
    tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
@@ -110,6 +110,7 @@ sub setrelation($%) { my($id,$options)=@_;
 		$relation{$id}="$$options{status} $$options{atag} $$options{info}";
 	}
 	untie %relation;
+	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or die $!;
 }
 
 sub playername2id($) { my($name)=@_;
@@ -189,7 +190,10 @@ sub allianceid2tag($) { my($id)=@_;
 	$alliances{$id}?$alliances{$id}{tag}:undef;
 }
 sub allianceid2members($) { my($id)=@_;
-        $alliances{$id}?@{$alliances{$id}{m}}:undef;
+        ($alliances{$id} && $alliances{$id}{m})?@{$alliances{$id}{m}}:undef;
+}
+sub allianceid2membersr($) { my($id)=@_;
+        $alliances{$id}?$alliances{$id}{m}:undef;
 }
 sub alliancetag2id($) { my($tag)=@_;
         $alliances{"\L$tag"}	#?$::alliances{$id}{tag}:undef;
@@ -220,6 +224,9 @@ sub planet2siege($) {my($h)=@_;
 }
 sub planet2pid($) {${$_[0]}{planetid}}
 sub planet2sid($) {${$_[0]}{systemid}}
+sub planet2pidm($) {my($h)=@_;$h?(($$h{sidpid})%13):undef}
+sub planet2sidm($) {my($h)=@_;$h?int(($$h{sidpid})/13):undef}
+
 sub getatag($) {my($tag)=@_;
 	if(!$tag) { return ""; }
 	return "[$tag]";
@@ -230,6 +237,7 @@ sub sidpid2planet($) {my ($sidpid)=@_;
 }
 sub getplanet2($) { sidpid2planet($_[0]) }
 sub sidpid22sidpid3($$) { "$_[0]#$_[1]" }
+sub sidpid22sidpid3m($$) {return $_[0]*13+$_[1];}
 
 sub gettradepartners($$) { my($maxta,$minad)=@_;
   my @result;
@@ -275,11 +283,25 @@ sub playername2alli($) {my ($user)=@_;
    return $alli;
 }
 
-sub dbfleetaddinit($) { my($pid)=@_;
+# prepare DBs for adding new fleets
+# input pid = player ID of whose fleets are viewed
+# input screen = 0=news, 1=fleets 2=alliance_incomings 3=alliance_detail
+sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
 	untie %planetinfo;
 	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
+   require DBAccess;
+   if($pid) {
+      my $cond="";
+      if($screen==1) {$cond=" AND ( `trn` != 0 OR `cls` != 0 OR `ds` != 0 OR `cs` != 0 OR `bs` != 0 ) "}
+      my $result=$DBAccess::dbh->do("UPDATE `fleets` SET `iscurrent` = 0 WHERE `owner` = '$pid' $cond");
+   } elsif($screen==2) { # set all incomings as outdated
+   }
 }
 sub dbfleetadd($$$$$$@) { my($sid,$pid,$plid,$name,$time,$type,$fleet)=@_;
+   {
+      local $^W=0;
+      do "fleetadd.pm"; fleetadd::dbfleetaddmysql(@_);
+   }
 	my $sidpid=sidpid22sidpid3($sid,$pid);
 	my $oldentry=$planetinfo{$sidpid};
 	my $newentry=addfleet($oldentry,$plid, $name, $time, $type, $fleet);
@@ -324,6 +346,11 @@ sub dblinkadd { my($sid,$url)=@_;
    my $oldentry=$planetinfo{$sidpid};
    return if($oldentry);
    $planetinfo{$sidpid}=qq(0 0 see also <a href="$url">this $type forum thread</a>);
+}
+
+sub estimate_xcv($$) { my($plid,$cv)=@_;
+#TODO use phys+race or SL+4
+   return $cv;
 }
 
 # support functions for sort_table

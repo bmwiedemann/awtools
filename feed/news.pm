@@ -24,7 +24,7 @@ if(0){
 	}
 }
 
-dbfleetaddinit(undef);
+dbfleetaddinit(undef, 0);
 require 'feed/libincoming.pm';
 parseincomings($_);
 dbfleetaddfinish();

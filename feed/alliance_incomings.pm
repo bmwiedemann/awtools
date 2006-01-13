@@ -6,7 +6,7 @@ my $name=$::options{name};
 #open(OUT, ">", "html/x/$ENV{REMOTE_USER}-incomings.html");
 #print OUT $_; close OUT;
 
-dbfleetaddinit(undef);
+dbfleetaddinit(undef, 2);
 
 require 'feed/libincoming.pm';
 parseincomings($_);
