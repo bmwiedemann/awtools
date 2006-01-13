@@ -2,7 +2,7 @@
 
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 use sort_table;
@@ -21,7 +21,7 @@ if(!defined($sysxy[0])) {
    exit(0);
 }
 
-open(IN, "whocansee.pl $sysid |") or die $!;
+open(IN, "whocansee.pl $sysid $alli |") or die $!;
 my @data=<IN>;
 close(IN);
 foreach(@data) {$_=[split(/ /,$_)]}

@@ -1,13 +1,14 @@
-#!/usr/bin/perl
-BEGIN {if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="idle"; }}
+#!/usr/bin/perl -w
 
 use strict;
 use DBAccess;
 use awstandard;
 use awinput;
+my $sysid = shift @ARGV;
+$ENV{REMOTE_USER} = shift @ARGV;
+#if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="idle"; }
 awinput_init();
 
-my $sysid = shift @ARGV;
 my @sysxy = systemid2coord($sysid);#(59,-12);
 my $delta = 13; # for Bio24
 
@@ -28,6 +29,7 @@ foreach(@$allplayers) {
    my @rel=getrelation($ename);
    next if(!$rel[2]);
    my @sci=relation2science($rel[2]);
+   $sci[0]||=0;
    if($sci[0]>100){shift(@sci)}
    my $bio=$sci[0]||0;
    next if(abs($ex-$sysxy[0])*2>$bio);
