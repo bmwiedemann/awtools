@@ -6,20 +6,17 @@ use DBAccess;
 
 my $origbmwlink="<a href=\"http://$bmwserver/cgi-bin";
 
-sub manglefilter { my($options)=@_;
+sub mangle_dispatch(%) { my($options)=@_;
+   if($$options{url} && $$options{url}=~m%/images/%) {return}
    %::options=%$options;
    $::bmwlink=$origbmwlink;
-   my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy});
+   my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($$options{url}) && $$options{url}=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $$options{url}=~m%^http://www1\.astrowars\.com/0/%;
    my $title="";
    my $module="";
    my $alli="\U$ENV{REMOTE_USER}";
    
-   if($gameuri && $$options{name} && $$options{url}=~m%^http://www1.astrowars.com/register/login.php% && (my $session=${$$options{headers}}{Cookie})) { # reset click counter now
-         $session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/;
-         $dbh->do("UPDATE `usersession` SET `nclick` = '0' WHERE `sessionid` = ".$dbh->quote($session));
-   }
    if($$options{url}=~m%^http://www\.astrowars\.com/about/battlecalculator%) {
       s/(form action="" method=")post/$1get/;
    }
@@ -31,25 +28,19 @@ sub manglefilter { my($options)=@_;
       $module=title2pm($title);
 
 # add main AWTool link
-      if(1 && $ingameuri && (my $session=${$$options{headers}}{Cookie})) {
+      if(1 && (my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
          my $nclicks="";
-         if($session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/) {
-            my $time=time();
-            my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = `nclick` + 1 , `lastclick` = ? WHERE `sessionid` = ? LIMIT 1;");
-            my $result=$sth->execute($time, $session);
-            if($result>0) {
-               my $sth2=$dbh->prepare_cached("SELECT `nclick` FROM `usersession` WHERE `sessionid` = ?");
-               my $aref=$dbh->selectall_arrayref($sth2, {}, $session);
-               $nclicks=$$aref[0][0];
-            } else { #insert
-              $nclicks=0;
-              $dbh->do("INSERT INTO `usersession` VALUES ( '$session', '$$options{name}', '0', '$time', '$time');");
-            }
-            if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
-            $info{clicks}=$nclicks;
-            $::bmwlink="$origbmwlink/authaw?session=$session&uri=/cgi-bin";
+         my $sth2=$dbh->prepare_cached("SELECT `nclick` FROM `usersession` WHERE `sessionid` = ?");
+         my $aref=$dbh->selectall_arrayref($sth2, {}, $session);
+         $nclicks=$$aref[0][0];
+         if(defined($nclicks)) {$nclicks++}
+         else {$nclicks=1}
+         if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
+         $info{clicks}=$nclicks;
+         $::bmwlink="$origbmwlink/authaw?session=$session&uri=/cgi-bin";
+         if($ingameuri) {
+            s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a></td>%;
          }
-         s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a></td>%;
 #         s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/authaw?session=$session">AWTools</a></td>%;
       }
       
@@ -57,7 +48,7 @@ sub manglefilter { my($options)=@_;
       if(-e $include) {
          do $include;
          if($@) {$module="error in $module: $@";}
-         else { $module="filtered $module"; # for the log
+         else { $module="mangled $module"; # for the log
          }
       }
       else {$module="$module"}
@@ -84,6 +75,7 @@ sub manglefilter { my($options)=@_;
       my $sth=$dbh->prepare_cached("SELECT usersession.name,`lastclick` 
             FROM `usersession`,`player`,`alliances` 
             WHERE `lastclick` > ? AND `aid` = `alliance` AND usersession.name = player.name AND `tag` LIKE ? AND usersession.name != ?
+            GROUP BY usersession.name
             ORDER BY lastclick DESC;");
       $sth->execute($reltime, $alli, $$options{name});
       my @who2;
@@ -91,7 +83,7 @@ sub manglefilter { my($options)=@_;
 #      foreach my $row (@$who) {
          my ($name,$time)=@row;
          my $diff=15-int(($now-$time)/60/2);
-         if($diff<4) {$diff=4}
+         if($diff<3) {$diff=3}
          my $c=sprintf("%x", $diff);
 #if($time<$now-60*6) {
          push(@who2,"<span style=\"color:#$c$c$c\">$name</span>");
@@ -106,12 +98,6 @@ sub manglefilter { my($options)=@_;
    my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$online$info</p>";
    s%</body>%</center>$gbcontent $&%;
 
-}
-
-sub mangle_dispatch(%) { my($options)=@_;
-   if(!$$options{url} || $$options{url}!~m%/images/%) {
-      manglefilter($options);
-   }
 }
 
 1;

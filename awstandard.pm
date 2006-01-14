@@ -9,7 +9,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
 #qw(&AWheader &AWheader2 &AWheader3 &AWtail &awstandard_init &AWfocus &parseawdate &getrelationcolor);
-qw(&awstandard_init &bmwround &bmwmod &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodatetime &sb2cv &title2pm
+qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodatetime &sb2cv &title2pm
       $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname);
 
 use CGI ":standard";
@@ -208,13 +208,13 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 sub fleet2cv(@) { my($fleet)=@_;
 	return $$fleet[2]*3+$$fleet[3]*24+$$fleet[4]*60;
 }
+# input time in UTC
 sub addfleet($$$$$@;$) { my($oldentry,$pid, $name, $time, $own, $fleet, $tz)=@_;
 	my $status=4;
 	my $ships=0;
 	if($own) {$status=7}
 	if($own==0) {$status=4}
-   if(! defined($tz)) {$tz=$::options{tz}}
-	if($time) {$status=3; $time-=3600*$tz}
+	if($time) {$status=3}
 	else {$time=time()}
 	my $gmtime=gmtime($time);
 	for my $s (@$fleet) {$ships+=$s}
@@ -318,6 +318,12 @@ sub urldecode { my($string) = @_;
 # Convert %XX from hex numbers to ASCII 
    $string =~ s/%([0-9a-fA-F][0-9a-fA-F])/pack("c",hex($1))/eg; 
    return($string);
+}
+
+# input: cookie string
+sub cookie2session { my($session)=@_;
+   if($session && $session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/) { return $session; }
+   return "";
 }
 
 1;

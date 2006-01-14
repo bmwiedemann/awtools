@@ -9,11 +9,12 @@ our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%relation,%p
    $dbnamer,$dbnamep);
 our $adprice=0.93;
 our $alarmtime=99;
+our $dbdir="/home/aw/db/db";
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &gettradepartners &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd
+&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd
 &display_pid &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -226,6 +227,8 @@ sub planet2pid($) {${$_[0]}{planetid}}
 sub planet2sid($) {${$_[0]}{systemid}}
 sub planet2pidm($) {my($h)=@_;$h?(($$h{sidpid})%13):undef}
 sub planet2sidm($) {my($h)=@_;$h?int(($$h{sidpid})/13):undef}
+sub sidpid2sidm($) {my($sidpid)=@_;int($sidpid/13) }
+sub sidpid2pidm($) {my($sidpid)=@_;$sidpid%13 }
 
 sub getatag($) {my($tag)=@_;
 	if(!$tag) { return ""; }
@@ -270,9 +273,9 @@ sub playername2alli($) {my ($user)=@_;
    untie(%alliuser);
    if(!$alli) {
       local $ENV{REMOTE_USER};
-      tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666;
-      tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
-      tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
+      tie %alliances, "MLDBM", "$dbdir/alliances.mldbm", O_RDONLY, 0666;
+      tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
+      tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
       my $pid=playername2id($user);
       if($pid && $pid>2) {
          my $aid=playerid2alliance($pid);
@@ -293,14 +296,17 @@ sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
    if($pid) {
       my $cond="";
       if($screen==1) {$cond=" AND ( `trn` != 0 OR `cls` != 0 OR `ds` != 0 OR `cs` != 0 OR `bs` != 0 ) "}
-      my $result=$DBAccess::dbh->do("UPDATE `fleets` SET `iscurrent` = 0 WHERE `owner` = '$pid' $cond");
+      my $sth=$DBAccess::dbh->prepare_cached("UPDATE `fleets` SET `iscurrent` = 0 WHERE `owner` = ? $cond");
+      $sth->execute($pid);
    } elsif($screen==2) { # set all incomings as outdated
    }
 }
-sub dbfleetadd($$$$$$@) { my($sid,$pid,$plid,$name,$time,$type,$fleet)=@_;
+sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
+   if(! defined($tz)) {$tz=$::options{tz}}
+   if($time) {$time-=3600*$tz}
    {
       local $^W=0;
-      do "fleetadd.pm"; fleetadd::dbfleetaddmysql(@_);
+      do "fleetadd.pm"; fleetadd::dbfleetaddmysql($sid,$pid,$plid,$name,$time,$type,$fleet,$tz);
    }
 	my $sidpid=sidpid22sidpid3($sid,$pid);
 	my $oldentry=$planetinfo{$sidpid};
@@ -351,6 +357,30 @@ sub dblinkadd { my($sid,$url)=@_;
 sub estimate_xcv($$) { my($plid,$cv)=@_;
 #TODO use phys+race or SL+4
    return $cv;
+}
+
+# input: sidpid
+sub get_fleets($) { my($sidpid)=@_;
+   my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE `alli` = ? AND `sidpid` = ? ORDER BY `eta`");# AND `iscurrent` = 1");
+   my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $ENV{REMOTE_USER}, $sidpid);
+   return $res;
+}
+
+our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
+# input: 1 row from fleet table
+# output: HTML for a short display of fleet with detailed info in title=
+sub show_fleet($) { my($f)=@_;
+   #fid alli status sidpid owner eta firstseen lastseen trn cls ds cs bs cv xcv iscurrent info
+   my($sidpid, $owner, $etc, $firstseen, $lastseen, $trn, $cls, $cv, $iscurrent, $info)=@$f[3..9,13,15,16];
+   my $color=!$iscurrent;
+   my $tz=$timezone*3600;
+# TODO : only red when owner not ally
+   if($trn){$trn=" $trn TRN ";$color|=2;} else {$trn=""}
+   if($cls){$cls=" $cls CLS ";} else {$cls=""}
+   if($etc) {$etc=AWisodatetime($etc+$tz)} else {$etc=" defending fleet.... "}
+   if($color) {$color="; color:$fleetcolormap{$color}"}
+   my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".AWisodatetime($firstseen+$tz)." lastseen=".AWisodatetime($lastseen+$tz);
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\">".playerid2link($owner)." $etc $cv CV $trn $cls $info</span>";
 }
 
 # support functions for sort_table
