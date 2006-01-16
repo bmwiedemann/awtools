@@ -37,7 +37,7 @@ sub awstandard_init() {
    chdir "/home/aw/db";
    $style=cookie('style');
    $timezone=cookie('tz');
-   if(!defined($timezone)) {$timezone=1}
+   if(!defined($timezone)) {$timezone=0}
    $start_time=[gettimeofday()];
 }
 # free locks & other critical resources
@@ -53,7 +53,7 @@ sub bmwmod($$) { my($number,$mod)=@_; my $sign=($number <=> 0);
 }
 
 sub awdiag($) { my ($str)=@_;
-   open(LOG, ">>/tmp/aw.log");
+   open(LOG, ">>", "/tmp/aw.log");
    print LOG (scalar localtime()." $str\n");
    close(LOG);
 }
