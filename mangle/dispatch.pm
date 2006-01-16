@@ -7,20 +7,21 @@ use DBAccess;
 my $origbmwlink="<a href=\"http://$bmwserver/cgi-bin";
 
 sub mangle_dispatch(%) { my($options)=@_;
-   if($$options{url} && $$options{url}=~m%/images/%) {return}
+   my $url=$$options{url};
+   if($url && $url=~m%/images/%) {return}
    %::options=%$options;
    $::bmwlink=$origbmwlink;
    my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
-   my $gameuri=defined($$options{url}) && $$options{url}=~m%^http://www1\.astrowars\.com/%;
-   my $ingameuri=$gameuri && $$options{url}=~m%^http://www1\.astrowars\.com/0/%;
+   my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
+   my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
    my $title="";
    my $module="";
    my $alli="\U$ENV{REMOTE_USER}";
    
-   if($$options{url}=~m%^http://www\.astrowars\.com/about/battlecalculator%) {
+   if($url=~m%^http://www\.astrowars\.com/about/battlecalculator%) {
       s/(form action="" method=")post/$1get/;
    }
-   if($gameuri && $$options{url}=~m%^http://www1\.astrowars\.com/rankings/alliances/(\w+)\.php%) { my $tag=$1;
+   if($gameuri && $url=~m%^http://www1\.astrowars\.com/rankings/alliances/(\w+)\.php%) { my $tag=$1;
       s%^</td></tr></table>%$& $::bmwlink/alliance?alliance=$tag">AWtools($tag)</a><br>%m;
    }
    if($gameuri && m&<title>([^<]*)</title>&) {
@@ -96,8 +97,26 @@ sub mangle_dispatch(%) { my($options)=@_;
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span style=\"color:gray\">$_=</span>$info{$_}"} sort keys %info));
    my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$online$info</p>";
-   s%</body>%</center>$gbcontent $&%;
+   s%</body>%$gbcontent $&%;
 
+   if($gameuri) {
+      # fix AR's broken HTML
+      if($url eq "http://www1.astrowars.com/") {
+         s%^%<html><head><title>Greenbird's Astrowars 2.0 Login</title></head><body>%;
+         s%$%</body></html>%;
+      }
+      if($::options{name} eq "greenbird") {
+         s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
+         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n} $&%;
+#         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }
+#         s%<center>%$&<div style="margin-left:10px; margin-right:10px">%;
+#         s%<table width="400" border=0 align="center"%</center><center>$&%g;
+         # fix color specification
+          s%bgcolor="([0-9a-fA-F]{6})"%bgcolor="#$1"%g;
+      }
+      s%(<a href=)([a-zA-Z0-9/.:?&\%=-]+)>%$1"$2">%g;
+      s%</head>%<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/awfavicon.ico">\n<link rel="shortcut icon" href="http://aw.lsmod.de/awfavicon.ico">$&%;
+   }
 }
 
 1;
