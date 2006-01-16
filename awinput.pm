@@ -296,10 +296,9 @@ sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
    if($pid) {
       my $cond="";
       if($screen==1) {$cond=" AND ( `trn` != 0 OR `cls` != 0 OR `ds` != 0 OR `cs` != 0 OR `bs` != 0 ) "}
-      my $sth=$DBAccess::dbh->prepare_cached("UPDATE `fleets` SET `iscurrent` = 0 WHERE `owner` = ? $cond");
-      $sth->execute($pid);
-   } elsif($screen==2) { # set all incomings as outdated
-   }
+      my $sth=$DBAccess::dbh->prepare_cached("UPDATE `fleets` SET `iscurrent` = 0 WHERE `alli` = ? AND `owner` = ? $cond");
+      $sth->execute($ENV{REMOTE_USER}, $pid);
+   } 
 }
 sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
    if(! defined($tz)) {$tz=$::options{tz}}
@@ -361,7 +360,7 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
 
 # input: sidpid
 sub get_fleets($) { my($sidpid)=@_;
-   my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE `alli` = ? AND `sidpid` = ? ORDER BY `eta`");# AND `iscurrent` = 1");
+   my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE `alli` = ? AND `sidpid` = ? ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
    my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $ENV{REMOTE_USER}, $sidpid);
    return $res;
 }
@@ -374,13 +373,16 @@ sub show_fleet($) { my($f)=@_;
    my($sidpid, $owner, $etc, $firstseen, $lastseen, $trn, $cls, $cv, $iscurrent, $info)=@$f[3..9,13,15,16];
    my $color=!$iscurrent;
    my $tz=$timezone*3600;
-# TODO : only red when owner not ally
-   if($trn){$trn=" $trn TRN ";$color|=2;} else {$trn=""}
-   if($cls){$cls=" $cls CLS ";} else {$cls=""}
-   if($etc) {$etc=AWisodatetime($etc+$tz)} else {$etc=" defending fleet.... "}
+   my $flstr="$cv CV";
+   if($trn){$flstr.=", $trn TRN"; if($etc){$color|=2;}}
+   if($cls){$flstr.=", $cls CLS";}
    if($color) {$color="; color:$fleetcolormap{$color}"}
+   if(!$etc && $iscurrent){$color.="; text-decoration:underline"}
+   if($etc) {$etc=AWisodatetime($etc+$tz)} else {$etc=" defending fleet.... "}
+   if(length($flstr)<18) {$flstr.="&nbsp;" x (18-length($flstr))}
    my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".AWisodatetime($firstseen+$tz)." lastseen=".AWisodatetime($lastseen+$tz);
-   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\">".playerid2link($owner)." $etc $cv CV $trn $cls $info</span>";
+   if($info) {$info=" ".$info}
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\">$etc $flstr ".playerid2link($owner)."$info</span>";
 }
 
 # support functions for sort_table
