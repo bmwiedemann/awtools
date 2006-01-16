@@ -2,7 +2,7 @@
 
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awinput_init();
@@ -18,16 +18,21 @@ print "sys#planet: info".br;
 foreach my $p (keys %planetinfo) {
 	my $info=$planetinfo{$p};
 	next unless $info=~s/$magicstring([^:]*)/$magicstring.span({-style=>"color: ".getrelationcolor((getrelation($1))[0])},$1)/geo;
+   my($status, $who)=($info=~m/^(\d) ([^ ]*)/);
 	$info=~s/^.*?($magicstring)/$1/so;
 	my @CV=($info=~/(\d+)CV/g);
 	my $CV=0;
 	foreach(@CV){$CV+=$_}
-	if($CV==0 && $info=~/2005 (\d+) (\d+) (\d+) (\d+) (\d+)/) { $CV=fleet2cv([$1,$2,$3,$4,$5]); }
+#	if($CV==0 && $info=~/200\d (\d+) (\d+) (\d+) (\d+) (\d+)/) { $CV=fleet2cv([$1,$2,$3,$4,$5]); }
 	$p=~/^(\d+)#/;
 	my $sid=$1;
 	(my $penc=$p)=~s/#/%23/;
    $info=~s!^!<br />!mg;
-	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> $info<br />\n!;
+   $info=~s!automagic:!!g;
+   my $planet=sidpid2planet($p);
+   my $owner=planet2owner($planet);
+   my $sb=planet2sb($planet);
+	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> of !.display_pid($owner)." SB $sb &larr; ".display_pid($who)." $info<br />\n";
 	#my $str=qq!<a href="/cgi-bin/system-info?id=$sid">$p</a> $info<br />\n!;
 	push(@out,$str);
 	$CV{$str}=$CV;
