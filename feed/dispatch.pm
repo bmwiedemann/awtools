@@ -28,6 +28,7 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
    }
    if(! m!<title>([^<>]*)</title>!) { 
 		my @race;
+      %::options=%$options;
 		if($$options{name}) { require './feed/plain_race.pm'; feed_plain_race(); }
 		print "no title found\n"; return -1;
 	}
