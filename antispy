@@ -5,7 +5,14 @@ use CGI ":standard";
 BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
+use sort_table;
 awinput_init();
+
+my %options;
+for my $p (qw'sort') {
+   $options{$p}=param($p);
+}
+if(!defined $options{sort}){$options{sort}="5.-7";}
 
 my $m=3; # SL margin
 my $alli=$ENV{REMOTE_USER};
@@ -20,8 +27,10 @@ sub sortfunc {
 }
 
 print AWheader("possible spying [\U$alli]");
-foreach(sort sortfunc @spies) {
-	my($ename,$epid,$esl,$pid,$sl)=@$_;
+my @spies2;
+
+foreach(@spies) {
+   my($ename,$epid,$esl,$pid,$bio)=@$_;
    my @erel=getrelation($ename);
    my @esci=relation2science($erel[2]);
    my $ebio=getbio(@esci);
@@ -29,12 +38,15 @@ foreach(sort sortfunc @spies) {
    if($ebio) {
       $eeffbio=$ebio+int((time-$esci[0])/86400); # estimation of current value
       if($eeffbio>$esl) { $eeffbio=$esl }
-   }
-   my $name=playerid2name($pid);
-   my @rel=getrelation($name);
-   my $bio=getbio(relation2science($rel[2]));
-   next if($eeffbio && (($bio && $eeffbio<$bio+$m) || $sl && $eeffbio<$sl+$m));
+   } else {$eeffbio=$esl}
+   next if($eeffbio && $bio && ($eeffbio<$bio+$m));
    if(!$ebio) {$ebio="?"};
-   print a({-href=>"relations?name=$ename"},"$ename=$epid(science=$esl,bio=$ebio)")," &gt; ",a({-href=>"relations?name=$name"},"$name=$pid(".($bio?"bio":"science")."=$sl)").br;
+   push(@spies2, [$epid,$esl,$ebio,$eeffbio,$pid,$bio, $eeffbio-$bio]);
 }
+
+print sort_table([qw(spy SL Bio xBio victim Bio diff)],
+      [\&display_pid, \&display_string ,\&display_string, \&display_string, \&display_pid, \&display_string, \&display_string],
+      [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_pid, \&sort_num, \&sort_num],
+      sort_param_to_keys($options{sort}), \@spies2);
+
 print AWtail();
