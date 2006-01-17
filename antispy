@@ -2,7 +2,7 @@
 
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awinput_init();
@@ -12,7 +12,7 @@ my $alli=$ENV{REMOTE_USER};
 open(IN, "<", "datadir/spies-$alli");
 my @spies=<IN>;
 close(IN);
-foreach(@spies) {$_=[split(" ",$_)]}
+foreach(@spies) {$_=[split(/\t/,$_)]}
 
 sub getbio {if($_[0] && $_[0]>100){return $_[1]} return $_[0]}
 sub sortfunc {

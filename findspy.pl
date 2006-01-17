@@ -81,7 +81,7 @@ foreach(@$allplayers) {
       my $dist=int($esl/2)+$distmargin;
       next if(abs($ex-$x)>$dist || abs($ey-$y)>$dist);
 #print "$ename=$epid($esl) -> $pid($sl)\n";
-      print "$ename $epid $esl $pid $sl\n";
+      print join("\t",($ename, $epid, $esl, $pid, $sl))."\n";
    }
 }
 
