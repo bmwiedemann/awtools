@@ -15,6 +15,8 @@ our %options;
 our $awuser=cookie('user');
 our $refsys=cookie('refsys');
 
+my $wantcurrent=" AND `iscurrent` = 1 ";
+
 sub tlink(@) { my($a)=@_;
    if($options{export}) {
       return "[url=".$$a[0]."]".$$a[1]."[/url]";
@@ -42,11 +44,13 @@ sub spinfo($) { my($id)=@_; # short player info string
 }
 sub mkhash($) { my($tag)=@_;
 	if($options{uniq} && $options{uniq}!~/\./) {$options{uniq}=".$options{uniq}."} else {$options{uniq}=""}
-	my $token="$tag$options{uniq}$options{expires}#$options{id}#sekretge1";
+   my $secret=awstandard::file_content("systemexportsecret");
+	my $token="$tag$options{uniq}$options{expires}#$options{id}#$secret";
 #   print " md5($token) ";
 	return md5_hex($token);
 }
 sub auth_ok($) { my($auth)=@_;
+   return if(!$auth);
 	my @auth=split("#",$auth);
 	if(mkhash($auth[0]) ne $auth[1]) {return 0}
 	if($options{expires} && $options{expires}<time) {
@@ -80,9 +84,10 @@ if(param("legend")) {
 
 if(param()) {
 	my($x,$y,$system);
-	for my $p (qw'x y mapx mapy id name export auth expires uniq') {
+	for my $p (qw'x y mapx mapy id name export auth expires uniq history') {
 	  $options{$p}=param($p);
 	}
+   if($options{history}) {$wantcurrent=""}
    $options{name}=~s/\s+$//;
    $options{name}=~s/^\s+//;
 	if($options{export}==2) {
@@ -129,7 +134,7 @@ if(param()) {
 
 		## start of normal output ##
 		if(!$options{export}) {
-			print qq!<a href="?legend=1">legend</a> <a href="?id=$system&amp;export=1">BB-export</a> <a href="?id=$system&amp;export=2">anonymous updated export</a>!,br;
+			print qq!<a href="?legend=1">legend</a> <a href="?id=$system&amp;export=1">BB-export</a> <a href="?id=$system&amp;export=2">anonymous updated export</a> !.a({-href=>"?id=$system&history=".(!$options{history})},"toggle history"),br;
 			($bs,$be,$eol)=('<b>','</b>',"<br />\n");
 		}
 		my $syslevel=systemid2level($system);
@@ -190,7 +195,7 @@ if(param()) {
 					$info=" ".span({-style=>"color: $scolor"},$planetstatusstring{$status})." ".span({-style=>"color: $rcolor"},$atag." ".$name).": ".$pinfo;
 				}
 			}
-         my $fleets = awinput::get_fleets(sidpid22sidpid3m($system,$planetid));
+         my $fleets = awinput::get_fleets(sidpid22sidpid3m($system,$planetid), $wantcurrent);
          my $fleetsstr="";
          foreach my $f (@$fleets) {
             $fleetsstr.=$eol.awinput::show_fleet($f);
