@@ -6,6 +6,9 @@ use DBAccess;
 
 my $origbmwlink="<a href=\"http://$bmwserver/cgi-bin";
 
+# input options hash reference
+# input $_ with HTML code of a complete page
+# output $_ with HTML of mangled page
 sub mangle_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
    if($url && $url=~m%/images/%) {return}
@@ -97,20 +100,18 @@ sub mangle_dispatch(%) { my($options)=@_;
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span style=\"color:gray\">$_=</span>$info{$_}"} sort keys %info));
    my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$online$info</p>";
-   s%</body>%$gbcontent $&%;
 
    if($gameuri) {
       # fix AR's broken HTML
       if($url eq "http://www1.astrowars.com/") {
-         s%^%<html><head><title>Greenbird's Astrowars 2.0 Login</title></head><body>%;
+         s%^%<html><head><title>Greenbird's Astrowars 2.0 Login</title></head> <link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/aw.css"><body>%;
          s%$%</body></html>%;
       }
-      if($::options{name} eq "greenbird") {
+      s%</body>%$gbcontent $&%;
+      if($::options{name}=~m/greenbird|neron92/) {
          s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
-         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n} $&%;
+         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }
-#         s%<center>%$&<div style="margin-left:10px; margin-right:10px">%;
-#         s%<table width="400" border=0 align="center"%</center><center>$&%g;
          # fix color specification
           s%bgcolor="([0-9a-fA-F]{6})"%bgcolor="#$1"%g;
       }
