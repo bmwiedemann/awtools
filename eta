@@ -33,8 +33,9 @@ if($refsys && param()) {
    print redirect("/cgi-bin/arrival?distance=$refdist&amp;planet=$pdiff&amp;energy=$refe&amp;racespeed=$refs");
 
 } else {
-   print AWheader("AW ETA tool");
-	print start_form(-name=>"form", -method=>"get"),textfield(-name=>'sid', -class=>'text')," sid",br,
+   print AWheader("AW ETA tool"). "This tool uses the value from refsys cookie as second coord which can be ".a({-href=>"preferences"},"set in preferences")." or system-info tools".br;
+	print start_form(-name=>"form", -method=>"get"),
+      textfield(-name=>'sid', -class=>'text')," sid",br,
       textfield(-name=>'pid', -class=>'text')," pid",br,
 		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.sid");
    print AWtail();
