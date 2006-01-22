@@ -13,7 +13,7 @@ awstandard_init();
 
 our %options;
 our $awuser=cookie('user');
-our $refsys=cookie('refsys');
+my $refsys=cookie('refsys');
 
 my $wantcurrent=" AND `iscurrent` = 1 ";
 
@@ -62,15 +62,20 @@ sub auth_ok($) { my($auth)=@_;
 }
 sub tprint { unless($options{export}){print @_} }
 
-for my $p (qw'x y') {
+for my $p (qw(refpid id)) {
   $options{$p}=param($p);
+}
+my $cookies=[];
+if(defined($options{refpid}) && defined($options{id})) {
+   my $ref="$options{id}#$options{refpid}";
+   push(@$cookies, cookie(-name=>'refsys', -value=>$ref, -expires=>'+90d'));
 }
 #if(defined($options{x}) && defined($options{y})) {
 #	my($x,$y)=awmap::imgtomap($options{x}, $options{y});
 #	print redirect("http://$ENV{HTTP_HOST}$ENV{SCRIPT_NAME}?mapx=$x&mapy=$y");
 #	exit(0);
 #}
-print header;
+print header(-cookie=>$cookies);
 
 if(param("legend")) {
 	print AWheader2('legend of AW relations');
@@ -121,7 +126,7 @@ if(param()) {
 		 a({-href=>"$ENV{HTTP_REFERER}"},"go back");
 	} else {
       if($ENV{HTTP_REFERER}) {
-         dbfleetaddinit(0);
+         awinput::dbplanetaddinit(1);
 #         if($ENV{HTTP_REFERER}=~m/xtasisrebellion/){
 #         open(DEBUG, "> /tmp/debug"); print DEBUG "$system, $ENV{HTTP_REFERER}";}
          dblinkadd($system, $ENV{HTTP_REFERER});
@@ -153,19 +158,6 @@ if(param()) {
 			"planets here: <ul>";
 		} else {
 			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
-		}
-		my ($refdist,$refp,$refid,$refe,$refs);
-		if($refsys) {
-			($refid,$refp)=split("#",$refsys);
-			my($refx,$refy)=systemid2coord($refid);
-			if(defined($refx)) {
-				$refdist=($refx-$x)**2+($refy-$y)**2;
-				my @rel=getrelation($awuser);
-				my @race;
-				my @sci;
-				if((@race=relation2race($rel[2]))) {$refs=$race[4];$refs=~s/\+//;}
-				if((@sci=relation2science($rel[2]))) {if($sci[0]>99){shift(@sci)};$refe=$sci[2]}
-			}
 		}
 		my @planets=systemid2planets($system);
 		foreach my $h (@planets) {
@@ -204,10 +196,9 @@ if(param()) {
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
 			if(!$options{export}) {
-				my $pdiff=abs($refp-$planetid);
-				my $etalink;
-				if(defined($refdist)) {$etalink=qq! <a href="arrival?distance=$refdist&amp;planet=$pdiff&amp;energy=$refe&amp;racespeed=$refs">ETA</a> !;}
-				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s%s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info.$fleetsstr."</li>\n";
+				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/images/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
+				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
+				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info.$fleetsstr."</li>\n";
 			} else {
 				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s", $planetid, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), $info);
 			}
