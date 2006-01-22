@@ -9,7 +9,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
 #qw(&AWheader &AWheader2 &AWheader3 &AWtail &awstandard_init &AWfocus &parseawdate &getrelationcolor);
-qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodatetime &sb2cv &title2pm
+qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodatetime &sb2cv &title2pm &file_content
       $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname);
 
 use CGI ":standard";
@@ -61,9 +61,10 @@ sub awdiag($) { my ($str)=@_;
 sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
-   my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"})];
+   my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"}),Link({-rel=>"shortcut icon", -href=>"http://aw.lsmod.de/favicon.ico"})];
    if($extra) {push(@$heads,$extra);}
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/common.css" />!);
+#   push(@$heads, "<title>$title</title>");
 	$owncgi=~s!/cgi-bin/(?:modperl/)?!!;
 	foreach my $item (qw(index.html preferences arrival tactical tactical-large tactical-live relations alliance system-info fleets feedupdate)) {
 		my %h=(href=>$item);
@@ -75,11 +76,13 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 		$links.="|&nbsp;".a(\%h,$item)." ";
 	}
 	if(!$style) {$style='blue'}
+   my $flag = autoEscape(0);
 	local $^W=0; #disable warnings for next line
-	start_html(-title=>$title, -style=>"/$style.css", 
+   my $retval=start_html(-title=>$title, -style=>"/$style.css", 
 	# -head=>qq!<link rel="icon" href="/favicon.ico" type="image/ico" />!).
-	 -head=>$heads).
-	div({-align=>'justify',-class=>'header'},#a({href=>"index.html"}, "AW tools index").
+	 -head=>$heads);
+   autoEscape([$flag]);
+	return $retval.div({-align=>'justify',-class=>'header'},#a({href=>"index.html"}, "AW tools index").
 	$links)."\n". h1($title2)."\n";
 }
 sub AWheader2($;$) { my($title,$extra)=@_; AWheader3($title, $title, $extra);}
@@ -324,6 +327,14 @@ sub urldecode { my($string) = @_;
 sub cookie2session { my($session)=@_;
    if($session && $session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/) { return $session; }
    return "";
+}
+
+sub file_content($) {my($fn)=@_;
+   open(FCONTENT, "<", $fn) or return undef;
+   local $/;
+   my $result=<FCONTENT>;
+   close(FCONTENT);
+   return $result;
 }
 
 1;

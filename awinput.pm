@@ -25,10 +25,9 @@ use MLDBM qw(DB_File Storable);
 use DB_File::Lock;
 use CGI ":standard";
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
+use awaccess;
 use awstandard;
 my $head="Content-type: text/plain\015\012";
-
-my %allowedalli=("af"=>1, "tgd"=>1, "xr"=>1, "love"=>1, "kk"=>1, "wink"=>1, ""=>0);
 
 sub awinput_init(;$) { my($nolock)=@_;
    awstandard_init();
@@ -112,6 +111,15 @@ sub setrelation($%) { my($id,$options)=@_;
 	}
 	untie %relation;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or die $!;
+}
+
+sub playername2etc($) { my($name)=@_;
+   my @rel=getrelation($name);
+   if($rel[2]) {
+      my @sci=relation2science($rel[2]);
+      if($sci[8]) { return $sci[8] }
+   }
+   return undef;
 }
 
 sub playername2id($) { my($name)=@_;
@@ -286,12 +294,18 @@ sub playername2alli($) {my ($user)=@_;
    return $alli;
 }
 
+# prepare DB for adding planet/planning info
+# input: screen = integer identifying source of data (1=system-info, 2=cleanplanning)
+sub dbplanetaddinit(;$) { my($screen)=@_;
+	untie %planetinfo;
+	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
+}
 # prepare DBs for adding new fleets
 # input pid = player ID of whose fleets are viewed
 # input screen = 0=news, 1=fleets 2=alliance_incomings 3=alliance_detail
 sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
-	untie %planetinfo;
-	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
+#	untie %planetinfo;
+#	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
    require DBAccess;
    if($pid) {
       my $cond="";
@@ -304,9 +318,10 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
    if(! defined($tz)) {$tz=$::options{tz}}
    if($time) {$time-=3600*$tz}
    {
-      local $^W=0;
-      do "fleetadd.pm"; fleetadd::dbfleetaddmysql($sid,$pid,$plid,$name,$time,$type,$fleet,$tz);
+#      local $^W=0;
+      require "fleetadd.pm"; fleetadd::dbfleetaddmysql($sid,$pid,$plid,$name,$time,$type,$fleet,$tz);
    }
+   return 0;
 	my $sidpid=sidpid22sidpid3($sid,$pid);
 	my $oldentry=$planetinfo{$sidpid};
 	my $newentry=addfleet($oldentry,$plid, $name, $time, $type, $fleet);
@@ -359,8 +374,10 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
 }
 
 # input: sidpid
-sub get_fleets($) { my($sidpid)=@_;
-   my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE `alli` = ? AND `sidpid` = ? ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
+# input: SQL condition to add - defaults to ""
+sub get_fleets($;$) { my($sidpid,$cond)=@_;
+   $cond||="";
+   my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE `alli` = ? AND `sidpid` = ? $cond ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
    my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $ENV{REMOTE_USER}, $sidpid);
    return $res;
 }
@@ -370,19 +387,20 @@ our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
 # output: HTML for a short display of fleet with detailed info in title=
 sub show_fleet($) { my($f)=@_;
    #fid alli status sidpid owner eta firstseen lastseen trn cls ds cs bs cv xcv iscurrent info
-   my($sidpid, $owner, $etc, $firstseen, $lastseen, $trn, $cls, $cv, $iscurrent, $info)=@$f[3..9,13,15,16];
+   my($fid, $sidpid, $owner, $eta, $firstseen, $lastseen, $trn, $cls, $cv, $iscurrent, $info)=@$f[0,3..9,13,15,16];
+   if($cv==0 && $cls==0 && $trn==0) {return ""}
    my $color=!$iscurrent;
    my $tz=$timezone*3600;
    my $flstr="$cv CV";
-   if($trn){$flstr.=", $trn TRN"; if($etc){$color|=2;}}
+   if($trn){$flstr.=", $trn TRN"; if($eta){$color|=2;}}
    if($cls){$flstr.=", $cls CLS";}
    if($color) {$color="; color:$fleetcolormap{$color}"}
-   if(!$etc && $iscurrent){$color.="; text-decoration:underline"}
-   if($etc) {$etc=AWisodatetime($etc+$tz)} else {$etc=" defending fleet.... "}
+   if(!$eta && $iscurrent){$color.="; text-decoration:underline"}
+   if($eta) {$eta=AWisodatetime($eta+$tz)} else {$eta=" defending fleet.... "}
    if(length($flstr)<18) {$flstr.="&nbsp;" x (18-length($flstr))}
    my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".AWisodatetime($firstseen+$tz)." lastseen=".AWisodatetime($lastseen+$tz);
    if($info) {$info=" ".$info}
-   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\">$etc $flstr ".playerid2link($owner)."$info</span>";
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://aw.lsmod.de/cgi-bin/edit-fleet?fid=$fid\">edit</a> $eta $flstr ".playerid2link($owner)."$info</span>";
 }
 
 # support functions for sort_table
