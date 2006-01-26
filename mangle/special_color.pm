@@ -4,7 +4,7 @@ sub manglecolor($$) { my($id,$name)=@_;
    my $alli="";
    my $atag=playerid2tag($id);
    if($atag) {$alli="[$atag] "}
-   elsif($rel[1]) {$alli="[$rel[1]] "}
+   elsif($rel[1] && $id>2) {$alli="[$rel[1]] "}
    if($rel[0]) {
       $col=getrelationcolor($rel[0]);
    }
