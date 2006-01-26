@@ -16,7 +16,7 @@ if(!defined $options{sort}){$options{sort}="5.-7";}
 
 my $m=3; # SL margin
 my $alli=$ENV{REMOTE_USER};
-open(IN, "<", "datadir/spies-$alli");
+open(IN, "<", "html/alli/$alli/spies.csv");
 my @spies=<IN>;
 close(IN);
 foreach(@spies) {$_=[split(/\t/,$_)]}
@@ -32,6 +32,7 @@ my @spies2;
 foreach(@spies) {
    my($ename,$epid,$esl,$pid,$bio)=@$_;
    my @erel=getrelation($ename);
+   next if($erel[0]>5);
    my @esci=relation2science($erel[2]);
    my $ebio=getbio(@esci);
    my $eeffbio;
