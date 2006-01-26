@@ -4,6 +4,7 @@ use awstandard;
 use awinput;
 use DBAccess;
 
+our $g;
 my $origbmwlink="<a href=\"http://$bmwserver/cgi-bin";
 my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period this morning (2006-01-23 02:30-06:00 UTC). Do not worry about errors then. Just reload a bit later.</b><br>";
 
@@ -27,6 +28,7 @@ sub url2pm($) {my($url)=@_;
 sub mangle_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
    if($url && $url=~m%/images/%) {return}
+   $g=$$options{name} eq "greenbird";
    %::options=%$options;
    $::bmwlink=$origbmwlink;
    my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
@@ -35,14 +37,12 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $title="";
    my $alli="\U$ENV{REMOTE_USER}";
    
-   if($url=~m%^http://www\.astrowars\.com/about/battlecalculator%) {
-      s/(form action="" method=")post/$1get/;
-   }
-   if($gameuri && m&<title>([^<]*)</title>&) {
+   if(m&<title>([^<]*)</title>&) {
       $title=$1;
+   } else { $title="special_no_title" }
 
 # add main AWTool link
-      if(1 && (my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
+      if((my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
          my $nclicks="";
          my $sth2=$dbh->prepare_cached("SELECT `nclick` FROM `usersession` WHERE `sessionid` = ?");
          my $aref=$dbh->selectall_arrayref($sth2, {}, $session);
@@ -58,7 +58,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       $::options{title}=$title;
       my @module=();
       my $module=title2pm($title);
-      push(@module, url2pm($url), $module);
+      push(@module, url2pm($url), ($gameuri ? $module :()));
       foreach my $m (@module) {
          my $include="mangle/$m.pm";
          next if(!-e $include);
@@ -69,13 +69,13 @@ sub mangle_dispatch(%) { my($options)=@_;
          last;
       }
 #      $module="($module)"; #qq'<span style="color:gray">($module)</span>';
-      if($::options{name} eq "greenbird") {
+      if($g) {
          $info{page}=join(", ",@module). " $module";
       } else { $info{page}=$module }
 
       if($ingameuri) {
-         if(0 && $::options{name} eq "greenbird") {
-#            eval q§
+         if(0) {
+            eval q§
                my $sep="<td>|</td>";
                my $e="</a></td>";
                my $s=qq'<td class="white">$::bmwlink';
@@ -89,16 +89,14 @@ sub mangle_dispatch(%) { my($options)=@_;
                   $l/alliance">alliance
                   $l/fleets">fleets$e$&%m;
 #               $_.="test OK";
-#            § or $_.= $@;
+            § or $_.= $@;
          } else {
             s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a></td>%;
          }
       }
 
 # colorize player links
-      require "mangle/special_color.pm"; mangle_player_color();
-
-   }
+   require "mangle/special_color.pm"; mangle_player_color();
 
 # remove ads
    s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
@@ -139,14 +137,10 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $info=join(" ", map({"<span style=\"color:gray\">$_=</span>$info{$_}"} sort keys %info));
    my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>";
 
-   if($gameuri) {
+   if($gameuri || $g) {
       # fix AR's broken HTML
-      if($url eq "http://www1.astrowars.com/") {
-         s%^%<html><head><title>Greenbird's Astrowars 2.0 Login</title></head> <link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/aw.css"><body>%;
-         s%$%</body></html>%;
-      }
       s%</body>%$gbcontent $&%;
-      if($::options{name}=~m/greenbird|neron92/) {
+      if($g) {
          s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
          s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }

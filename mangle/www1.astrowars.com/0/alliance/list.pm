@@ -2,13 +2,12 @@ use strict;
 use DBAccess;
 use awinput;
 
-if($ENV{REMOTE_USER} || $::options{name} eq "greenbird") {
+if($ENV{REMOTE_USER}) {
    my $now=time();
    sub addetc($) { my($name)=@_;
       my $etc=awinput::playername2etc($name);
-      if(!$etc || (($etc-$now)<-150*3600)) {$etc="-"}
-      else {$etc-=$now;$etc=sprintf("%.1fh",$etc/3600)}
-      return $etc;
+      require "sort_table.pm";
+      return sort_table::display_etc($etc);
    }
    sub addidle($) { my($name)=@_;
       my $sth=$dbh->prepare_cached("SELECT lastclick 
