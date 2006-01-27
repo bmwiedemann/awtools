@@ -2,8 +2,9 @@ package mapcommon;
 use GD;
 
 my %colormap;
+our %colorindex;
 sub initrgb() {
-  open(RGB, "< rgb.txt") or print "Content-type: text/html\n\nerror opening rgb.txt\n";
+  open(RGB, "< /home/aw/inc/rgb.txt") or die "Content-type: text/html\n\nerror opening rgb.txt $!\n";
   while(<RGB>) {
     next if(/!/);
     if(m/^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\w+[ a-zA-Z0-9]*)$/) {
@@ -12,9 +13,10 @@ sub initrgb() {
       $colormap{$colname}=[$r, $g, $b];
     }
   }
+  close(RGB);
 }
 sub getrgb($) {
-  if(!$_[0]) {return undef};
+  if(!$_[0]) {return (0,0,0)};
   my $entry=$colormap{$_[0]};
   if(!$entry) {
 #    print "color \"$_[0]\" not found\n";
@@ -24,18 +26,16 @@ sub getrgb($) {
 #  print "color: ".join(", ",@ret);
   return @ret;
 }
-initrgb();
 
 sub mapcoloralloc($) { my($img)=@_;
-our %colorindex;
-for my $c (qw"black white gray red", @awstandard::statuscolor, @awstandard::relationcolor) {
-  my @rgb=getrgb($c);
-  next if !@rgb || !defined $rgb[0];
-  $colorindex{$c}=$img->colorAllocate(@rgb);
-}
-our $axiscolor=$img->colorAllocate(getrgb("blue"));
-our $lightgridcolor=$img->colorAllocate(getrgb("gray83"));
-our $darkgridcolor=$img->colorAllocate(getrgb("gray34"));
+   for my $c (qw"black white gray dimgray red", @awstandard::statuscolor, @awstandard::relationcolor) {
+     my @rgb=getrgb($c);
+     next if !@rgb || !defined $rgb[0];
+     $colorindex{$c}=$img->colorAllocate(@rgb);
+   }
+   our $axiscolor=$img->colorAllocate(getrgb("blue"));
+   our $lightgridcolor=$img->colorAllocate(getrgb("gray83"));
+   our $darkgridcolor=$img->colorAllocate(getrgb("gray34"));
 }
 
 sub writeimg($$) { my($img,$name)=@_;
@@ -44,5 +44,7 @@ sub writeimg($$) { my($img,$name)=@_;
   print OUT $img->png();
   close OUT;
 }
+
+BEGIN { initrgb();}
 
 1;
