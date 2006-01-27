@@ -6,7 +6,7 @@
 use strict "vars";
 use DBAccess;
 use awstandard;
-require "access.pm";
+require "awaccess.pm";
 my $head="Content-type: text/plain\015\012";
 our (%planets,%alliances,%starmap,%player,%playerid,$dbh,$readalli);
 tie %planets,'Tie::DBI',$DBAccess::dbh,'planets','sidpid',{CLOBBER=>1};
