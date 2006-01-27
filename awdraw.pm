@@ -69,7 +69,7 @@ sub mapimage($$$$;$$) {
             my $ownerid=$$planet{ownerid};
             if(defined($ownerid) && $ownerid>2) {
                $color=mrelationcolorid($ownerid);
-            } else {$color="white"}
+            } else {$color=defined($ownerid)?"white":"dimgray"}
             $img->filledRectangle($px2*$scale,$py2*$scale, ($px3+1)*$scale-1,($py2+1)*$scale-1, $mapcommon::colorindex{$color});
             if(planet2siege($planet)) {
                $img->filledRectangle(($pxe-5)*$scale,$py2*$scale, ($px3+1)*$scale-1,($py2+1)*$scale-1, $mapcommon::colorindex{"red"});
