@@ -16,6 +16,17 @@ use CGI qw":standard";
 
 sub display_string($) { $_[0]; }
 
+sub display_etc($) { my($etc)=@_;
+   my $now=time();
+   my $ret="-";
+   if($etc && (($etc-$now)>-150*3600)) {
+      $etc-=$now;
+      $ret=sprintf("%.1fh",$etc/3600);
+      if($etc>-10*3600 && $etc<20*3600) {$ret=qq'<span style="color:#f44">$ret</span>';}
+   }
+   return $ret;
+}
+
 
 sub sort_num($$) {$_[0]<=>$_[1]}
 sub sort_string($$) {$_[0] cmp $_[1]}
