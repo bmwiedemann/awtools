@@ -15,7 +15,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
 &awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd
-&display_pid &display_sid &display_sid2 &sort_pid
+&display_pid &display_relation &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
 
@@ -368,8 +368,26 @@ sub dblinkadd { my($sid,$url)=@_;
    $planetinfo{$sidpid}=qq(0 0 see also <a href="$url">this $type forum thread</a>);
 }
 
+sub playername2ir($) { my($name)=@_;
+   return undef if !$name;
+   my @rel=getrelation($name);
+   return undef if !$rel[2];
+   my $race=[relation2race($rel[2])];
+   my $sci=[relation2science($rel[2])];
+   if(!@$race) {$race=undef}
+   if(!@$sci) {$sci=undef}
+   return($race,$sci);
+}
+
+# input: player ID
+# output: race,science array reference
+sub playerid2ir($) { my($plid)=@_;
+   return playername2ir(playerid2name($plid));
+}
+
 sub estimate_xcv($$) { my($plid,$cv)=@_;
 #TODO use phys+race or SL+4
+   
    return $cv;
 }
 
@@ -406,6 +424,11 @@ sub show_fleet($) { my($f)=@_;
 # support functions for sort_table
 sub display_pid($) {
    playerid2link($_[0]);
+}
+sub display_relation($) { my($rel)=@_;
+   my $c=getrelationcolor($rel);
+   my $rn=$awstandard::relationname{$rel};
+   return qq'<span style="background-color: $c">&nbsp;$rn&nbsp;</span>';
 }
 sub display_sid($) { my($sid)=@_;
    my ($x,$y)=systemid2coord($sid);
