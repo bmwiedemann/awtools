@@ -50,6 +50,11 @@ if($::options{post}) {
    my $destname=display_sid2($destsid);
    my $srcname=display_sid2($srcsid);
    $time=AWisodatetime($time);
+
+# add awauth
+   for my $l ($destname, $srcname) {
+      $l=~s%<a href="http://aw.lsmod.de/cgi-bin%$::bmwlink%;
+   }
    
 # add everything only here to the output HTML:
    s%(<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#000000' width="600"><tr><td><br>\n)(<b>)%$1 <table><tr><td$align>Fleet$delim</td><td> $fleet</td></tr><tr><td$align>From$delim</td><td> $srcsid#$srcpid = $srcname $srcpid</td></tr><tr><td$align>To$delim</td><td> $destsid#$destpid = $destname $destpid</td></tr>${extrainfo}<tr><td$align>Launch time$delim</td><td> $time UTC</td></tr>$extrainfo2</table><br> $2%;

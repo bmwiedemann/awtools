@@ -23,4 +23,16 @@ $page=~s%<td colspan="3">Destination</td></tr>%$&<tr align=center><td bgcolor='#
 $_=$page;
 #$_.=$extra;
 
+sub piddropdown($) {
+   my $ret='<select name="planet">';
+   for my $i (1..12) {
+      my $sel=$_[0]==$i?" selected":"";
+      $ret.=qq%<option$sel>$i</option>%;
+   }
+   $ret.='</select>';
+   return $ret;
+}
+
+s%<input type="text" name="planet" size="2" class=text value="(\d*)">%piddropdown($1)%ge;
+
 1;

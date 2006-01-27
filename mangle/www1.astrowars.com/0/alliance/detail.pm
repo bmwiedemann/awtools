@@ -11,6 +11,7 @@ if($::options{url}=~/id=(\d+)/) {
    my $prevstring="";
    if($previd>=0) { $prevstring=qq'<a href="$url$previd">prev</a>'; }
    s%<br><table border=0%<br>$prevstring <a href="$url$nextid">next</a>$&%;
+   do "mangle/www1.astrowars.com/0/alliance.pm";
 }
 
 require "mangle/special_color_incomings.pm"; mangle_incoming();
