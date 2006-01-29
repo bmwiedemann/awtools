@@ -6,9 +6,9 @@ my $align=' align="right" style="padding:0px; color:#4978ff"';
 my $delim=": &nbsp;";
 
 sub addtimer($$$) { my($n,$time,$script)=@_;
-   my($sec,$min,$hour,$mday,$mon,$year)=gmtime($time);
-   $mon++;$year+=1900;
-   $script=~s% //inserthere%$&\n e[$n] = [$year, $mon, $mday, $hour,$min,$sec];c$n=window.setInterval("C($n)",1000);%;
+#   my($sec,$min,$hour,$mday,$mon,$year)=gmtime($time);
+#   $mon++;$year+=1900;
+   $script=~s% //inserthere%$&\n reftime[$n] = $time; c$n=window.setInterval("C($n)",100);%;
    $_[2]=$script;
 }
 
@@ -55,37 +55,26 @@ if($::options{post}) {
 
 # auto-update arrival time
 if(1) {
+   use Time::HiRes;
+   my $starttime=sprintf("%i.%.6i ;", Time::HiRes::gettimeofday()); 
    $script=qq^
 <script type="text/javascript">
 <!--
-var e = new Array();
-var maxe = new Array();
-maxe = [9999, 12, 30, 24, 60, 60];
+   starttime = $starttime
+   var startdiff = (startd.getTime()/1000) - starttime;
    //inserthere
 
-function C(k) {
-  var i=5;
-  e[k][i]++;
-  while(i>=1) {
-     if (e[k][i]==maxe[i]) {
-       e[k][i-1]++;
-       e[k][i]=0;
-     } else { break }
-     i--;
-  }
-  
-  document.forms[k].z.value=e[k][0]+'-'+(e[k][1]>9?e[k][1]:'0'+e[k][1])+'-'+(e[k][2]>9?e[k][2]:'0'+e[k][2])+' '+(e[k][3]>9 ? e[k][3] : '0'+e[k][3])+':'+(e[k][4]>9 ? e[k][4] : '0'+e[k][4])+':'+(e[k][5]>9?e[k][5]:'0'+e[k][5]);
-}
       //-->
    </script>
       ^;
+   my $commonattr=qq'type="text" size="28" class="text" style="text-align:left; background-color: #000;"';
    if($altime) {
       addtimer(1, $altime, $script);
-      $extrainfo2=~s%<!--inserthere-->([^<]*)%<form><input type="text" name="z" class="text" style="text-align:left; background-color: #000;" value="$altime">$1</form>%;
+      $extrainfo2=~s%<!--inserthere-->([^<]*)%<form><input name="z" $commonattr value="$altime">$1</form>%;
    }
    addtimer(0, $time, $script);
    $time=AWisodatetime($time);
-   $time=qq'<form><input type="text" name="z" class="text" style="text-align:left; background-color: #000;" value="$time"> $time UTC</form>';
+   $time=qq'<form><input name="z" $commonattr value="$time"> $time UTC</form>';
    s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/fleet_send.js"></script>$&%;
 } else {
    $time=AWisodatetime($time);
