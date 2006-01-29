@@ -51,7 +51,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          else {$nclicks=1}
          if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          $info{clicks}=$nclicks;
-         $::bmwlink="$origbmwlink/authaw?session=$session&uri=/cgi-bin";
+         $::bmwlink="$origbmwlink/modperl/authaw?session=$session&uri=/cgi-bin";
       }
       
       $::extralink="$::bmwlink/index.html\">AWTools</a>";
@@ -137,6 +137,9 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $info=join(" ", map({"<span style=\"color:gray\">$_=</span>$info{$_}"} sort keys %info));
    my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>";
 
+   if($ingameuri) {
+      s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/aworig.css">%;
+   }
    if($gameuri || $g) {
       # fix AR's broken HTML
       s%</body>%$gbcontent $&%;
