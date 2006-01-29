@@ -7,7 +7,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&display_string &sort_num &sort_string &sort_table &sort_param_to_keys
+&display_string &display_etc &sort_num &sort_string &sort_table &sort_param_to_keys
 );
 use awstandard;
 use CGI qw":standard";

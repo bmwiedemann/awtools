@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use CGI qw":standard *table";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awinput_init();
@@ -12,10 +12,10 @@ for my $p (qw'alliance sort omit') {
 	$options{$p}=param($p);
 }
 print AWheader("\U$options{alliance}\E alliance info [\U$ENV{REMOTE_USER}]", 
-      "<style> th, td { font-family: monospace; 
-      border-left: 1px solid gray;  
-      border-bottom: 1px solid gray; } </style>
-");
+      '<link rel="stylesheet" type="text/css" href="/code/css/alliance.css" />'
+#      border-left: 1px solid gray;  
+#      border-bottom: 1px solid gray; } </style>
+);
 if(!defined $options{sort}){$options{sort}="14.2";}
 
 sub display_needplanets{ my($n)=@_;
@@ -29,7 +29,7 @@ if($options{alliance}) {
    my @displayfuncs=
          (\&display_string, \&display_pid, \&display_sid, 
            \&display_string, \&display_string, \&display_string, \&display_needplanets, \&display_string, \&display_string, \&display_string, \&display_string, 
-           \&AWisodatetime, \&display_string, \&display_string);
+           \&AWisodatetime, \&display_string, \&display_etc);
    foreach(split / /, $options{omit}) {
       $displayfuncs[$_-1]=undef;
    }
@@ -93,8 +93,8 @@ if($options{alliance}) {
          $intel=int((time()-$science[0])/3600/24)."d";
          if($science[1]>=25) {$bio25=1}
          if($science[8]) {
-            my $diff=$science[8]-time();
-            $etc=sprintf(" %.1fh",(int($science[8])-time())/3600);
+#            my $diff=$science[8]-time();
+            $etc=$science[8];#sprintf(" %.1fh",(int($science[8])-time())/3600);
 #if($diff<24*3600 && ($diff<-60*3600 || $diff>-20*3600)) { $intel.=span({-style=>"color:red"},$etc)}
 #           else {$intel.=$etc;}
             
@@ -118,22 +118,24 @@ if($options{alliance}) {
          sort_param_to_keys($options{sort}), \@members2 );
 
 
-# footer
-   if(scalar @alliancepoints == scalar @members) {
-      my $counted=@members;
-      if($counted>=10) {$counted-=int(($counted-5)/5)}
-      @alliancepoints = reverse sort @alliancepoints;
+   if(@members>0) {
+      # footer
+      if(scalar @alliancepoints == scalar @members) {
+         my $counted=@members;
+         if($counted>=10) {$counted-=int(($counted-5)/5)}
+         @alliancepoints = reverse sort @alliancepoints;
 #print "$counted: @alliancepoints\n".br;
-      my $sum=0;
-      foreach(@alliancepoints[0..$counted-1]) { $sum+=$_ }
-      printf "current alliance score: %.2f".br,($sum/$counted);
-      
-   }
-   printf "average culture: %.2f".br,($totalcul/@members);
-   printf "average PL: %.2f".br,($totalpl/@members);
-	if($totalprod[0]) {
-      print "total hourly production/science/culture: ".join(" / ", @totalprod).br;
-      print "total saved A\$ / PP: ".join(" / ", @totalres).br;
+         my $sum=0;
+         foreach(@alliancepoints[0..$counted-1]) { $sum+=$_ }
+         printf "current alliance score: %.2f".br,($sum/$counted);
+         
+      }
+      printf "average culture: %.2f".br,($totalcul/@members);
+      printf "average PL: %.2f".br,($totalpl/@members);
+      if($totalprod[0]) {
+         print "total hourly production/science/culture: ".join(" / ", @totalprod).br;
+         print "total saved A\$ / PP: ".join(" / ", @totalres).br;
+      }
    }
 } else {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
