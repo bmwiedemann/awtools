@@ -288,12 +288,14 @@ sub playername2alli($) {my ($user)=@_;
       if($pid && $pid>2) {
          my $aid=playerid2alliance($pid);
          $alli=lc(playerid2tag($pid));
+         if($awaccess::remap_alli{$alli}) { $alli=$awaccess::remap_alli{$alli} }
          if(!$allowedalli{$alli}) {$alli=""}
       }
    }
    return $alli;
 }
 
+our $fleetscreen="uninitialized";
 # prepare DB for adding planet/planning info
 # input: screen = integer identifying source of data (1=system-info, 2=cleanplanning)
 sub dbplanetaddinit(;$) { my($screen)=@_;
@@ -304,6 +306,8 @@ sub dbplanetaddinit(;$) { my($screen)=@_;
 # input pid = player ID of whose fleets are viewed
 # input screen = 0=news, 1=fleets 2=alliance_incomings 3=alliance_detail
 sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
+   $awinput::fleetscreen=$screen;
+#   awdiag("name:$::options{name} scr:$screen awscr:$awinput::fleetscreen");
 #	untie %planetinfo;
 #	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
    require DBAccess;
@@ -386,9 +390,20 @@ sub playerid2ir($) { my($plid)=@_;
 }
 
 sub estimate_xcv($$) { my($plid,$cv)=@_;
-#TODO use phys+race or SL+4
-   
-   return $cv;
+   return $cv if(!$plid || $plid<=2 || !defined($player{$plid}));
+   my ($phys,$att)=($player{$plid}{sl}, +4);
+   my ($race,$sci)=playerid2ir($plid);
+   if($race) { # use phys+race or SL+4
+      $att=$$race[5];
+   }
+   if($sci && $$sci[0]>time()-4*24*3600) {
+      $phys=$$sci[5];
+   }
+# phys adj values: 
+# DS: (107518/100000-1)/5 = 0.015036 ... 0.01525 ?
+# CS: (211633/1.25/100000-1)/40 = 0.0173266
+# BS: (107709/100000-1)/5 = 0.015418
+   return int($cv*(1+$phys*0.01525)*(1+$awstandard::racebonus[5]*$att));
 }
 
 # input: sidpid
@@ -404,18 +419,19 @@ our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
 # input: 1 row from fleet table
 # output: HTML for a short display of fleet with detailed info in title=
 sub show_fleet($) { my($f)=@_;
+   my $minlen=21;
    #fid alli status sidpid owner eta firstseen lastseen trn cls ds cs bs cv xcv iscurrent info
-   my($fid, $sidpid, $owner, $eta, $firstseen, $lastseen, $trn, $cls, $cv, $iscurrent, $info)=@$f[0,3..9,13,15,16];
+   my($fid, $sidpid, $owner, $eta, $firstseen, $lastseen, $trn, $cls, $cv, $xcv, $iscurrent, $info)=@$f[0,3..9,13..16];
    if($cv==0 && $cls==0 && $trn==0) {return ""}
    my $color=!$iscurrent;
    my $tz=$timezone*3600;
-   my $flstr="$cv CV";
+   my $flstr="$cv/$xcv CV";
    if($trn){$flstr.=", $trn TRN"; if($eta){$color|=2;}}
    if($cls){$flstr.=", $cls CLS";}
    if($color) {$color="; color:$fleetcolormap{$color}"}
    if(!$eta && $iscurrent){$color.="; text-decoration:underline"}
    if($eta) {$eta=AWisodatetime($eta+$tz)} else {$eta=" defending fleet.... "}
-   if(length($flstr)<18) {$flstr.="&nbsp;" x (18-length($flstr))}
+   if(length($flstr)<$minlen) {$flstr.="&nbsp;" x ($minlen-length($flstr))}
    my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".AWisodatetime($firstseen+$tz)." lastseen=".AWisodatetime($lastseen+$tz);
    if($info) {$info=" ".$info}
    return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://aw.lsmod.de/cgi-bin/edit-fleet?fid=$fid\">edit</a> $eta $flstr ".playerid2link($owner)."$info</span>";
