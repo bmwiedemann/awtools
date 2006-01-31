@@ -1,4 +1,7 @@
 use strict;
+package feed::alliance_detail;
+use awstandard;
+use awinput;
 my $ironly=0;
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -84,8 +87,7 @@ for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+)</td>(?:<td>N/A</t
         my $sid="$system#$planetid";
 	my @fleet=@a[3..7];
 	my $details="@fleet";
-	my $time=undef;
-	dbfleetadd($system,$planetid,$pid, $name, $time, 0, \@fleet);
+	dbfleetadd($system,$planetid,$pid, $name, undef, 0, \@fleet);
 }
 
 # flying fleets
