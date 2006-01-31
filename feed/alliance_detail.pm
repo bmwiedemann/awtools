@@ -101,7 +101,7 @@ for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</
 	dbfleetadd($system,$planetid,$pid, $name, $time, 0, \@fleet);
 }
 require 'feed/libincoming.pm';
-parseincomings($_);
+feed::libincoming::parseincomings($_);
 dbfleetaddfinish();
 
 print "<br>done\n";

@@ -9,7 +9,7 @@ my $name=$::options{name};
 dbfleetaddinit(undef, 2);
 
 require 'feed/libincoming.pm';
-parseincomings($_);
+feed::libincoming::parseincomings($_);
 dbfleetaddfinish();
 }
 1;

@@ -13,16 +13,17 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
    if($gameuri && (my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
       if($$options{url}=~m%^http://www1\.astrowars\.com/register/login\.php%) {
          # reset click counter now
-         $dbh->do("UPDATE `usersession` SET `nclick` = '0' WHERE `sessionid` = ".$dbh->quote($session));
+#         $dbh->do("UPDATE `usersession` SET `nclick` = '0' WHERE `sessionid` = ".$dbh->quote($session));
       }
       my $time=time();
       if($$options{url}=~m%^http://www1\.astrowars\.com/0/%) {
          my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = `nclick` + 1 , `lastclick` = ? WHERE `sessionid` = ? LIMIT 1;");
          my $result=$sth->execute($time, $session);
-         if($result==0) {
+         if($result eq "0E0") {
             # insert new entry with 1 click
-            my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES ( ?, ?, 1, ?, ?);");
-            $sth->execute($session, $$options{name}, $time, $time);
+            my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES ( ?, ?, 1, ?, ?, ?, 0);");
+            $$options{ip}||="";
+            $sth->execute($session, $$options{name}, $time, $time, $$options{ip});
          }
       }
    }

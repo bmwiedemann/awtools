@@ -1,7 +1,7 @@
 use strict;
 
 sub feed_plain_race() {
-if(1 && $::options{name}=~m/greenbird/i) {
+if(0 && $::options{name}=~m/greenbird/i) {
    if(m/^\s*(\w*)\s/s) { $::options{name}=$1 }
    else {return 1}
 }
