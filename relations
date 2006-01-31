@@ -4,7 +4,7 @@ use CGI ":standard";
 
 my $readonly=0;
 #if($ENV{REMOTE_USER} eq "is") {$ENV{REMOTE_USER}="fun"; $readonly=1;} # TODO: only for beta10
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 use arrival;
@@ -21,6 +21,17 @@ for my $p (qw'id name alliance relation comment submit') {
 }
 if(defined($options{submit}) && $options{submit}=~/delete/) { $options{delete}=1 }
 if($options{id}) { $options{name}=playerid2name($options{id}); param("name",$options{name}) }
+
+if($options{comment}) {
+   $options{comment} =~ s/[<>]+//g;
+}
+if($options{alliance}) {
+	$options{alliance} =~ s/[^a-zA-Z0-9._-]+//g;
+}
+if($options{name}) {
+	$options{name} =~ s/[^a-zA-Z0-9.äöüß*û _\]\[-]+//g;
+}
+
 if(!$readonly && defined($options{relation})) {
 	$options{name} =~ y/A-Z/a-z/;
 	$options{comment}=~s/\r//g;
@@ -42,7 +53,7 @@ if(!$readonly && defined($options{relation})) {
 	print span({-style=>'color: darkgreen'},"$mod $options{name}"),br;
 }
 
-if($options{name} && $options{name} ne "unknown") {
+if($options{name}) {# && $options{name} ne "unknown") {
 	my $user=$options{name};
 	$user =~ y/A-Z/a-z/;
 	my $new="edit existing entry";
@@ -93,9 +104,9 @@ if($options{name} && $options{name} ne "unknown") {
       }
         #$epl=$opl=0; # while bonus is not really working
       $extralinks=" ".
-              a({-href=>"http://www.astrowars.com/forums/profile.php?mode=viewprofile&u=".$id}, img({-src=>"/images/icon_profile.gif",-alt=>"forum-profile"}))." ".
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/images/shield.png",-alt=>"defend"})).
-         a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/images/sword.png",-alt=>"attack"}))." ";
+         a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/images/sword.png",-alt=>"attack"}))." ".
+              a({-href=>"http://www.astrowars.com/forums/profile.php?mode=viewprofile&u=".$id}, img({-src=>"/images/icon_profile.gif",-alt=>"forum-profile"}))." ";
       }
    }
 	$atag=$atag?" ".alliancelink($atag):"";
@@ -150,7 +161,7 @@ if($options{name} && $options{name} ne "unknown") {
 		my @prod=relation2production($options{comment});
       my $bonus=pop(@prod);
 		if(defined($prod[0])) {
-			print p,"production:",br;
+			print p,"production/sci/cul:",br;
 			my $n=0;
 			foreach(@prod[0..2]) {
 				my $total=int($_*$$bonus[$n]*24);
