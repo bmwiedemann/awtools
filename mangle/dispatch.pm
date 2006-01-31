@@ -51,7 +51,9 @@ sub mangle_dispatch(%) { my($options)=@_;
          else {$nclicks=1}
          if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          $info{clicks}=$nclicks;
-         $::bmwlink="$origbmwlink/modperl/authaw?session=$session&uri=/cgi-bin";
+         if($ENV{REMOTE_USER}) {
+            $::bmwlink="$origbmwlink/modperl/authaw?session=$session&uri=/cgi-bin";
+         }
       }
       
       $::extralink="$::bmwlink/index.html\">AWTools</a>";
@@ -62,7 +64,8 @@ sub mangle_dispatch(%) { my($options)=@_;
       foreach my $m (@module) {
          my $include="mangle/$m.pm";
          next if(!-e $include);
-         do $include;
+         my $ret=do $include;
+         next if $ret==2;
          if($@) {$module="error in $m: $@";}
          else { $module="mangled $m";} # for the log
          # is handled now, so stop filtering
@@ -138,14 +141,16 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>";
 
    if($ingameuri) {
-      s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/aworig.css">%;
+      my $style="aworig";
+      if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
+      s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;
    }
    if($gameuri || $g) {
       # fix AR's broken HTML
       s%</body>%$gbcontent $&%;
       if($g) {
          s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
-         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
+#         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }
          # fix color specification
           s%bgcolor="([0-9a-fA-F]{6})"%bgcolor="#$1"%g;

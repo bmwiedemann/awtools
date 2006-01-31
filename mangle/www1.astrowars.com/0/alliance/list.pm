@@ -27,8 +27,7 @@ if($ENV{REMOTE_USER}) {
    s%(<td>Idle</td>)</tr>%$1<td>ETC</td></tr>%;
    my $tdre=qr/<td>(?:<font color=#80b0b0>)?[^<]*(<\/font>)?<\/td>/;
    s/(<tr align=center bgcolor=#303030 [^>]*><td><a href=[^>]*>)([^<]*)(<\/a>(?:<img src=[^>]*>)?<\/td>$tdre{12}<td>[^<]*)/$1.$2.$3.addidle($2)."<\/td><td>".addetc($2)/ge;
-   do "mangle/www1.astrowars.com/0/alliance.pm";
 #   $_.="notice: this filter is new. It adds time since last click and ETC (Estimated Time to Culture)";
 }
 
-1;
+2;

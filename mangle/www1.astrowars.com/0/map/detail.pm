@@ -1,6 +1,6 @@
 if($::options{url}=~/nr=(\d+)/) {
    my $id=$1;
-   my $link=qq($::bmwlink/system-info?id=$id#planets">);
+   my $link=qq($::bmwlink/system-info?id=$id">);
    my $l=$link;
    $l=~s/.*(http:)/$1/;
    s%(Planets at)%$1 ${link}id=$id</a>%;
