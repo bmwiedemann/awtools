@@ -171,6 +171,9 @@ sub setplanetinfo($%) { my($id,$options)=@_;
 	#print "set '$id', '$options' $dbnamep ";
 	if(!$options) {delete $planetinfo{$id}; }
 	else {
+      $$options{status}||=0;
+      $$options{who}||=0;
+      $$options{info}||="";
 		$planetinfo{$id}="$$options{status} $$options{who} $$options{info}";
 	}
 	untie %planetinfo;
@@ -420,6 +423,7 @@ our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
 # output: HTML for a short display of fleet with detailed info in title=
 sub show_fleet($) { my($f)=@_;
    my $minlen=21;
+   my $minlen1=34;
    #fid alli status sidpid owner eta firstseen lastseen trn cls ds cs bs cv xcv iscurrent info
    my($fid, $sidpid, $owner, $eta, $firstseen, $lastseen, $trn, $cls, $cv, $xcv, $iscurrent, $info)=@$f[0,3..9,13..16];
    if($cv==0 && $cls==0 && $trn==0) {return ""}
@@ -430,9 +434,10 @@ sub show_fleet($) { my($f)=@_;
    if($cls){$flstr.=", $cls CLS";}
    if($color) {$color="; color:$fleetcolormap{$color}"}
    if(!$eta && $iscurrent){$color.="; text-decoration:underline"}
-   if($eta) {$eta=AWisodatetime($eta+$tz)} else {$eta=" defending fleet.... "}
+   if($eta) {$eta=AWisodatetime($eta+$tz)." ".awstandard::AWreltime($eta)} else {$eta="defending fleet.............."}
+   if(length($eta)<$minlen1) {$eta.="&nbsp;" x ($minlen1-length($eta))}
    if(length($flstr)<$minlen) {$flstr.="&nbsp;" x ($minlen-length($flstr))}
-   my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".AWisodatetime($firstseen+$tz)." lastseen=".AWisodatetime($lastseen+$tz);
+   my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
    if($info) {$info=" ".$info}
    return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://aw.lsmod.de/cgi-bin/edit-fleet?fid=$fid\">edit</a> $eta $flstr ".playerid2link($owner)."$info</span>";
 }
