@@ -26,6 +26,7 @@ if($options{user} && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3
       delete $db{$options{user}};
       print "deleted $options{user}";
    } 
+   untie(%db);
 } 
 
 # form

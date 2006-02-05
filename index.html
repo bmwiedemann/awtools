@@ -1,17 +1,18 @@
 #!/usr/bin/perl -w 
 use CGI ":standard";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 awstandard_init();
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout sim planet-info distsqr tradepartners ranking permanentranking holes battles antispy topwars topallis)) {
+foreach(qw(logout sim eta planet-info distsqr tradepartners ranking permanentranking holes battles antispy topwars topallis)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 
 print p;
 #print qq!<a href="/ranking.$ENV{REMOTE_USER}.html">\U$ENV{REMOTE_USER}\E alliance ranking</a>!,br;
+print a({href=>"/alli/$ENV{REMOTE_USER}/"},"\U$ENV{REMOTE_USER}\E data dir"),br;
 #print a({href=>"/$ENV{REMOTE_USER}-holes.html"},"\U$ENV{REMOTE_USER}\E holes"),br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
 my $reldate="051206";
@@ -29,11 +30,11 @@ p,
  a({href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
  a({href=>"http://www1.astrowars.com/rankings/"},"AW rankings"),br,
  a({href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
- a({href=>"/battlecalculator.html"},"AW battle calculator"),br,
+ a({href=>"http://www.astrowars.com/about/battlecalculator"},"AW battle calculator"),br,
  a({href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
  "other tools: ".a({href=>"http://azgharde.celeonet.fr/tools/index.php"},"azgharde")," ",
  a({href=>"http://lefois.de/aw/tool/index.php"}, "Lefois"), " ",
- a({href=>"http://neron92.free.fr/AW_Tools/index.php"}, "neron92"), " ",
+ a({href=>"http://aw.neron92.info/"}, "neron92"), " ",
  a({href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",
  a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
  a({href=>"http://astrostats.reseaulocal.fr/"}, "Astrostats"), " ",

@@ -4,11 +4,26 @@ use DBI;
 use MLDBM qw(DB_File Storable);
 use Fcntl;
 use strict;
-use DBConf;
+use DBAccess;
 # make connection to database
-my $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
+#my $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
+
 if(0) { # create tables
+$dbh->do(qq!
+CREATE TABLE usersession (
+sessionid CHAR ( 32 ) BINARY NOT NULL ,
+name VARCHAR ( 64 ) NOT NULL,
+nclick INT ,
+firstclick INT NOT NULL ,
+lastclick INT NOT NULL ,
+ip VARCHAR ( 15 ) NOT NULL,
+auth TINYINT ( 1 ) NOT NULL,
+PRIMARY KEY ( sessionid ),
+KEY `lastclick` ( lastclick )
+) TYPE=MEMORY;!);
+#exit 0;
+
 $dbh->do(qq!
 CREATE TABLE starmap (
 sid INT( 16 ) UNSIGNED NOT NULL ,
@@ -98,9 +113,10 @@ CREATE TABLE `logins` (
 `pid` INT ( 8 ) NOT NULL ,
 `n` INT ( 4 ) ,
 `time` INT ( 15 ),
+`idle` INT ( 6 ),
 `fuzz` INT ( 8 ),
-INDEX ( alli ),
-INDEX ( `pid` ),
+INDEX ( `alli` ),
+INDEX ( `pid`,`n` ),
 PRIMARY KEY ( `lid` )
 );!);
 $dbh->do(qq!
@@ -110,7 +126,7 @@ CREATE TABLE `fleets` (
 `status` INT( 2 ) UNSIGNED DEFAULT '0' NOT NULL ,
 `sidpid` INT( 16 ) UNSIGNED NOT NULL ,
 `owner` INT( 16 ) UNSIGNED NOT NULL ,
-`time` INT( 16 ) NULL ,
+`eta` INT( 16 ) NULL ,
 `firstseen` INT( 16 ) NOT NULL ,
 `lastseen` INT( 16 ) NOT NULL ,
 `trn` SMALLINT (5) ,
@@ -139,7 +155,7 @@ PRIMARY KEY ( `fid` )
 #UNIQUE `uniq` ( `time` , `dplayer` , `splayer` , `alli` ),
 #PRIMARY KEY ( `tid` )
 #);!);
-#exit 0;
+exit 0;
 }
 
 our (%alliances,%starmap,%player,%playerid,%planets);

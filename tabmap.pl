@@ -27,7 +27,7 @@ our $imagesize=$mapsize*$pixelpersystem+1;
 our $ih=$imagesize/2;
 if($ENV{REMOTE_USER} eq "af") {$mapxoff=-100}
 #if($ENV{REMOTE_USER} eq "tgd") {$mapxoff=-110; $mapyoff=-100}
-my $out="large-$ENV{REMOTE_USER}/star";
+my $out="/home/aw/alli/$ENV{REMOTE_USER}/l/star";
 my $c=25; # base color
 
 
@@ -99,7 +99,7 @@ for(my $x=$mapxoff; $x<$mapxend; $x++) {
 			#print "own $ownerid\n";
 			if(defined($ownerid) && $ownerid>2) {
 				$color=mrelationcolorid($ownerid);
-			} else {$color="white"}
+			} else {$color=defined($ownerid)?"white":"dimgray"}
 			if(@pinfo) {
 				$statuscolor=getstatuscolor($pinfo[0]);
 			} else {$statuscolor=undef}

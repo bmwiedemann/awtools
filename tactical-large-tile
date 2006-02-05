@@ -5,7 +5,8 @@ use mod_perl;
 use constant MP2 => ($mod_perl::VERSION >= 1.99);
 use Apache::RequestRec ();
 #use Apache2::RequestIO ();
-my $dir="/home/aw/db/large-$ENV{REMOTE_USER}";
+#my $dir="/home/aw/db/large-$ENV{REMOTE_USER}";
+my $dir="/home/aw/alli/$ENV{REMOTE_USER}/l";
 my ($x,$y)=$ENV{QUERY_STRING}=~m/x=([^=]*)&y=([^=]*)/;
 my $f="$dir/star$x,$y.png";
 my ($size,$modified)=(stat($f))[7,9];
@@ -15,8 +16,8 @@ if(!open(F,"<", $f)) {
    $r->content_type('text/plain');
    $r->print("error opening $f\n".$!);
 } else {
-   undef($/);
-   my $image=<F>;
+   my $image;
+   sysread(F, $image, 4096);
    close(F);
 
    $r->content_type('image/png');

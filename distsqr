@@ -2,7 +2,7 @@
 
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awinput_init();
@@ -16,7 +16,6 @@ if(param()) {
  for my $p (qw'dx dy sx sy sid did') {
   $options{$p}=param($p);
  }
-# require "input.pm";
  if($options{sid}) { ($options{sx},$options{sy})=systemid2coord($options{sid}); }
  if($options{did}) { ($options{dx},$options{dy})=systemid2coord($options{did}); }
  my $dx=$options{sx}-$options{dx};
@@ -31,6 +30,6 @@ if(param()) {
    textfield(-name=>'dx', -size=>$s, -class=>'text'), " x ", textfield(-name=>'dy', -size=>$s, -class=>'text'), " y - or id: ", textfield(-name=>'did', -size=>$s+1, -class=>'text'), " destination location", br,
    submit(-class=>'smbutton'), end_form;
 }
-print end_html;
+print AWtail();
 
-awinput::awinput_finish();
+#awinput::awinput_finish();

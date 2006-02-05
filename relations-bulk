@@ -3,7 +3,7 @@ use strict;
 use CGI ":standard";
 use DB_File;
 
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awinput_init();
@@ -30,6 +30,7 @@ if(defined($options{relation})) {
 		$options{relation}+=0;
 		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
 		my @rel=getrelation($user);
+      $rel[2]||="";
 		$data{$user}="$options{relation} $options{alliance} $options{comment}\n$rel[2]";
 	}
 	untie(%data);

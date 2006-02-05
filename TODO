@@ -1,12 +1,17 @@
-fleet tracker (remove old ones on feeding)
+system-info: rearrange basic player info in table
+speed table (Bio0, Bio4(2AU)-link arrival,...Bio20)
+#fleet tracker (remove old ones on feeding)
+#fleet screen: show owner+relation of fleet target
+#directory for alliance data with PerlAuthzHandler
 incoming-intercept + defence tool
 fix player/planets index after feeding (e.g. with mysql)
-muffin Feed+Mangle (Upload+Download) filter
+tactical-large/live: Bio selector(JS)
+#muffin Feed+Mangle (Upload+Download) filter
 #trade tool listing players with $TAs<n  and A$+PP>15k
-include battles.csv 7-day history in alliancerelation-detector
+#include battles.csv 7-day history in alliancerelation-detector
 #better idle-time tracking (start-end)
 anon export for relations
-fleets (and others) with local times instead of GMT. not for BB-export
+#fleets (and others) with local times instead of GMT. not for BB-export
 correlate strongest fleet to best guarded
 merge strongest fleets history to catch moving fleets or see growth/loss
 #RSA thread link - auto from referer. e.g. use $::planetinfo{"$sid#0"}

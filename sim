@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 awstandard_init();
 
@@ -9,14 +9,18 @@ my $title="AW economic simulation";
 print AWheader($title);
 my @params=();
 foreach(qw(turns print tactic pop pp cul sci social trades initialp maxbuilding cdturns activeturns)) {
-   if(param($_)) {push(@params, "--$_=".param($_));}
+   my $p=param($_);
+   if($p) {
+      $p=~/([0-9.-]+)/;
+      push(@params, "--$_=$1");
+   }
 }
 foreach(qw(trader startuplab)){
    if(param($_)) {push(@params, "--$_");}
 }
 if(@params && param("turns")<=9999) {
 	print "simulating...".br."\n<pre>";
-	system("./awsim.pl", @params);# or print "failed executing\n";
+	print `./awsim.pl @params`;# or print "failed executing\n";
 	print "</pre>\n";
 } else {
 	my $s=5;

@@ -155,7 +155,7 @@ if(param()) {
             $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
          }
 			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,$sysinfo,
-			"planets here: <ul>";
+			"planets here: <a name=\"planets\" /><ul>";
 		} else {
 			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
 		}
@@ -184,7 +184,7 @@ if(param()) {
                $pinfo=~s!\n!<br />!g;
                $pinfo=~s/$magicstring([^:]*)/$magicstring.span({-style=>
                      "color: ".getrelationcolor((getrelation($1))[0])},$1)/geo;
-					$info=" ".span({-style=>"color: $scolor"},$planetstatusstring{$status})." ".span({-style=>"color: $rcolor"},$atag." ".$name).": ".$pinfo;
+					$info=" ".span({-style=>"color: $scolor"},$planetstatusstring{$status})." ".playerid2link($pinfo[1]).": ".$pinfo;
 				}
 			}
          my $fleets = awinput::get_fleets(sidpid22sidpid3m($system,$planetid), $wantcurrent);
@@ -198,7 +198,7 @@ if(param()) {
 			if(!$options{export}) {
 				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/images/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
 				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
-				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info.$fleetsstr."</li>\n";
+				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, playerid2link($$h{ownerid}), $info.$fleetsstr."</li>\n";
 			} else {
 				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s", $planetid, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), $info);
 			}
@@ -236,5 +236,6 @@ if(param()) {
    textfield(-name=>'name', -class=>'text'), " system name", br,
    submit(-class=>'smbutton'), end_form;
 }
-print AWtail();
+print br.b("notice: fleets now show two CV values with the second one being xCV = effective CV = CV*attbonus*physbonus").
+AWtail;
 

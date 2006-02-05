@@ -18,15 +18,18 @@ if($refsys && param()) {
 	}
    my($refe,$refs)=(0,0);
    my($refsid,$refpid)=split(/[^0-9]/,$refsys);
+   $refpid||=0;
    my($refx,$refy)=systemid2coord($refsid);
    my($x,$y)=systemid2coord($options{sid});
+   $refx||=0;
+   $refy||=0;
+   $x||=0;
+   $y||=0;
    my $refdist=($refx-$x)**2+($refy-$y)**2;
    if(defined($awuser)) {
-      my @rel=getrelation($awuser);
-      my @race;
-      my @sci;
-      if((@race=relation2race($rel[2]))) {$refs=$race[4];$refs=~s/\+//;}
-      if((@sci=relation2science($rel[2]))) {if($sci[0]>99){shift(@sci)};$refe=$sci[2]}
+      my($race,$sci)=awinput::playername2ir($awuser);
+      if($race) {$refs=$$race[4];$refs=~s/\+//;}
+      if($sci) {if($$sci[0]>99){shift(@$sci)};$refe=$$sci[2]}
    }
    my $pdiff=abs($refpid-$options{pid});
    #print header(), "eta for: $refsid#$refpid -> $options{sid}#$options{pid}";

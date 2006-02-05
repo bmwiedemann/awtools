@@ -2,7 +2,7 @@
 use strict;
 use CGI ":standard";
 #$ENV{REMOTE_USER}="af";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awinput_init();
@@ -16,7 +16,8 @@ print AWheader("alliance ranking [\U$ENV{REMOTE_USER}\E]");
 my $aid=alliancetag2id($ENV{REMOTE_USER});
 my @members=();
 if($aid) {
-	@members=allianceid2members($aid);
+	my $members=awinput::allianceid2membersr($aid);
+   if($members){@members=@$members}
 	foreach (@members) {
 		$_=playerid2name($_);
 		$_="\L$_";

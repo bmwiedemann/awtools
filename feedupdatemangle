@@ -35,6 +35,7 @@ if(param()) {
 		}
 	}
    if($options{cookie}) { $options{headers}={Cookie=>$options{cookie}}; }
+   $options{ip}=$ENV{REMOTE_ADDR};
    $_=$html;
 #   require "./mangle/dispatch.pm";
    mangle::dispatch::mangle_dispatch(\%options);

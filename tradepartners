@@ -3,7 +3,7 @@
 use strict;
 use CGI qw":standard";
 my $title="trade partners [\U$ENV{REMOTE_USER}\E]";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 awinput_init();
@@ -19,7 +19,7 @@ for my $p (qw'sort') {
 if(!defined $options{sort}){$options{sort}="-6.4.5";}
 
 #print "test";
-my @tap=gettradepartners(4, 5000);
+my @tap=gettradepartners(4, 000);
 my @tap2;
 foreach my $entry (@tap) {
    my ($name, $ad, $prod, $partners)=@$entry;
@@ -36,7 +36,7 @@ foreach my $entry (@tap) {
 }
 
 print sort_table([qw(who ad prod/h partners ready(h) relation)], 
-         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_string],
+         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_relation],
          [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@tap2 );
 

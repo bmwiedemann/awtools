@@ -20,7 +20,7 @@ our $ih=$imagesize/2;
 #my $fileend=$file;
 #$fileend=~s".*/"";
 #$fileend=~s/(\d\d)-(\d\d)-(\d+)\.tar\.bz2/$3-$2-$1/;
-my $out="datadir/tactical-$ENV{REMOTE_USER}";
+my $out="/home/aw/alli/$ENV{REMOTE_USER}/tactical";
 my $c=25; # base color
 
 

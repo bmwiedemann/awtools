@@ -1,6 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
+BEGIN {chdir "/home/aw/db"}
+use awinput;
 print header();
 use WWW::Mechanize;
 #use WWW::Mechanize::FormFiller;
@@ -25,6 +27,9 @@ $agent->env_proxy();
   m!<a href ="/about/starmap.php\?dx=([+-]?\d+)&dy=([+-]?\d+)"!;
   my ($x,$y)=($1,$2);
   my $time = gmtime();
-  print "$time $pid $name\n",
+  awinput_init();
+  my $sid=systemcoord2id($x,$y);
+  awinput::awinput_finish();
+  print "$time $sid $pid $name ",
       "($x,$y)\n";
 

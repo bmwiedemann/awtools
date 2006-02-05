@@ -1,46 +1,49 @@
 #!/usr/bin/perl -w
+package feedupdate;
 use strict;
 use CGI ":standard";
 
 if($ENV{REMOTE_USER} eq "affeed") {$ENV{REMOTE_USER}="af"}
 
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
-use feed::dispatch;
+#use feed::dispatch;
 awstandard_init();
 
 my $title="AW feed update";
 my $debug=0;
 print AWheader($title);
-%::options=();
-foreach my $p (qw(tz html file debug name url)) {
-	$::options{$p}=param($p);
+our %options=();
+foreach my $p (qw(tz html file debug name url cookie post)) {
+	$options{$p}=param($p);
 }
 if(param()) {
 	chdir("/home/bernhard/code/cvs/perl/awcalc");
-	my $html=$::options{html};
+	my $html=$options{html};
 	if(upload('file')) {
-		print "uploaded file $::options{file}\n".br;
+		print "uploaded file $options{file}\n".br;
 		my $bytes_read=read(upload('file'), $html, 40000);
 		#print $bytes_read;
 	}
 	print "input ",length($html)," bytes".br;
+   if($options{cookie}) { $options{headers}={Cookie=>$options{cookie}}; }
+   $options{ip}=$ENV{REMOTE_ADDR};
 	if($debug) {
 		open(DEBUG, ">> /tmp/debug");
 		print DEBUG time(),"\n";
-		foreach(keys(%::options)) {
+		foreach(keys(%options)) {
 			my $entry=$_."=";
-			if($::options{$_}){$entry.=$::options{$_}}
+			if($options{$_}){$entry.=$options{$_}}
 			print DEBUG $entry,"\n";
 		}
 	}
-#require 'feed/dispatch.pm';
+   do 'feed/dispatch.pm';
    awinput_init();
-   feed::dispatch::feed_dispatch($html, \%::options);
+   feed::dispatch::feed_dispatch($html, \%options);
 } else {
 	my $uc=cookie('user');
-	if(!$::options{name}) {param("name",$uc)}
+	if(!$options{name}) {param("name",$uc)}
 	print start_form(-method=>'post',-enctype=>"multipart/form-data", -name=>"form"),
 	textfield(-name=>'tz', -value=>$timezone, -class=>'text'), " timezone of subject: GMT+n", br,
 	textfield(-name=>'name',-value=>'', -class=>'text'), " who reports (e.g. for own fleet movements)", br,

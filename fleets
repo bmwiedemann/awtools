@@ -5,37 +5,55 @@ use CGI ":standard";
 BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
+use DBAccess;
 awinput_init();
-my $title="fleets [\U$ENV{REMOTE_USER}\E]";
+my $alli=$ENV{REMOTE_USER};
+my $title="fleets [\U$alli\E]";
+my $wantcurrent=" AND `iscurrent` = 1 ";
+my %options;
+for my $p (qw'history') {
+   $options{$p}=param($p);
+}
+if($options{history}) {$wantcurrent=""}
+
+
 print AWheader($title);
-
-our %CV;
-my @out;
-
-sub sortfunc { return $CV{$b}<=>$CV{$a} }
+print p(a({-href=>"?history=".(!$options{history})},"toggle history"));
 
 print "sys#planet: info".br;
-foreach my $p (keys %planetinfo) {
-	my $info=$planetinfo{$p};
-	next unless $info=~s/$magicstring([^:]*)/$magicstring.span({-style=>"color: ".getrelationcolor((getrelation($1))[0])},$1)/geo;
-   my($status, $who)=($info=~m/^(\d) ([^ ]*)/);
-	$info=~s/^.*?($magicstring)/$1/so;
-	my @CV=($info=~/(\d+)CV/g);
-	my $CV=0;
-	foreach(@CV){$CV+=$_}
-#	if($CV==0 && $info=~/200\d (\d+) (\d+) (\d+) (\d+) (\d+)/) { $CV=fleet2cv([$1,$2,$3,$4,$5]); }
-	$p=~/^(\d+)#/;
-	my $sid=$1;
-	(my $penc=$p)=~s/#/%23/;
-   $info=~s!^!<br />!mg;
-   $info=~s!automagic:!!g;
+
+my $res=$dbh->selectall_arrayref("SELECT sidpid,sum(xcv),sum(trn),sum(cls) FROM `fleets` WHERE `alli` = '$alli' AND `iscurrent` = 1 GROUP BY `sidpid` ");
+
+
+my @sidpids=sort {$$b[1]<=>$$a[1]} @$res;
+
+foreach my $row1 (@sidpids) {
+   my($sidpid,$sumcv,$trn,$cls)=@$row1;
+   next if ($sumcv+$trn+$cls == 0);
+   my $sid=awinput::sidpid2sidm($sidpid);
+   my $pid=awinput::sidpid2pidm($sidpid);
+   my $p="$sid#$pid";
+   (my $penc=$p)=~s/#/%23/;
    my $planet=sidpid2planet($p);
    my $owner=planet2owner($planet);
    my $sb=planet2sb($planet);
-	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> of !.display_pid($owner)." SB $sb &larr; ".display_pid($who)." $info<br />\n";
+	my $info=$planetinfo{$p};
+   $info||="";
+   $info=~s!^\d [^ ]+!!;
+   $info=~s!automagic:.*!!g;
+	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> of !.display_pid($owner)." SB $sb $info";
 	#my $str=qq!<a href="/cgi-bin/system-info?id=$sid">$p</a> $info<br />\n!;
-	push(@out,$str);
-	$CV{$str}=$CV;
+   
+   print "$str\n".br;
+
+#   my $sth=$dbh->prepare_cached("SELECT * FROM `fleets` WHERE `alli` = ? $wantcurrent AND `sidpid` = ?");
+   my $res=awinput::get_fleets($sidpid, $wantcurrent); #$dbh->selectall_arrayref($sth, {}, $alli, $sidpid);
+   foreach my $row2 (@$res) {
+      print awinput::show_fleet($row2).br;
+      #print "@$row2\n".br;
+   }
+   print br;
 }
-print (sort sortfunc @out);
+
 print AWtail();
+

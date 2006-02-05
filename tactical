@@ -2,29 +2,30 @@
 use strict;
 use CGI ":standard";
 
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awmap;
 awstandard_init();
 
-if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
-my $title="tactical map [\U$ENV{REMOTE_USER}\E]";
+my $alli=$ENV{REMOTE_USER};
+#if(!$alli) {$alli="af"}
+my $title="tactical map [\U$alli\E]";
 my %options;
 
 for my $p (qw'map') {
 	$options{$p}=param($p);
 }
 if($options{map}) {
-	my $f="datadir/tactical-$ENV{REMOTE_USER}.png";
-	my $size=(stat($f))[7];
-	my $modified=(stat(_))[9];
+	my $f="/home/aw/alli/$alli/tactical.png";
+	my ($size,$modified)=(stat($f))[7,9];
 	open(F, "<", $f) or die $!;
    my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime($modified);
    $year+=1900;
-   $modified=sprintf("$::weekday[$wday], %.2i $::month[$mon] $year %.2i:%.2i:%.2i GMT", $mday, $hour, $min, $sec);
+   $modified=sprintf("$awstandard::weekday[$wday], %.2i $awstandard::month[$mon] $year %.2i:%.2i:%.2i GMT", $mday, $hour, $min, $sec);
 	print header(-type=>'image/png', -last_modified=>$modified, -expires=>"+6h", #-last_modified=>$modified,
     -content_lenth=>$size);
-	print <F>;
+   local $/;
+   print <F>;
 } else {
 	print header(-expires=>'+1d'), 
 		start_html(-title=>$title , -style=>"/tactical.css"), 

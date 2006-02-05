@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/bernhard/code/cvs/perl/awcalc";}
+BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 awstandard_init();
 
 my $sortopts="-k15";
-my $round="gold2";
+my $round="gold3";
 my $titlestr;
 if($0=~/topwars/) {
 	$titlestr=" wars";
