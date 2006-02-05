@@ -35,12 +35,14 @@ my @data2;
 foreach(@data) {
 	my($x,$y,$ename,$epid,$esl,$ebio,$rel)=@$_;
    my $dist=sprintf("%.2f", sqrt(($x-$sysxy[0])**2 + ($y-$sysxy[1])**2));
-   push(@data2, [$epid, $x, $y, $ebio, $dist, $rel]);
+   $rel||=4;
+   my $etc=awinput::playername2etc(playerid2name($epid));
+   push(@data2, [$epid, $x, $y, $ebio, $dist, $rel, $etc]);
 }
  
-print sort_table([qw(who x y bio dist relation)],
-         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_string],
-         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+print sort_table([qw(who x y bio dist relation ETC)],
+         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_string, \&display_etc],
+         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@data2);
 
 print AWtail();
