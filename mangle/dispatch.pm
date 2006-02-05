@@ -5,8 +5,8 @@ use awinput;
 use DBAccess;
 
 our $g;
-my $origbmwlink="<a href=\"http://$bmwserver/cgi-bin";
-my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period this morning (2006-01-23 02:30-06:00 UTC). Do not worry about errors then. Just reload a bit later.</b><br>";
+my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
+my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period next morning (2006-02-01 03:30-07:00 UTC). Do not worry about errors then. Just reload a bit later.</b><br>";
 
 sub url2pm($) {my($url)=@_;
    if(!$url){ return ();}
@@ -27,8 +27,8 @@ sub url2pm($) {my($url)=@_;
 # output $_ with HTML of mangled page
 sub mangle_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
-   if($url && $url=~m%/images/%) {return}
    $g=$$options{name} eq "greenbird";
+#   if($$options{name} eq "kroy") { $notice="<b style=\"color:green\">good morning kroy :-) ... I was wondering if it is worth while implementing an instant messenging facility into AW - like this one.</b><br>" }
    %::options=%$options;
    $::bmwlink=$origbmwlink;
    my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
@@ -99,7 +99,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       }
 
 # colorize player links
-   require "mangle/special_color.pm"; mangle_player_color();
+   require "mangle/special_color.pm"; mangle::special_color::mangle_player_color();
 
 # remove ads
    s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
@@ -114,7 +114,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       my $reltime=$now-60*25;
       my $allimatch=" AND `aid` = `alliance` AND usersession.name = player.name AND `tag` LIKE ? ";
       my $allifrom=",`player`,`alliances`";
-      if(0 && $$options{name} eq "greenbird") {$allimatch=$allifrom=""}
+      if(0 && $g) {$allimatch=$allifrom=""}
       my $sth=$dbh->prepare_cached("SELECT usersession.name,`lastclick` 
             FROM `usersession` $allifrom 
             WHERE `lastclick` > ? $allimatch AND usersession.name != ?
@@ -141,7 +141,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>";
 
    if($ingameuri) {
-      my $style="aworig";
+      my $style=$g?"awmod2":"awmod";
       if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
       s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;
    }
@@ -149,14 +149,14 @@ sub mangle_dispatch(%) { my($options)=@_;
       # fix AR's broken HTML
       s%</body>%$gbcontent $&%;
       if($g) {
-         s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
+#         s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
 #         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }
          # fix color specification
           s%bgcolor="([0-9a-fA-F]{6})"%bgcolor="#$1"%g;
       }
       s%(<a href=)([a-zA-Z0-9/.:?&\%=-]+)>%$1"$2">%g;
-      s%</head>%<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/awfavicon.ico">\n<link rel="shortcut icon" href="http://aw.lsmod.de/awfavicon.ico">$&%;
+      s%</head>%<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/awfavicon.ico">\n<link rel="shortcut icon" href="http://aw.lsmod.de/awfavicon.ico">\n$&%;
    }
 }
 

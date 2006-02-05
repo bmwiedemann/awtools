@@ -1,3 +1,7 @@
+package mangle::special_color;
+use awstandard;
+use awinput;
+
 sub manglecolor($$) { my($id,$name)=@_;
    my $col="white";
    my @rel=getrelation($name);
@@ -13,7 +17,8 @@ sub manglecolor($$) { my($id,$name)=@_;
 
 sub mangle_player_color() {
 # colorize player links
-   s%(<a href=/0/Player/Profile.php/?\?id=)(\d+)>([^<]*)</a>%$1.$2." style=\"color:".manglecolor($2,$3)."</a>"%ge;
+   s%(<a href=/0/Player/Profile\.php/?\?id=)(\d+)>([^<]*)</a>%$1.$2." style=\"color:".manglecolor($2,$3)."</a>"%ge;
+   s%(<a href="profile\.php\?mode=viewprofile&amp;u=)(\d+)("[^>]*)>([^<]*)</a>%$1.$2.$3." style=\"color:".manglecolor($2,$4)."</a>"%ge;
 }
 
 1;

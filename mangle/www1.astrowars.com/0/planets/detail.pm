@@ -12,8 +12,8 @@ foreach my $n (0..$#buildings) {
    my $buil=$buildings[$n];
    next if(! m%($buil</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%);
    my ($level,$ppneeded)=($2,$4);
-   next if($ppneeded>1000 || $ppneeded>$pp);
-   s%($buil</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4 <a href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$4&amp;produktion=$val[$n]" style="background-color:red">+1</a>$5%;
+   next if(($ppneeded>1000 && $buil ne "Starbase") || $ppneeded>$pp);
+   s%($buil</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4 <a href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$4&amp;produktion=$val[$n]" class="awtools">+1</a>$5%;
 #   $debug.="<br>test: $buil $val[$n] $2 $4";
 }
 

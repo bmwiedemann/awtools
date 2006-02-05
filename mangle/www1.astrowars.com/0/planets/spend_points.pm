@@ -8,6 +8,6 @@ if($::options{url}=~/produktion=(\w+)/) {
    s/name="produktion" value="$prod"/$& checked/;
 }
 s%<form action="/0/Planets/submit.php"%$& name="form"%;
-s/(<input type="text" name="points" size="3" class=text value=")(\d+)("\s*> \/ \d+)/$1$points$3 <a href="#all" onClick="document.form.points.value=$2;">all<\/a> $script/;
+s/(<input type="text" name="points" size="3" class=text value=")(\d+)("\s*> \/ \d+)/$1$points$3 <a class="awtools" href="#all" onClick="document.form.points.value=$2;">all<\/a> $script/;
 
 1;

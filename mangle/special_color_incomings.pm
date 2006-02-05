@@ -1,3 +1,6 @@
+use strict;
+package mangle::special_color_incomings;
+
 # emphasize important incomings 
 sub mangle_incoming() {
 #going to attack <b>Alpha Kelb Alrai</b>          [914] 2
