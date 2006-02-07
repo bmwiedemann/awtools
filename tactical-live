@@ -19,22 +19,23 @@ for my $p (qw'map xs ys xe ye scale') {
 }
 my $xsize=$options{xe};
 my $ysize=$options{ye};
+my $done;
 if(defined($options{xs}) && $options{scale}>0 && $options{scale}<5 && $xsize>0 && $ysize>0 && $xsize*$ysize<=$max) { # validity checks
  if($options{map}==1) {
 	use bytes;
 	if($xsize>0 && $ysize>0 && $xsize*$ysize<=$max) {
 		$options{xs}-=$xsize>>1;
 		$options{ys}-=$ysize>>1;
-      awinput_init();
+      awinput_init(1);
 		my $png=awdraw::mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize-1, $options{scale})->png();
       awinput::awinput_finish();
 		my $size=length($png);
 		print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>$size), $png;
-		exit(0);
+      $done++;
 	}
 	$options{map}==0;
  }
- if($options{map}==2) {
+ if(!$done && $options{map}==2) {
   my $xsize=$options{xe}>>1;
   my $ysize=$options{ye}>>1;
   param("xs", $options{xs}-$xsize);
@@ -67,9 +68,10 @@ function getMouseXY(e) {
 }
 //--></script>%
 	,end_form, end_html;
-	exit(0);
+   $done++;
  }
 }
+if(!$done) {
    awinput_init();
 	my $s=5;
 	print AWheader($title),start_form(-method=>'get', -name=>"form"),
@@ -80,4 +82,4 @@ function getMouseXY(e) {
 	 end_form, end_html;
 
    awinput::awinput_finish();
-
+}

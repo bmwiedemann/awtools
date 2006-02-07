@@ -89,6 +89,7 @@ access:
 	-cp -ia ../dbm/empty.dbm ~/db/$a-relation.dbm
 	-cp -ia ../dbm/empty.dbm ~/db/$a-planets.dbm
 	touch ~/db/$a-planets.dbm.lock ~/db/$a-relation.dbm.lock
+	../dbm/add.pl ~/db/$a-relation.dbm $a "9 $a "
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}
 	/usr/sbin/htpasswd2 ~/.htpasswd $a

@@ -41,9 +41,9 @@ if($options{status}) {
 	} else {
 		#$options{info}=$options{comment};
       for($options{comment}) {
-         s/\bin (\d+) (days|d)\b/AWisodate(time()+3600*24*$1)/e;
-         s/\bin (\d+) (hours|h)\b/AWisodatetime(time()+3600*$1)/e;
-         param('comment', $options{comment})
+         s/\bin (\d+) (days|d)\b/AWisodate(time()+3600*24*$1)/ge;
+         s/\bin (\d+) (hours|h)\b/AWisodatetime(time()+3600*$1)/ge;
+         param('comment', $_);
       }
 		$plinfo={"sidpid"=>sidpid22sidpid3($sid,$pid), "status"=>$options{status}, "who"=>$options{who}, "info"=>$options{comment}};
 	}

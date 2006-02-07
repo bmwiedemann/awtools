@@ -18,13 +18,6 @@ print AWheader("\U$options{alliance}\E alliance info [\U$ENV{REMOTE_USER}]",
 );
 if(!defined $options{sort}){$options{sort}="14.2";}
 
-sub display_needplanets{ my($n)=@_;
-      my $planetscolor="";
-      if($n>1) {$planetscolor=' style="color:red"'}
-      if($n==1) {$planetscolor=' style="color:brown"'}
-      return "<span $planetscolor>$n</span>";
-}
-
 if($options{alliance}) {
    my @displayfuncs=
          (\&display_string, \&display_pid, \&display_sid, 

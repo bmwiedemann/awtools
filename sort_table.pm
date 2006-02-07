@@ -7,7 +7,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&display_string &display_etc &sort_num &sort_string &sort_table &sort_param_to_keys
+&display_string &display_etc &display_needplanets &sort_num &sort_string &sort_table &sort_param_to_keys
 );
 use awstandard;
 use CGI qw":standard";
@@ -25,6 +25,12 @@ sub display_etc($) { my($etc)=@_;
       if($etc>-10*3600 && $etc<20*3600) {$ret=qq'<span style="color:#f44">$ret</span>';}
    }
    return $ret;
+}
+sub display_needplanets{ my($n)=@_;
+   my $planetscolor="";
+   if($n>1) {$planetscolor=' style="color:red"'}
+   if($n==1) {$planetscolor=' style="color:brown"'}
+   return "<span $planetscolor>$n</span>";
 }
 
 

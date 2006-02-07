@@ -31,6 +31,10 @@ if($::options{post}) {
 # calc timezone
    my $extrainfo="";
    my $tz;
+   my $energy=$cgi->param("energy");
+   if($energy) {
+      $extrainfo.="<tr><td$align>Energy$delim</td><td>$energy</td></tr>";
+   }
    if(m/<title>(.*)/) {
       $tz=awstandard::guesstimezone($1);
       my $tzh=sprintf("%i",$tz/3600);

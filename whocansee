@@ -13,7 +13,7 @@ my %options;
 for my $p (qw'sort sid') {
    $options{$p}=param($p);
 }
-if(!defined $options{sort}){$options{sort}="-6.5";}
+if(!defined $options{sort}){$options{sort}="-6.-7.8";}
 my $sysid=$options{sid};
 my @sysxy=systemid2coord($sysid);
 if(!defined($sysxy[0])) {
@@ -37,12 +37,15 @@ foreach(@data) {
    my $dist=sprintf("%.2f", sqrt(($x-$sysxy[0])**2 + ($y-$sysxy[1])**2));
    $rel||=4;
    my $etc=awinput::playername2etc(playerid2name($epid));
-   push(@data2, [$epid, $x, $y, $ebio, $dist, $rel, $etc]);
+   my $p=$player{$epid};
+   my $planets=playerid2planets($epid);
+   my $needplanets=$$p{culture}-$planets;
+   push(@data2, [$epid, $x, $y, $ebio, $dist, $rel, $needplanets, $etc]);
 }
  
-print sort_table([qw(who x y bio dist relation ETC)],
-         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_string, \&display_etc],
-         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+print sort_table([qw(who x y bio dist relation need ETC)],
+         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_string, \&display_needplanets, \&display_etc],
+         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@data2);
 
 print AWtail();
