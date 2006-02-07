@@ -8,7 +8,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
-qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodatetime &sb2cv &title2pm &file_content
+qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &sb2cv &title2pm &file_content
       $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname);
 
 use CGI ":standard";
@@ -299,8 +299,15 @@ sub AWtime($) { my($t)=@_;
    if($tz>=0){$tz="+$tz"}
    return AWreltime($t)." = ". scalar gmtime($t)." GMT = ".scalar gmtime($t+3600*$timezone)." GMT$tz";
 }
+
 # input: UNIX timestamp
 # input: ISO format date string (like 2005-12-31)
+sub AWisodate($) { my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($_[0]);
+   sprintf("%i-%.2i-%.2i", $year+1900, $mon+1, $mday);
+}
+
+# input: UNIX timestamp
+# input: ISO format date+time string (like 2005-12-31 23:59:59)
 sub AWisodatetime($) { my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($_[0]);
    sprintf("%i-%.2i-%.2i %.2i:%.2i:%.2i", $year+1900, $mon+1, $mday, $hour, $min, $sec);
 }
