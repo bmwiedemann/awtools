@@ -1,11 +1,13 @@
 #exit 0; # partial energy no more needed
 use strict;
+#use CGI ":standard";
+use awinput;
 
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 my $name="\L$::options{name}";
-print a({-href=>"relations?name=$name"}, $::options{name}).br();
+#print a({-href=>"relations?name=$name"}, $::options{name}).br();
 
 
 my @science;
@@ -25,8 +27,10 @@ if(my @a=m!Culture</a>.*INPUT type="text" value="(\d+):(\d+):(\d+)" size="8" nam
    print " ETC: ".AWtime($etc).br();#" @a\n<br>";
 }
 # calc ETC for > 3 days
-if(@science<9 && m!href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a>(?: <b>([+-]\d+)%)?!) {
+if(@science<9 && m!Culture.*href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a>((?: <b>[+-]\d+%)|)!) {
    my ($culperh,$culbonus)=($1,$2);
+#   awdiag("$::options{name} $culperh $culbonus");
+   $culbonus=~s/.*([+-]\d+).*/$1/;
    $culbonus||=0;
    $culbonus=1+$culbonus/100;
 #print "cul: $culperh,$culbonus<br>";
