@@ -6,6 +6,7 @@ topn=500
 round=gold3
 allies=$(shell cat allowed_alliances)
 tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners whocansee permanentranking adminuseralli logout
+pubtools=sim topwars nph-brownie.cgi arrival authaw
 #allies=
 #winterwolf arnaken manindamix tabouuu
 all: TA.candidate
@@ -14,6 +15,9 @@ test:
 links:
 	ln -f ${tools} /srv/www/cgi-bin/aw/
 	ln -f topwars /srv/www/cgi-bin/aw/topallis
+	ln -f ${pubtools} /srv/www/cgi-bin/aw/public
+	ln -f topwars /srv/www/cgi-bin/aw/public/topallis
+
 system-ids.txt:
 	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
 updatecsv: dumpdbs
