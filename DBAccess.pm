@@ -1,6 +1,5 @@
 package DBAccess;
 use DBI;
-use Tie::DBI;
 use DBConf;
 require Exporter;
 use vars qw(@ISA @EXPORT);
