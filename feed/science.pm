@@ -25,8 +25,10 @@ if(my @a=m!Culture</a>.*INPUT type="text" value="(\d+):(\d+):(\d+)" size="8" nam
    print " ETC: ".AWtime($etc).br();#" @a\n<br>";
 }
 # calc ETC for > 3 days
-if(@science<9 && m!href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a> <b>([+-]\d+)%!) {
-   my ($culperh,$culbonus)=($1,1+$2/100);
+if(@science<9 && m!href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a>(?: <b>([+-]\d+)%)?!) {
+   my ($culperh,$culbonus)=($1,$2);
+   $culbonus||=0;
+   $culbonus=1+$culbonus/100;
 #print "cul: $culperh,$culbonus<br>";
    if($culperh && m!Culture.*/images/leer.gif" height="10" width="\d+"></td><td>(\d+)<!) {
       my $culleft=$1;
