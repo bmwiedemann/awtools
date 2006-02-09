@@ -16,7 +16,7 @@ print AWheader("\U$options{alliance}\E alliance info [\U$ENV{REMOTE_USER}]",
 #      border-left: 1px solid gray;  
 #      border-bottom: 1px solid gray; } </style>
 );
-if(!defined $options{sort}){$options{sort}="14.2";}
+if(!defined $options{sort}){$options{sort}="-7.14.2";}
 
 if($options{alliance}) {
    my @displayfuncs=
@@ -100,7 +100,7 @@ if($options{alliance}) {
       $totalpl+=$$p{level};
       my $needplanets=$$p{culture}-$planets;
       my $links=profilelink($pid). $alink;
-      push(@members2, [$links, $pid, $$p{home_id}, $$p{level}, $$p{science}, $$p{culture}, $needplanets, "$$p{points}(#$$p{rank})", $n, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc]);
+      push(@members2, [$links, $pid, $$p{home_id}, $$p{level}, $$p{science}, $$p{culture}, $needplanets, "$$p{points}(#$$p{rank})", $n+1, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc]);
 		$n++;
 	}
    print " ".a({-href=>"relations-bulk?user=".join("%0a",@membernames)."&alliance=$options{alliance}"},"edit relations for all members");
