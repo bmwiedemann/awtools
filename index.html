@@ -16,7 +16,9 @@ print a({href=>"/alli/$ENV{REMOTE_USER}/"},"\U$ENV{REMOTE_USER}\E data dir"),br;
 #print a({href=>"/$ENV{REMOTE_USER}-holes.html"},"\U$ENV{REMOTE_USER}\E holes"),br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
 my $reldate="060207";
-print a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,
+print 
+ a({href=>"http://aw.lsmod.de/manual.html#brownie"}, "brownie")." and ".a({href=>"http://brownie.zq1.de/000100A/http/www1.astrowars.com/"}, "no-install-brownie"),br,
+ a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,
  a({href=>"http://$bmwserver/gold3/alliancerelation-$reldate.png"},"alliance relations")."
  (".a({href=>"http://$bmwserver/gold3/alliancerelation-$reldate.svg"},"svg").")",br,
  a({href=>"http://$bmwserver/customize_race.html"},"race helper"),br,
