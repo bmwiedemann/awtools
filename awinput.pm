@@ -200,7 +200,7 @@ sub systemid2planets($) { my($id)=@_;
         $planets{$id}?@{$planets{$id}}:undef;
 }
 sub allianceid2tag($) { my($id)=@_;
-	$alliances{$id}?$alliances{$id}{tag}:undef;
+	($id && $alliances{$id})?$alliances{$id}{tag}:undef;
 }
 sub allianceid2members($) { my($id)=@_;
         ($alliances{$id} && $alliances{$id}{m})?@{$alliances{$id}{m}}:undef;
@@ -279,18 +279,18 @@ sub gettradepartners($$) { my($maxta,$minad)=@_;
 }
 
 sub playername2alli($) {my ($user)=@_;
+#   if($user eq "greenbird") {return ""}
    my %alliuser;
    awinput::opendb(O_RDONLY, "/home/aw/db2/useralli.dbm", \%alliuser);
    my $alli=$alliuser{lc $user};
    untie(%alliuser);
    if(!$alli) {
-      local $ENV{REMOTE_USER};
+#      local $ENV{REMOTE_USER};
       tie %alliances, "MLDBM", "$dbdir/alliances.mldbm", O_RDONLY, 0666;
       tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
       tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
       my $pid=playername2id($user);
       if($pid && $pid>2) {
-         my $aid=playerid2alliance($pid);
          $alli=lc(playerid2tag($pid));
          if($awaccess::remap_alli{$alli}) { $alli=$awaccess::remap_alli{$alli} }
          if(!$allowedalli{$alli}) {$alli=""}
@@ -311,6 +311,7 @@ sub dbplanetaddinit(;$) { my($screen)=@_;
 # input screen = 0=news, 1=fleets 2=alliance_incomings 3=alliance_detail
 sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
    $awinput::fleetscreen=$screen;
+   return unless $ENV{REMOTE_USER};
 #   awdiag("name:$::options{name} scr:$screen awscr:$awinput::fleetscreen");
 #	untie %planetinfo;
 #	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
@@ -323,6 +324,7 @@ sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
    } 
 }
 sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
+   return unless $ENV{REMOTE_USER};
    if(! defined($tz)) {$tz=$::options{tz}}
    if($time) {$time-=3600*$tz}
    {
@@ -343,8 +345,8 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
    return 0;
 }
 sub dbfleetaddfinish() {
-	untie %planetinfo;
-	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
+#	untie %planetinfo;
+#	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 
 sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
