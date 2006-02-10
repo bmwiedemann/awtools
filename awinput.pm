@@ -168,6 +168,7 @@ sub setplanetinfo($%) { my($id,$options)=@_;
 	untie %planetinfo;
 	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or die $!;
 	if(!$id) {$id=$$options{sidpid}}
+   if(!$id) {return}
 	#print "set '$id', '$options' $dbnamep ";
 	if(!$options) {delete $planetinfo{$id}; }
 	else {
@@ -396,10 +397,10 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
    return $cv if(!$plid || $plid<=2 || !defined($player{$plid}));
    my ($phys,$att)=($player{$plid}{sl}, +4);
    my ($race,$sci)=playerid2ir($plid);
-   if($race) { # use phys+race or SL+4
+   if($race && defined($$race[5])) { # use phys+race or SL+4
       $att=$$race[5];
    }
-   if($sci && $$sci[0]>time()-4*24*3600) {
+   if($sci && defined($$sci[0]) && $$sci[0]>time()-4*24*3600) {
       $phys=$$sci[5];
    }
 # phys adj values: 
