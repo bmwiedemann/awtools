@@ -19,7 +19,7 @@ if(!defined($u) && $uc) {param("user",$uc);$u=$uc}
 if(!defined($ref) && $refc) {param("ref",$refc);$ref=$refc}
 if(!defined($stylep) && $stylec) {param("style",$stylec);$stylep=$stylec}
 if(!defined($tz) && $tzc) {param("tz",$tzc);$tz=$tzc}
-if(!defined($tz)) {param("tz",2)}
+if(!defined($tz)) {param("tz",0)}
 if(defined($u)) {
    $ref||="";
    my @cookies;
