@@ -1,6 +1,7 @@
 #exit 0; # partial energy no more needed
 use strict;
 #use CGI ":standard";
+use awstandard;
 use awinput;
 
 my $debug=$::options{debug};
