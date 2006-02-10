@@ -28,7 +28,6 @@ sub url2pm($) {my($url)=@_;
 sub mangle_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
    $g=$$options{name} eq "greenbird";
-#   if($$options{name} eq "kroy") { $notice="<b style=\"color:green\">good morning kroy :-) ... I was wondering if it is worth while implementing an instant messenging facility into AW - like this one.</b><br>" }
    %::options=%$options;
    $::bmwlink=$origbmwlink;
    my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
@@ -52,7 +51,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          $info{clicks}=$nclicks;
          if($ENV{REMOTE_USER}) {
-            $::bmwlink="$origbmwlink/modperl/authaw?session=$session&uri=/cgi-bin";
+            $::bmwlink="$origbmwlink/modperl/public/authaw?session=$session&uri=/cgi-bin";
          }
       }
       
@@ -101,10 +100,12 @@ sub mangle_dispatch(%) { my($options)=@_;
 # colorize player links
    require "mangle/special_color.pm"; mangle::special_color::mangle_player_color();
 
-# remove ads
-   s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
-# disable ad
-   s/(?:pagead2\.googlesyndication\.com)|(?:games\.advertbox\.com)|(?:oz\.valueclick\.com)|(?:optimize\.doubleclick\.net)/localhost/g;
+   if($alli) {
+   # remove ads
+      s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
+   # disable ad
+      s/(?:pagead2\.googlesyndication\.com)|(?:games\.advertbox\.com)|(?:oz\.valueclick\.com)|(?:optimize\.doubleclick\.net)/localhost/g;
+   }
 #   s%<br>\s*(<TABLE)%$1%; # remove some blanks
 
 # add footer + disclaimer
@@ -112,14 +113,24 @@ sub mangle_dispatch(%) { my($options)=@_;
    if($alli && $$options{name}) {
       my $now=time();
       my $reltime=$now-60*25;
-      my $allimatch=" AND `aid` = `alliance` AND usersession.name = player.name AND `tag` LIKE ? ";
+      my $allimatch=" AND `aid` = `alliance` AND e.name = player.name AND `tag` LIKE ? ";
       my $allifrom=",`player`,`alliances`";
       if(0 && $g) {$allimatch=$allifrom=""}
-      my $sth=$dbh->prepare_cached("SELECT usersession.name,`lastclick` 
-            FROM `usersession` $allifrom 
-            WHERE `lastclick` > ? $allimatch AND usersession.name != ?
-            GROUP BY usersession.name
-            ORDER BY lastclick DESC;");
+      my $sth=$dbh->prepare_cached("SELECT e.`name` , `lastclick`
+         FROM usersession AS e, (
+               SELECT max( i.lastclick ) AS t
+               FROM `usersession` AS i
+               GROUP BY `name`
+               ) AS m$allifrom
+         WHERE e.lastclick = m.t
+         AND `lastclick` > ? $allimatch
+         AND e.`name` != ?
+         ORDER BY `lastclick` DESC");
+#      my $sth=$dbh->prepare_cached("SELECT usersession.name,`lastclick` 
+#           FROM `usersession` $allifrom 
+#           WHERE `lastclick` > ? $allimatch AND usersession.name != ?
+#           GROUP BY usersession.name
+#           ORDER BY lastclick DESC;");
       $sth->execute($reltime, ($allimatch?$alli:()), $$options{name});
       my @who2;
       while ( my @row = $sth->fetchrow_array ) {
