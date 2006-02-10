@@ -6376,6 +6376,8 @@ Content-type: text/html
 <head>
 $jslib_block
 <title>Start Using CGIProxy</title>
+<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/awlogin.css">
+</style>
 </head>
 <body$onload>
 $msg
@@ -6385,9 +6387,9 @@ Only HTTP URLs are supported.  Not all functions will work
 (e.g. some Java applets), but most pages will be fine.
 
 <form name="URLform" action="$action" method=$method$onsubmit>
-<input name="URL" size=66 value="http://www1.astrowars.com/$safe_URL">
+<input class=text name="URL" size=66 value="http://www1.astrowars.com/$safe_URL">
 $flags
-<p><input type=submit value="   Begin browsing   ">
+<p><input class=smbutton type=submit value="   Begin browsing   ">
 </form>
 
 <h3><a href="$cookies_url">Manage cookies</a></h3>
