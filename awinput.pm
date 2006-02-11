@@ -51,6 +51,12 @@ sub awinput_init(;$) { my($nolock)=@_;
          tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
          tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
       }
+   } else {
+      # make sure it isnt tied and stored
+      untie %relation;
+      untie %planetinfo;
+      %relation=();
+      %planetinfo=();
    }
 }
 
