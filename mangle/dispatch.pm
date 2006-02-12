@@ -3,6 +3,7 @@ use strict;
 use awstandard;
 use awinput;
 use DBAccess;
+use Time::HiRes qw(gettimeofday tv_interval); # for profiling
 
 our $g;
 my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
@@ -28,6 +29,7 @@ sub url2pm($) {my($url)=@_;
 sub mangle_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
    $g=$$options{name} eq "greenbird";
+   my $t2=[gettimeofday];
    %::options=%$options;
    $::bmwlink=$origbmwlink;
    my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
@@ -97,15 +99,10 @@ sub mangle_dispatch(%) { my($options)=@_;
          }
       }
 
+   do "mangle/special/dispatch.pm"; mangle::special::mangle();
 # colorize player links
-   require "mangle/special_color.pm"; mangle::special_color::mangle_player_color();
+   require "mangle/special/color.pm"; mangle::special::color::mangle();
 
-   if($alli) {
-   # remove ads
-      s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
-   # disable ad
-      s/(?:pagead2\.googlesyndication\.com)|(?:games\.advertbox\.com)|(?:oz\.valueclick\.com)|(?:optimize\.doubleclick\.net)/localhost/g;
-   }
 #   s%<br>\s*(<TABLE)%$1%; # remove some blanks
 
 # add footer + disclaimer
@@ -116,7 +113,8 @@ sub mangle_dispatch(%) { my($options)=@_;
       my $allimatch=" AND `aid` = `alliance` AND e.name = player.name AND `tag` LIKE ? ";
       my $allifrom=",`player`,`alliances`";
       if(0 && $g) {$allimatch=$allifrom=""}
-      my $sth=$dbh->prepare_cached("SELECT e.`name` , `lastclick`
+      my $t1=[gettimeofday];
+      my $sth=$dbh->prepare_cached("SELECT distinct e.`name` , `lastclick`
          FROM usersession AS e, (
                SELECT max( i.lastclick ) AS t
                FROM `usersession` AS i
@@ -132,6 +130,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 #           GROUP BY usersession.name
 #           ORDER BY lastclick DESC;");
       $sth->execute($reltime, ($allimatch?$alli:()), $$options{name});
+      $$options{sqlelapsed}=tv_interval ( $t1 );
       my @who2;
       while ( my @row = $sth->fetchrow_array ) {
 #      foreach my $row (@$who) {
@@ -149,25 +148,26 @@ sub mangle_dispatch(%) { my($options)=@_;
    }
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span style=\"color:gray\">$_=</span>$info{$_}"} sort keys %info));
+   $$options{totalelapsed}=tv_interval ( $t2 );
    my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>";
 
    if($ingameuri) {
       my $style=$g?"awmod2":"awmod";
       if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
+      if($$options{name} eq "snappyduck") {$style="snappy/main"}
       s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;
    }
    if($gameuri || $g) {
       # fix AR's broken HTML
       s%</body>%$gbcontent $&%;
       if($g) {
+         $_.=sprintf(" benchmark: pre:%ims aw:%ims sql:%ims mangle:%ims ", $$options{prerequestelapsed}*1000, $$options{awelapsed}*1000, $$options{sqlelapsed}*1000, $$options{totalelapsed}*1000);
 #         s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
 #         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }
-         # fix color specification
-          s%bgcolor="([0-9a-fA-F]{6})"%bgcolor="#$1"%g;
       }
+      # fix AR's non-standard HTML
       s%(<a href=)([a-zA-Z0-9/.:?&\%=-]+)>%$1"$2">%g;
-      s%</head>%<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/awfavicon.ico">\n<link rel="shortcut icon" href="http://aw.lsmod.de/awfavicon.ico">\n$&%;
    }
 }
 
