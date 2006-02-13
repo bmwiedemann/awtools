@@ -2,6 +2,8 @@ use strict;
 use DBAccess;
 use awinput;
 
+s%<td>([A-Za-z]{2,3}) ([1-3])</td>%<td>$1&nbsp;$2</td>%g;
+
 if($ENV{REMOTE_USER}) {
    my $now=time();
    sub addetc($) { my($name)=@_;
@@ -18,7 +20,7 @@ if($ENV{REMOTE_USER}) {
       my $res=$dbh->selectall_arrayref($sth, {}, $name);
       if($res && $$res[0]) {
          my $t=int(($now-$$res[0][0])/60);
-         return " / ".$t."m";
+         return "&nbsp;/&nbsp;".$t."m";
       }
       return "";
    }
