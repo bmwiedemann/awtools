@@ -97,12 +97,12 @@ if(param()) {
    $options{name}=~s/^\s+//;
 	if($options{export}==2) {
 		my $u=$ENV{REMOTE_USER};
-		my $expiryinfo="whole beta";
+		my $expiryinfo="the whole round";
 		if(!$options{expires}) {$options{expires}=""}
 		else {$expiryinfo="$options{expires} days";$options{expires}=time+$options{expires}*3600*24;}
-		my $l="http://guest:guest\@aw.lsmod.de/cgi-bin/system-info?id=$options{id}&amp;expires=$options{expires}&amp;uniq=$options{uniq}&amp;auth=$u%23".mkhash($u);
+		my $l="http://aw.lsmod.de/cgi-bin/system-info?id=$options{id}&amp;expires=$options{expires}&amp;uniq=$options{uniq}&amp;auth=$u%23".mkhash($u);
 		print AWheader2("export for system $options{id}").
-		qq!This is an anonymous read-only access URL. It is valid for $expiryinfo - give only to trusted friends.<br /> <a href="$l">copy this link</a> or try $l <br />note: for IE leave out the guest:guest\@!,p,
+		qq!This is an anonymous read-only access URL. It is valid for $expiryinfo - give only to trusted friends.<br /> <a href="$l">copy this link</a> or try $l <br />note: user=guest pass=guest!,p,
 		"set expiry time: ", start_form('get'),
 		hidden('id', $options{id}),
 		hidden('export', $options{export}),
@@ -114,7 +114,7 @@ if(param()) {
 	if(!auth_ok($options{auth})) {
 #		print "incorrect auth\n";
 	}
-   awinput_init();
+   awinput_init(1);
 	if(defined($options{mapx})) { ($x,$y)=($options{mapx}, $options{mapy}) }
 #	elsif(defined($options{x})) { ($x,$y)=awmap::imgtomap($options{x}, $options{y}) }
 	if(defined($x)) { $system=systemcoord2id($x,$y) }
@@ -146,6 +146,7 @@ if(param()) {
 		my $output="$bs$sysname($x,$y)$be${eol}Id=$system level=$syslevel ";
       my @nstarmaplink=("http://neron92.free.fr/AW_Tools/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
       my @lstarmaplink=("http://lefois.de/aw/tool/map.php?R_pid=&R_sysid=$system&lb=1&coord=1&details=1","lefoisstarmap");
+      my @lbattleslink=("http://www.lefois.de/aw/tool/battles.php?&days=all&sysid=$system", "lefoisbattles");
       my @mapdetailslink=("http://$server/0/Map/Detail.php/?nr=$system","Map/Details");
       if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
@@ -154,7 +155,7 @@ if(param()) {
             $sysinfo=~s!^<br />!!;
             $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
          }
-			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,$sysinfo,
+			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@lbattleslink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,$sysinfo,
 			"planets here: <a name=\"planets\" /><ul>";
 		} else {
 			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
