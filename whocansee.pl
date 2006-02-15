@@ -10,7 +10,7 @@ $ENV{REMOTE_USER} = shift @ARGV;
 awinput_init();
 
 my @sysxy = systemid2coord($sysid);#(59,-12);
-my $delta = 13; # for Bio24
+my $delta = 19; # for Bio24
 
 my (@minxy,@maxxy);
 @minxy=@maxxy=@sysxy;
@@ -32,11 +32,13 @@ foreach(@$allplayers) {
    $sci[0]||=0;
    if($sci[0]>100){shift(@sci)}
    my $bio=$sci[0]||0;
-   next if(abs($ex-$sysxy[0])*2>$bio);
-   next if(abs($ey-$sysxy[1])*2>$bio);
+   if($bio<25) {
+      next if(abs($ex-$sysxy[0])*2>$bio);
+      next if(abs($ey-$sysxy[1])*2>$bio);
+   }
 #   next if($rel[0]<9);
 #print "@$_\n";
 #next if $member{$epid};
-   print "$ex $ey $ename $epid $esl $bio $rel[0]\n";
+   print (join("\t", $ex, $ey, $ename, $epid, $esl, $bio, $rel[0])."\n");
 }
 
