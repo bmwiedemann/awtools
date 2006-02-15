@@ -356,6 +356,7 @@ sub dbfleetaddfinish() {
 }
 
 sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
+   return if(!$ENV{REMOTE_USER});
 	$name="\L$name";
 	untie %relation;
 	untie %planetinfo;
@@ -403,7 +404,7 @@ sub playerid2ir($) { my($plid)=@_;
 
 sub estimate_xcv($$) { my($plid,$cv)=@_;
    return $cv if(!$plid || $plid<=2 || !defined($player{$plid}));
-   my ($phys,$att)=($player{$plid}{sl}, +4);
+   my ($phys,$att)=($player{$plid}{science}, +4);
    my ($race,$sci)=playerid2ir($plid);
    if($race && defined($$race[5])) { # use phys+race or SL+4
       $att=$$race[5];
