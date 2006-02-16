@@ -1,6 +1,7 @@
 use strict;
 use CGI;
 use awstandard;
+use awinput;
 
 my $align=' align="right" style="padding:0px; color:#4978ff"';
 my $delim=": &nbsp;";
@@ -86,7 +87,8 @@ if(1) {
 
 
 # add echo of destination
-   my $destsid=$cgi->param("destination");
+   my $destsid=$cgi->param("destination2");
+   if(!$destsid) { $destsid=$cgi->param("destination"); }
    my $destpid=$cgi->param("planet");
    my $srcsid=$cgi->param("nr");
    my $srcpid=$cgi->param("id");
