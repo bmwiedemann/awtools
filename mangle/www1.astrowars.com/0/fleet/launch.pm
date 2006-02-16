@@ -1,3 +1,6 @@
+use awstandard;
+use awinput;
+
 # activate arrival calc checkbox
 s/<input type="checkbox" name="calc" value="1"/$& checked/;
 
@@ -34,5 +37,57 @@ sub piddropdown($) {
 }
 
 s%<input type="text" name="planet" size="2" class=text value="(\d*)">%piddropdown($1)%ge;
+
+if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
+   $::options{url}=~/nr=(\d+)/;
+   my $srcsid=$1;
+   my $refs;
+   my $refe;
+   my($race,$sci)=awinput::playername2ir($::options{name});
+# this is used for sidpid->own/allied mapping
+   my $pid=awinput::playername2id($::options{name});
+   my $aid=playerid2alliance($pid);
+   if($race) {$refs=$$race[4];}
+   if($sci) {if($$sci[0]>99){shift(@$sci)};$refe=$$sci[2]}
+   my @c1=systemid2coord($srcsid);
+   if(defined($refs) && defined($refe) && $srcsid && defined(@c1)) {
+      $refs=1+$refs*$awstandard::racebonus[4];
+      s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/arrival.js"></script>$&%;
+      
+      my @distlist;
+      foreach my $e (@list) {
+         my $sid=$$e[1];
+         my $own="";
+         my @c2=systemid2coord($sid);
+         for my $i (1..12) {
+            my $o;
+            my $p=getplanet($sid, $i);
+            if($p) {
+               my $ownerid=planet2owner($p);
+               if($ownerid && $ownerid>2){
+                  if(!$aid) {$o=($ownerid==$pid)}
+                  else {
+                     my $a=playerid2alliance($ownerid);
+                     $o=($a==$aid);
+                  }
+               }
+            }
+            $o||=0;
+            $own.=",$o";
+         }
+         next if(!defined(@c2));
+         my $dist=($c2[0]-$c1[0])**2 + ($c2[1]-$c1[1])**2;
+         push(@distlist, "disttable[$sid]=[$dist$own];\n");
+      }
+      s%</form>%$& <form><input class="text" name="travel" size="9"> <input class="text" name="arrival" size="28"></form>
+      <script type="text/javascript">
+         <!--
+         @distlist;
+         energy=$refe;
+         racebonus=$refs;
+      //-->
+      </script>%;
+   }
+}
 
 1;
