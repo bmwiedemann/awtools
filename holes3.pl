@@ -33,6 +33,7 @@ for my $sid (keys %systems) {
 	my $member=0;
 	my $worstrel=10;
 	foreach my $planet (systemid2planets($sid)) {
+      next if(!$planet);
 		my $p=$$planet{ownerid};
 		my @rel=getrelation(playerid2name($p));
 		if(!$p || $p<=2 || !$rel[0]) {$rel[0]=4}
@@ -42,7 +43,7 @@ for my $sid (keys %systems) {
 			if($rel[0]==9) {$member++}
 		} else {$other++}
 	}
-	next if $member<3 || $member==12;
+	next if $member<3 || ($other==0 && $friend==$member);
 	push(@holes, [$sid, $member, $friend, $other, $worstrel]);
 }
 
