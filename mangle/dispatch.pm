@@ -78,13 +78,13 @@ sub mangle_dispatch(%) { my($options)=@_;
       } else { $info{page}=$module }
 
       if($ingameuri) {
-         if(0) {
+         if($g || $$options{name} eq "Mythwin") {
             eval q§
                my $sep="<td>|</td>";
                my $e="</a></td>";
                my $s=qq'<td class="white">$::bmwlink';
                my $l="$e$sep$s";
-               s%^</tr></table>%</tr><tr><td width="140" bgcolor="#202060"></td><td colspan="13"> &nbsp; </td></tr><tr height=15 align="center"><td width="140" bgcolor="#202060"><b>$::extralink</b>$e
+               s%^</tr></table>%</tr><tr><td width="140" bgcolor="#202060"></td><td colspan="13"> &nbsp; </td></tr><tr height=15 align="center"><td width="140" bgcolor="#206020"><b>$::extralink</b>$e
                   $s/arrival">arrival
                   $l/tactical">tacmap
                   $l/tactical-large">tlarge
@@ -143,16 +143,16 @@ sub mangle_dispatch(%) { my($options)=@_;
       }
       $online=join(", ", @who2);
       if($online){
-         $online="<span style=\"color:gray\">allies online:</span> $online<br>"
+         $online="<span class=\"bottom_key\">allies online:</span> $online<br>"
       }
    }
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
-   my $info=join(" ", map({"<span style=\"color:gray\">$_=</span>$info{$_}"} sort keys %info));
+   my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span>$info{$_}"} sort keys %info));
    $$options{totalelapsed}=tv_interval ( $t2 );
-   my $gbcontent="<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>";
+   my $gbcontent="<!-- start greenbird disclaimer -->\n<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
    if($ingameuri) {
-      my $style=$g?"awmod2":"awmod";
+      my $style=$g?"awmod":"awmod";
       if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
       if($$options{name} eq "snappyduck") {$style="snappy/main"}
       s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;

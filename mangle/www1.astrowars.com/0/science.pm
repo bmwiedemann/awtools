@@ -1,5 +1,7 @@
 use strict;
+use awinput;
 use sort_table;
+
 my %transtable=(Biology=>"bio", Economy=>"eco", Energy=>"energy", Mathematics=>"math", Physics=>"physics", Social=>"social");
 if($::options{name} && $ENV{REMOTE_USER}) {
    my $etc=awinput::playername2etc($::options{name});

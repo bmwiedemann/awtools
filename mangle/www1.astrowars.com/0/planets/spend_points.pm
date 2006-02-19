@@ -21,7 +21,7 @@ if($::options{url}=~/dscost=(\w+)/) {
       my $n3=2*$n+1;
       my $poss=int($ppthere/$cost[$n]);
       my $ret=s%<input type="radio" name="produktion" value="$names[$n]">%$&
-         <input type="text" class="text" size="4" onblur="update_field(0, $n2, $cost[$n]); document.form.produktion[$n3].checked=true " value=""></td><td> / $poss%;
+         <input type="text" class="text" size="4" onblur="update_field(0, $n2, $n3, $cost[$n]);" value=""></td><td> / $poss%;
       # normally we have 2 fields per entry and make 3, but if Math<15, it is only 1 in that row.
       $n2+=1+2*$ret;
    }

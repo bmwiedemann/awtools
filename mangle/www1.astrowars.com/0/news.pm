@@ -10,6 +10,6 @@ s%((?:The population decreased by \d+ at) )([^.!]+)( \d+)[.]%$1.$maplink.systemn
 s%(Congratulations! (?:Your attacking fleet was|We were) victorious at )([^.]+)( \d+)\.%$1.$maplink.systemname2id($2).qq'">$2</a>$3.'%ge;
 s%(Your (?:attack|defend)ing fleet was defeated by <a href=[^<]*</a> at )([^.]+)( \d+)(\. You killed about \d+\%\.)%$1.$maplink.systemname2id($2).qq'">$2</a>$3$4'%ge;
 
-require "mangle/special_color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
+require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
 
 1;

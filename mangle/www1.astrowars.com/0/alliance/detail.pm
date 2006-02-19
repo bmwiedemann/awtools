@@ -46,6 +46,6 @@ if($::options{url}=~/id=(\d+)/) {
    do "mangle/www1.astrowars.com/0/alliance.pm";
 }
 
-require "mangle/special_color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
+require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
 
 1;
