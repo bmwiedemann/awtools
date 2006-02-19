@@ -1,5 +1,6 @@
 use awstandard;
 use awinput;
+use Time::HiRes;
 
 # activate arrival calc checkbox
 s/<input type="checkbox" name="calc" value="1"/$& checked/;
@@ -79,15 +80,19 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
          my $dist=($c2[0]-$c1[0])**2 + ($c2[1]-$c1[1])**2;
          push(@distlist, "disttable[$sid]=[$dist$own];\n");
       }
-      s%</form>%$& <form><input class="text" name="travel" size="9"> <input class="text" name="arrival" size="28"></form>
+      my $starttime=sprintf("%i.%.6i ;", Time::HiRes::gettimeofday());
+      s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="28" disabled></form>
       <script type="text/javascript">
          <!--
          @distlist;
          energy=$refe;
          racebonus=$refs;
+         starttime=$starttime
+         var startdiff = (startd.getTime()/1000) - starttime;
       //-->
       </script>%;
    }
+   s%</body>%<span class="bmwnotice">note: predicted arrival time will be wrong if your local clock is wrong (or target ownership changed).</span>$&%
 }
 
 1;

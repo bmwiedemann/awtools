@@ -3,4 +3,4 @@ if($::options{url}=~m%^http://www1\.astrowars\.com/rankings/alliances/(\w+)\.php
    s%^</td></tr></table>%$& $::bmwlink/alliance?alliance=$tag">AWtools($tag)</a><br>%m;
 }
 
-1;
+2;

@@ -17,13 +17,17 @@ if($::options{post}) {
    my $cgi=new CGI($::options{post});
 # add echo of fleet
    my @fleet;
+   my $warning;
    for my $ship (qw(inf col des cru bat)) {
       my $n=$cgi->param($ship);
       my $s=$ship;
-      $s=~s/inf/trn/;
+      if($s=~s/inf/trn/ && $n>0) { $warning=1; }
       push(@fleet, "$n $s");
    }
    my $fleet=join(", ",@fleet);
+   if($warning) {
+      $fleet="<span class=bmwwarning>$fleet</span>";
+   }
    
 # add current time (UTC/GMT)
    my $time=time();
@@ -72,7 +76,7 @@ if(1) {
       //-->
    </script>
       ^;
-   my $commonattr=qq'type="text" size="28" class="text" style="text-align:left; background-color: #000;"';
+   my $commonattr=qq'type="text" size="28" class="text" style="text-align:left; background-color: #000;" disabled';
    if($altime) {
       addtimer(1, $altime, $script);
       $extrainfo2=~s%<!--inserthere-->([^<]*)%<form><input name="z" $commonattr value="$altime">$1</form>%;
@@ -112,6 +116,15 @@ if(1) {
    }
    $form.="<label for=\"launch\"> Or click <input type=\"submit\" id=\"launch\" value=\"Launch !!!\" class=smbutton></label></form>";
    s%</small>% $& $form%;
+
+   my $l=qq($::bmwlink/system-info?id=$destsid);
+   $l=~s/.*(http:)/$1/;
+   s%</body>%<span class="bmwnotice">note: predicted arrival time will be wrong if you use the back button of your browser.</span><br>$&%;
+   if($destsid) {
+      s%</body>%<iframe width="95\%" height="700" src="$l"></iframe><br>$&%;
+   }
+
+   
 #   $_.="post-data: ".$::options{post};
 }
 
