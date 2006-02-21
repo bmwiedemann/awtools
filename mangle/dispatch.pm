@@ -88,7 +88,7 @@ sub mangle_dispatch(%) { my($options)=@_;
                   $s/arrival">arrival
                   $l/tactical">tacmap
                   $l/tactical-large">tlarge
-                  $l/tactical-live">tlive
+                  $l/system-info">system
                   $l/relations">player
                   $l/alliance">alliance
                   $l/fleets">fleets$e$&%m;

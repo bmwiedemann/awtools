@@ -117,7 +117,8 @@ if(1) {
    $form.="<label for=\"launch\"> Or click <input type=\"submit\" id=\"launch\" value=\"Launch !!!\" class=smbutton></label></form>";
    s%</small>% $& $form%;
 
-   my $l=qq($::bmwlink/system-info?id=$destsid);
+   my $public=$ENV{REMOTE_USER}?"":"/public";
+   my $l=qq($::bmwlink$public/system-info?id=$destsid);
    $l=~s/.*(http:)/$1/;
    s%</body>%<span class="bmwnotice">note: predicted arrival time will be wrong if you use the back button of your browser.</span><br>$&%;
    if($destsid) {

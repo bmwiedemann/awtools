@@ -16,7 +16,7 @@ my %options;
 for my $p (qw'sort') {
    $options{$p}=param($p);
 }
-if(!defined $options{sort}){$options{sort}="-6.4.5";}
+if(!defined $options{sort}){$options{sort}="-6.5";}
 
 #print "test";
 my @tap=gettradepartners(4, 000);
