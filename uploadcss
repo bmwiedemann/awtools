@@ -1,0 +1,69 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib("/home/aw/inc");
+use vars qw"$cgi $serverbase $imagedir $errormessage %allowedext";
+use IO::File;
+use CGI $cgi=new CGI;
+use CGI::Carp 'fatalsToBrowser';
+$CGI::POST_MAX=1024*31;
+
+use awinput;
+my $authname=awinput::getauthname();
+
+$serverbase="http://aw.lsmod.de";
+$imagedir="/code/css/user/";
+%allowedext=qw(css 1);
+
+sub process {
+	my ($filename,$name,$newname,$buffer,$bytesread,$fullname,$outfile,$ext)=($cgi->param("file"),lc($cgi->param("name")));
+	$name=~s".*/"";
+	if($name eq ""){$name=$filename}
+$name=~s"^.*[/\\]"";	if($filename=~m/\.([^.]+)$/ && ($allowedext{$1}||return ".$1 - invalid extension")){$ext=$1}
+	if($name=~m/\.([^.]+)$/&& !$allowedext{$1}){return "invalid format"}
+	if($name!~m"^[\w.0-9-]+$"){return "invalid name"}
+# filename check for invalid .. / etc
+
+# derive .jp[e]g / .gif from $filename, test for overwrite
+	if($name!~/\./){$name.=".".$ext}
+   local $imagedir="$imagedir$authname/";
+	$newname="/home/aw/html/$imagedir$name";
+#	if(-r $newname){return "Die Datei existiert bereits!"}
+	$outfile = new IO::File $newname, O_WRONLY|O_CREAT|O_TRUNC;
+	unless (defined($outfile)) {
+	  return "Ausgabedatei konnte nicht geoeffnet werden.";
+	}
+	while ($bytesread=read($filename,$buffer,1024)) {print $outfile $buffer;}
+	undef $outfile;
+	$fullname=$serverbase.$imagedir.$name;
+	print STDOUT ($cgi->start_html('Erfolgreich'),
+	$cgi->h1('success'),
+	qq|is now at: <a href="$fullname">$fullname<br></a>|
+	);
+	return "";
+}
+
+print STDOUT $cgi->header(-expires=>'+1m', -Cache_control=>"no-cache", -Pragma=>"no-cache");
+
+if(!$authname) {
+  $errormessage=$cgi->a({-href=>"/manual/auth.html"},"authenticate first");
+}
+if($cgi->param() && $authname) {
+  $errormessage=process();
+}
+if(!$cgi->param() or $errormessage) {
+  print STDOUT ($cgi->start_html('custom CSS upload'));
+  if($errormessage) {
+    print STDOUT ($cgi->h1($errormessage),$cgi->hr);
+  }
+  print STDOUT ($cgi->h1('upload'),
+	$cgi->start_multipart_form,
+	$cgi->filefield("file"),
+	" Which file? (30KB max)".$cgi->br,
+	$cgi->textfield("name", "main.css"),
+	"name on server".$cgi->br,
+	$cgi->submit(defined($authname)?():(-disabled=>1)),
+	$cgi->end_form,$cgi->hr);
+}
+
+print ($cgi->end_html);
