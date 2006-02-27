@@ -6,7 +6,7 @@ awstandard_init();
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout sim eta planet-info distsqr tradepartners ranking permanentranking holes battles antispy topwars topallis)) {
+foreach(qw(logout antispy battles distsqr eta feedupdate holes permanentranking planet-info ranking sim topwars topallis tradepartners uploadcss)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 
@@ -15,7 +15,7 @@ print p;
 print a({href=>"/alli/$ENV{REMOTE_USER}/"},"\U$ENV{REMOTE_USER}\E data dir"),br;
 #print a({href=>"/$ENV{REMOTE_USER}-holes.html"},"\U$ENV{REMOTE_USER}\E holes"),br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
-my $reldate="060207";
+my $reldate="060219";
 print 
  a({href=>"http://aw.lsmod.de/manual.html#brownie"}, "brownie")." and ".a({href=>"http://brownie.zq1.de/000100A/http/www1.astrowars.com/"}, "no-install-brownie"),br,
  a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,

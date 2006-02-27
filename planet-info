@@ -41,7 +41,10 @@ if($options{status}) {
 	} else {
 		#$options{info}=$options{comment};
       for($options{comment}) {
-         s/\bin (\d+) (days|d)\b/AWisodate(time()+3600*24*$1)/ge;
+         s/\btomorrow\b/in 1 d/;
+         s/\btoday\b/in 0 d/;
+         s/\byesterday\b/in -1 d/;
+         s/\bin ([-+]?\d+) (days|d)\b/AWisodate(time()+3600*24*$1)/ge;
          s/\bin (\d+) (hours|h)\b/AWisodatetime(time()+3600*$1)/ge;
          param('comment', $_);
       }
@@ -74,7 +77,7 @@ if($options{id}) {
 		popup_menu(-name=>'status', -values=>[1..7], -default=>$options{status},
 		-labels=>\%planetstatusstring), " status", br,
 		textfield(-name=>'who', -value=>$options{who}, -class=>'text'), " user-id or user-name of the one who does the above $link", br,
-		textarea(-name=>'comment', -value=>"\n".$options{comment}, -rows=>9, -cols=>40, -class=>'text'), " ETA, fleet, etc...", br,
+		textarea(-name=>'comment', -value=>"\n".$options{comment}, -rows=>9, -cols=>40, -class=>'text'), " why, when, how, plans, etc...", br,
 		hidden(-name=>'id', $id),
 		submit(-name=>"submit", -class=>'smbutton'), qq! <a href="?">new query</a> !, submit(-name=>"submit",-value=>"delete entry", -class=>'smbutton').
          AWfocus("form.who");

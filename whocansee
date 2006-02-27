@@ -24,7 +24,7 @@ if(!defined($sysxy[0])) {
 open(IN, "whocansee.pl $sysid $alli |") or die $!;
 my @data=<IN>;
 close(IN);
-foreach(@data) {$_=[split(/ /,$_)]}
+foreach(@data) {chop; $_=[split(/\t/,$_)]}
 
 print header().AWheader3("Who can see $sysid [\U$alli]", 
       "Who can see system ".a({-href=>"system-info?id=$sysid"},$sysid)." [\U$alli]");
@@ -44,7 +44,7 @@ foreach(@data) {
 }
  
 print sort_table([qw(who x y bio dist relation need ETC)],
-         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_string, \&display_needplanets, \&display_etc],
+         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_relation, \&display_needplanets, \&display_etc],
          [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@data2);
 

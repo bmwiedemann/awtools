@@ -8,7 +8,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
-qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &sb2cv &title2pm &file_content
+qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &sb2cv &title2pm &safe_encode &file_content
       $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname);
 
 use CGI ":standard";
@@ -65,7 +65,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/common.css" />!);
 #   push(@$heads, "<title>$title</title>");
 	$owncgi=~s!/cgi-bin/(?:modperl/)?!!;
-	foreach my $item (qw(index.html preferences arrival tactical tactical-large tactical-live relations alliance system-info fleets feedupdate)) {
+	foreach my $item (qw(index.html preferences arrival tactical tactical-large tactical-live relations alliance system-info fleets)) {
 		my %h=(href=>$item);
 		if($item eq $owncgi) {
 			$h{class}='headeractive';
@@ -339,6 +339,11 @@ sub urldecode { my($string) = @_;
 sub cookie2session { my($session)=@_;
    if($session && $session=~s/^.*PHPSESSID=([a-f0-9]{32}).*/$1/) { return $session; }
    return "";
+}
+
+sub safe_encode($) { my($name)=@_;
+   $name=~s/[^a-zA-Z0-9-]/"_".ord($&)/ge;
+   return $name;
 }
 
 sub file_content($) {my($fn)=@_;

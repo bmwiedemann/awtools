@@ -22,7 +22,7 @@ sub display_etc($) { my($etc)=@_;
    if($etc && (($etc-$now)>-150*3600)) {
       $etc-=$now;
       $ret=sprintf("%.1fh",$etc/3600);
-      if($etc>-10*3600 && $etc<20*3600) {$ret=qq'<span style="color:#f44">$ret</span>';}
+      if($etc<20*3600) {$ret=qq'<span style="color:#f44">$ret</span>';}
    }
    return $ret;
 }
@@ -34,7 +34,7 @@ sub display_needplanets{ my($n)=@_;
 }
 
 
-sub sort_num($$) {$_[0]<=>$_[1]}
+sub sort_num($$) {defined($_[0]) && defined($_[1]) && ($_[0]<=>$_[1])}
 sub sort_string($$) {$_[0] cmp $_[1]}
 
 

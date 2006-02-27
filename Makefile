@@ -5,8 +5,8 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold3
 allies=$(shell cat allowed_alliances)
-tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners whocansee permanentranking adminuseralli logout
-pubtools=sim topwars nph-brownie.cgi arrival authaw
+tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners whocansee permanentranking adminuseralli uploadcss logout
+#pubtools=sim topwars nph-brownie.cgi arrival authaw permanentranking distsqr eta relations system-info index.html preferences
 #allies=
 #winterwolf arnaken manindamix tabouuu
 all: TA.candidate
@@ -15,7 +15,7 @@ test:
 links:
 	ln -f ${tools} /srv/www/cgi-bin/aw/
 	ln -f topwars /srv/www/cgi-bin/aw/topallis
-	ln -f ${pubtools} /srv/www/cgi-bin/aw/public
+	ln -f ${tools} /srv/www/cgi-bin/aw/public
 	ln -f topwars /srv/www/cgi-bin/aw/public/topallis
 
 system-ids.txt:
@@ -62,6 +62,7 @@ drawall:
 	for f in www1.astrowars.com/export/history/starmap* ; do ./drawmap.pl $$f ; done
 
 dumpdbs:
+	-cp -a ~/db /no_backup/bernhard/aw/backup/db-${mydate}
 #	mkdir -p html/alli/$$a/history
 	for a in $(allies) ; do \
 		cp -a html/alli/$$a/{fleets.csv,history/fleets-${mydate}.csv} ; \
@@ -93,7 +94,7 @@ access:
 	-cp -ia ../dbm/empty.dbm ~/db/$a-relation.dbm
 	-cp -ia ../dbm/empty.dbm ~/db/$a-planets.dbm
 	touch ~/db/$a-planets.dbm.lock ~/db/$a-relation.dbm.lock
-	../dbm/add.pl ~/db/$a-relation.dbm $a "9 $a "
+	../dbm/add.pl ~/db/$a-relation.dbm $a "9 $a alliance relation"
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}
 	/usr/sbin/htpasswd2 ~/.htpasswd $a

@@ -14,7 +14,7 @@ our $dbdir="/home/aw/db/db";
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd
+&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname
 &display_pid &display_relation &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -70,6 +70,23 @@ sub awinput_finish() {
    untie(%relation);
    untie(%planetinfo);
    alarm(0);
+}
+
+sub getauthname() { 
+   my $cookies=$ENV{HTTP_COOKIE};
+   my $authname;
+   my $session=awstandard::cookie2session($cookies);
+   if($session) {
+      my $ip=$ENV{REMOTE_ADDR};
+      require DBAccess;
+      my $dbh=$DBAccess::dbh;
+      my $sth=$dbh->prepare_cached("SELECT `name` from `usersession` WHERE `auth` = 1 AND `sessionid` = ? AND `ip` = ?");
+      my $aref=$dbh->selectall_arrayref($sth, {}, $session, $ip);
+      if($aref and (my $a=$$aref[0])) {
+         $authname=$$a[0];
+      }
+   }
+   return $authname;
 }
 
 sub getrelation($;$) { my($name)=@_;
@@ -422,6 +439,7 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
 # input: sidpid
 # input: SQL condition to add - defaults to ""
 sub get_fleets($;$) { my($sidpid,$cond)=@_;
+   if(!$ENV{REMOTE_USER}) {return [];}
    $cond||="";
    my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE `alli` = ? AND `sidpid` = ? $cond ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
    my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $ENV{REMOTE_USER}, $sidpid);
@@ -449,7 +467,7 @@ sub show_fleet($) { my($f)=@_;
    if(length($flstr)<$minlen) {$flstr.="&nbsp;" x ($minlen-length($flstr))}
    my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
    if($info) {$info=" ".$info}
-   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://aw.lsmod.de/cgi-bin/edit-fleet?fid=$fid\">edit</a> $eta $flstr ".playerid2link($owner)."$info</span>";
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://$bmwserver/cgi-bin/edit-fleet?fid=$fid\">edit</a> $eta $flstr ".playerid2link($owner)."$info</span>";
 }
 
 # support functions for sort_table

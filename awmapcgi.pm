@@ -20,10 +20,16 @@ sub awmapcoordinput() {
 		@pos=systemid2coord($home);
 	}
 	my $s=5;
-		textfield(-name=>'xs', -value=>$pos[0], -size=>$s, -class=>'text'). " x position (center)". br.AWfocus("form.xs").
+   my @bio;
+   for my $i (3..13) {push(@bio,2*$i)}
+   my $ret=textfield(-name=>'xs', -value=>$pos[0], -size=>$s, -class=>'text'). " x position (center)". br.AWfocus("form.xs").
 		textfield(-name=>'ys', -value=>$pos[1], -size=>$s, -class=>'text'). " y position (center)". p.
+      div({class=>"grouping"},
 		textfield(-name=>'xe', -value=>$s[0], -size=>$s, -class=>'text'). " width". br.
-		textfield(-name=>'ye', -value=>$s[1], -size=>$s, -class=>'text'). " height". br;
+		textfield(-name=>'ye', -value=>$s[1], -size=>$s, -class=>'text'). " height". br.
+      " or ".br.popup_menu(-values=>\@bio, -onChange=>"document.form.xe.value=document.form.ye.value=Math.ceil(document.form.elements[4].value)+1")." Bio").br;
+   
+   return $ret;
 }
 
 1;

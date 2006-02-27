@@ -10,7 +10,7 @@ my $debug=0;
 
 sub feed_dispatch($%) { (local $_, my $options)=@_;
    my $gameuri=defined($$options{url}) && $$options{url}=~m%^http://www1\.astrowars\.com/%;
-   if($gameuri && (my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
+   if($$options{name} && $gameuri && (my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
       if($$options{url}=~m%^http://www1\.astrowars\.com/register/login\.php%) {
          # reset click counter now
 #         $dbh->do("UPDATE `usersession` SET `nclick` = '0' WHERE `sessionid` = ".$dbh->quote($session));

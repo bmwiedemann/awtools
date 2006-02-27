@@ -1,11 +1,17 @@
+brownie:planets/detail: add remaining time (minutes) behind remaining PP
+#javascript arrival calc on fleet/launch
+alliance/detail: #non-member incomings
 system-info: rearrange basic player info in table
+#brownie: add incomings to planet/details
 speed table (Bio0, Bio4(2AU)-link arrival,...Bio20)
+#display %.2f PP
+calc PP/h sci/h cul/h with bonusses (from trade field of player DB + Arti)
 #fleet tracker (remove old ones on feeding)
 #fleet screen: show owner+relation of fleet target
 #directory for alliance data with PerlAuthzHandler
 incoming-intercept + defence tool
 fix player/planets index after feeding (e.g. with mysql)
-tactical-large/live: Bio selector(JS)
+#tactical-large/live: Bio selector(JS)
 #muffin Feed+Mangle (Upload+Download) filter
 #trade tool listing players with $TAs<n  and A$+PP>15k
 #include battles.csv 7-day history in alliancerelation-detector

@@ -6,6 +6,7 @@ use awstandard;
 use awinput;
 awinput_init();
 use sort_table;
+use DBAccess;
 
 my %options;
 for my $p (qw'alliance sort omit') {
@@ -22,7 +23,7 @@ if($options{alliance}) {
    my @displayfuncs=
          (\&display_string, \&display_pid, \&display_sid, 
            \&display_string, \&display_string, \&display_string, \&display_needplanets, \&display_string, \&display_string, \&display_string, \&display_string, 
-           \&AWisodatetime, \&display_string, \&display_etc);
+           \&AWisodatetime, \&display_string, \&display_etc, \&display_string);
    foreach(split / /, $options{omit}) {
       $displayfuncs[$_-1]=undef;
    }
@@ -100,14 +101,21 @@ if($options{alliance}) {
       $totalpl+=$$p{level};
       my $needplanets=$$p{culture}-$planets;
       my $links=profilelink($pid). $alink;
-      push(@members2, [$links, $pid, $$p{home_id}, $$p{level}, $$p{science}, $$p{culture}, $needplanets, "$$p{points}(#$$p{rank})", $n+1, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc]);
+      my $incomings=0;
+      my $sth=$dbh->prepare("SELECT count(owner) 
+            FROM `fleets`,`planets`
+            WHERE alli=? AND fleets.sidpid=planets.sidpid AND planets.ownerid=? AND planets.ownerid!=fleets.owner AND iscurrent=1 AND eta > 0
+      ");
+      my $res=$dbh->selectall_arrayref($sth, {}, $ENV{REMOTE_USER}, $pid);
+      $incomings=${$$res[0]}[0];
+      push(@members2, [$links, $pid, $$p{home_id}, $$p{level}, $$p{science}, $$p{culture}, $needplanets, "$$p{points}(#$$p{rank})", $n+1, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc, $incomings]);
 		$n++;
 	}
    print " ".a({-href=>"relations-bulk?user=".join("%0a",@membernames)."&alliance=$options{alliance}"},"edit relations for all members");
-	print sort_table([qw"links name home pl sl cl", '<span title="number of planets needed">need</span>', qw"pts(rank) arank log from joined intel ETC"],
+	print sort_table([qw"links name home pl sl cl", '<span title="number of planets needed">need</span>', qw"pts(rank) arank log from joined intel ETC inco"],
          \@displayfuncs,
          [undef, \&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_string,
-           \&sort_num, \&sort_string, \&sort_num],
+           \&sort_num, \&sort_string, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@members2 );
 
 
@@ -132,7 +140,7 @@ if($options{alliance}) {
    }
 } else {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'alliance', -class=>'text'), " alliance tag", br,
-    textfield(-name=>'omit', -class=>'text', -value=>"9 12"), " omit field # (space separated list)", br, br,
+    textfield(-name=>'omit', -class=>'text', -value=>"9 12 15"), " omit field # (space separated list)", br, br,
 	 submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.alliance");
 }
 print AWtail();
