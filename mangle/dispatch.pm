@@ -78,13 +78,13 @@ sub mangle_dispatch(%) { my($options)=@_;
       } else { $info{page}=$module }
 
       if($ingameuri) {
-         if($g || $$options{name} eq "Mythwin") {
-            eval q§
+         if($alli) {
+#            eval q§
                my $sep="<td>|</td>";
                my $e="</a></td>";
                my $s=qq'<td class="white">$::bmwlink';
                my $l="$e$sep$s";
-               s%^</tr></table>%</tr><tr><td width="140" bgcolor="#202060"></td><td colspan="13"> &nbsp; </td></tr><tr height=15 align="center"><td width="140" bgcolor="#206020"><b>$::extralink</b>$e
+               s%^</tr></table>%</tr><tr><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b>$e
                   $s/arrival">arrival
                   $l/tactical">tacmap
                   $l/tactical-large">tlarge
@@ -93,7 +93,7 @@ sub mangle_dispatch(%) { my($options)=@_;
                   $l/alliance">alliance
                   $l/fleets">fleets$e$&%m;
 #               $_.="test OK";
-            § or $_.= $@;
+#            § or $_.= $@;
          } else {
             s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a></td>%;
          }
@@ -146,15 +146,22 @@ sub mangle_dispatch(%) { my($options)=@_;
          $online="<span class=\"bottom_key\">allies online:</span> $online<br>"
       }
    }
+#   if($alli eq "TGD" || $alli eq "AF") {$notice="<b style=\"color:green\">note: RSA forum is down - backup forum is at <a href=\"http://s3.invisionfree.com/RSA_Outpost/index.php?act=idx\">http://s3.invisionfree.com/RSA_Outpost/</a>.</b><br>"}
+   else {$notice=""}
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
-   my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span>$info{$_}"} sort keys %info));
+   my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
    $$options{totalelapsed}=tv_interval ( $t2 );
    my $gbcontent="<!-- start greenbird disclaimer -->\n<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
    if($ingameuri) {
-      my $style=$g?"awmod":"awmod";
+      my @style=("main");
+      if($ENV{REMOTE_USER}) { unshift(@style,"alli/$ENV{REMOTE_USER}/main") }
+      if($$options{name}) { unshift(@style, "user/".safe_encode($$options{name})."/main") }
+      my $style;
+      foreach my $s (@style){
+         if(-r "/home/aw/css/$s.css") {$style=$s;last;}
+      }
       if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
-      if($$options{name} eq "snappyduck") {$style="snappy/main"}
       s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;
    }
    if($gameuri || $g) {
@@ -166,6 +173,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 #         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }
       }
+      do "mangle/special/use_css.pm";
       # fix AR's non-standard HTML
       s%(<a href=)([a-zA-Z0-9/.:?&\%=-]+)>%$1"$2">%g;
    }

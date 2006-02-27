@@ -13,8 +13,14 @@ sub addtimer($$$) { my($n,$time,$script)=@_;
    $_[2]=$script;
 }
 
-if($::options{post}) {
-   my $cgi=new CGI($::options{post});
+my $param=$::options{post};
+if(!$param) {
+   $param=$::options{url};
+   $param=~s/.*\?//;
+}
+
+if($param) {
+   my $cgi=new CGI($param);
 # add echo of fleet
    my @fleet;
    my $warning;
@@ -126,7 +132,7 @@ if(1) {
    }
 
    
-#   $_.="post-data: ".$::options{post};
+#   $_.="post/param-data: ".$param;
 }
 
 1;

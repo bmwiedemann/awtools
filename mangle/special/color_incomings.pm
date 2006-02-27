@@ -13,7 +13,8 @@ sub add_fleets($$) { my($sid,$pid)=@_;
       $fs=~s/<a href="(relations\?id=)/$::bmwlink\/$1/;
       $fstr.=$fs;
    }
-   return $fstr;
+   $fstr=~s/^<br>//;
+   return "<div class=bmwincoming>$fstr</div>";
 }
 
 # emphasize important incomings 

@@ -12,6 +12,7 @@ sub mangle() {
    }
    # fix color specification
    s%bgcolor="([0-9a-fA-F]{6})"%bgcolor="#$1"%g;
+   s%bgcolor=#([0-9a-fA-F]{6})%bgcolor="#$1"%g;
    # add icon
    s%</head>%<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/awfavicon.ico">\n<link rel="shortcut icon" href="http://aw.lsmod.de/awfavicon.ico">\n</head>%;
 }
