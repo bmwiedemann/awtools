@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use mod_perl;
 use constant MP2 => ($mod_perl::VERSION >= 1.99);
-use Apache::RequestRec ();
+#use Apache::RequestRec ();
 #use Apache2::RequestIO ();
 #my $dir="/home/aw/db/large-$ENV{REMOTE_USER}";
 my $dir="/home/aw/alli/$ENV{REMOTE_USER}/l";
