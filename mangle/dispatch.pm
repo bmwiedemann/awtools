@@ -84,7 +84,7 @@ sub mangle_dispatch(%) { my($options)=@_;
                my $e="</a></td>";
                my $s=qq'<td class="white">$::bmwlink';
                my $l="$e$sep$s";
-               s%^</tr></table>%</tr><tr><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b>$e
+               s%^</tr></table>%</tr><tr class="bmwblankrow"><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b>$e
                   $s/arrival">arrival
                   $l/tactical">tacmap
                   $l/tactical-large">tlarge

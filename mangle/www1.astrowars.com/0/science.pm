@@ -18,4 +18,7 @@ if($::options{name} && $ENV{REMOTE_USER}) {
       }
       s%(<tr align=center bgcolor='#\d+'><td)>(<a href=/0/Glossary[^>]*>)(\w+)%$1." align=left>".trans($3).$2.$3%ge;
 
+s%("r" class=)text%$1scitext%;
+s%("z" class=)text%$1scitext%;
+
 1;
