@@ -28,7 +28,7 @@ if($options{map}) {
    print <F>;
 } else {
 	print header(-expires=>'+1d'), 
-		start_html(-title=>$title , -style=>"/tactical.css"), 
+		start_html(-title=>$title , -style=>"/code/css/tools/tactical.css"), 
 		#AWheader2($title),
 		start_form('get', "coord"),
 		qq!<input type="image" src="?map=1" />!,

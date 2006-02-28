@@ -62,7 +62,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
    my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"}),Link({-rel=>"shortcut icon", -href=>"http://aw.lsmod.de/favicon.ico"})];
    if($extra) {push(@$heads,$extra);}
-   push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/common.css" />!);
+   push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/code/css/tools/common.css" />!);
 #   push(@$heads, "<title>$title</title>");
 	$owncgi=~s!/cgi-bin/(?:modperl/)?!!;
 	foreach my $item (qw(index.html preferences arrival tactical tactical-large tactical-live relations alliance system-info fleets)) {
@@ -77,7 +77,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	if(!$style) {$style='blue'}
    my $flag = autoEscape(0);
 	local $^W=0; #disable warnings for next line
-   my $retval=start_html(-title=>$title, -style=>"/$style.css", 
+   my $retval=start_html(-title=>$title, -style=>"/code/css/tools/$style.css", 
 	# -head=>qq!<link rel="icon" href="/favicon.ico" type="image/ico" />!).
 	 -head=>$heads);
    autoEscape([$flag]);
