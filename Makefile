@@ -5,10 +5,9 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold3
 allies=$(shell cat allowed_alliances)
-tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners whocansee permanentranking adminuseralli uploadcss logout
-#pubtools=sim topwars nph-brownie.cgi arrival authaw permanentranking distsqr eta relations system-info index.html preferences
+tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners whocansee permanentranking adminuseralli uploadcss logout nph-brownie.cgi
 #allies=
-#winterwolf arnaken manindamix tabouuu
+#winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
