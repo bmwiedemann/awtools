@@ -57,7 +57,7 @@ if(1 || $mangle::dispatch::g) {
 }
 
 if(1 || $mangle::dispatch::g) {
-   my $fleets=awinput::get_fleets($sidpid, "AND `iscurrent` = 1 AND `eta` > 0");
+   my $fleets=awinput::get_fleets($sidpid, "AND `iscurrent` = 1 ");
    my $fstr="";
    foreach my $f (@$fleets) {
       my $fs=awinput::show_fleet($f)."<br>";
