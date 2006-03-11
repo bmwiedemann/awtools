@@ -43,11 +43,11 @@ sub awinput_init(;$) { my($nolock)=@_;
       $dbnamer="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
       $dbnamep="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
 #     if($ENV{REMOTE_USER} ne "guest") {
-      alarm($alarmtime); # make sure locks are free'd
       if($nolock) {
          tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
          tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY, 0, $DB_HASH);
       } else {
+         alarm($alarmtime); # make sure locks are free'd
          tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
          tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
       }
