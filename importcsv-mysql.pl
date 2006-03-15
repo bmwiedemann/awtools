@@ -26,11 +26,11 @@ KEY `lastclick` ( lastclick )
 
 $dbh->do(qq!
 CREATE TABLE starmap (
-sid INT( 16 ) UNSIGNED NOT NULL ,
-x INT( 16 ) NOT NULL ,
-y INT( 16 ) NOT NULL ,
-level INT( 8 ) NOT NULL ,
-name VARCHAR( 50 ) NOT NULL ,
+sid SMALLINT( 16 ) UNSIGNED NOT NULL ,
+x SMALLINT( 16 ) NOT NULL ,
+y SMALLINT( 16 ) NOT NULL ,
+level TINYINT( 8 ) NOT NULL ,
+name VARCHAR( 40 ) NOT NULL ,
 UNIQUE ( x,y ),
 INDEX ( name ),
 PRIMARY KEY ( sid ));!);
@@ -50,25 +50,25 @@ UNIQUE ( tag ),
 PRIMARY KEY ( aid ));!);
 $dbh->do(qq!
 CREATE TABLE player (
-pid INT( 24 ) UNSIGNED NOT NULL ,
-points INT( 16 ) NOT NULL ,
-rank INT( 16 ) NOT NULL ,
-science INT( 8 ) NOT NULL ,
-culture INT( 8 ) NOT NULL ,
-level INT( 8 ) NOT NULL ,
-home_id INT( 16 ) NOT NULL ,
-logins INT( 16 ) NOT NULL ,
+pid MEDIUMINT UNSIGNED NOT NULL ,
+points SMALLINT NOT NULL ,
+rank MEDIUMINT( 16 ) NOT NULL ,
+science TINYINT( 8 ) NOT NULL ,
+culture TINYINT( 8 ) NOT NULL ,
+level TINYINT( 8 ) NOT NULL ,
+home_id SMALLINT( 16 ) NOT NULL ,
+logins MEDIUMINT( 16 ) NOT NULL ,
 trade SMALLINT( 6 ) NOT NULL ,
 country VARCHAR ( 3 ) NOT NULL ,
 joined INT( 15 ) NOT NULL ,
-alliance INT( 16 ) NOT NULL ,
+alliance SMALLINT( 16 ) NOT NULL ,
 name VARCHAR ( 50 ) NOT NULL ,
 UNIQUE ( name ),
 INDEX ( alliance ),
 PRIMARY KEY ( pid ));!);
 $dbh->do(qq!
 CREATE TABLE planets (
-sidpid SMALLINT( 6 ) UNSIGNED NOT NULL ,
+sidpid MEDIUMINT( 6 ) UNSIGNED NOT NULL ,
 population TINYINT( 2 ) NOT NULL ,
 opop TINYINT( 2 ) NOT NULL ,
 starbase TINYINT( 2 ) NOT NULL ,
