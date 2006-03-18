@@ -11,6 +11,14 @@ if(!$dbh) {die "DB err: $!"}
 
 if(0) { # create tables
 $dbh->do(qq!
+CREATE TABLE `cdcv` (
+`sidpid` INT NOT NULL ,
+`time` INT,
+`cv` INT,
+PRIMARY KEY ( `sidpid` )
+);!);
+
+$dbh->do(qq!
 CREATE TABLE usersession (
 sessionid CHAR ( 32 ) BINARY NOT NULL ,
 name VARCHAR ( 64 ) NOT NULL,

@@ -1,3 +1,6 @@
+use Tie::DBI;
+use awstandard;
+
 sub feed_profile() {
 print "profile feed\n";
 
@@ -13,6 +16,19 @@ if(m!>Points: (\d+)</td>!) {
    
    print "Points: $points\n";
    $pointsdb{$name}=$points;
+
+   my %h;
+   tie(%h,'Tie::DBI',$dbh,'cdcv','sidpid',{CLOBBER=>3});
+   my $now=time();
+   foreach my $n (1..40) {
+      if(my($sid,$pid,$pop,$cv)=(m%<tr bgcolor="#303030" align=center><td>$n</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td>%)) {
+         my($sidpid)=sidpid22sidpid3m($sid,$pid);
+#         awdiag("test3 $n $sid#$pid=$sidpid $pop $cv");
+         $h{$sidpid}={time=>$now, cv=>$cv};
+         
+      }
+   }
+   untie(%h);
 }
 }
 

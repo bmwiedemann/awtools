@@ -137,6 +137,17 @@ if(param()) {
 		print AWheader2("($x,$y) $sysname system info [\U$ENV{REMOTE_USER}\E]");
 		my ($bs,$be,$eol)=('[b]','[/b]',"\n");
 
+      my $sidpid1=sidpid22sidpid3m($system,1);
+      my $sth=$dbh->prepare("SELECT * from `cdcv` WHERE `sidpid` >= ? AND `sidpid` <= ?");
+      my $aref=$dbh->selectall_arrayref($sth, {}, $sidpid1, $sidpid1+11);
+      my %planetcdcv;
+      foreach my $row (@$aref) {
+         my($sidpid,$time,$cv)=@$row;
+         my $pid=awinput::sidpid2pidm($sidpid);
+#         print "$pid $cv ".scalar localtime($time);
+         $planetcdcv{$pid}=$cv;
+      }
+         
 		## start of normal output ##
 		if(!$options{export}) {
 			print qq!<a href="?legend=1">legend</a> <a href="?id=$system&amp;export=1">BB-export</a> <a href="?id=$system&amp;export=2">anonymous updated export</a> !.a({-href=>"?id=$system&history=".(!$options{history})},"toggle history"),br;
@@ -193,6 +204,9 @@ if(param()) {
          my $fleetsstr="";
          foreach my $f (@$fleets) {
             $fleetsstr.=$eol.awinput::show_fleet($f);
+         }
+         if((my $plcdcv=$planetcdcv{$planetid})) {
+            $fleetsstr.=$eol.$plcdcv." CV defending (from countdown info)";
          }
 			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" title="edit planet-info" alt="planet info"/></a> !;
 			my $siegedcol="";
