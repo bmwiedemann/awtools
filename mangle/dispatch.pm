@@ -9,20 +9,6 @@ our $g;
 my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
 my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period next morning (2006-02-01 03:30-07:00 UTC). Do not worry about errors then. Just reload a bit later.</b><br>";
 
-sub url2pm($) {my($url)=@_;
-   if(!$url){ return ();}
-   $url=~s/^http:\/\///;
-   $url=~s/\?.*//;
-   $url=~s/\/$//;
-   $url=~s/\.php//;
-   $url=lc($url);
-   my @result=($url);
-   while($url=~s/\/[^\/]*$//) {
-      push(@result, $url);
-   }
-   return (@result);
-}
-
 # input options hash reference
 # input $_ with HTML code of a complete page
 # output $_ with HTML of mangled page
@@ -151,7 +137,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
    $$options{totalelapsed}=tv_interval ( $t2 );
-   my $gbcontent="<!-- start greenbird disclaimer -->\n<p style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.<br>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
+   my $gbcontent="<!-- start greenbird disclaimer -->\n<p id=disclaimer style=\"text-align:center; color:white; background-color:black\">disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
    if($ingameuri) {
       my @style=("main");

@@ -35,11 +35,21 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
 	}
 	my $title=$1;
 	my $aw="Astro Wars";
-   if($title=~/- profile - $aw/) { require './feed/profile.pm'; feed_profile(); return 0}
+   if($title=~/- profile - $aw/o) { require './feed/profile.pm'; feed_profile(); return 0}
    my @time;
 	return unless @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
 	$title=shift(@time);
+   my @module=();
    my $module=title2pm($title);
+   my $url=$$options{url};
+   push(@module, url2pm($url), (1 ? $module :()));
+   foreach my $m (@module) {
+      my $include="feed/$m.pm";
+      next if(!-e $include);
+      $module=$m;
+      last;
+   }
+#   awdiag("$module: $module $url");
 #our $deliverytime;
 	{
       my $gtz=awstandard::guesstimezone(join(":",@time));

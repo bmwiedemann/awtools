@@ -28,7 +28,7 @@ if($::options{url}=~/id=(\d+)/) {
          if($id) { $x="<a href=\"/0/Player/Profile.php/?id=$id\">$1</a>"; }
          $x.$2%e;
       if($previd>=0) { $prevstring.=qq'<a href="$url$previd">prev</a>'; }
-      if($nextid<@$members) { $prevstring.=qq' <a href="$url$nextid">next</a>'; }
+      if(1||$nextid<@$members) { $prevstring.=qq' <a href="$url$nextid">next</a>'; }
       my $form="";
       my $n=0;
       $form.=' <form><select style="text-align:left;" name="id" onchange="submit()">';

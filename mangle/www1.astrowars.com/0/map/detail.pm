@@ -10,7 +10,7 @@ if($::options{url}=~/nr=(\d+)/) {
    }
    s%Map / Detail</b></td>%$&<td>${link}AWtools($id)</a></td><td>|</td>%;
 #   if($ENV{REMOTE_USER}) {
-      s%Coordinates</a></td>\n</tr>\n</table>%$& <br><iframe width="95\%" height="480" src="$l</iframe>%;
+      s%Coordinates</a></td>\n</tr>\n</table>%$& <br><iframe width="95\%" height="900" src="$l</iframe>%;
 #   }
    $::extralink="${link}AWtools($id)</a>";
 }

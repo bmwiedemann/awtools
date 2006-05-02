@@ -39,6 +39,10 @@ sub piddropdown($) {
 
 s%<input type="text" name="planet" size="2" class=text value="(\d*)">%piddropdown($1)%ge;
 
+if(0) {
+s%Energy Level</a></td><td><select name="energy">%$&<option>-9999</option>%;
+}
+
 if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
    $::options{url}=~/nr=(\d+)/;
    my $srcsid=$1;
