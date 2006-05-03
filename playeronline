@@ -1,0 +1,71 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+#awstandard_init();
+awinput_init();
+
+my $ticks=3;
+my $granularity=24*$ticks;
+my $unk="?";
+my %cmap=($unk=>"gray", X=>"green", "-"=>"red");
+
+my $firstlog=0;
+my $firstlogt;
+sub time2dt($) { my($time)=@_;
+      my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);
+      $yday*$granularity+ int(($sec+$min*60+$hour*3600)*$granularity/86400)-$firstlog;
+}
+
+my %options;
+print AWheader("AW player idle time viewer");
+if(param()) {
+	foreach my $p (qw(name)) {
+		$options{$p}=param($p);
+	}
+   my @rel=getrelation($options{name});
+   if($rel[0]) {
+      my @logins=($rel[2]=~m/login:(\d+:\d+:\d+:\d+)/g);
+      my @logs;
+      my $lastlog=-1;
+      my $lastlogn=-1;
+      foreach(@logins) {
+         my @l=split(":");
+         my $dt1=time2dt($l[1]-$l[3]);
+         if(!$firstlog) {$firstlogt=$l[1]-$l[3];$firstlog=$dt1-$dt1%$granularity; $dt1-=$firstlog;}
+         my $dt=time2dt($l[1]);
+         my $dt2=time2dt($l[1]+$l[2]);
+         for my $dti ($lastlog+1..$dt1-1) { $logs[$dti]=($lastlogn+1==$l[0] ?"-":$unk); }
+         for my $dti ($dt1..$dt) { $logs[$dti]="X"; }
+         for my $dti ($dt+1..$dt2) { $logs[$dti]="-"; }
+         $lastlog=$dt2;
+         $lastlogn=$l[0];
+#      print "@l $dt $dt1 $dt2<br>";
+      }
+      my $n=0;
+      print "<code>legend: ",br,
+            "'X': logged in",br,
+            "'-': idle (or sometimes permanently logged in)",br,
+            "'$unk': unknown status",br,
+            "</code><pre>  day\\hour";
+#"0 1 2 3 4 5 6 7 8 9 1011121314151617181920212223";
+      for(0..23) {printf("%${ticks}i", $_);}
+      my $currt=$firstlogt;
+      foreach(@logs) {
+         if($n++%$granularity==0) {
+            print br,AWisodate($currt)." ";
+            $currt+=3600*24;
+         }
+         print "<span style=\"color:$cmap{$_}\">$_</span>";
+      }
+      print "</pre>";
+   }
+} else {
+	print start_form(-name=>"form",-method=>"get"),textfield(-name=>'name', -class=>'text')," player name",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.name");
+}
+print AWtail();
+
