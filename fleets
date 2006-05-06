@@ -26,6 +26,7 @@ my $res=$dbh->selectall_arrayref("SELECT sidpid,sum(xcv),sum(trn),sum(cls) FROM 
 
 
 my @sidpids=sort {$$b[1]<=>$$a[1]} @$res;
+my %cvsum;
 
 foreach my $row1 (@sidpids) {
    my($sidpid,$sumcv,$trn,$cls)=@$row1;
@@ -43,17 +44,22 @@ foreach my $row1 (@sidpids) {
    $info=~s!automagic:.*!!g;
 	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> of !.display_pid($owner)." SB $sb $info";
 	#my $str=qq!<a href="/cgi-bin/system-info?id=$sid">$p</a> $info<br />\n!;
-   
    print "$str\n".br;
 
 #   my $sth=$dbh->prepare_cached("SELECT * FROM `fleets` WHERE `alli` = ? $wantcurrent AND `sidpid` = ?");
    my $res=awinput::get_fleets($sidpid, $wantcurrent); #$dbh->selectall_arrayref($sth, {}, $alli, $sidpid);
    foreach my $row2 (@$res) {
+		my($owner,$cv, $xcv)=@$row2[4,13,14];
+		$cvsum{$owner}+=$xcv;
       print awinput::show_fleet($row2).br;
       #print "@$row2\n".br;
    }
    print br;
 }
-
+print "<table><tr><th>Player</th><th>XCV</th></tr>";
+foreach my $owner (sort {$cvsum{$b}<=>$cvsum{$a}} keys (%cvsum)) {
+	print ("<tr>".td(playerid2link($owner)).td($cvsum{$owner})."</tr>");
+}
+print "</table>";
 print AWtail();
 
