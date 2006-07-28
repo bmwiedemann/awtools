@@ -7,7 +7,7 @@ use Time::HiRes qw(gettimeofday tv_interval); # for profiling
 
 our $g;
 my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
-my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period next morning (2006-02-01 03:30-07:00 UTC). Do not worry about errors then. Just reload a bit later.</b><br>";
+my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period Thursday morning (2006-07-27 02:30-05:00 UTC) and be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
 
 # input options hash reference
 # input $_ with HTML code of a complete page

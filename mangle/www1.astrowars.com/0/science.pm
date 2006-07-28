@@ -22,4 +22,13 @@ my $extrastyle="scitext disabled";
 s%("r" class=)text%$1$extrastyle%;
 s%("z" class=)text%$1$extrastyle%;
 
+
+sub calcbonus($$) {
+   my($base,$bonus)=@_;
+   $bonus||=0;
+   return int($base*(1+$bonus/100));
+}
+
+s{id=23">\(\+(\d+) per hour\)</a>(?:\s*<b>([+-]\d+)%</b>)?}{"$& = ".calcbonus($1,$2)."/h"}ge;
+
 1;

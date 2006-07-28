@@ -17,8 +17,10 @@ sub add_fleets($$) { my($sid,$pid)=@_;
    return "<div class=bmwincoming>$fstr</div>";
 }
 
+
 # emphasize important incomings 
 sub mangle_incoming() {
+#   s%width=135 bgcolor="#894900" align=center>18:58:39 - May 19.*?<br>We suppose its the Fleet of <a href=/0/Player/Profile.php/?id=(\d+)%$&%;
 #going to attack <b>Alpha Kelb Alrai</b>          [914] 2
 s%(going to attack )(<b>[^<]*</b>\s*)\[(\d+)\] (\d+)(!<br>[^.]*\.php[^.]*\.)%qq'$1$::bmwlink/system-info?id=$3">$2 [$3]</a> $4$5'.add_fleets($3,$4)%ge;
 
