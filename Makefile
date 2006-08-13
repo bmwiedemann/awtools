@@ -3,9 +3,9 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-round=gold3
+round=gold5
 allies=$(shell cat allowed_alliances)
-tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy tradepartners whocansee permanentranking adminuseralli uploadcss logout nph-brownie.cgi
+tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy2 antispy tradepartners whocansee permanentranking adminuseralli uploadcss playeronline playeronline2 passwd logout nph-brownie.cgi
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -26,11 +26,13 @@ updatecsv: dumpdbs
 	#-cp -a tactical-af.png olddb/tactical-af-$d.png
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
+	wget -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
 	for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
 	perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
 	perl detectalliancerelation.pl > html/${round}/alliancerelation-${mydate}
 	ln -f html/${round}/alliancerelation-${mydate} html/${round}/alliancerelation
 	perl importcsv-mysql.pl
+#	- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
 
 updatemap: updatemaponly updaterank af-relations.txt tgd-relations.txt
 updatemapsonly: updatemaponly updatemap2only
@@ -96,7 +98,7 @@ access:
 	../dbm/add.pl ~/db/$a-relation.dbm $a "9 $a alliance relation"
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}
-	/usr/sbin/htpasswd2 ~/.htpasswd $a
+	/usr/sbin/htpasswd2 /home/aw/.htpasswd $a
 	#vi /srv/www/cgi-bin/aw/.htaccess
 	-chmod 660 ~/db/$a*.dbm*
 	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm*

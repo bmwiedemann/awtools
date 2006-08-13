@@ -10,18 +10,19 @@ awinput_init();
 
 my $alli=$ENV{REMOTE_USER};
 my %options;
-for my $p (qw'sort sid') {
+for my $p (qw'sort sid bio25') {
    $options{$p}=param($p);
 }
 if(!defined $options{sort}){$options{sort}="-6.-7.8";}
-my $sysid=$options{sid};
+my($sysid)=($options{sid}=~m/(\d+)/);
+my $wantbio25=($options{bio25}!=0);
 my @sysxy=systemid2coord($sysid);
 if(!defined($sysxy[0])) {
    print AWheader("$sysid not found");
    exit(0);
 }
 
-open(IN, "whocansee.pl $sysid $alli |") or die $!;
+open(IN, "whocansee.pl $sysid $alli $wantbio25 |") or die $!;
 my @data=<IN>;
 close(IN);
 foreach(@data) {chop; $_=[split(/\t/,$_)]}
@@ -29,6 +30,8 @@ foreach(@data) {chop; $_=[split(/\t/,$_)]}
 print header().AWheader3("Who can see $sysid [\U$alli]", 
       "Who can see system ".a({-href=>"system-info?id=$sysid"},$sysid)." [\U$alli]");
 #      " system ".a({-href=>"system-info?id=$sysid"},$sysid);
+$wantbio25=!$wantbio25;
+print a({-href=>"?sid=$sysid&bio25=$wantbio25"},($wantbio25?"in":"ex")."clude bio25 players").br;
 
 
 my @data2;

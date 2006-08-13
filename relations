@@ -110,7 +110,9 @@ if($options{name}) {# && $options{name} ne "unknown") {
       }
    }
 	$atag=$atag?" ".alliancelink($atag):"";
-	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles"),br;
+	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, 
+   #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
+         a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles")," ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
@@ -165,7 +167,8 @@ if($options{name}) {# && $options{name} ne "unknown") {
 			my $n=0;
 			foreach(@prod[0..2]) {
 				my $total=int($_*$$bonus[$n]*24);
-				print "$_ * $$bonus[$n++] = $total/day\n".br;
+            my $totalh=int($_*$$bonus[$n]);
+				print "$_ * $$bonus[$n++] = $totalh/h = $total/day\n".br;
 			}
          if($prod[5]) {print "AD $prod[5]".br}
          if($prod[6]) {print "PP $prod[6]".br}

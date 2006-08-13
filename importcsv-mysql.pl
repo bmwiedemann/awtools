@@ -11,6 +11,16 @@ if(!$dbh) {die "DB err: $!"}
 
 if(0) { # create tables
 $dbh->do(qq!
+CREATE TABLE `trades` (
+`pid1` INT NOT NULL,
+`pid2` INT NOT NULL,
+`time` INT,
+INDEX ( `pid1` ),
+INDEX (`pid2`)
+);!);
+exit 0;
+
+$dbh->do(qq!
 CREATE TABLE `cdcv` (
 `sidpid` INT NOT NULL ,
 `time` INT,
@@ -137,11 +147,11 @@ CREATE TABLE `fleets` (
 `eta` INT( 16 ) NULL ,
 `firstseen` INT( 16 ) NOT NULL ,
 `lastseen` INT( 16 ) NOT NULL ,
-`trn` SMALLINT (5) ,
-`cls` SMALLINT (5) ,
-`ds` SMALLINT (5) ,
-`cs` SMALLINT (5) ,
-`bs` SMALLINT (5) ,
+`trn` MEDIUMINT (5) ,
+`cls` MEDIUMINT (5) ,
+`ds` MEDIUMINT (5) ,
+`cs` MEDIUMINT (5) ,
+`bs` MEDIUMINT (5) ,
 `cv` INT( 6 ) NOT NULL ,
 `xcv` INT( 6 ) NOT NULL ,
  iscurrent TINYINT(1) NOT NULL,

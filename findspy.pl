@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use strict;
 #$ENV{REMOTE_USER}="af";
+exit 0 if $ENV{REMOTE_USER} eq "guest";
 
 my @members;
 use DBAccess;

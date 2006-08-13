@@ -150,7 +150,7 @@ if(param()) {
          
 		## start of normal output ##
 		if(!$options{export}) {
-			print qq!<a href="?legend=1">legend</a> <a href="?id=$system&amp;export=1">BB-export</a> <a href="?id=$system&amp;export=2">anonymous updated export</a> !.a({-href=>"?id=$system&history=".(!$options{history})},"toggle history"),br;
+			print qq!<a href="system-info?legend=1">legend</a> <a href="system-info?id=$system&amp;export=1">BB-export</a> <a href="system-info?id=$system&amp;export=2">anonymous updated export</a> !.a({-href=>"system-info?id=$system&history=".(!$options{history})},"toggle history"),br;
 			($bs,$be,$eol)=('<b>','</b>',"<br />\n");
 		}
 		my $syslevel=systemid2level($system);
@@ -205,7 +205,7 @@ if(param()) {
          foreach my $f (@$fleets) {
             $fleetsstr.=$eol.awinput::show_fleet($f);
          }
-         if((my $plcdcv=$planetcdcv{$planetid})) {
+         if(defined(my $plcdcv=$planetcdcv{$planetid})) {
             $fleetsstr.=$eol.$plcdcv." CV defending (from countdown info)";
          }
 			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" title="edit planet-info" alt="planet info"/></a> !;
@@ -237,8 +237,10 @@ if(param()) {
 				print "$awuser($uid): ($hx,$hy)-&gt;($x,$y) = ($dx,$dy)  Bio=$bio distsqr=$sqr";
 			}
 		} else {
+         my $who=getauthname() || $ENV{REMOTE_USER};
+         $output.=$eol."[color=blue]exported by $who at ".AWisodatetime(time())."[/color]";
 			#print qq!<textarea cols=80 rows=15 name="dummy" class="text">$output</textarea>!;
-			print textarea(-cols=>80, -rows=>15, -class=>'text', -value=>$output);
+			print textarea(-cols=>80, -rows=>15, -class=>'text', -value=>$output.$eol);
 		}
 	}
 } else { 

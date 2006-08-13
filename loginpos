@@ -30,6 +30,6 @@ $agent->env_proxy();
   awinput_init();
   my $sid=systemcoord2id($x,$y);
   awinput::awinput_finish();
-  print "$time $sid $pid $name ",
+  print "$time Id=$sid $pid $name ",
       "($x,$y)\n";
 

@@ -5,6 +5,6 @@ BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 awstandard_init();
 
-print AWheader("permanent alliance ranking")."<pre>";
-print `cut -f2,7 alliances.csv|sort -r -k 2|grep -v 0\\\$`;
+print AWheader("permanent alliance ranking points")."<pre>";
+print `cut -f2,7 alliances.csv|sort -n -r -k 2|grep -v -e 0 -e permanent\\\$`;
 print "</pre>".AWtail();

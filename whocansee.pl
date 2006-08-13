@@ -6,6 +6,7 @@ use awstandard;
 use awinput;
 my $sysid = shift @ARGV;
 $ENV{REMOTE_USER} = shift @ARGV;
+my $wantbio25 = shift @ARGV;
 #if(!$ENV{REMOTE_USER}) { $ENV{REMOTE_USER}="idle"; }
 awinput_init();
 
@@ -32,7 +33,7 @@ foreach(@$allplayers) {
    $sci[0]||=0;
    if($sci[0]>100){shift(@sci)}
    my $bio=$sci[0]||0;
-   if($bio<25) {
+   if($bio<25 || !$wantbio25) {
       next if(abs($ex-$sysxy[0])*2>$bio);
       next if(abs($ey-$sysxy[1])*2>$bio);
    }

@@ -1,11 +1,18 @@
+#planet/buildings: add colours for buildable stuff
+remember user timezones from settings page and use for GMT+n display in fleets and arrival
+reserved-planets-list
+parsing the owner of sieging fleets (replacing unknown)
 brownie:planets/detail: add remaining time (minutes) behind remaining PP
+feed:parse num of SUs and num of Artifacts into DB
+friendly-siege-SB-calc: input(SBlevel,planet) output(PP or A$ needed)
+holes: add speedy-attractivity-heuristic value in separate column
 #javascript arrival calc on fleet/launch
-alliance/detail: #non-member incomings
+#alliance/detail: hide/mark non-member incomings
 system-info: rearrange basic player info in table
 #brownie: add incomings to planet/details
 speed table (Bio0, Bio4(2AU)-link arrival,...Bio20)
 #display %.2f PP
-calc PP/h sci/h cul/h with bonusses (from trade field of player DB + Arti)
+#calc PP/h sci/h cul/h with bonusses (from trade field of player DB + Arti)
 #fleet tracker (remove old ones on feeding)
 #fleet screen: show owner+relation of fleet target
 #directory for alliance data with PerlAuthzHandler
@@ -22,14 +29,17 @@ correlate strongest fleet to best guarded
 merge strongest fleets history to catch moving fleets or see growth/loss
 #RSA thread link - auto from referer. e.g. use $::planetinfo{"$sid#0"}
 #add battlecalc link to relations - def/att from race or just worst-case
-Arnaken: could you sum up the fleets of everyone ie at the end of the fleet page ?
+#Arnaken: could you sum up the fleets of everyone ie at the end of the fleet page ?
 RSA-TD: Actually you know what I thought of, possible to code the best planets into your tool? As in it will show up where best planets are?
 
-possibly improve muffin AWLink to fetch info from aw.lsmod.de on demand
+#possibly improve muffin AWLink to fetch info from aw.lsmod.de on demand -> brownie
 #muffin: clickable system-IDs in Alliance/Detail (mouseover "AWTools")
 
-If you click on a system and et the system info (in the tools) you would also get a list of which alliance members who could see that particular system.
+#If you click on a system and et the system info (in the tools) you would also get a list of which alliance members who could see that particular system.
 
 
 changing the map look to look more "AW-like" - much like Mob's tools... I really think that would encourage people to use the tools more than they do today...
+
+wie wäre es mit einer möglichkeit eine sys ID, einen energylevel und einen biolevwel einzugeben und dann werden alle potentiellen jumper mit weniger als 2h flugzeit gesucht, als optionen kann man alle von aktiven und verbündeten, von kleinen spielermn und free/unknown einzeln filtern lassen
+
 

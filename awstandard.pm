@@ -8,12 +8,13 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
-qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &sb2cv &title2pm &safe_encode &file_content
+qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &sb2cv &title2pm &safe_encode &file_content &url2pm &awmax &awmin
       $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname);
 
 use CGI ":standard";
 use Time::Local;
 use Time::HiRes qw(gettimeofday tv_interval);
+use awaccess;
 
 our $server="www1.astrowars.com";
 our $bmwserver="aw.lsmod.de";
@@ -33,6 +34,10 @@ our @statuscolor=qw(black black blue cyan red green orange green);
 our $start_time;
 
 sub awstandard_init() {
+   my $alli=$ENV{REMOTE_USER};
+   if($alli && $awaccess::remap_alli{$alli}) {
+      $ENV{REMOTE_USER}=$alli=$awaccess::remap_alli{$alli};
+   }
    chdir "/home/aw/db";
    $style=cookie('style');
    $timezone=cookie('tz');
@@ -177,8 +182,8 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 #	if(!$magic) {$magic=$magicstring." "}
 	if($trade && $magic!~s/trade:\S*/$trade/) {$magic=~s/automagic:/$&\n$trade /}
 	if($prod && $magic!~s/production:\S*/$prod/) {$magic=~s/automagic:/$&\n$prod /}
-	if($sci && $magic!~s/science:[-+,.0-9]*/$sci/) {$magic=~s/automagic:/$&\n$sci /}
-	if($race && $magic!~s/race:[-+,0-9]*/$race/) {$magic=~s/automagic:/$&\n$race /}
+	if($sci && $magic!~s/science:[-+,.0-9?]*/$sci/) {$magic=~s/automagic:/$&\n$sci /}
+	if($race && $magic!~s/race:[-+,0-9?]*/$race/) {$magic=~s/automagic:/$&\n$race /}
 	if($newlogin) {
 		my @l2=@$newlogin;
 		my $add=1;
@@ -352,6 +357,27 @@ sub file_content($) {my($fn)=@_;
    my $result=<FCONTENT>;
    close(FCONTENT);
    return $result;
+}
+
+sub url2pm($) {my($url)=@_;
+   if(!$url){ return ();}
+   $url=~s/^http:\/\///;
+   $url=~s/\?.*//;
+   $url=~s/\/$//;
+   $url=~s/\.php//;
+   $url=lc($url);
+   my @result=($url);
+   while($url=~s/\/[^\/]*$//) {
+      push(@result, $url);
+   }
+   return (@result);
+}
+
+sub awmax($$) {
+   $_[0]>$_[1]?$_[0]:$_[1];
+}
+sub awmin($$) {
+   $_[0]<$_[1]?$_[0]:$_[1];
 }
 
 1;

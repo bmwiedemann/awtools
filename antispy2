@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+use DBAccess;
+#awstandard_init();
+awinput_init();
+
+our %options;
+print AWheader("AW IR spy detector tool");
+if(param() && param("bio")>2) {
+	foreach my $p (qw(bio x y)) {
+		$options{$p}=param($p);
+	}
+   my $bio=$options{bio}||24;
+   my @maxxy=($options{x},$options{y});
+   my @minxy=@maxxy;
+   my $AUdiff=$bio>>1;
+
+   for my $i (0..1) {
+      $minxy[$i]-=$AUdiff;
+      $maxxy[$i]+=$AUdiff;
+   }
+   my $minsci=$bio-6;
+   print "unspied players in Bio$bio range (@minxy to @maxxy) - probable enemy spies\n".br;
+   my $allplayers=$::dbh->selectall_arrayref( qq(
+      SELECT  x,y,player.name,pid,science
+      FROM  `player`,`starmap` 
+      WHERE science > $minsci AND
+      `home_id` = starmap.`sid` AND starmap.x >= $minxy[0] AND starmap.y >= $minxy[1] AND starmap.x <= $maxxy[0] AND starmap.y <= $maxxy[1]
+   ));
+   my $now=time();
+   foreach(@$allplayers) {
+         my($ex,$ey,$ename,$epid,$esl)=@$_;
+#         next if($esl<=$bio-6); # we are sure to have spied on him
+         my @rel=getrelation($ename);
+         my @sci=relation2science($rel[2]);
+         my $spytime;
+         if($sci[0]>100){$spytime=shift(@sci)}
+         if($now-$spytime<80000) {next}
+         my $ebio=$sci[0];
+         print "($ex,$ey) ".display_pid($epid)." SL=$esl oldBio=$ebio\n".br;
+   }
+} else {
+   my $s=3;
+	print start_form(-name=>"form", -method=>"get"),
+         textfield(-name=>'bio', -class=>'text', -size=>$s)," Bio",br,
+         textfield(-name=>'x', -class=>'text', -size=>$s)," Home x",br,
+         textfield(-name=>'y', -class=>'text', -size=>$s)," Home y",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.bio");
+}
+print AWtail();
+

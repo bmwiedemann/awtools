@@ -7,7 +7,7 @@ require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%relation,%planetinfo,
    $dbnamer,$dbnamep);
-our $adprice=0.93;
+our $adprice=0.914;
 our $alarmtime=99;
 our $dbdir="/home/aw/db/db";
 
@@ -39,9 +39,13 @@ sub awinput_init(;$) { my($nolock)=@_;
    tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
    tie %battles, "MLDBM", "db/battles.mldbm", O_RDONLY, 0666;
    tie %trade, "MLDBM", "db/trade.mldbm", O_RDONLY, 0666;
-   if($ENV{REMOTE_USER}) {
-      $dbnamer="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
-      $dbnamep="/home/bernhard/db/$ENV{REMOTE_USER}-planets.dbm";
+   my $alli=$ENV{REMOTE_USER};
+   if($alli) {
+      $dbnamer="/home/bernhard/db/$alli-relation.dbm";
+      if($remap_planning{$alli}) {
+         $alli=$remap_planning{$alli};
+      }
+      $dbnamep="/home/bernhard/db/$alli-planets.dbm";
 #     if($ENV{REMOTE_USER} ne "guest") {
       if($nolock) {
          tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
@@ -296,7 +300,7 @@ sub gettradepartners($$) { my($maxta,$minad)=@_;
     }
     if($trades>$maxta) {next}
 #print("$name : ad: $ad \n<br />");
-    push(@result,[$name,$ad, $prod*$$bonus[0], $trades]);
+    push(@result,[$name,$ad, $prod*$$bonus[0]*$adprice, $trades]);
   }
   return @result;
 }
@@ -331,7 +335,7 @@ sub dbplanetaddinit(;$) { my($screen)=@_;
 }
 # prepare DBs for adding new fleets
 # input pid = player ID of whose fleets are viewed
-# input screen = 0=news, 1=fleets 2=alliance_incomings 3=alliance_detail
+# input screen = 0=news, 1=fleets 2=alliance_incomings 3=alliance_detail 4=alliance_detail_incoming
 sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
    $awinput::fleetscreen=$screen;
    return unless $ENV{REMOTE_USER};
@@ -352,7 +356,7 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
    if($time) {$time-=3600*$tz}
    {
 #      local $^W=0;
-      require "fleetadd.pm"; fleetadd::dbfleetaddmysql($sid,$pid,$plid,$name,$time,$type,$fleet,$tz);
+      require "fleetadd.pm"; fleetadd::dbfleetaddmysql($sid,$pid,$plid,$name,$time,$type,$fleet,$tz,$awinput::fleetscreen);
    }
    return 0;
 	my $sidpid=sidpid22sidpid3($sid,$pid);
@@ -439,10 +443,17 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
 # input: sidpid
 # input: SQL condition to add - defaults to ""
 sub get_fleets($;$) { my($sidpid,$cond)=@_;
-   if(!$ENV{REMOTE_USER}) {return [];}
+   my $alli=$ENV{REMOTE_USER};
+   if(!$alli) {return [];}
    $cond||="";
-   my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE `alli` = ? AND `sidpid` = ? $cond ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
-   my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $ENV{REMOTE_USER}, $sidpid);
+   my $allimatch="`alli` = '$ENV{REMOTE_USER}'";
+   if($read_access{$alli}) {
+      foreach my $a (@{$read_access{$alli}}) {
+         $allimatch.=" OR `alli` = '$a'";
+      }
+   }
+   my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE ($allimatch) AND `sidpid` = ? $cond ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
+   my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $sidpid);
    return $res;
 }
 
@@ -462,7 +473,8 @@ sub show_fleet($) { my($f)=@_;
    if($cls){$flstr.=", $cls CLS";}
    if($color) {$color="; color:$fleetcolormap{$color}"}
    if(!$eta && $iscurrent){$color.="; text-decoration:underline"}
-   if($eta) {$eta=AWisodatetime($eta+$tz)." ".awstandard::AWreltime($eta)} else {$eta="defending fleet.............."}
+   my $tz2=($timezone>=0?"+":"").$timezone;
+   if($eta) {$eta=AWisodatetime($eta+$tz)." GMT$tz2 ".awstandard::AWreltime($eta)} else {$eta="defending fleet.............."}
    if(length($eta)<$minlen1) {$eta.="&nbsp;" x ($minlen1-length($eta))}
    if(length($flstr)<$minlen) {$flstr.="&nbsp;" x ($minlen-length($flstr))}
    my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);

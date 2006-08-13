@@ -132,7 +132,7 @@ if(1) {
    }
 
    
-#   $_.="post/param-data: ".$param;
+   $_.="post/param-data: http://$ENV{HTTP_HOST}$ENV{SCRIPT_NAME}?$param";
 }
 
 1;

@@ -46,7 +46,10 @@ if($options{alliance}) {
    if($forumlink) {$forumlink=" URL:".a({-href=>$forumlink}, $forumlink)}
 	my $rellink=qq! <a href="relations?name=$alli"><img src="/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
    my @members=allianceid2members($aid);
-	print a({-href=>"http://$server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." ".a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde").$forumlink.br."\n$alli members (".scalar @members.")";
+	print a({-href=>"http://$server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." "
+   #.a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde")
+      .a({-href=>"http://lefois.de/aw/tool/info.php?R_tag=$alli"},"Lefois")
+      .$forumlink.br."\n$alli members (".scalar @members.")";
 
    my @members2;
    my @membernames;

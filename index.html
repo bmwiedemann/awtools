@@ -6,7 +6,7 @@ awstandard_init();
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout antispy battles distsqr eta feedupdate holes permanentranking planet-info ranking sim topwars topallis tradepartners uploadcss)) {
+foreach(qw(logout antispy antispy2 battles distsqr eta feedupdate holes permanentranking planet-info ranking sim topwars topallis tradepartners uploadcss)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 
@@ -23,7 +23,7 @@ print
  (".a({href=>"http://$bmwserver/gold3/alliancerelation-$reldate.svg"},"svg").")",br,
  a({href=>"http://$bmwserver/customize_race.html"},"race helper"),br,
 # a({href=>"/beta10/alliancerelation"},"alliance relation data")." &gt; ".a({href=>"topwars"},"top wars").", ".a({href=>"topallis"},"top allis"),
- p,a({href=>"/manual.html"},"manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog") ,br,
+ p,a({href=>"/manual.html"},"manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog"), " / ", a({href=>"http://aw.lsmod.de/TODO"},"ToDo-List"),br,
 "color codes ". a({href=>"system-info?legend=1"}, "for relations"), 
 " and ".a({href=>"planet-info?legend=1"}, "for planet/plannings"),
 p,
@@ -34,10 +34,12 @@ p,
  a({href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
  a({href=>"http://www.astrowars.com/about/battlecalculator"},"AW battle calculator"),br,
  a({href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
- "other tools: ".a({href=>"http://azgharde.celeonet.fr/tools/index.php"},"azgharde")," ",
+ "other tools: ".
  a({href=>"http://lefois.de/aw/tool/index.php"}, "Lefois"), " ",
+ a({href=>"http://azgharde.free.fr/tools/index.php"},"azgharde")," ",
  a({href=>"http://aw.neron92.info/"}, "neron92"), " ",
- a({href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",
  a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
+ "outdated: ",
  a({href=>"http://astrostats.reseaulocal.fr/"}, "Astrostats"), " ",
+ a({href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",
  AWtail;

@@ -8,6 +8,7 @@ if($debug) {print "debug mode - no modifications done<br>\n"}
 
 sub filter() {
    return if(!m!Planets at <b>([^<]*)</b> \((-?\d+)/(-?\d+)\)! || !$::options{url});
+   return if($ENV{REMOTE_USER} eq "xr"); # TODO : drop later?
    my ($sysname,$x,$y)=($1,$2,$3);
    my $sid=systemcoord2id($x,$y); #systemname2id($sysname);
    if ($::options{url}=~m/\?nr=(\d+)/) {$sid=$1}
