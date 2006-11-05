@@ -78,13 +78,14 @@ if($options{name}) {# && $options{name} ne "unknown") {
       my @science=relation2science($options{comment});
       if($id>2 && (my $p=$player{$id})) {
       my $sl=$$p{science};
-      my ($eatt,$edef,$emath,$ephys,$epl)=(4,4,$sl,$sl,$$p{level});
+      my ($eatt,$edef,$espeed,$eenergy,$emath,$ephys,$epl)=(4,4,4,$sl,$sl,$sl,$$p{level});
       if($science[0]) { 
          if($science[0]>100) {shift @science}
-         ($emath,$ephys)=@science[3,4];
+         ($eenergy,$emath,$ephys)=@science[2..4];
       }
       if($race[0]) { 
-         ($eatt,$edef)=@race[5,6];
+         ($espeed,$eatt,$edef)=@race[4..6];
+         $espeed=~s/\+//;
       }
       my($oatt,$odef,$omath,$ophys,$opl)=(0,0,0,0,0);
       my $awuser=cookie('user');
@@ -106,6 +107,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
       $extralinks=" ".
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/images/shield.png",-alt=>"defend"})).
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/images/sword.png",-alt=>"attack"}))." ".
+         a({-href=>"arrival?energy=$eenergy&racespeed=$espeed"}, img({-src=>"/images/shuttle.png",-alt=>"traveltime"}))." ".
               a({-href=>"http://www.astrowars.com/forums/profile.php?mode=viewprofile&u=".$id}, img({-src=>"/images/icon_profile.gif",-alt=>"forum-profile"}))." ";
       }
    }

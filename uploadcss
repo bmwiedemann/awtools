@@ -47,15 +47,19 @@ $name=~s"^.*[/\\]"";	if($filename=~m/\.([^.]+)$/ && ($allowedext{$1}||return ".$
 
 #print STDOUT header(-expires=>'+1m', -Cache_control=>"no-cache", -Pragma=>"no-cache");
 
+if($authname && $authname eq "unknown") {
+   $authname="";
+}
 if(!$authname) {
   $errormessage=a({-href=>"/manual/auth.html"},"authenticate first");
 }
 if(param() && $authname) {
   $errormessage=process();
 }
+my $authstr=$authname || "<span style=\"color:red\">no user</span>";
 if(!param() or $errormessage) {
    print AWheader("Custom CSS Upload"),
-         "Cascading Style Sheets (CSS) can be used to customize the look of AW pages. This tool is for HTML/CSS experts only.",br;
+         "Cascading Style Sheets (CSS) can be used to customize the look of AW pages. This tool is for HTML/CSS experts only. Authenticated: $authstr",br;
   if($errormessage) {
     print STDOUT (h1($errormessage),hr);
   }

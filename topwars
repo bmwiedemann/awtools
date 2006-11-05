@@ -6,7 +6,7 @@ use awstandard;
 awstandard_init();
 
 my $sortopts="-k15";
-my $round="gold5";
+my $round="gold6";
 my $titlestr;
 if($0=~/topwars/) {
 	$titlestr=" wars";

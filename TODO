@@ -1,3 +1,6 @@
+dynamic PP-A$ price for tradepartners tool
+automatic state transitions planned->targeted, targeted->sieged|taken
+sieged-by $user and fleets in BB-export
 #planet/buildings: add colours for buildable stuff
 remember user timezones from settings page and use for GMT+n display in fleets and arrival
 reserved-planets-list

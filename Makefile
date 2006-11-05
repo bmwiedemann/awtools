@@ -3,7 +3,7 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-round=gold5
+round=gold6
 allies=$(shell cat allowed_alliances)
 tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy2 antispy tradepartners whocansee permanentranking adminuseralli uploadcss playeronline playeronline2 passwd logout nph-brownie.cgi
 #allies=
@@ -22,6 +22,7 @@ system-ids.txt:
 updatecsv: dumpdbs
 	wget -x -nc -o/dev/null http://${f2}
 	tar xjf ${f2}
+	-grep -v id trade.csv >> alltrades.csv
 	umask 2 ; perl importcsv.pl && ( mv db/* olddb ; mv newdb/* db )
 	#-cp -a tactical-af.png olddb/tactical-af-$d.png
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html

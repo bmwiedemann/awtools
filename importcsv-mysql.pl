@@ -11,6 +11,18 @@ if(!$dbh) {die "DB err: $!"}
 
 if(0) { # create tables
 $dbh->do(qq!
+CREATE TABLE `alltrades` (
+`tid` INT NOT NULL,
+`pid1` INT NOT NULL,
+`pid2` INT NOT NULL,
+`time` INT,
+PRIMARY KEY ( `tid` ),
+INDEX ( `pid1` ),
+INDEX (`pid2`)
+);!);
+exit 0;
+
+$dbh->do(qq!
 CREATE TABLE `trades` (
 `pid1` INT NOT NULL,
 `pid2` INT NOT NULL,
@@ -18,7 +30,6 @@ CREATE TABLE `trades` (
 INDEX ( `pid1` ),
 INDEX (`pid2`)
 );!);
-exit 0;
 
 $dbh->do(qq!
 CREATE TABLE `cdcv` (
@@ -176,7 +187,7 @@ PRIMARY KEY ( `fid` )
 exit 0;
 }
 
-our (%alliances,%starmap,%player,%playerid,%planets);
+our (%alliances,%starmap,%player,%playerid,%planets,%alltrades);
 #tie %alliances, "MLDBM", "newdb/alliances.mldbm", O_RDWR|O_CREAT, 0666 or die $!;
 #tie %starmap, "MLDBM", "newdb/starmap.mldbm", O_RDWR|O_CREAT, 0666;
 #tie %player, "MLDBM", "newdb/player.mldbm", O_RDWR|O_CREAT, 0666;
@@ -263,9 +274,17 @@ sub planets {
 #	$tempplanets{$id}[$pid-1]=\%h;
 }
 
+my $tid=0;
+sub alltrades
+{
+   my($pid1,$pid2)=@_;
+   if($pid1<$pid2) { ($pid2,$pid1)=@_ }
+   $alltrades{$tid++}={pid1=>$pid1, pid2=>$pid2};
+}
+
 print "reading CSV files\n";
 #for my $f (@::files) {
-for my $f (qw(planets player alliances starmap)) {
+for my $f (qw(planets player alliances starmap alltrades)) {
 	my $file="$f.csv";
 	my $head=1;
 	$firstline=1;
@@ -307,6 +326,11 @@ print "\tstarmap\n";
 tie %h,'Tie::DBI',$dbh,'starmap','sid',{CLOBBER=>3};
 %h=%starmap;
 untie %h;
+print "\talltrades\n";
+tie %h,'Tie::DBI',$dbh,'alltrades','tid',{CLOBBER=>3};
+%h=%alltrades;
+untie %h;
+
 
 print "done\n";
 1;

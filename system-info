@@ -216,7 +216,7 @@ if(param()) {
 				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
 				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, playerid2link($$h{ownerid}), $info.$fleetsstr."</li>\n";
 			} else {
-				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s", $planetid, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), $info);
+				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s%s", $planetid, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), (planet2siege($h)?"[color=red]sieged[/color] ":""), $info);
 			}
 			
 		}

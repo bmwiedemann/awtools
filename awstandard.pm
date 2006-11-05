@@ -26,9 +26,9 @@ our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue");
 our @racestr=qw(growth science culture production speed attack defense);
-our @racebonus=qw(0.07 0.08 0.04 0.04 0.19 0.15 0.16);
+our @racebonus=qw(0.07 0.08 0.04 0.04 0.18 0.14 0.16);
 our $magicstring="automagic:";
-our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HOR"=>15);
+our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HoR"=>15);
 our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "darkturquoise", "LimeGreen", "green");
 our @statuscolor=qw(black black blue cyan red green orange green);
 our $start_time;
@@ -347,6 +347,7 @@ sub cookie2session { my($session)=@_;
 }
 
 sub safe_encode($) { my($name)=@_;
+   $name||="";
    $name=~s/[^a-zA-Z0-9-]/"_".ord($&)/ge;
    return $name;
 }

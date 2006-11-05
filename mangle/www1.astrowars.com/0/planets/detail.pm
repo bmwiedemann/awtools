@@ -3,7 +3,7 @@ use awinput;
 
 my @buildings=("Hydroponic Farm", "Robotic Factory", "Galactic Cybernet", "Research Lab", "Starbase");
 my @val=qw(farm fabrik kultur forschungslabor starbase);
-#my $debug="";
+my $debug="";
 
 $::options{url}=~/i=(\d+)/;
 my $planet=$1;
@@ -13,12 +13,7 @@ my $sidpid;
 
 sub manglesys($$) {my($sysname, $planet)=@_;
    my $result="$sysname #$planet";
-   my $sid;
-   if($sysname=~m/^\((\d+)\)$/) {
-      $sid=$1;
-   } else {
-      $sid=systemname2id($sysname);
-   }
+   my $sid=systemname2id($sysname);
    if($sid) {
       $sidpid=sidpid22sidpid3m($sid, $planet);
       my ($x,$y)=systemid2coord($sid);
@@ -41,8 +36,11 @@ foreach my $n (0..$#buildings) {
    my $buil=$buildings[$n];
    next if(! m%($buil</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%);
    my ($level,$ppneeded)=($2,$4);
+   if($mangle::dispatch::g) {
+#      $debug.="$level $ppneeded<br>";
+   }
    next if(($ppneeded>1000 && $buil ne "Starbase") || $ppneeded>$pp);
-   s%($buil</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4 <a href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$4&amp;produktion=$val[$n]$dscost" style="background-color:blue">+1</a>$5%;
+   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$5&amp;produktion=$val[$n]$dscost" style="background-color:blue">+1</a>$6%;
 #   $debug.="<br>test: $buil $val[$n] $2 $4";
 }
 
@@ -71,6 +69,6 @@ if(1 || $mangle::dispatch::g) {
       $&%m
    }
 }
-#$_.=$debug;
+$_.=$debug;
 
 1;

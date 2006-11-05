@@ -22,7 +22,8 @@ print p(a({-href=>"?history=".(!$options{history})},"toggle history"));
 
 print "sys#planet: info".br;
 
-my $res=$dbh->selectall_arrayref("SELECT sidpid,sum(xcv),sum(trn),sum(cls) FROM `fleets` WHERE `alli` = '$alli' AND `iscurrent` = 1 GROUP BY `sidpid` ");
+my $allimatch=awinput::get_alli_match($alli);
+my $res=$dbh->selectall_arrayref("SELECT sidpid,sum(xcv),sum(trn),sum(cls) FROM `fleets` WHERE $allimatch AND `iscurrent` = 1 GROUP BY `sidpid` ");
 
 
 my @sidpids=sort {$$b[1]<=>$$a[1]} @$res;

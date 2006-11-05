@@ -41,7 +41,11 @@ sub awinput_init(;$) { my($nolock)=@_;
    tie %trade, "MLDBM", "db/trade.mldbm", O_RDONLY, 0666;
    my $alli=$ENV{REMOTE_USER};
    if($alli) {
-      $dbnamer="/home/bernhard/db/$alli-relation.dbm";
+      my $a=$alli;
+      if($remap_relations{$alli}) {
+         $a=$remap_relations{$alli};
+      }
+      $dbnamer="/home/bernhard/db/$a-relation.dbm";
       if($remap_planning{$alli}) {
          $alli=$remap_planning{$alli};
       }
@@ -175,6 +179,7 @@ sub getplanet($$) { my($sid,$pid)=@_;
 sub playerid2link($) { my($id)=@_;
    if($id==0) {return "free planet"}
    my $name=playerid2name($id);
+   $name=~s/O/o/g;
    my @rel=getrelation($name);
    my $col=getrelationcolor($rel[0]);
    my $alli="";
@@ -208,6 +213,7 @@ sub setplanetinfo($%) { my($id,$options)=@_;
 	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 sub systemname2id($) { my($name)=@_;
+   if($name=~m/^\((\d+)\)$/) { return $1 }
 	$name=~s/\s+/ /;
 	$starmap{"\L$name"};
 }
@@ -317,6 +323,7 @@ sub playername2alli($) {my ($user)=@_;
       tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
       tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
       my $pid=playername2id($user);
+#      if($user eq "greenbird") {$pid=68061}
       if($pid && $pid>2) {
          $alli=lc(playerid2tag($pid));
          if($awaccess::remap_alli{$alli}) { $alli=$awaccess::remap_alli{$alli} }
@@ -335,7 +342,7 @@ sub dbplanetaddinit(;$) { my($screen)=@_;
 }
 # prepare DBs for adding new fleets
 # input pid = player ID of whose fleets are viewed
-# input screen = 0=news, 1=fleets 2=alliance_incomings 3=alliance_detail 4=alliance_detail_incoming
+# input screen = 0=news, 1=fleets 2=alliance_incomings 3=alliance_detail 4=alliance_detail_incoming 8=planet_detail
 sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
    $awinput::fleetscreen=$screen;
    return unless $ENV{REMOTE_USER};
@@ -397,7 +404,9 @@ sub dblinkadd { my($sid,$url)=@_;
    my $type;
    if($url=~m!http://xtasisrebellion.free.fr/phpnuke/modules.php\?name=Forums&file=viewtopic&t=(\d+)!) { $type="XR" }
    elsif($url=~m!http://forum.rebelstudentalliance.co.uk/index.php\?showtopic=(\d+)!) { $type="RSA" }
-   elsif($url=~m!http://(?:www.)vbbyjc.com/phpBB2/viewtopic.php\?t=(\d+)!) { $type="SW" }
+   elsif($url=~m!http://lesnains\.darkbb.com/viewtopic\.forum\?[pt]=(\d+)!) { $type="NAIN" }
+   elsif($url=~m!http://quicheinside\.free\.fr/viewtopic\.php\?[pt]=(\d+)!) { $type="QI" }
+   elsif($url=~m!http://(?:www.)vbbyjc.com/phpBB2/viewtopic.php\?[pt]=(\d+)!) { $type="SW" }
    return unless($sid && $type);
    $url=$&;
    my $sidpid=sidpid22sidpid3($sid,0);
@@ -440,18 +449,27 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
    return int($cv*(1+$phys*0.01525)*(1+$awstandard::racebonus[5]*$att));
 }
 
+# input: alli
+# output: SQL to match allies
+sub get_alli_match($)
+{
+   my($alli)=@_;
+   my $allimatch="`alli` = '$alli'";
+   if($read_access{$alli}) {
+      foreach my $a (@{$read_access{$alli}}) {
+         $allimatch.=" OR `alli` = '$a'";
+      }
+   }
+   return $allimatch;
+}
+
 # input: sidpid
 # input: SQL condition to add - defaults to ""
 sub get_fleets($;$) { my($sidpid,$cond)=@_;
    my $alli=$ENV{REMOTE_USER};
    if(!$alli) {return [];}
    $cond||="";
-   my $allimatch="`alli` = '$ENV{REMOTE_USER}'";
-   if($read_access{$alli}) {
-      foreach my $a (@{$read_access{$alli}}) {
-         $allimatch.=" OR `alli` = '$a'";
-      }
-   }
+   my $allimatch=get_alli_match($alli);
    my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE ($allimatch) AND `sidpid` = ? $cond ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
    my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $sidpid);
    return $res;
@@ -504,4 +522,10 @@ sub display_sid2($) { my($sid)=@_;
 
 sub sort_pid($$) {lc(playerid2name($_[0])) cmp lc(playerid2name($_[1]))}
 
+sub get_alli_group($)
+{
+   my($alli)=@_;
+   my @list=($alli);
+   return @list;
+}
 1;

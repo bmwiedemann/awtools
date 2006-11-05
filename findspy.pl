@@ -59,14 +59,20 @@ for my $i (0..1) {
    $minxy[$i]-=$AUdiff;
    $maxxy[$i]+=$AUdiff;
 }
+if(!defined($maxxy[0]) || $minsci>=100) {
+   exit 0;
+}
 #print "@minxy , @maxxy";
 $minsci+=$scidiff;
-my $allplayers=$::dbh->selectall_arrayref( qq(
+my $sth=$::dbh->prepare(
+      qq(
 SELECT  x,y,player.name,pid,science
 FROM  `player`,`starmap` 
-WHERE science >= $minsci
-AND `home_id` = starmap.`sid` AND starmap.x >= $minxy[0] AND starmap.y >= $minxy[1] AND starmap.x <= $maxxy[0] AND starmap.y <= $maxxy[1]
+WHERE science >= ?
+AND `home_id` = starmap.`sid` AND starmap.x >= ? AND starmap.y >= ? AND starmap.x <= ? AND starmap.y <= ?
    ));
+$|=1;
+my $allplayers=$::dbh->selectall_arrayref($sth, undef, $minsci, $minxy[0], $minxy[1], $maxxy[0], $maxxy[1]); 
 
 #while(<>) { print eval; }
 

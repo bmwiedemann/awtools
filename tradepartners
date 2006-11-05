@@ -24,7 +24,7 @@ my @tap2;
 foreach my $entry (@tap) {
    my ($name, $ad, $prod, $partners)=@$entry;
    my $pid=playername2id($name);
-   if(!$pid) {next}
+   if(!$pid || !$prod) {next}
    $name=playerid2name($pid);
    my @rel=getrelation($name);
    $$entry[0]=$name;
