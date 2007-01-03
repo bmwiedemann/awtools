@@ -381,4 +381,12 @@ sub awmin($$) {
    $_[0]<$_[1]?$_[0]:$_[1];
 }
 
+sub awsyslink($;$) {
+   my($sid,$simple)=@_;
+   $simple||=1;
+   my $public=$ENV{REMOTE_USER}?"":"";#:"/public";
+   my $and=$ENV{REMOTE_USER}?'%':'&';
+   my $link=qq($public/system-info?id=$sid${and}simple=$simple">);
+}
+
 1;
