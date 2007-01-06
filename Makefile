@@ -3,9 +3,9 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-round=gold6
+round=gold7
 allies=$(shell cat allowed_alliances)
-tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy2 antispy tradepartners whocansee permanentranking adminuseralli uploadcss playeronline playeronline2 passwd logout nph-brownie.cgi
+tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy2 antispy tradepartners whocansee permanentranking adminuseralli uploadcss playeronline playeronline2 passwd ipban logout nph-brownie.cgi
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -22,7 +22,7 @@ system-ids.txt:
 updatecsv: dumpdbs
 	wget -x -nc -o/dev/null http://${f2}
 	tar xjf ${f2}
-	-grep -v id trade.csv >> alltrades.csv
+	-grep -v id trade.csv||true >> alltrades.csv
 	umask 2 ; perl importcsv.pl && ( mv db/* olddb ; mv newdb/* db )
 	#-cp -a tactical-af.png olddb/tactical-af-$d.png
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
@@ -33,7 +33,7 @@ updatecsv: dumpdbs
 	perl detectalliancerelation.pl > html/${round}/alliancerelation-${mydate}
 	ln -f html/${round}/alliancerelation-${mydate} html/${round}/alliancerelation
 	perl importcsv-mysql.pl
-#	- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
+	- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
 
 updatemap: updatemaponly updaterank af-relations.txt tgd-relations.txt
 updatemapsonly: updatemaponly updatemap2only
@@ -96,6 +96,7 @@ access:
 	-cp -ia ../dbm/empty.dbm ~/db/$a-relation.dbm
 	-cp -ia ../dbm/empty.dbm ~/db/$a-planets.dbm
 	touch ~/db/$a-planets.dbm.lock ~/db/$a-relation.dbm.lock
+	../dbm/add.pl ~/db/$a-relation.dbm af "7 af alliance relation"
 	../dbm/add.pl ~/db/$a-relation.dbm $a "9 $a alliance relation"
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}

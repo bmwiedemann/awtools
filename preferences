@@ -3,37 +3,39 @@ use strict;
 use CGI ":standard";
 BEGIN {chdir "/home/aw/inc";}
 use awstandard;
-$style=cookie('style');
+my @paramlist=qw(user refsys style tz customhtml);
+my %options;
+my %cookies;
 
-my $u=param('user');
-my $uc=cookie('user');
-my $ref=param('ref');
-my $refc=cookie('refsys');
-my $stylep=param('style');
-my $stylec=cookie('style');
-my $tz=param('tz');
-my $tzc=cookie('tz');
-if($stylep) {$style=$stylep}
+foreach my $n (@paramlist) {
+	my $p=param($n);
+	my $c=cookie($n);
+	if(!defined($p) && $c) {param($n,$c);$p=$c}
+	$options{$n}=$p;
+	$cookies{$n}=$c;
+}
 
-if(!defined($u) && $uc) {param("user",$uc);$u=$uc}
-if(!defined($ref) && $refc) {param("ref",$refc);$ref=$refc}
-if(!defined($stylep) && $stylec) {param("style",$stylec);$stylep=$stylec}
-if(!defined($tz) && $tzc) {param("tz",$tzc);$tz=$tzc}
-if(!defined($tz)) {param("tz",0)}
-if(defined($u)) {
-   $ref||="";
+awstandard_init();
+$style=$options{style}||$cookies{style};
+$awstandard::customhtml=$options{customhtml}||$cookies{customhtml};
+
+if(!defined($options{tz})) {param("tz",0)}
+if(defined($options{user})) {
+   $options{refsys}||="";
    my @cookies;
-	push(@cookies, cookie(-name=>'user', -value=>$u, -expires=>'+90d'));
-	push(@cookies, cookie(-name=>'refsys', -value=>$ref, -expires=>'+90d'));
-	push(@cookies, cookie(-name=>'style', -value=>$stylep, -expires=>'+600d'));
-	push(@cookies, cookie(-name=>'tz', -value=>$tz, -expires=>'+600d'));
-	print header(-cookie=>\@cookies).AWheader2("logged in as $u ($ref)");
+	push(@cookies, cookie(-name=>'user', -value=>$options{user}, -expires=>'+90d'));
+	push(@cookies, cookie(-name=>'refsys', -value=>$options{refsys}, -expires=>'+90d'));
+	push(@cookies, cookie(-name=>'style', -value=>$options{style}, -expires=>'+600d'));
+	push(@cookies, cookie(-name=>'tz', -value=>$options{tz}, -expires=>'+600d'));
+	push(@cookies, cookie(-name=>'customhtml', -value=>$options{customhtml}, -expires=>'+600d'));
+	print header(-cookie=>\@cookies).AWheader2("logged in as $options{user} ($options{refsys})");
 } else { print AWheader("login"); }
 
 print start_form(-method=>'get', -name=>"form"), textfield(-name=>'user', -class=>'text'), " user name", br.AWfocus("form.user"),
-textfield(-name=>'ref', -class=>'text'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
+textfield(-name=>'refsys', -class=>'text'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
 popup_menu(-name=>'style', -values=>[qw(green blue blue2 aw plain)], -default=>"blue"), " color theme for AWtools", br,
 popup_menu(-name=>'tz', -values=>[-11..12]), " timezone for AWtools", br,
+textarea(-name=>'customhtml', -class=>'text', -rows=>5, -cols=>80), " custom HTML for AWTools",br,br,
 submit(-name=>"submit", -class=>'smbutton'), end_form, br,
    "This tool sets cookies which are stored in your browser and used by some of my other tools.",
 end_html;

@@ -1,4 +1,6 @@
 dynamic PP-A$ price for tradepartners tool
+add display of player's trades. Maybe I draw another alliance-friendship-graph from that data.
+http://aw.lsmod.de/cgi-bin/tradepartners   Then You could also add two more columns: 'AD+artifact_price' and 'new ready(h)' (based on new AD+artifact_price amount). 
 automatic state transitions planned->targeted, targeted->sieged|taken
 sieged-by $user and fleets in BB-export
 #planet/buildings: add colours for buildable stuff

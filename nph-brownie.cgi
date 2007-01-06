@@ -1261,6 +1261,7 @@ if ($ENV{'HTTP_HOST'} ne '') {
 } else {
     $THIS_HOST= $ENV{'SERVER_NAME'} ;
 }
+$THIS_HOST="brownie.zq1.de";
 
 
 # Build the constant $THIS_SCRIPT_URL from environment variables.  Only include
@@ -6393,6 +6394,7 @@ $flags
 </form>
 
 <h3><a href="$cookies_url">Manage cookies</a></h3>
+<h3><a href="http://aw.lsmod.de/manual.html#brownie">Check out the brownie manual</h3>
 EOF
 
     &footer ;

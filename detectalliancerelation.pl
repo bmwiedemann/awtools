@@ -17,6 +17,7 @@ my $maxkilledcv=0;
 sub max($$) {$_[0]>$_[1]?$_[0]:$_[1]}
 
 #print STDERR "importing old data...\n";
+close STDERR;
 my @olddata;
 my @oldpopdata;
 for my $day (0..7) {

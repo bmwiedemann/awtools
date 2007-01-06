@@ -89,7 +89,7 @@ if(param("legend")) {
 
 if(param()) {
 	my($x,$y,$system);
-	for my $p (qw'x y mapx mapy id name export auth expires uniq history') {
+	for my $p (qw'x y mapx mapy id name export auth expires uniq history simple') {
 	  $options{$p}=param($p);
 	}
    if($options{history}) {$wantcurrent=""}
@@ -134,7 +134,9 @@ if(param()) {
       }
 		($x,$y)=systemid2coord($system);
 		my $sysname=systemid2name($system);
-		print AWheader2("($x,$y) $sysname system info [\U$ENV{REMOTE_USER}\E]");
+      my $headline="($x,$y) $sysname system info [\U$ENV{REMOTE_USER}\E]";
+      if($options{simple}) {print AWheader2("").b($headline).br}
+      else {print AWheader2($headline);}
 		my ($bs,$be,$eol)=('[b]','[/b]',"\n");
 
       my $sidpid1=sidpid22sidpid3m($system,1);
@@ -150,7 +152,7 @@ if(param()) {
          
 		## start of normal output ##
 		if(!$options{export}) {
-			print qq!<a href="system-info?legend=1">legend</a> <a href="system-info?id=$system&amp;export=1">BB-export</a> <a href="system-info?id=$system&amp;export=2">anonymous updated export</a> !.a({-href=>"system-info?id=$system&history=".(!$options{history})},"toggle history"),br;
+			print qq!<a href="system-info?legend=1">legend</a> <a href="system-info?id=$system&amp;export=1">BB-export</a> <a href="system-info?id=$system&amp;export=2">anonymous updated export</a> !.a({-href=>"system-info?id=$system&history=".(!$options{history})},"toggle history")." ".a({-href=>"system-info?id=$system&simple=".(!$options{simple})},"toggle simple"),br;
 			($bs,$be,$eol)=('<b>','</b>',"<br />\n");
 		}
 		my $syslevel=systemid2level($system);
@@ -208,12 +210,16 @@ if(param()) {
          if(defined(my $plcdcv=$planetcdcv{$planetid})) {
             $fleetsstr.=$eol.$plcdcv." CV defending (from countdown info)";
          }
-			my $plink=qq! <a href="planet-info?id=$id"><img src="/images/aw/edit-planet.gif" title="edit planet-info" alt="planet info"/></a> !;
+         my $img;
+         if($options{simple}) {$img="edit"}
+         else {$img='<img src="/images/aw/edit-planet.gif" title="edit planet-info" alt="planet info"/>'}
+			my $plink=qq! <a href="planet-info?id=$id">$img</a> !;
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
 			if(!$options{export}) {
 				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/images/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
 				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
+            if($options{simple}) {$etalink=""}
 				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, playerid2link($$h{ownerid}), $info.$fleetsstr."</li>\n";
 			} else {
 				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s%s", $planetid, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), (planet2siege($h)?"[color=red]sieged[/color] ":""), $info);

@@ -11,6 +11,15 @@ if(!$dbh) {die "DB err: $!"}
 
 if(0) { # create tables
 $dbh->do(qq!
+CREATE TABLE `ipban` (
+`ip` VARCHAR(16) NOT NULL,
+`timeadded` INT NOT NULL,
+`reason` VARCHAR(255) NOT NULL,
+PRIMARY KEY ( `ip` )
+);!);
+exit 0;
+
+$dbh->do(qq!
 CREATE TABLE `alltrades` (
 `tid` INT NOT NULL,
 `pid1` INT NOT NULL,

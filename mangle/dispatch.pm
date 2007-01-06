@@ -24,6 +24,13 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $title="";
    my $alli="\U$ENV{REMOTE_USER}";
    
+   # greenbird special
+   if($::options{name} eq "greenbird" && m/onLoad="document.login.secure.focus\(\);">/) {
+      do "mangle/special/secure.pm";
+      $_=mangle::special::secure::read($_);
+   }
+
+   
    if(m&<title>([^<]*)</title>&) {
       $title=$1;
    } else { $title="special_no_title" }

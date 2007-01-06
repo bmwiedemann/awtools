@@ -26,12 +26,13 @@ our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue");
 our @racestr=qw(growth science culture production speed attack defense);
-our @racebonus=qw(0.07 0.08 0.04 0.04 0.18 0.14 0.16);
+our @racebonus=qw(0.07 0.08 0.04 0.04 0.17 0.13 0.16);
 our $magicstring="automagic:";
 our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HoR"=>15);
 our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "darkturquoise", "LimeGreen", "green");
 our @statuscolor=qw(black black blue cyan red green orange green);
 our $start_time;
+our $customhtml;
 
 sub awstandard_init() {
    my $alli=$ENV{REMOTE_USER};
@@ -41,6 +42,7 @@ sub awstandard_init() {
    chdir "/home/aw/db";
    $style=cookie('style');
    $timezone=cookie('tz');
+   $customhtml=cookie('customhtml');
    if(!defined($timezone)) {$timezone=0}
    $start_time=[gettimeofday()];
 }
@@ -79,6 +81,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 		}
 		$links.="|&nbsp;".a(\%h,$item)." ";
 	}
+	$links.=$customhtml||"";
 	if(!$style) {$style='blue'}
    my $flag = autoEscape(0);
 	local $^W=0; #disable warnings for next line

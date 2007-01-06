@@ -1,6 +1,7 @@
 package mangle::special;
 
 sub mangle() {
+   
    # modify title to work better with tabs
    s/^\s*(<html><head><title>) Astro Wars /$1/;
    

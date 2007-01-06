@@ -1,7 +1,6 @@
 if($::options{url}=~/nr=(\d+)/) {
    my $id=$1;
-   my $public=$ENV{REMOTE_USER}?"":"";#:"/public";
-   my $link=qq($::bmwlink$public/system-info?id=$id">);
+   my $link=$::bmwlink.awstandard::awsyslink($id);
    my $l=$link;
    $l=~s/.*(http:)/$1/;
    s%(Planets at)%$1 ${link}id=$id</a>%;
