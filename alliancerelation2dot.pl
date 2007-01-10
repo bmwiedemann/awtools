@@ -1,8 +1,10 @@
 #!/usr/bin/perl -w
-# this code is Copyright Bernhard M. Wiedemann and licensed under GNU GPL
+# this code is Copyright Bernhard M. Wiedemann 
+# and licensed under GNU GPL for everyone to use
 use strict;
-my $aentries=100;
-my $eentries=85;
+my $key=14;
+my $aentries=110;
+my $eentries=75;
 my @groups=(
 #[qw{HNU HND GPS MAD}], 
 #[qw{LA LD FO SP}],
@@ -14,7 +16,7 @@ my @groups=(
 #[qw{NEMO OMEN}],
 #[qw{THE NSA BKA PEYO}]
 );
-my $relre=qr!^([^ ]+) -- ([^ ;]+); // (\d+) (\d+) (\d+) (\d+) ([+-]?\d+)!;
+my $relre=qr!^([^ ]+) -- ([^ ;]+); //+ (\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+) ([+-]?[0-9.]+)!;
 my %group;
 {
  my $n=0;
@@ -73,7 +75,7 @@ sub sortfunc {
 sub sortfunc2 {
 	my @a=split(" ",$a);
 	my @b=split(" ",$b);
-	return $a[8]<=>$b[8];
+	return $a[$key]<=>$b[$key];
 }
 my @eedges=(sort sortfunc2 @edges)[0..$eentries-1];
 
