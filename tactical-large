@@ -9,7 +9,6 @@ use awinput;
 use awmapcgi;
 awstandard_init();
 
-my $imgsize=2*13;
 sub round($) {int($_[0]+0.5)}
 my $alli=$ENV{REMOTE_USER};
 #if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
@@ -18,9 +17,12 @@ my %options;
 
 #chdir "large-$alli";
 my $dir="/home/aw/alli/$alli/l";
-for my $p (qw'xs xe ys ye x y fast') {
+for my $p (qw'xs xe ys ye x y fast scale') {
 	$options{$p}=param($p);
 }
+if(!$options{scale} || $options{scale}!~m/^[0-9.]+$/) { $options{scale}=2; }
+my $imgsize=$options{scale}*13;
+
 if(defined($options{x}) && defined($options{y})) {
 	my $f="$dir/star$options{x},$options{y}.png";
 	my $size=(stat($f))[7];
@@ -55,7 +57,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 				if($my%10<=1) {$n|=1}
 				if($mx%10==0||$my%10==0) {$n=3}
 				$f="/$n.gif";
-				$link=qq!<a href="?xs=$mx&amp;ys=$my&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;fast=$options{fast}">!;
+				$link=qq!<a href="?xs=$mx&amp;ys=$my&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;fast=$options{fast}&amp;scale=$options{scale}">!;
 			} else {
 #				$f="?x=$mx&amp;y=$my";
 				$f="/alli/$alli/l/star$mx,$my.png";
@@ -65,7 +67,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
             }
 				$link=qq!<a href="system-info?mapx=$mx&amp;mapy=$my">!;}
 			my $formatstr="";
-			if($my==$ys || $mx==$xs) {$formatstr=qq! height="$imgsize" width="$imgsize"!}
+			if(1 || $my==$ys || $mx==$xs) {$formatstr=qq! height="$imgsize" width="$imgsize"!}
 			print qq!<td>$link<img src="$f"$formatstr alt="" />$linkend</td>!;
 		}
 		print "</tr>\n";
@@ -77,6 +79,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	print start_form(-method=>'get', -name=>"form"), 
     awmapcgi::awmapcoordinput(),
     checkbox(-name=>'fast', -label=>'fast', -checked=>1, -value=>'1'), " - uncheck when images are missing",br,
+    popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4], -value=>2)," scaling factor",br,
 	 submit(-name=>"draw", -class=>'smbutton'), end_form();
    awinput::awinput_finish();
 }
