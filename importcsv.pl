@@ -3,7 +3,7 @@
 use MLDBM qw(DB_File Storable);
 use Fcntl;
 use strict;
-our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade);
+our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%prices);
 tie %alliances, "MLDBM", "newdb/alliances.mldbm", O_RDWR|O_CREAT, 0666 or die $!;
 tie %starmap, "MLDBM", "newdb/starmap.mldbm", O_RDWR|O_CREAT, 0666;
 tie %player, "MLDBM", "newdb/player.mldbm", O_RDWR|O_CREAT, 0666;
@@ -11,6 +11,7 @@ tie %playerid, "MLDBM", "newdb/playerid.mldbm", O_RDWR|O_CREAT, 0666;
 tie %planets, "MLDBM", "newdb/planets.mldbm", O_RDWR|O_CREAT, 0666;
 tie %battles, "MLDBM", "newdb/battles.mldbm", O_RDWR|O_CREAT, 0666;
 tie %trade, "MLDBM", "newdb/trade.mldbm", O_RDWR|O_CREAT, 0666;
+tie %prices, "MLDBM", "newdb/prices.mldbm", O_RDWR|O_CREAT, 0666;
 my @origin;
 #my @playersat; # who has planets at ID
 my @playerplanets; #where does he have his
@@ -32,6 +33,14 @@ sub trade { my($id1,$id2)=@_;
    push @id2, $id1;
    $trade{$id1}=\@id1;
    $trade{$id2}=\@id2;
+}
+sub prices {
+	for(my $i=0; $i<=$#elements; ++$i) {
+      my $e=lc($elements[$i]);
+      $e=~s/ //;
+      $_[$i]=~s/,/./;
+      $prices{$e}=$_[$i];
+   }
 }
 
 sub battles { #rank points id science culture level home_id logins from joined alliance name
@@ -114,7 +123,7 @@ sub planets {
 
 print "reading CSV files\n";
 #for my $f (@::files) {
-for my $f (qw(planets player alliances starmap trade battles)) {
+for my $f (qw(planets player alliances starmap trade battles prices)) {
 	my $file="$f.csv";
 	my $head=1;
 	$firstline=1;

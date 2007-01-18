@@ -1,3 +1,4 @@
+use strict;
 use awstandard;
 use awinput;
 
@@ -10,6 +11,10 @@ my $planet=$1;
 m%Production Points</a></td><td>\s*(\d+)</td>%;
 my $pp=$1;
 my $sidpid;
+my ($popplus,$pop,$popneeded)= (m%id=23>\+(\d+)</a></td><td>\s*(\d+)</td>.*\n(\d+)</td></tr>%);
+#   $debug.=" $popplus $pop $popneeded ";
+my($ppplus)=(m%id=23>\+(\d+)</a>\n%);
+#   $debug.=$ppplus;
 
 sub manglesys($$) {my($sysname, $planet)=@_;
    my $result="$sysname #$planet";
@@ -31,6 +36,31 @@ if(m%/0/Glossary//\?id=17> Destroyer.*\n<td colspan="2">\d+/(\d+)</td></tr>%) {
    s%(<td><a href="/0/Planets/Spend_Points.php/\?p=\d+&i=\d+)("><b>Spend Points</b></a></td>)%$1$dscost$2%;
 }
 
+
+my $realpp=$pp;
+# show production points as float
+if(1) {
+   if((my($pp,$p1,$p2)=(m%id=21>Production Points</a></td><td> (\d+)</td><td><img src="/images/dot.gif" height="10" width="([0-9.]+)"><img src="/images/leer.gif" height="10" width="([0-9.]+)"></td>%))) {
+   my $frac=$p1/($p1+$p2);
+   $realpp=$pp+$frac;
+   $pp=sprintf("%.2f",$realpp);
+   s%id=(21>Production Points</a></td><td>) (\d+)%$1 $pp%;
+#   $_.="test $pp $p1 $p2 $frac";
+   }
+}
+
+
+my $prodbonus=1;
+my $popbonus=1;
+if($ENV{REMOTE_USER} && $::options{name}) { # use real race info - only for extended tools users
+   my ($race,$sci)=awinput::playername2ir($::options{name});
+   if($race && defined($$race[0])) {
+      $popbonus+=$awstandard::racebonus[0]*$$race[0];
+      $prodbonus+=$awstandard::racebonus[3]*$$race[3];
+#      $_.="@$race $popbonus $prodbonus";
+   }
+}
+
 # add +1 build links when there is enough PP
 foreach my $n (0..$#buildings) {
    my $buil=$buildings[$n];
@@ -39,22 +69,23 @@ foreach my $n (0..$#buildings) {
    if($mangle::dispatch::g) {
 #      $debug.="$level $ppneeded<br>";
    }
+   if($ppneeded>$pp && $ppplus && $prodbonus) {
+      my $hours=sprintf("<span style=\"color:gray\">in %.1fh</style>",($ppneeded-$realpp)/$ppplus/$prodbonus);
+      s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 $hours$6%;
+      next;
+   }
    next if(($ppneeded>1000 && $buil ne "Starbase") || $ppneeded>$pp);
    s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$5&amp;produktion=$val[$n]$dscost" style="background-color:blue">+1</a>$6%;
 #   $debug.="<br>test: $buil $val[$n] $2 $4";
 }
 
-# show production points as float
-if(1 || $mangle::dispatch::g) {
-   if((my($pp,$p1,$p2)=(m%id=21>Production Points</a></td><td> (\d+)</td><td><img src="/images/dot.gif" height="10" width="([0-9.]+)"><img src="/images/leer.gif" height="10" width="([0-9.]+)"></td>%))) {
-   my $frac=$p1/($p1+$p2);
-   $pp=sprintf("%.2f",$pp+$frac);
-   s%id=(21>Production Points</a></td><td>) (\d+)%$1 $pp%;
-#   $_.="test $pp $p1 $p2 $frac";
-   }
+if($popplus && $popbonus) { # add hours to pop-growth
+   my $hours=sprintf("<span style=\"color:gray\">in %.1fh</style>", $popneeded/$popplus/$popbonus);
+   s%(id=23>\+\d+</a></td><td>\s*\d+</td>.*\n\d+)(</td></tr>)%$1 $hours$2%;
 }
 
-if(1 || $mangle::dispatch::g) {
+# add incomings to this planet below
+if(1) {
    my $fleets=awinput::get_fleets($sidpid, "AND `iscurrent` = 1 ");
    my $fstr="";
    foreach my $f (@$fleets) {

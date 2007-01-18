@@ -5,9 +5,8 @@ require 5.002;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%relation,%planetinfo,
+our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%prices,%relation,%planetinfo,
    $dbnamer,$dbnamep);
-our $adprice=0.914;
 our $alarmtime=99;
 our $dbdir="/home/aw/db/db";
 
@@ -39,6 +38,7 @@ sub awinput_init(;$) { my($nolock)=@_;
    tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
    tie %battles, "MLDBM", "db/battles.mldbm", O_RDONLY, 0666;
    tie %trade, "MLDBM", "db/trade.mldbm", O_RDONLY, 0666;
+   tie %prices, "MLDBM", "db/prices.mldbm", O_RDONLY, 0666;
    my $alli=$ENV{REMOTE_USER};
    if($alli) {
       my $a=$alli;
@@ -289,6 +289,7 @@ sub sidpid22sidpid3m($$) {return $_[0]*13+$_[1];}
 
 sub gettradepartners($$) { my($maxta,$minad)=@_;
   my @result;
+  my $adprice=$prices{pp};
   foreach my $name (keys %relation) {
     my($rel)=$relation{$name};
     if(!$rel) {next}
@@ -333,6 +334,34 @@ sub playername2alli($) {my ($user)=@_;
    return $alli;
 }
 
+
+# add a number of trades for a certain player id
+sub add_trades($@)
+{
+   my($ownpid,$otherpids)=@_;
+   require DBAccess;
+   my $dbh=$DBAccess::dbh;
+   my $sth=$dbh->prepare_cached("SELECT pid1,pid2 FROM `trades` WHERE `pid1` =  ? OR `pid2` = ?");
+   my $old=$dbh->selectall_arrayref($sth, {}, $ownpid, $ownpid);
+   my %oldmap;
+   my $now=time();
+   if($old) {
+      foreach my $row (@$old) {
+         my @a=@$row;
+         $oldmap{"$a[0],$a[1]"}=1;
+      }
+   }
+   foreach my $xpid (@$otherpids) {
+      my $pid1=awmax($xpid,$ownpid);
+      my $pid2=awmin($xpid,$ownpid);
+      next if($oldmap{"$pid1,$pid2"}); # do not re-add existing entries
+      # pid1 is always larger than pid2
+      $sth=$dbh->prepare_cached(qq!INSERT INTO `trades` VALUES (?, ?, ?)!);
+      my $result=$sth->execute($pid1, $pid2, $now);
+   }
+}
+
+
 our $fleetscreen="uninitialized";
 # prepare DB for adding planet/planning info
 # input: screen = integer identifying source of data (1=system-info, 2=cleanplanning)
@@ -357,25 +386,31 @@ sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
       $sth->execute($ENV{REMOTE_USER}, $pid);
    } 
 }
+# type: 0=siege, 1=defending, 2=incoming 3=moving own
 sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
    return unless $ENV{REMOTE_USER};
    if(! defined($tz)) {$tz=$::options{tz}}
    if($time) {$time-=3600*$tz}
    {
 #      local $^W=0;
-      require "fleetadd.pm"; fleetadd::dbfleetaddmysql($sid,$pid,$plid,$name,$time,$type,$fleet,$tz,$awinput::fleetscreen);
-   }
-   return 0;
-	my $sidpid=sidpid22sidpid3($sid,$pid);
-	my $oldentry=$planetinfo{$sidpid};
-	my $newentry=addfleet($oldentry,$plid, $name, $time, $type, $fleet);
-	if($newentry) {
-		if(!$::options{debug}) {
-         $planetinfo{$sidpid}=$newentry;
-         return !$oldentry || $newentry ne $oldentry;
+      require "fleetadd.pm"; my $ret=fleetadd::dbfleetaddmysql($sid,$pid,$plid,$name,$time,$type,$fleet,$tz,$awinput::fleetscreen);
+      if($ret==1) {  # there was a new fleet and we need to check+update plannings
+         my $sidpid=sidpid22sidpid3($sid,$pid);
+         untie %planetinfo;
+         opendb(O_RDWR, $dbnamep, \%planetinfo);
+         my $d=AWisodate(time());
+         if($time) { # moving fleet: planned to targeted
+            $planetinfo{$sidpid}=~s/^2 $plid /3 $plid l:$d /;
+         } else { # resting fleet: targeted to sieged
+            my $newstat=($type==0?4:5); # or to taken if fleet is on own planet
+            my $oldstat=($type==0?3:qr([34]));
+            my $text=($type==0?"s":"took").":";
+            $planetinfo{$sidpid}=~s/^$oldstat $plid /$newstat $plid $text$d /;
+         }
+         untie %planetinfo;
+         opendb(O_RDONLY, $dbnamep, \%planetinfo);
       }
-		else {print "$sid#$pid: $newentry <br />\n"}
-	}
+   }
    return 0;
 }
 sub dbfleetaddfinish() {
@@ -432,6 +467,28 @@ sub playerid2ir($) { my($plid)=@_;
    return playername2ir(playerid2name($plid));
 }
 
+# input integer player ID
+# output array of worst case battle stats
+# ($pl,$ener,$phys,$math,$speed,$att,$def)
+# or undef if pid is invalid
+sub playerid2battlestats($) {
+   my $plid=shift;
+   my $p=$player{$plid};
+   return if not $p;
+   my $sl=$p->{science};
+   my ($pl,$ener,$phys,$math,$speed,$att,$def)=($p->{level}, $sl,$sl,$sl, +4,+4,+4);
+   my ($race,$sci)=playerid2ir($plid);
+   if($race && defined($$race[0])) {
+      ($speed,$att,$def)=@$race[4..6];
+   }
+   if($sci && defined($$sci[0])) {
+      if($$sci[0]>100) {shift @$sci}
+      ($ener,$math,$phys)=@$sci[2..4];
+   }
+   return ($pl,$ener,$phys,$math,$speed,$att,$def);
+}
+
+# take into consideration worst case IR
 sub estimate_xcv($$) { my($plid,$cv)=@_;
    return $cv if(!$plid || $plid<=2 || !defined($player{$plid}));
    my ($phys,$att)=($player{$plid}{science}, +4);
@@ -475,6 +532,18 @@ sub get_fleets($;$) { my($sidpid,$cond)=@_;
    return $res;
 }
 
+sub get_fleet($) {
+   my $fid=shift;
+   require DBAccess;
+   my $dbh=$DBAccess::dbh;
+   my $alli=$ENV{REMOTE_USER};
+   if(!$alli) {return [];}
+   my $allimatch=get_alli_match($alli);
+   my $sth=$dbh->prepare("SELECT * from `fleets` WHERE `fid` = ? AND ($allimatch)");
+   my $res=$dbh->selectall_arrayref($sth, {}, $fid);
+   return $res;
+}
+
 our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
 # input: 1 row from fleet table
 # output: HTML for a short display of fleet with detailed info in title=
@@ -497,7 +566,7 @@ sub show_fleet($) { my($f)=@_;
    if(length($flstr)<$minlen) {$flstr.="&nbsp;" x ($minlen-length($flstr))}
    my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
    if($info) {$info=" ".$info}
-   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://$bmwserver/cgi-bin/edit-fleet?fid=$fid\">edit</a> $eta $flstr ".playerid2link($owner)."$info</span>";
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://$bmwserver/cgi-bin/edit-fleet?fid=$fid\">edit</a> <a href=\"http://$bmwserver/cgi-bin/fleetbattlecalc?fid=$fid\">bc</a> $eta $flstr ".playerid2link($owner)."$info</span>";
 }
 
 # support functions for sort_table
@@ -528,4 +597,6 @@ sub get_alli_group($)
    my @list=($alli);
    return @list;
 }
+
+
 1;

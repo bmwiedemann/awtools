@@ -15,13 +15,13 @@ print p;
 print a({href=>"/alli/$ENV{REMOTE_USER}/"},"\U$ENV{REMOTE_USER}\E data dir"),br;
 #print a({href=>"/$ENV{REMOTE_USER}-holes.html"},"\U$ENV{REMOTE_USER}\E holes"),br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
-my $reldate="060219";
+my $reldate="061220";
 print 
  a({href=>"http://aw.lsmod.de/manual.html#brownie"}, "brownie")." and ".a({href=>"http://brownie.zq1.de/000100A/http/www1.astrowars.com/"}, "no-install-brownie"),br,
  a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,
- a({href=>"http://$bmwserver/gold3/alliancerelation-$reldate.png"},"alliance relations")."
- (".a({href=>"http://$bmwserver/gold3/alliancerelation-$reldate.svg"},"svg").")",br,
- a({href=>"http://$bmwserver/customize_race.html"},"race helper"),br,
+ a({href=>"http://$bmwserver/gold6/alliancerelation-$reldate.png"},"alliance relations")."
+ (".a({href=>"http://$bmwserver/gold6/alliancerelation-$reldate.svg"},"svg").")",br,
+ a({href=>"http://$bmwserver/customize_race.html"},"greenbird's race helper")," ",a({href=>"http://brownie.zq1.de/000000A/http/www1.astrowars.com/register/customize_race.php"},"AW race"),br,
 # a({href=>"/beta10/alliancerelation"},"alliance relation data")." &gt; ".a({href=>"topwars"},"top wars").", ".a({href=>"topallis"},"top allis"),
  p,a({href=>"/manual.html"},"manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog"), " / ", a({href=>"http://aw.lsmod.de/TODO"},"ToDo-List"),br,
 "color codes ". a({href=>"system-info?legend=1"}, "for relations"), 
@@ -32,13 +32,14 @@ p,
  a({href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
  a({href=>"http://www1.astrowars.com/rankings/"},"AW rankings"),br,
  a({href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
- a({href=>"http://www.astrowars.com/about/battlecalculator"},"AW battle calculator"),br,
+ a({href=>"http://www.astrowars.com/about/battlecalculator"},"AW battle calculator")," ", a({href=>"http://www1.astrowars.com/0/Trade/prices.txt"},"AW trade prices"),br,
  a({href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
  "other tools: ".
  a({href=>"http://lefois.de/aw/tool/index.php"}, "Lefois"), " ",
  a({href=>"http://azgharde.free.fr/tools/index.php"},"azgharde")," ",
  a({href=>"http://aw.neron92.info/"}, "neron92"), " ",
- a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
+ a({href=>"http://filix.exx.pl/aw/"}, "Filix"), " ",
+ #a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
  "outdated: ",
  a({href=>"http://astrostats.reseaulocal.fr/"}, "Astrostats"), " ",
  a({href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",

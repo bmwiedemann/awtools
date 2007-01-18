@@ -17,6 +17,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 use awaccess;
 
 our $server="www1.astrowars.com";
+our $awforumserver="www.astrowars.com";
 our $bmwserver="aw.lsmod.de";
 our $style;
 our $timezone;
@@ -190,7 +191,10 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 	if($newlogin) {
 		my @l2=@$newlogin;
 		my $add=1;
-		if($oldentry=~/$l2[0]:(\d+):(\d+):(\d+)/) {
+      foreach my $lold (($l2[0]+1)..($l2[0]+4)) {
+         $magic=~s/login:${lold}:.*//s; # erase outdated entries
+      }
+		if($oldentry=~/login:$l2[0]:(\d+):(\d+):(\d+)/) {
          my @l1=($l2[0],$1,$2,$3);
          my @l3=@l1;
          # adjust start+idle times

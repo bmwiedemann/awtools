@@ -59,7 +59,8 @@ ip VARCHAR ( 15 ) NOT NULL,
 auth TINYINT ( 1 ) NOT NULL,
 PRIMARY KEY ( sessionid ),
 KEY `lastclick` ( lastclick )
-) TYPE=MEMORY;!);
+);!);
+#) TYPE=MEMORY;!);
 #exit 0;
 
 $dbh->do(qq!
@@ -284,6 +285,7 @@ sub planets {
 }
 
 my $tid=0;
+# in DB there is always pid1>pid2
 sub alltrades
 {
    my($pid1,$pid2)=@_;
@@ -340,6 +342,19 @@ tie %h,'Tie::DBI',$dbh,'alltrades','tid',{CLOBBER=>3};
 %h=%alltrades;
 untie %h;
 
+print "\tmerging trades\n";
+my $now=time();
+my $prevtrades=$dbh->selectall_arrayref("SELECT pid1,pid2 FROM `trades`");
+my %prevtrades;
+foreach my $t (@$prevtrades) {
+   $prevtrades{"$t->[0],$t->[1]"}=1; # hashing existing trades for efficient access
+}
+while(my @a=each(%alltrades)) {
+   my %a=%{$a[1]};
+   next if $prevtrades{"$a{pid1},$a{pid2}"}; # skip dups
+   my $sth=$dbh->prepare_cached(qq!INSERT INTO `trades` VALUES (?, ?, ?)!);
+   my $result=$sth->execute($a{pid1}, $a{pid2}, $now);
+}
 
 print "done\n";
 1;

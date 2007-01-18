@@ -20,7 +20,7 @@ for my $p (qw'map xs ys xe ye scale') {
 my $xsize=$options{xe};
 my $ysize=$options{ye};
 my $done;
-if(defined($options{xs}) && $options{scale}>0 && $options{scale}<5 && $xsize>0 && $ysize>0 && $xsize*$ysize<=$max) { # validity checks
+if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 && $ysize>0 && $xsize*$ysize<=$max) { # validity checks
  if($options{map}==1) {
 	use bytes;
 	if($xsize>0 && $ysize>0 && $xsize*$ysize<=$max) {
@@ -33,11 +33,13 @@ if(defined($options{xs}) && $options{scale}>0 && $options{scale}<5 && $xsize>0 &
 		print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>$size), $png;
       $done++;
 	}
-	$options{map}==0;
+	$options{map}=0;
  }
  if(!$done && $options{map}==2) {
   my $xsize=$options{xe}>>1;
   my $ysize=$options{ye}>>1;
+  my $totx=bmwround(13*$options{xe});
+  my $toty=bmwround(13*$options{ye});
   param("xs", $options{xs}-$xsize);
   param("ys", $options{ys}-$ysize);
   print header(-expires=>"+1h"), 

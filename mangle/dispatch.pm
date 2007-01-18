@@ -6,6 +6,10 @@ use DBAccess;
 use Time::HiRes qw(gettimeofday tv_interval); # for profiling
 
 our $g;
+my %specialname=qw(
+      greenbird 1
+      pentabarf 1
+);
 my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
 my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period Thursday morning (2006-07-27 02:30-05:00 UTC) and be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
 
@@ -14,7 +18,7 @@ my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will ha
 # output $_ with HTML of mangled page
 sub mangle_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
-   $g=$$options{name} eq "greenbird";
+   $g=$specialname{$$options{name}};
    my $t2=[gettimeofday];
    %::options=%$options;
    $::bmwlink=$origbmwlink;
@@ -25,7 +29,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $alli="\U$ENV{REMOTE_USER}";
    
    # greenbird special
-   if($::options{name} eq "greenbird" && m/onLoad="document.login.secure.focus\(\);">/) {
+   if($g && m/onLoad="document.login.secure.focus\(\);">/) {
       do "mangle/special/secure.pm";
       $_=mangle::special::secure::read($_);
    }

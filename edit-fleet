@@ -22,8 +22,7 @@ if(param()) {
          print "entry $options{fid} updated".br.br;
       }
    }
-   my $sth=$dbh->prepare("SELECT * from `fleets` WHERE `fid` = ? AND `alli` = ?");
-   my $res=$dbh->selectall_arrayref($sth, {}, $options{fid}, $ENV{REMOTE_USER});
+   my $res=awinput::get_fleet($options{fid});
    foreach my $row (@$res) {
 #         foreach my $c (
       print awinput::show_fleet($row).br;

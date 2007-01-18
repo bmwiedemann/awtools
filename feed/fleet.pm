@@ -21,18 +21,19 @@ for(;(@a=m!<tr[^>]*><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small
 	my $time=parseawdate($a[0]);
 	my $sid="$system#$planetid";
 	print "targeted: ".planetlink($sid)." $details<br>\n";
-	dbfleetadd($system,$planetid,$pid, $name, $time, 2, \@fleet);
+	dbfleetadd($system,$planetid,$pid, $name, $time, 3, \@fleet);
 }
-for(;(@a=m!<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[7]) {
-	my ($system,$planetid)=@a[0..1];
+for(;(@a=m!<tr align=center bgcolor="#(\d{6})">.*?<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[7]) {
+	my ($color,$system,$planetid)=@a[0..2];
 	if($system=~/\((\d+)\)/) {$system=$1}
 	elsif((my $x=systemname2id($system))) {$system=$x}
 	else {print "unable to get ID of \"$system\" <br>";next}
-	my @fleet=@a[2..6];
+	my @fleet=@a[3..7];
 	my $details="@fleet";
 	my $sid="$system#$planetid";
-	print "defending fleet: ".planetlink($sid)." $details<br>\n";
-	dbfleetadd($system,$planetid,$pid, $name, $time, 1, \@fleet);
+   my $own=($color eq "404040");
+	print "defending $own fleet: ".planetlink($sid)." $details<br>\n";
+	dbfleetadd($system,$planetid,$pid, $name, $time, $own, \@fleet);
 }
 
 1;

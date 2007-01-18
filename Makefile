@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold7
 allies=$(shell cat allowed_alliances)
-tools=index.html preferences arrival authaw distsqr eta tactical{,-large{,-tile},-live} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord holes battles loginpos antispy2 antispy tradepartners whocansee permanentranking adminuseralli uploadcss playeronline playeronline2 passwd ipban logout nph-brownie.cgi
+tools=index.html preferences arrival authaw authrsa distsqr eta tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord fleetbattlecalc holes battles loginpos antispy2 antispy tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd ipban logout nph-brownie.cgi
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -23,11 +23,11 @@ updatecsv: dumpdbs
 	wget -x -nc -o/dev/null http://${f2}
 	tar xjf ${f2}
 	-grep -v id trade.csv||true >> alltrades.csv
+	wget -x -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
 	umask 2 ; perl importcsv.pl && ( mv db/* olddb ; mv newdb/* db )
 	#-cp -a tactical-af.png olddb/tactical-af-$d.png
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
-	wget -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
 	for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
 	perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
 	perl detectalliancerelation.pl > html/${round}/alliancerelation-${mydate}

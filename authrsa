@@ -1,0 +1,93 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+awstandard_init();
+use LWP::UserAgent;
+use Digest::MD5 qw(md5_hex);
+use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
+#awinput_init();
+my %allis=(
+"AF Gold 7", "af",
+"AF Gold 7 Mod", "af",
+"Rat Bastards Gold 7", "rats",
+"Rat Bastards Gold 7 Mod", "rats",
+"TGD Gold 7", "tgd",
+);
+
+my %specialmap=( # inline because I only expect the Administrator group to be problematic
+jimmy=>"rats",
+winterwolf=>"tgd",
+#"[RSA]TD"=>"",
+#"alphabravo"=>"",
+#"slimbojai"=>"",
+);
+my %rsamap;
+#=( "[RSA]TD"=>"[RSA]Top-Dogg[UK2]*",);
+awinput::opendb(O_RDONLY, "/home/aw/db2/rsamap.dbm", \%rsamap);
+
+our %options;
+my $h=AWheader("AW user RSA-authentication tool", '<script type="text/javascript" src="/code/js/webtoolkit.md5.js"></script>');
+if(param()) {
+	foreach my $p (qw(u p md5)) {
+		$options{$p}=param($p);
+	}
+   my $p=$options{p}?md5_hex($options{p}):$options{md5};
+   my $ua = LWP::UserAgent->new;
+   $ua->timeout(5);
+   my $response = $ua->post("http://forum.rebelstudentalliance.co.uk/secured/check.php", {username=>$options{u}, password=>$p}, Authorization=>"Basic cnNhZG1pbjp0cmVlYnVn");
+   if ($response->is_success) {
+      my $c=$response->content;
+#      print $c;
+      if($c=~m/^1 "([^"]+)"/) {
+         my $group=$1;
+         my $a=$allis{$group};
+         if(my $xtraalli=$specialmap{lc($options{u})}) {
+            $a=$xtraalli;
+         }
+         if($a) {
+            awinput_init();
+            my $awname=$options{u};
+            if(my $r=$rsamap{$awname}) { # map RSA-name to AW-name
+               $awname=$r;
+            }
+            my $a2=playerid2tag(playername2id($awname));
+            my $u;
+            if(lc($a2) eq $a) {
+               $u=$awname;
+            }
+            if($u) {
+               require DBAccess;
+               my $dbh=$DBAccess::dbh;
+               my $now=time();
+               my $sessionid=sprintf("%016s%016s",int(rand(1000000000000000)),int(rand(1000000000000000))); # generate random 32 chars
+               my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES (?, ?, 0, $now, $now, ?, 1);");
+               my $result=$sth->execute($sessionid, $awname, $ENV{REMOTE_ADDR});
+               my $ruri="http://$bmwserver/cgi-bin/public/authaw?session=$sessionid";
+               print redirect($ruri),"$options{u}: you are now successfully logged in as alliance $a (AW tag $a2) - user $u".br;
+            } else {
+               print "$h you are authenticated as $a, but unknown AW-user. Either ask RSA admin to rename you or ask greenbird to add your AW-name manually\n";
+            }
+            awinput::awinput_finish();
+         } else {
+            print "$h RSA successfully verified your user+pass but you belong to group \"$group\". Please contact greenbird, if you think your group should be allowed to access private AWTools data. <br>Alternatively ".a({href=>"/cgi-bin/public/index.html"},"continue with guest access").br;
+         }
+      } else {
+         print "$h Sorry, you supplied an incorrect login or password. ".a({href=>"/cgi-bin/public/index.html"},"Continue with guest access");
+      }
+   } else {
+      print $h,"Error. RSA said ".$response->status_line;
+   }
+} else {
+	print $h,start_form(-name=>"form"),textfield(-name=>'u', -class=>'text')," user",br,
+      password_field(-name=>'p', -class=>'text')," pass",br,
+      textfield(-name=>'md5', -class=>'text'),' or MD5 value of pass <input type="button" value="Calculate" onclick="this.form.md5.value=MD5(this.form.p.value);this.form.p.value=\'\'"> - this prevents transmission of your clear-text-password over the internet',br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.u"),
+      "cookies must be enabled past this point";
+   
+}
+print AWtail();
+

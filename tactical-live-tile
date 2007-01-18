@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use mod_perl;
+use constant MP2 => ($mod_perl::VERSION >= 1.99);
+#use Apache::RequestRec ();
+#use Apache2::RequestIO ();
+#my $dir="/home/aw/db/large-$ENV{REMOTE_USER}";
+my $dir="/home/aw/alli/$ENV{REMOTE_USER}/l";
+my ($x,$y)=$ENV{QUERY_STRING}=~m/x=([-+0-9]*)&y=([-+0-9]*)&o=([^=&]*)/;
+
+my $r = shift;
+if(0) {
+   $r->content_type('text/plain');
+   $r->print("error ");
+} else {
+   my $image;
+   my $size=length($image);
+   $r->content_type('image/png');
+   $r->set_content_length($size);
+   $r->set_keepalive();
+   $r->headers_out->set("max-age"=>3600*3);
+#   $r->headers_out->set("debug"=>1);
+#   $r->set_last_modified($modified);
+   $r->print($image);
+}
+
+1;

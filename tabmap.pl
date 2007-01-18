@@ -15,7 +15,7 @@ awinput_init(1);
 our ($pixelpersystem, $mapsize, $mapxoff, $mapyoff, $mapxend, $mapyend);
 
 my $suf=".png";
-my $scale=2;
+my $scale=1;
 my $extra=30;
 $mapsize+=2*$extra;
 $mapxoff-=$extra;
@@ -41,6 +41,9 @@ my ($gc1,$gc2)=($mapcommon::lightgridcolor, $mapcommon::darkgridcolor); # grid c
 sub drawgrid { my($c1,$c2,$im)=@_;
 	$im->rectangle(0,0, $pixelpersystem,$scale-1, $c1);
 	$im->rectangle(0,0, $scale-1,$pixelpersystem, $c2);
+   if($c1==$mapcommon::lightgridcolor) {
+      $im->rectangle(0,0, $scale-1,$scale-1, $c1); # over-draw top-left corner for grid lines
+   }
 }
 
 drawgrid($gc2,$gc2,$im);

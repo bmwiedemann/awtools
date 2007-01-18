@@ -47,12 +47,16 @@ foreach my $resource (qw(AD PP)) {
 
 my @trade;
 {
-local $_=$tradehtml;
-for(;(my @a=m!<a [^>]*>([^>]+)</a><br>(.*)!); $_=$a[1]) {
-   push(@trade,$1);
-}
-#dbplayeriradd($name, undef, undef, undef, \@trade);
-print "<br>trades: @trade<br>";
+   local $_=$tradehtml;
+   my @tpid;
+   for(;(my @a=m!<a [^>]*>([^>]+)</a><br>(.*)!); $_=$a[1]) {
+      push(@trade,$1);
+      my $tpid=playername2id($1);
+      next if not $tpid;
+      push(@tpid,$tpid);
+   }
+   print "<br>trades: @trade<br>";
+   eval {awinput::add_trades($pid,\@tpid)};
 }
 
 
@@ -98,7 +102,7 @@ for(;(@a=m!<tr[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td colspan=[^>]*>([^<]*)</
 	my $details="@fleet";
 	print "targeted: ".planetlink($sid)." $details <br>\n";
 	my $time=parseawdate($a[2]);
-	dbfleetadd($system,$planetid,$pid, $name, $time, 0, \@fleet);
+	dbfleetadd($system,$planetid,$pid, $name, $time, 3, \@fleet);
 }
 require 'feed/libincoming.pm';
 feed::libincoming::parseincomings($_);

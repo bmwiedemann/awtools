@@ -73,24 +73,18 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	
 	my $extralinks="";
    {
-      my @rel;
-      my @race=relation2race($options{comment});
-      my @science=relation2science($options{comment});
       if($id>2 && (my $p=$player{$id})) {
-      my $sl=$$p{science};
-      my ($eatt,$edef,$espeed,$eenergy,$emath,$ephys,$epl)=(4,4,4,$sl,$sl,$sl,$$p{level});
-      if($science[0]) { 
-         if($science[0]>100) {shift @science}
-         ($eenergy,$emath,$ephys)=@science[2..4];
-      }
-      if($race[0]) { 
-         ($espeed,$eatt,$edef)=@race[4..6];
-         $espeed=~s/\+//;
-      }
+      my($epl,$eenergy,$ephys,$emath,$espeed,$eatt,$edef)=awinput::playerid2battlestats($id);
+      $espeed=~s/\+//;
+
+      # get own stats
       my($oatt,$odef,$omath,$ophys,$opl)=(0,0,0,0,0);
       my $awuser=cookie('user');
       my $oid=playername2id($awuser);
       if($oid && $oid>2) {
+         my @rel;
+         my @race;
+         my @science;
          $opl=$player{$oid}{level};
          @rel=getrelation($awuser);
          @race=relation2race($rel[2]);

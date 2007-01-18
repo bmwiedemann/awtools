@@ -32,28 +32,10 @@ if(m!>Points: (\d+)</td>!) {
    }
    untie(%h);
 }
-   # autodetect trades:
+   # autodetect and add trades:
    $opid+=0;
    my @a=(m%<a href=/about/playerprofile\.php\?id=(\d+)>[^<]+</a><br>%g);
-   tie(%h,'Tie::DBI',$dbh,'trades','pid1',{CLOBBER=>3});
-   my $old=$dbh->selectall_arrayref("SELECT pid1,pid2 FROM `trades` WHERE `pid1` = $opid OR `pid2` = $opid");
-   my %oldmap;
-   if($old) {
-      foreach my $row (@$old) {
-         my @a=@$row;
-         $oldmap{$a[0]}=$oldmap{$a[1]}=1;
-      }
-   }
-   foreach my $xpid (@a) {
-      next if($oldmap{$xpid}); # do not re-add existing entries
-      my $pid1=awmax($xpid,$opid);
-      my $pid2=awmin($xpid,$opid);
-      eval(' $h{$pid1}={pid2=>$pid2, time=>time()}; 
-            ');
-#$h{$xpid}={pid2=>$opid, time=>time()}; 
-   }
-#   awdiag("$opid @a : $old");
-   untie(%h);
+   awinput::add_trades($opid,\@a);
 }
 
 1;

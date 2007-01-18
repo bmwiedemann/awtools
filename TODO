@@ -1,14 +1,19 @@
-dynamic PP-A$ price for tradepartners tool
+general user preferences DB: tz, customhtml, race+sci for planets,arrival
+remember user timezones from settings page and use for GMT+n display in fleets and arrival
+Timezone for added fleets in AW
+verify +59 feed/alliance_detail.pm
+flexible map - coloring by last round's tag (fallback)
+#dynamic PP-A$ price for tradepartners tool
+add last round alliance tag to system-info
 add display of player's trades. Maybe I draw another alliance-friendship-graph from that data.
+feed:parse num of SUs and num of Artifacts into DB
 http://aw.lsmod.de/cgi-bin/tradepartners   Then You could also add two more columns: 'AD+artifact_price' and 'new ready(h)' (based on new AD+artifact_price amount). 
-automatic state transitions planned->targeted, targeted->sieged|taken
+#automatic state transitions planned->targeted, targeted->sieged|taken
 sieged-by $user and fleets in BB-export
 #planet/buildings: add colours for buildable stuff
-remember user timezones from settings page and use for GMT+n display in fleets and arrival
 reserved-planets-list
 parsing the owner of sieging fleets (replacing unknown)
-brownie:planets/detail: add remaining time (minutes) behind remaining PP
-feed:parse num of SUs and num of Artifacts into DB
+#brownie:planets/detail: add remaining time (minutes) behind remaining PP
 friendly-siege-SB-calc: input(SBlevel,planet) output(PP or A$ needed)
 holes: add speedy-attractivity-heuristic value in separate column
 #javascript arrival calc on fleet/launch

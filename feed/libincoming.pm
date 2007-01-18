@@ -20,7 +20,7 @@ sub parseincomings($) {local $_=$_[0];
       print "incoming: ".planetlink($sid)." @fleet\n";
       print "<br>added $systemid#$planetid $epid $ename $time";
       if(!$::options{debug}) {
-         my $res=dbfleetadd($systemid,$planetid,$epid, $ename, $time, 1, \@fleet);
+         my $res=dbfleetadd($systemid,$planetid,$epid, $ename, $time, 2, \@fleet);
          if(1 && $fleet[0]) {
 #my @rel=getrelation("bananabird");
 #        my $r=$rel[0]||1;
