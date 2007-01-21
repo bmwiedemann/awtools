@@ -10,6 +10,12 @@ use awstandard;
 use awinput;
 use mapcommon;
 
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT = 
+qw(&mapimage);
+
+
 sub mrelationcolor($) { my($name)=@_;
 	my @rel=getrelation($name);
 	my $color=getrelationcolor($rel[0]);
@@ -19,6 +25,14 @@ sub mrelationcolor($) { my($name)=@_;
 sub mrelationcolorid($) {
 	mrelationcolor(playerid2name($_[0])); 
 }
+sub gridtest2($$) { my($x,$y)=@_; my($c1,$c2)=($mapcommon::darkgridcolor,$mapcommon::darkgridcolor);
+   my $gc1=$mapcommon::lightgridcolor;
+   if($x%10==0 || $y%10==0) {return ($gc1,$gc1)}
+   if($x%10<=1) {$c2=$gc1}
+   if($y%10<=1) {$c1=$gc1}
+   return ($c1,$c2);
+}
+
 sub mapimage($$$$;$$) {
    my ($mapxstart, $mapystart, $mapxend, $mapyend, $scale, $initdraw)=@_;
    if(!$scale) {$scale=1}
@@ -30,13 +44,14 @@ sub mapimage($$$$;$$) {
    $::mapyoff=$mapystart;
    $::mapxoff=$mapxstart; # dummy to avoid warning
    $::mapyoff=$mapystart;
-   our $imagesizex=$mapsizex*$::pixelpersystem+1;
-   our $imagesizey=$mapsizey*$::pixelpersystem+1;
+   our $imagesizex=$mapsizex*$::pixelpersystem;
+   our $imagesizey=$mapsizey*$::pixelpersystem;
 
 
 
 # Create the main image
-   my $img = new GD::Image($imagesizex*$scale, $imagesizey*$scale);
+   my $truecolor=($imagesizex<30);
+   my $img = new GD::Image($imagesizex*$scale, $imagesizey*$scale, $truecolor);
    mapcommon::mapcoloralloc($img);
 
    sub gridtest($) { $_[0]%10<=1 ? $mapcommon::lightgridcolor:$mapcommon::darkgridcolor }
@@ -57,10 +72,12 @@ sub mapimage($$$$;$$) {
       my $color;
 
       # grid
-      my $gridcolor=gridtest($x);
-      $img->filledRectangle($px*$scale,$py*$scale, ($px+1)*$scale-1,($pye+1)*$scale-1, $gridcolor);
-      $gridcolor=gridtest($y);
-      $img->filledRectangle($px*$scale,$py*$scale, ($pxe+1)*$scale-1,($py+1)*$scale-1, $gridcolor);
+      my ($gridcolor1,$gridcolor2)=gridtest2($x,$y);
+      $img->filledRectangle($px*$scale,$py*$scale, ($pxe+1)*$scale-1,($py+1)*$scale-1, $gridcolor1);
+      $img->filledRectangle($px*$scale,$py*$scale, ($px+1)*$scale-1,($pye+1)*$scale-1, $gridcolor2);
+      if($gridcolor1==$mapcommon::lightgridcolor) {
+         $img->filledRectangle($px*$scale,$py*$scale, ($px+1)*$scale-1, ($py+1)*$scale-1, $gridcolor1);
+      }
       my $id=systemcoord2id($x,$y);
       if(defined($id)) {
          for(my $i=1; $i<=12; $i++) {
