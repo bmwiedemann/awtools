@@ -312,7 +312,9 @@ sub gettradepartners($$) { my($maxta,$minad)=@_;
   return @result;
 }
 
+# this function is intended to work without init
 sub playername2alli($) {my ($user)=@_;
+   if(!$user) {return ""}
 #   if($user eq "greenbird") {return ""}
    my %alliuser;
    awinput::opendb(O_RDONLY, "/home/aw/db2/useralli.dbm", \%alliuser);

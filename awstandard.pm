@@ -292,6 +292,15 @@ sub gmdate($) {
 	return "$month[$a[4]] $a[3] $a[5]";
 }
 
+# input: UNIX epoch integer
+# output: HTTP-conformant time string
+sub HTTPdate($) {
+   my ($t)=@_;
+   my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime($t);
+   $year+=1900;
+   return sprintf("$weekday[$wday], %.2i $month[$mon] $year %.2i:%.2i:%.2i GMT", $mday, $hour, $min, $sec);
+}
+
 # input AW title string
 # output timezone shift relative to UTC in seconds (e.g. CET=3600)
 sub guesstimezone($) {my($title)=@_;
