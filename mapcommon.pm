@@ -1,8 +1,15 @@
 package mapcommon;
+use strict;
 use GD;
+require Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT = 
+qw($axiscolor $lightgridcolor $darkgridcolor %colorindex &mapcoloralloc &writeimg);
 
 my %colormap;
 our %colorindex;
+
+# load RGB data for color names
 sub initrgb() {
   open(RGB, "< /home/aw/inc/rgb.txt") or die "Content-type: text/html\n\nerror opening rgb.txt $!\n";
   while(<RGB>) {
@@ -15,6 +22,8 @@ sub initrgb() {
   }
   close(RGB);
 }
+
+# convert a standard color-name to RGB array
 sub getrgb($) {
   if(!$_[0]) {return (0,0,0)};
   my $entry=$colormap{$_[0]};
@@ -27,17 +36,19 @@ sub getrgb($) {
   return @ret;
 }
 
+# allocate commonly used colors
 sub mapcoloralloc($) { my($img)=@_;
    for my $c (qw"black white gray dimgray red", @awstandard::statuscolor, @awstandard::relationcolor) {
      my @rgb=getrgb($c);
      next if !@rgb || !defined $rgb[0];
-     $colorindex{$c}=$img->colorAllocate(@rgb);
+     $colorindex{$c}=$img->colorResolve(@rgb);
    }
-   our $axiscolor=$img->colorAllocate(getrgb("blue"));
-   our $lightgridcolor=$img->colorAllocate(getrgb("gray83"));
-   our $darkgridcolor=$img->colorAllocate(getrgb("gray34"));
+   our $axiscolor=$img->colorResolve(getrgb("blue"));
+   our $lightgridcolor=$img->colorResolve(getrgb("gray83"));
+   our $darkgridcolor=$img->colorResolve(getrgb("gray34"));
 }
 
+# write a png to file $name
 sub writeimg($$) { my($img,$name)=@_;
   open(OUT, "> $name") or die "failed writing $name: $!";
   binmode OUT;
