@@ -3,11 +3,12 @@ use strict;
 use warnings;
 use mod_perl;
 use constant MP2 => ($mod_perl::VERSION >= 1.99);
+use GD;
 #use Apache::RequestRec ();
 #use Apache2::RequestIO ();
 #my $dir="/home/aw/db/large-$ENV{REMOTE_USER}";
 my $dir="/home/aw/alli/$ENV{REMOTE_USER}/l";
-my ($x,$y)=$ENV{QUERY_STRING}=~m/x=([-+0-9]*)&y=([-+0-9]*)&o=([^=&]*)/;
+my ($x,$y,$o)=$ENV{QUERY_STRING}=~m/x=([-+0-9]*)&y=([-+0-9]*)&o=([^=&]*)/;
 
 my $r = shift;
 if(0) {
@@ -15,13 +16,22 @@ if(0) {
    $r->print("error ");
 } else {
    my $image;
+   my $ret=require "livemap/draw.pm";
+   if(!$ret) {
+      $image=`cat /home/aw/html/images/awmaperror.png`;
+   } else {
+      $image=livemap::draw::draw($x,$y,$o);
+   }
    my $size=length($image);
+   my $modified=time();
    $r->content_type('image/png');
    $r->set_content_length($size);
    $r->set_keepalive();
-   $r->headers_out->set("max-age"=>3600*3);
+   my $timeout=30*60;
+   $r->headers_out->set("max-age"=>$timeout);
+   $r->headers_out->set("expires"=>awstandard::HTTPdate($modified+$timeout)); #   Sat, 20 Jan 2007 07:12:55 GMT
 #   $r->headers_out->set("debug"=>1);
-#   $r->set_last_modified($modified);
+   $r->set_last_modified($modified);
    $r->print($image);
 }
 
