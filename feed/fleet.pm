@@ -1,3 +1,7 @@
+#package feed::fleet;
+#use awinput;
+#use CGI ":standard";
+
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
@@ -23,7 +27,7 @@ for(;(@a=m!<tr[^>]*><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small
 	print "targeted: ".planetlink($sid)." $details<br>\n";
 	dbfleetadd($system,$planetid,$pid, $name, $time, 3, \@fleet);
 }
-for(;(@a=m!<tr align=center bgcolor="#(\d{6})">.*?<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[7]) {
+for(;(@a=m!<tr align=center bgcolor="#(\d{6})">(?:[^<]*(?:<[^s])*)*?<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
 	my ($color,$system,$planetid)=@a[0..2];
 	if($system=~/\((\d+)\)/) {$system=$1}
 	elsif((my $x=systemname2id($system))) {$system=$x}
@@ -31,7 +35,7 @@ for(;(@a=m!<tr align=center bgcolor="#(\d{6})">.*?<small>([^<]*) (\d+)</small>(?
 	my @fleet=@a[3..7];
 	my $details="@fleet";
 	my $sid="$system#$planetid";
-   my $own=($color eq "404040");
+   my $own=($color eq "404040")?1:0;
 	print "defending $own fleet: ".planetlink($sid)." $details<br>\n";
 	dbfleetadd($system,$planetid,$pid, $name, $time, $own, \@fleet);
 }
