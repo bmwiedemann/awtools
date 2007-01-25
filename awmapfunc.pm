@@ -9,7 +9,7 @@ use awinput;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
-qw(&awrelationfunc &awpopulationfunc &awplanfunc &awsiegefunc &awfilterchain);
+qw(&awrelationfunc &awpopulationfunc &awplanfunc &awsiegefunc &awfilterchain &awfleetstatusfunc &awfleetownerrelationfunc);
 
 my $s=12;
 
@@ -66,6 +66,7 @@ sub noaddright(@$$) # rescale a line even if there was nothing to add
 {
 	my($v,$w)=@_;
 	shrinkv($v,$w);
+	if(@$v==0) {@$v=([$w,"white"])}
 	$v->[$#{$v}][0]+=$w;
 }
 sub addright(@$$)
@@ -111,6 +112,51 @@ sub awpopulationfunc
 	addleft(\@v, 4, $c);
 	return @v;
 }
+
+my %fleetstatusmap=(0=>"red",1=>0x008800,2=>"orange",3=>"blue");
+# display defending, sieging, incoming and own moving fleets
+sub awfleetstatusfunc
+{ my($x,$y,$sid,$pid,$data)=@_;
+	my @v=awfilterchain($x,$y,$sid,$pid,$data);
+   my $sidpid=sidpid22sidpid3m($sid,$pid);
+	my $alli=$ENV{REMOTE_USER};
+	my $allimatch=awinput::get_alli_match($alli);
+   my $sth=$DBAccess::dbh->prepare_cached("
+		SELECT `status`,`cv` 
+		FROM `fleets` 
+		WHERE ($allimatch) AND `sidpid` = ? AND `iscurrent` = 1  
+		ORDER BY `xcv`");
+	my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $sidpid);
+	foreach my $row (@$res) {
+		my ($s,$cv)=@$row;
+#		print "$pid $s\n";
+		my $c=$fleetstatusmap{$s};
+		if($cv==0){$c="black"}
+		addleft(\@v,4, $c);
+	}
+	return @v;
+}
+
+sub awfleetownerrelationfunc
+{ my($x,$y,$sid,$pid,$data)=@_;
+	my @v=awfilterchain($x,$y,$sid,$pid,$data);
+   my $sidpid=sidpid22sidpid3m($sid,$pid);
+	my $alli=$ENV{REMOTE_USER};
+	my $allimatch=awinput::get_alli_match($alli);
+   my $sth=$DBAccess::dbh->prepare_cached("
+		SELECT `owner`
+		FROM `fleets` 
+		WHERE ($allimatch) AND `sidpid` = ? AND `iscurrent` = 1 AND `cv` > 0 
+		ORDER BY `xcv`");
+	my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $sidpid);
+	foreach my $row (@$res) {
+		my $ownerid=$$row[0];
+#		print "$pid $o\n";
+		addright(\@v,4, mrelationcolorid2($ownerid));
+	}
+	return @v;
+}
+
 
 sub awsiegefunc
 { my($x,$y,$sid,$pid,$data)=@_;
