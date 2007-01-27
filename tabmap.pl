@@ -50,7 +50,7 @@ for(my $x=$mapxoff; $x<$mapxend; $x++) {
 	if(defined($id)) {
 		my $img=new GD::Image($pps, $pps);
       mapcoloralloc($img);
-		drawtile($img,$x,$y,0,0,$scale, \&awfilterchain, [\&awplanfunc, \&awsiegefunc]);
+		drawtile($img,$x,$y,0,0,$scale, \&awfilterchain, [\&awrelationfunc, \&awplanfunc, \&awsiegefunc]);
       writeimg($img, "$out$x,$y$suf");
 	}
 }}

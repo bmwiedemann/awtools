@@ -27,16 +27,17 @@ if($q->param("time") && $sessionid) {
    my $pid;
    if($bg) {
       $pid=fork();
-      $m.=" forked as $pid\n";
+      $m.=" ".localtime()." forked as $pid\n";
    }
    if(defined($pid) && $pid==0) { # child process
       {
          require DBAccess;
          require Tie::DBI;
          my $dbh=$DBAccess::dbh;
+         my %options=%::options;
          my %us; # usersession
          tie %us,'Tie::DBI',$dbh,'usersession','sessionid',{CLOBBER=>2};
-         my @site=qw"Planets Science Fleet News Map";
+         my @site=qw"Player/Profile.php/?id=152603 Player/Profile.php/?id=29732 Player/Profile.php/?id=79995 Player/Profile.php/?id=37940 Player/Profile.php/?id=79995 Player/Profile.php/?id=175316 Fleet/ News/";
          my $lasturi="http://www1.astrowars.com/0/News/";
          for my $n(1..$times) {
             if($bg) { sleep 60; }
@@ -44,23 +45,28 @@ if($q->param("time") && $sessionid) {
             my %lus=%{$us{$sessionid}};
             if($lus{nclick}>300) {last};
             my $tdiff=$now-$lus{lastclick};
-            if($tdiff>9*60+rand(6*60)) {
+            if($tdiff>2*60+rand(6*60)) {
                my $page=$site[rand(@site)];
-               my $uri="http://www1.astrowars.com/0/$page/";
+               my $uri="http://www1.astrowars.com/0/$page";
                my $request = HTTP::Request->new("GET", $uri, \@headers);
                if($lasturi) {
                   $request->header(Referer=>$lasturi);
                }
                my $response=$::options{ua}->request($request);
-               my $c=$response->content();
-               $lasturi=$uri;
+               my $content=$response->content();
+               {
+                  awinput_init();
+                  feed::dispatch::feed_dispatch($content, \%options);
+                  awinput::awinput_finish();
+               }
+#               $lasturi=$uri;
                $lus{nclick}++;
                $lus{lastclick}=$now;
                $us{$sessionid}=\%lus;
 #            my @lus=%lus; print "@lus\n";
                
                open(F, ">>/tmp/awstay.log");
-               print F "$n $$ $now $uri ",length($c),"\n";
+               print F "$n $$ $now $uri ",length($content),"\n";
                close F;
             }
          }

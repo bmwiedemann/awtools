@@ -9,26 +9,28 @@ use awinput;
 use awmapcgi;
 awstandard_init();
 
-sub round($) {int($_[0]+0.5)}
+my %maptypestring=(0=>"relation", 1=>"test1");
+
 my $alli=$ENV{REMOTE_USER};
 #if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
-my $title="new tactical map [\U$alli\E]";
+my $title="tiled live tactical map [\U$alli\E]";
 my %options;
 
-for my $p (qw'xs xe ys ye scale') {
+for my $p (qw'xs xe ys ye scale type') {
 	$options{$p}=param($p);
 }
 if(!$options{scale} || $options{scale}!~m/^[0-9.]+$/) { $options{scale}=2; }
-my $imgsize=round($options{scale}*13);
+if(!defined($options{type}) || $options{type}!~m/^[0-9]+$/) {$options{type}=0}
+my $imgsize=bmwround($options{scale}*13);
 
 if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))
 {
-   awinput_init();
+   awinput_init(1);
    print AWheader($title, qq(<style type="text/css"><!-- img {border:0;} --></style>));
-	my $xe=round($options{xs}+$options{xe}/2);
-	my $ye=round($options{ys}+$options{ye}/2);
-	my $xs=round($options{xs}-$options{xe}/2);
-	my $ys=round($options{ys}-$options{ye}/2);
+	my $xe=bmwround($options{xs}+$options{xe}/2);
+	my $ye=bmwround($options{ys}+$options{ye}/2);
+	my $xs=bmwround($options{xs}-$options{xe}/2);
+	my $ys=bmwround($options{ys}-$options{ye}/2);
 	print qq!<table border="0" cellspacing="0" cellpadding="0" bgcolor='#000000'>!;
 	for(my $my=$ys; $my<$ye; $my++) {
 		print "<tr>";
@@ -45,11 +47,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 				$f="/$n.gif";
 				$link=qq!<a href="?xs=$mx&amp;ys=$my&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;fast=$options{fast}&amp;scale=$options{scale}">!;
 			} else {
-#				$f="?x=$mx&amp;y=$my";
-#				$f="/alli/$alli/l/star$mx,$my.png";
-#           if($options{fast}) {
-            $f="/cgi-bin/nphperl/tactical-live-tile?x=$mx&amp;y=$my";
-#           }
+            $f="/cgi-bin/nphperl/tactical-live-tile?x=$mx&amp;y=$my&amp;o=$options{type}";
 				$link=qq!<a href="system-info?mapx=$mx&amp;mapy=$my">!;}
 			my $formatstr="";
 			if(1||$my==$ys || $mx==$xs) {$formatstr=qq! height="$imgsize" width="$imgsize"!}
@@ -60,11 +58,12 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	print "</table>";
    awinput::awinput_finish();
 } else {
-   awinput_init();
+   awinput_init(1);
 	print header(), AWheader2($title);
 	print start_form(-method=>'get', -name=>"form"), 
     awmapcgi::awmapcoordinput(),
     popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4])," scaling factor",br,
+    popup_menu(-name=>'type',-values=>[keys %maptypestring],-labels=>\%maptypestring), " type of map",br,
 #    checkbox(-name=>'fast', -label=>'fast', -checked=>1, -value=>'1'), " - uncheck when images are missing",br,
 	 submit(-name=>"draw", -class=>'smbutton'), end_form();
    awinput::awinput_finish();

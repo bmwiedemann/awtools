@@ -19,10 +19,7 @@ if($options{map}) {
 	my $f="/home/aw/alli/$alli/tactical.png";
 	my ($size,$modified)=(stat($f))[7,9];
 	open(F, "<", $f) or die $!;
-   my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime($modified);
-   $year+=1900;
-   $modified=sprintf("$awstandard::weekday[$wday], %.2i $awstandard::month[$mon] $year %.2i:%.2i:%.2i GMT", $mday, $hour, $min, $sec);
-	print header(-type=>'image/png', -last_modified=>$modified, -expires=>"+6h", #-last_modified=>$modified,
+	print header(-type=>'image/png', -last_modified=>awstandard::HTTPdate($modified), -expires=>"+6h", #-last_modified=>$modified,
     -content_lenth=>$size);
    local $/;
    print <F>;

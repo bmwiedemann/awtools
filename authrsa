@@ -22,7 +22,7 @@ my %specialmap=( # inline because I only expect the Administrator group to be pr
 jimmy=>"rats",
 winterwolf=>"tgd",
 #"[RSA]TD"=>"",
-#"alphabravo"=>"",
+"alphabravo"=>"af",
 #"slimbojai"=>"",
 );
 my %rsamap;

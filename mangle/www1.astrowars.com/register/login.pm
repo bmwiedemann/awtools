@@ -11,14 +11,14 @@ foreach my $x (@{$::options{headers_out}}) {
    if($c=~m/PHPSESSID=([0-9a-f]{32})/) {
       $session=$1;
    }
-   if($c=~m/login=(\d+)/) {
+   if($c=~m/login=(\d+)/) { # we can trust this as AW sent the headers
       $name=awinput::playerid2name($1);
    }
 }
 if($session && $name) {
    my $time=time();
-   my $res=$dbh->do("UPDATE `usersession` SET `nclick` = '0', `auth` = 1, `ip` ='$::options{ip}', `lastclick` = '$time' 
-         WHERE `sessionid` = ".$dbh->quote($session));
+   my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = '0', `auth` = 1, `ip` = ?, `lastclick` = ?, name = ? WHERE `sessionid` = ?");
+   my $res=$sth->execute($::options{ip}, $time, $name, $session);
    if($res eq "0E0") {
       my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES ( ?, ?, 0, ?, ?, ?, 1);");
       $sth->execute($session, $name, $time, $time, $::options{ip});

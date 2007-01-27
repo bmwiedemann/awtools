@@ -6,7 +6,7 @@ BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
 use DBAccess;
-awinput_init();
+awinput_init(1);
 my $alli=$ENV{REMOTE_USER};
 my $title="fleets [\U$alli\E]";
 my $wantcurrent=" AND `iscurrent` = 1 ";

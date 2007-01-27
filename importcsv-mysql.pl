@@ -105,6 +105,15 @@ name VARCHAR ( 50 ) NOT NULL ,
 UNIQUE ( name ),
 INDEX ( alliance ),
 PRIMARY KEY ( pid ));!);
+
+$dbh->do(qq!
+CREATE TABLE playerprefs (
+pid MEDIUMINT UNSIGNED NOT NULL ,
+tz  MEDIUMINT,
+customhtml TEXT,
+storeir    BOOL,
+PRIMARY KEY ( pid ));!);
+
 $dbh->do(qq!
 CREATE TABLE planets (
 sidpid MEDIUMINT( 6 ) UNSIGNED NOT NULL ,

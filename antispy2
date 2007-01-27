@@ -26,7 +26,7 @@ if(param() && param("bio")>2) {
    }
    my $minsci=$bio-6;
    print "unspied players in Bio$bio range (@minxy to @maxxy) - probable enemy spies\n".br;
-   my $allplayers=$::dbh->selectall_arrayref( qq(
+   my $allplayers=$dbh->selectall_arrayref( qq(
       SELECT  x,y,player.name,pid,science
       FROM  `player`,`starmap` 
       WHERE science > $minsci AND

@@ -156,7 +156,7 @@ if(param()) {
 			($bs,$be,$eol)=('<b>','</b>',"<br />\n");
 		}
 		my $syslevel=systemid2level($system);
-		my $output="$bs$sysname($x,$y)$be${eol}Id=$system level=$syslevel ";
+		my $output="$bs$sysname ($x/$y)$be${eol}Id=$system level=$syslevel ";
       my @nstarmaplink=("http://neron92.free.fr/AW_Tools/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
       my @lstarmaplink=("http://lefois.de/aw/tool/map.php?R_pid=&R_sysid=$system&lb=1&coord=1&details=1","lefoisstarmap");
       my @lbattleslink=("http://www.lefois.de/aw/tool/battles.php?&days=all&sysid=$system", "lefoisbattles");

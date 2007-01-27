@@ -16,6 +16,10 @@ my @h=$re->header_field_names();
 foreach my $h (@h) {
    print "$h = ",$re->header($h),"\n";
 }
+print "\n--ENV--\n";
+foreach my $h (keys %ENV) {
+   print "$h = ",$ENV{$h},"\n";
+}
 print "\n--OK--\n";
 
 1;

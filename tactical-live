@@ -28,7 +28,7 @@ if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 
 		$options{xs}-=$xsize>>1;
 		$options{ys}-=$ysize>>1;
       awinput_init(1);
-		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize, $options{scale}, undef, \&awfilterchain, [\&awplanfunc, \&awsiegefunc])->png();
+		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize, $options{scale}, undef, \&awfilterchain, [\&awrelationfunc, \&awplanfunc, \&awsiegefunc])->png();
       awinput::awinput_finish();
 		my $size=length($png);
 		print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>$size), $png;
@@ -75,7 +75,7 @@ function getMouseXY(e) {
  }
 }
 if(!$done) {
-   awinput_init();
+   awinput_init(1);
 	my $s=5;
 	print AWheader($title),start_form(-method=>'get', -name=>"form"),
     awmapcgi::awmapcoordinput(),

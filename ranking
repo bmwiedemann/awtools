@@ -5,7 +5,7 @@ use CGI ":standard";
 BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
-awinput_init();
+awinput_init(1);
 #open ENEMY, "> html/enemies.$ENV{REMOTE_USER}.html" or die $!;
 my @enemy;
 
