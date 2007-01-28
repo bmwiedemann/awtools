@@ -11,6 +11,21 @@ if(!$dbh) {die "DB err: $!"}
 
 if(0) { # create tables
 $dbh->do(qq!
+CREATE TABLE `battles` (
+`id` INT NOT NULL,
+`cv_def` INT,
+`cv_att` INT,
+`att_id` INT,
+`def_id` INT,
+`win_id` INT,
+`planet_id` TINYINT,
+`system_id` INT,
+`time` INT NOT NULL,
+PRIMARY KEY ( `id` )
+);!);
+exit 0;
+
+$dbh->do(qq!
 CREATE TABLE `ipban` (
 `ip` VARCHAR(16) NOT NULL,
 `timeadded` INT NOT NULL,
@@ -206,7 +221,7 @@ PRIMARY KEY ( `fid` )
 exit 0;
 }
 
-our (%alliances,%starmap,%player,%playerid,%planets,%alltrades);
+our (%alliances,%starmap,%player,%playerid,%planets,%alltrades,%battles);
 #tie %alliances, "MLDBM", "newdb/alliances.mldbm", O_RDWR|O_CREAT, 0666 or die $!;
 #tie %starmap, "MLDBM", "newdb/starmap.mldbm", O_RDWR|O_CREAT, 0666;
 #tie %player, "MLDBM", "newdb/player.mldbm", O_RDWR|O_CREAT, 0666;
@@ -224,6 +239,18 @@ sub dumphash { my ($h)=@_;
 		print "$_=$$h{$_}\n";
 	}
 }
+
+sub battles {
+        my %h=();
+        my $id;
+#       splice(@_,7,1);
+        for(my $i=0; $i<=$#elements; ++$i) {
+                if($elements[$i] eq "id") {$id=$_[$i]}
+                else {$h{$elements[$i]}=$_[$i];}
+        }
+        $battles{$id}=\%h;
+}
+
 sub starmap { my($x,$y,$level,$id,$name)=@_;
 	if(!$name) {print "$x $y\n"; $name="undefined"}
 	$name=~s/\s+/ /;
@@ -304,7 +331,7 @@ sub alltrades
 
 print "reading CSV files\n";
 #for my $f (@::files) {
-for my $f (qw(planets player alliances starmap alltrades)) {
+for my $f (qw(planets player alliances starmap alltrades battles)) {
 	my $file="$f.csv";
 	my $head=1;
 	$firstline=1;
@@ -345,6 +372,13 @@ untie %h;
 print "\tstarmap\n";
 tie %h,'Tie::DBI',$dbh,'starmap','sid',{CLOBBER=>3};
 %h=%starmap;
+untie %h;
+print "\tadding battles\n";
+tie %h,'Tie::DBI',$dbh,'battles','id',{CLOBBER=>1};
+#%h=%battles; # battles.csv only delivers incremental data
+while(my @a=each(%battles)) {
+   $h{$a[0]}=$a[1];
+}
 untie %h;
 print "\talltrades\n";
 tie %h,'Tie::DBI',$dbh,'alltrades','tid',{CLOBBER=>3};
