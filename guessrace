@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+# safe 070204
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+use xpsim;
+
+our %options;
+print AWheader("AW race guesser");
+if(param()) {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+	}
+   $options{p}=~s/[^\[\]0-9,.]//g; # sanitize user input
+   print "<pre>input: $options{p}\n\n";
+   xpsim_print($options{p});
+#   system("./moatlz-naive-race-guesser.py", $options{p});
+   print "</pre>";
+} else {
+	print start_form(-name=>"form", -method=>"get"),textfield(-name=>'p', -class=>'text')," Battle info line: [XP,XP...],daysbonus,[XP,XP...],daysbonus",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+}
+print AWtail();
+

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-
+# safe 070204
 use strict;
 use CGI ":standard";
 use Digest::MD5 "md5_hex";
@@ -39,8 +39,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 	if($options{export}) {
 		return "[color=$color]$alliancestr $name [/color]";
 	}
-	return profilelink($id).$rellink.
-		span({-style=>'color: '.$color}, qq!$alliancestr $name ($id) !);
+	return (($options{simple}?"":profilelink($id)).playerid2link($id));
 }
 sub mkhash($) { my($tag)=@_;
 	if($options{uniq} && $options{uniq}!~/\./) {$options{uniq}=".$options{uniq}."} else {$options{uniq}=""}
@@ -89,9 +88,17 @@ if(param("legend")) {
 
 if(param()) {
 	my($x,$y,$system);
-	for my $p (qw'x y mapx mapy id name export auth expires uniq history simple') {
+	for my $p (qw'mapx mapy id name export auth expires uniq history simple') {
 	  $options{$p}=param($p);
 	}
+   for my $p (qw'mapx mapy id expires history simple export') {
+      next if not defined $options{$p};
+      $options{$p}=~s/[^-+0-9.]//g; # sanitize user input
+   }
+   for my $p (qw'auth uniq name') {
+      next if not defined $options{$p};
+      $options{$p}=~s/[^-+#,&; ().\/a-zA-Z0-9]//g; # sanitize user input
+   }
    if($options{history}) {$wantcurrent=""}
    $options{name}=~s/\s+$//;
    $options{name}=~s/^\s+//;
@@ -220,7 +227,7 @@ if(param()) {
 				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/images/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
 				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
             if($options{simple}) {$etalink=""}
-				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, playerid2link($$h{ownerid}), $info.$fleetsstr."</li>\n";
+				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info.$fleetsstr."</li>\n";
 			} else {
 				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s%s", $planetid, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), (planet2siege($h)?"[color=red]sieged[/color] ":""), $info);
 			}

@@ -43,7 +43,7 @@ sub preproc_dispatch(%) { my($options)=@_;
       next if $ret==2;
       if($@) {$module="error in $m: $@";}
       $module.=" preprocd $m"; $brownie::process::browniedone=200;
-      print "\n$module\n";
+#      print "\n$module\n";
       # is handled now, so stop filtering
       last;
    }

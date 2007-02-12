@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+#awstandard_init();
+awinput_init();
+use DBAccess;
+use Tie::DBI;
+print AWheader("AW IP banning tool");
+
+
+our %options;
+my %ips;
+tie %ips,'Tie::DBI',$dbh,'ipban','ip',{CLOBBER=>2};
+if(param()) {
+	foreach my $p (qw(ip action reason)) {
+		$options{$p}=param($p);
+	}
+   my $ip=$options{ip};
+   if($ip!~/^\d+\.\d+\.\d+\.\d+$/) {
+      print "bad IP";
+      exit 0;
+   }
+   if($options{action} eq "add") {
+      $ips{$ip}={timeadded=>time(), reason=>$options{reason}};
+      print "added $ip";
+   } elsif($options{action} eq "del") {
+      delete $ips{$ip};
+      print "deleted $ip";
+   } else {
+      print "error in request";
+   }
+} 
+
+print start_form(-name=>"form"),textfield(-name=>'ip', -class=>'text')," IP",br,
+      textfield(-name=>'reason', -class=>'text', -size=>50), " reason",br,
+      hidden(-name=>"action", -value=>"add"),
+   submit(-name=>"ban IP", -class=>'smbutton'),end_form.AWfocus("form.ip");
+print br.q'<div style="border: solid white 1px;">';
+foreach my $ip (keys %ips) {
+   my $l=a({-href=>"?ip=$ip&action=del"},"un-ban");
+   print $l." $ip added ".(scalar localtime $ips{$ip}->{timeadded})." reason: ".$ips{$ip}->{reason}.br;
+}
+print "</div>";
+print AWtail();
+

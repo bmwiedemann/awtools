@@ -18,10 +18,15 @@ our %options=();
 foreach my $p (qw(tz html file debug name url cookie post)) {
 	$options{$p}=param($p);
 }
+if($options{tz}){$options{tz}=~s/[^-+0-9.]//g;} # sanitize user input;
+if($options{name}){$options{name}=~s/[<>]//g;} # min sanitize user input;
+
+
 if(param()) {
 	chdir("/home/bernhard/code/cvs/perl/awcalc");
 	my $html=$options{html};
 	if(upload('file')) {
+      $options{file}=~s/[^a-zA-Z0-9_.-]//g;
 		print "uploaded file $options{file}\n".br;
 		my $bytes_read=read(upload('file'), $html, 40000);
 		#print $bytes_read;

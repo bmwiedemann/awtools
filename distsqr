@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-
+# safe 070204
 use strict;
 use CGI ":standard";
 BEGIN {chdir "/home/aw/inc";}
@@ -15,9 +15,13 @@ print "calculation of euclidian distance square value for ".a({-href=>"arrival"}
 if(param()) {
  for my $p (qw'dx dy sx sy sid did') {
   $options{$p}=param($p);
+  $options{$p}=~s/[^-+0-9]//g; # sanitize user input
  }
  if($options{sid}) { ($options{sx},$options{sy})=systemid2coord($options{sid}); }
  if($options{did}) { ($options{dx},$options{dy})=systemid2coord($options{did}); }
+ foreach(qw(dx dy sx sy)) {
+    $options{$_}||=0; # assign default value
+ }
  my $dx=$options{sx}-$options{dx};
  my $dy=$options{sy}-$options{dy};
  print "from ($options{sx},$options{sy}) to ($options{dx},$options{dy}) is distance ($dx,$dy) so \n".br;

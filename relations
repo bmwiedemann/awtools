@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# safe 070205
 use strict;
 use CGI ":standard";
 
@@ -23,22 +24,22 @@ if(defined($options{submit}) && $options{submit}=~/delete/) { $options{delete}=1
 if($options{id}) { $options{name}=playerid2name($options{id}); param("name",$options{name}) }
 
 if($options{comment}) {
-   $options{comment} =~ s/[<>]+//g;
+   $options{comment} =~ s/[<>]//g;
 }
 if($options{alliance}) {
 	$options{alliance} =~ s/[^a-zA-Z0-9._-]+//g;
 }
 if($options{name}) {
-	$options{name} =~ s/[^a-zA-Z0-9.הצüß*û _\]\[-]+//g;
+	$options{name} =~ s/[^a-zA-Z0-9.הצüײÜִß*û _!|{}\]\[-]+//g;
 }
 
 if(!$readonly && defined($options{relation})) {
-	$options{name} =~ y/A-Z/a-z/;
+   my $n=lc($options{name});
 	$options{comment}=~s/\r//g;
 	if(!$options{delete}) {
 		if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
 		$options{alliance} =~ y/a-z/A-Z/;
-		if($options{name} !~ /^[-_. a-z0-9\[\]*!|הצüִײÜû{}]*$/) { print 'illegal character in user name'; exit(0);}
+#		if($options{name} !~ /^[-_. a-z0-9\[\]*!|הצüִײÜû{}]*$/) { print 'illegal character in user name'; exit(0);} # redundant
 		$options{relation}+=0;
 		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
 	}
@@ -48,14 +49,14 @@ if(!$readonly && defined($options{relation})) {
 		setrelation($rel[5],undef);
 		$mod="deleted";
 	} else {
-		setrelation($rel[5],{"name"=>$options{name}, "status"=>$options{relation}, "atag"=>$options{alliance}, "info"=>$options{comment}});
+		setrelation($rel[5],{"name"=>$n, "status"=>$options{relation}, "atag"=>$options{alliance}, "info"=>$options{comment}});
 	}
 	print span({-style=>'color: darkgreen'},"$mod $options{name}"),br;
 }
 
 if($options{name}) {# && $options{name} ne "unknown") {
 	my $user=$options{name};
-	$user =~ y/A-Z/a-z/;
+#	$user =~ y/A-Z/a-z/;
 	my $new="edit existing entry";
 	my $id=playername2id($user);
 	my $atag=playerid2tag($id);
@@ -114,7 +115,8 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
 		-labels=>\%awstandard::relationname), " relation", br,
 	textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added him, why, contact, intel, etc...", br,
-	 submit(-name=>"submit", -class=>"smbutton")." ".a({href=>"?"},"new query")." "
+	 submit(-name=>"submit", -class=>"smbutton")." "
+    #.a({href=>"?"},"new query")." "
 	 #.submit(-name=>"submit", -value=>"delete")
     #.AWfocus("form.relation")
 	;
@@ -130,7 +132,12 @@ if($options{name}) {# && $options{name} ne "unknown") {
 			$pop+=planet2opop($pp);
 			push(@planets, $pp);
 		}
-		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".2*$level."+$pop+".($$pl{points}-$pop-2*$level).") trade=$$pl{trade}% logins=$$pl{logins} from=$$pl{from} joined=".(gmtime($$pl{joined}))." ";
+      my $trades="";
+      {
+         my @t=awinput::playerid2trades($id);
+         $trades=join(", ", map {playerid2link($_)} @t);
+      }
+		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".2*$level."+$pop+".($$pl{points}-$pop-2*$level).") trade=$$pl{trade}% logins=$$pl{logins} from=$$pl{from} joined=".(gmtime($$pl{joined}))." trades=$trades ";
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";

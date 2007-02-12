@@ -94,7 +94,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 #      img({-src=>"/images/greenbird_banner.png", -id=>"headlogo"}).
       div({-align=>'justify',-class=>'header'},
 #a({href=>"index.html"}, "AW tools index").
-	$links)."\n".h1($title2)."\n";
+	$links)."\n".a({-href=>"?"},h1($title2))."\n";
 }
 sub AWheader2($;$) { my($title,$extra)=@_; AWheader3($title, $title, $extra);}
 sub AWheader($;$) { my($title,$extra)=@_; header(-connection=>"Keep-Alive", -keep_alive=>"timeout=15, max=99").AWheader2($title,$extra);}
@@ -395,6 +395,13 @@ sub awmax($$) {
 }
 sub awmin($$) {
    $_[0]<$_[1]?$_[0]:$_[1];
+}
+
+sub awpl2xp($) {
+   5*$_[0]**2.7;
+}
+sub awxp2pl($) {
+   ($_[0]/5)**(1/2.7)
 }
 
 sub awsyslink($;$) {

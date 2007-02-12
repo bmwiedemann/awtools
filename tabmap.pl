@@ -29,7 +29,7 @@ my $pps=$pixelpersystem*$scale;
 #if($ENV{REMOTE_USER} eq "tgd") {$mapxoff=-110; $mapyoff=-100}
 my $out="/home/aw/alli/$ENV{REMOTE_USER}/l/star";
 
-print "Drawing...\n";
+print "Drawing $ENV{REMOTE_USER}...\n";
 
 {
 	my $img=new GD::Image($pps, $pps);

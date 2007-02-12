@@ -17,6 +17,9 @@ my $debug=0;
 foreach my $p (qw(tz html file debug name url cookie post)) {
 	$options{$p}=param($p);
 }
+$options{tz}=~s/[^-+0-9.]//g; # sanitize user input;
+$options{name}=~s/[<>]//g; # min sanitize user input;
+
 if(param()) {
 	my $html=$options{html};
 	if(upload('file')) {

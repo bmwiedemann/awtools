@@ -3,7 +3,7 @@ package arrival;
 
 use strict;
 
-my ($c,$a,$p,$e,$rs)=(850/60, 34, 0.1, 91/100, 0.18);
+my ($c,$a,$p,$e,$rs)=(850/60, 34, 0.1, 91/100, 0.17);
 
 # calculates and returns travel time for given options
 sub traveltime { my ($options)=@_;

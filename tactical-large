@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# safe 070205
 use strict;
 use CGI ":standard";
 
@@ -19,6 +20,7 @@ my %options;
 my $dir="/home/aw/alli/$alli/l";
 for my $p (qw'xs xe ys ye x y fast scale') {
 	$options{$p}=param($p);
+   $options{$p}=~s/[^-+0-9.]//g; # sanitize user input
 }
 if(!$options{scale} || $options{scale}!~m/^[0-9.]+$/) { $options{scale}=2; }
 my $imgsize=$options{scale}*13;
@@ -39,8 +41,8 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
    print AWheader($title, qq(<style type="text/css"><!-- img {border:0;} --></style>));
 	my $xe=round($options{xs}+$options{xe}/2);
 	my $ye=round($options{ys}+$options{ye}/2);
-	my $xs=round($options{xs}-$options{xe}/2);
-	my $ys=round($options{ys}-$options{ye}/2);
+	my $xs=$xe-$options{xe};
+	my $ys=$ye-$options{ye};
 	print qq!<table border="0" cellspacing="0" cellpadding="0" bgcolor='#000000'>!;
 	for(my $my=$ys; $my<$ye; $my++) {
 		print "<tr>";
@@ -58,9 +60,11 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 			} else {
 #				$f="?x=$mx&amp;y=$my";
 				$f="/alli/$alli/l/star$mx,$my.png";
-            if($options{fast}) {
+            if($options{fast}==1) {
                $f="/cgi-bin/nphperl/tactical-large-tile?x=$mx&amp;y=$my";
                #$f="http://aw.lsmod.de:2349/tactical-large.pl?x=$mx&y=$my";
+            } elsif($options{fast}==2) {
+               $f="?x=$mx&amp;y=$my";
             }
 				$link=qq!<a href="system-info?mapx=$mx&amp;mapy=$my">!;}
 			my $formatstr="";

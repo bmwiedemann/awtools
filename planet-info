@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+# safe 070204 (except comment)
 use strict;
 use CGI ":standard";
 
@@ -10,8 +11,12 @@ use awinput;
 awinput_init();
 
 print AWheader($title);
-for my $p (qw'id status who comment legend submit') {
+for my $p (qw'id status who comment submit') {
 	$options{$p}=param($p);
+}
+if($options{comment}) {
+   $options{comment}=~s/[<>]//g; # minimal sanitazion only - prevent HTML in entries
+#   TODO allow certain safe tags (bbcode)
 }
 if(param("legend")) {
         print "legend: "; 
@@ -27,11 +32,11 @@ if(param("legend")) {
 if($options{status}) {
 	$options{status}+=0;
 	if($options{status}<1 || $options{status}>9) { print "wrong input"; exit 0;}
-	if($options{who}=~/[a-zA-Z ]/) {
-		$options{who}=playername2id($options{who});
+	if($options{who}!~/^[0-9]+$/) {
+		$options{who}=playername2id($options{who}); # sanitizes
 	}
 	if(!$options{who}) {$options{who}=2};
-	if($options{id}!~m/(\d+)#(\d+)/) {print "invalid system/planet id\n"; exit 0; }
+	if($options{id}!~m/^(\d+)#(\d+)$/) {print "invalid system/planet id\n"; exit 0; }
 	my ($sid,$pid)=($1,$2);
 	my @pinfo=getplanetinfo($sid,$pid,1);
 	my $mod=(@pinfo)? "modified" : "added";
@@ -79,7 +84,7 @@ if($options{id}) {
 		textfield(-name=>'who', -value=>$options{who}, -class=>'text'), " user-id or user-name of the one who does the above $link", br,
 		textarea(-name=>'comment', -value=>"\n".$options{comment}, -rows=>9, -cols=>40, -class=>'text'), " why, when, how, plans, etc...", br,
 		hidden(-name=>'id', $id),
-		submit(-name=>"submit", -class=>'smbutton'), qq! <a href="?">new query</a> !, submit(-name=>"submit",-value=>"delete entry", -class=>'smbutton').
+		submit(-name=>"submit", -class=>'smbutton'), " &nbsp;", submit(-name=>"submit",-value=>"delete entry", -class=>'smbutton').
          AWfocus("form.who");
 } else {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'id', -class=>'text'), " ID: system#planet".AWfocus("form.id"), br,

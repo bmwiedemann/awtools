@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# safe 070205
 use strict;
 use CGI ":standard";
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
@@ -15,6 +16,7 @@ my %options;
 my %db;
 for my $p (qw'pw user alli') {
    $options{$p}=lc(param($p));
+   $options{$p}=~s/[<>]//g; # min sanitize user input
 }
 if($options{user} && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3daac7e9') {
    awinput::opendb(O_RDWR|O_CREAT, "/home/aw/db2/useralli.dbm", \%db);
@@ -23,6 +25,7 @@ if($options{user} && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3
       $db{$options{user}}=$options{alli};
       print "added $options{user}=$options{alli}";
    } else {
+      print "$options{user} = $db{$options{user}} ... ";
       delete $db{$options{user}};
       print "deleted $options{user}";
    } 

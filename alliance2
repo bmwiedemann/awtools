@@ -12,6 +12,7 @@ print AWheader("alliance info");
 #print header, start_html($title), h1($title);
 for my $p (qw'alliance') {
 	$options{$p}=param($p);
+   $options{$p}=~s/[^-+a-zA-Z0-9.]//g; # sanitize user input
 }
 
 if($options{alliance}) {

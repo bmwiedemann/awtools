@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+# should be safe 070205
 use strict;
 use CGI ":standard";
 use DB_File;
@@ -16,6 +17,9 @@ for my $p (qw'user alliance relation comment') {
 	$options{$p}=param($p);
 }
 if(defined($options{relation})) {
+   if($options{comment}) {
+      $options{comment} =~ s/[<>]//g;
+   }
 	$options{user} =~ y/A-Z/a-z/;
 	if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
 	$options{alliance} =~ y/a-z/A-Z/;
@@ -24,7 +28,9 @@ if(defined($options{relation})) {
 	$options{user}=~s/[\r\n\t ]+/ /g;
 	my $i=0;
 	foreach my $user(split(" ", $options{user})) {
-		$i++; print "user $i: ".a({-href=>"relations?name=$user"},$user).br;
+      my $pid=playername2id($user);
+      if(!$pid) {print "skipped ".safe_encode($options{user});next}
+		$i++; print "user $i: ".playerid2link($pid).br;#a({-href=>"relations?name=$user"},$user).br;
 		if($user=~m/^\s*$/) {next}
 #		if($user !~ /^[-_. a-z0-9\[\]]*$/) { print 'illegal character in user name'; exit(0);}
 		$options{relation}+=0;

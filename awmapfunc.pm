@@ -102,18 +102,21 @@ sub awpopulationfunc
 	my @v=awfilterchain($x,$y,$sid,$pid,$data);
 	my $planet=getplanet($sid, $pid);
 	use constant maxpop => 25;
-	my $pop=awmin(maxpop,$$planet{pop});
 	my $c;
-	if($$planet{ownerid}==0) {$c="blue"}
-	else {
-		my $l=$pop*255/maxpop;
-		$c=((255-$l)<<16)|($l<<8);
-	}
+   if(!$planet) {$c="dimgray"}
+   else {
+      my $pop=awmin(maxpop,$$planet{pop});
+      if($$planet{ownerid}==0) {$c="blue"}
+      else {
+         my $l=$pop*255/maxpop;
+         $c=((255-$l)<<16)|($l<<8);
+      }
+   }
 	addleft(\@v, 4, $c);
 	return @v;
 }
 
-my %fleetstatusmap=(0=>"red",1=>0x008800,2=>"orange",3=>"blue");
+my %fleetstatusmap=(0=>"red",1=>0x008800,2=>"orange",3=>"cyan");
 # display defending, sieging, incoming and own moving fleets
 sub awfleetstatusfunc
 { my($x,$y,$sid,$pid,$data)=@_;
@@ -132,7 +135,7 @@ sub awfleetstatusfunc
 #		print "$pid $s\n";
 		my $c=$fleetstatusmap{$s};
 		if($cv==0){$c="black"}
-		addleft(\@v,4, $c);
+		addleft(\@v,3, $c);
 	}
 	return @v;
 }
@@ -152,7 +155,7 @@ sub awfleetownerrelationfunc
 	foreach my $row (@$res) {
 		my $ownerid=$$row[0];
 #		print "$pid $o\n";
-		addright(\@v,4, mrelationcolorid2($ownerid));
+		addright(\@v,3, mrelationcolorid2($ownerid));
 	}
 	return @v;
 }

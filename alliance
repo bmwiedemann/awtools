@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# safe 070204
 use strict;
 use CGI qw":standard *table";
 BEGIN {chdir "/home/aw/inc";}
@@ -12,6 +13,9 @@ my %options;
 for my $p (qw'alliance sort omit') {
 	$options{$p}=param($p);
 }
+$options{omit}=~s/[^ 0-9]//g; # sanitize user input
+$options{alliance}=~s/[^A-Za-z]//g; # sanitize user input
+
 print AWheader("\U$options{alliance}\E alliance info [\U$ENV{REMOTE_USER}]", 
       '<link rel="stylesheet" type="text/css" href="/code/css/alliance.css" />'
 #      border-left: 1px solid gray;  
@@ -49,6 +53,7 @@ if($options{alliance}) {
 	print a({-href=>"http://$server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." "
    #.a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde")
       .a({-href=>"http://lefois.de/aw/tool/info.php?R_tag=$alli"},"Lefois")
+      ." ".a({-href=>"http://www1.astrowars.com/0/Alliance/Info.php/?tag=$alli"}, "AW")
       .$forumlink.br."\n$alli members (".scalar @members.")";
 
    my @members2;

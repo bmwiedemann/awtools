@@ -13,7 +13,7 @@ our $dbdir="/home/aw/db/db";
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname
+&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &get_dbh
 &display_pid &display_relation &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -50,6 +50,9 @@ sub awinput_init(;$) { my($nolock)=@_;
          $alli=$remap_planning{$alli};
       }
       $dbnamep="/home/bernhard/db/$alli-planets.dbm";
+      untie %relation;
+      untie %planetinfo;
+
 #     if($ENV{REMOTE_USER} ne "guest") {
       if($nolock) {
          tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
@@ -67,6 +70,17 @@ sub awinput_init(;$) { my($nolock)=@_;
       %planetinfo=();
    }
 }
+
+# return DB handle
+# useful when you only need the mysql DB for some stuff
+sub get_dbh()
+{  
+   require DBAccess;
+   no warnings;
+   return $DBAccess::dbh;
+   use warnings;
+}  
+
 
 sub opendb($$%) {my($mode,$file,$db)=@_;
    tie(%$db, "DB_File::Lock", $file, $mode, 0, $DB_HASH, ($mode==O_RDONLY)?'read':'write');
@@ -86,8 +100,7 @@ sub getauthname() {
    my $session=awstandard::cookie2session($cookies);
    if($session) {
       my $ip=$ENV{REMOTE_ADDR};
-      require DBAccess;
-      my $dbh=$DBAccess::dbh;
+      my $dbh=get_dbh;
       my $sth=$dbh->prepare_cached("SELECT `name` from `usersession` WHERE `auth` = 1 AND `sessionid` = ? AND `ip` = ?");
       my $aref=$dbh->selectall_arrayref($sth, {}, $session, $ip);
       if($aref and (my $a=$$aref[0])) {
@@ -287,6 +300,46 @@ sub getplanet2($) { sidpid2planet($_[0]) }
 sub sidpid22sidpid3($$) { "$_[0]#$_[1]" }
 sub sidpid22sidpid3m($$) {return $_[0]*13+$_[1];}
 
+# return all know production values, PP/A$,artifact
+sub getallproductions()
+{
+   my @p=();
+   foreach my $name (keys %relation) {
+      my($rel)=$relation{$name};
+      if(!$rel) {next}
+      my($prod,undef,undef,$arti,undef,$ad,$pp,$bonus)=relation2production($rel);   
+      if(!defined($prod)) {next}
+      my @sci=relation2science($rel);
+      if($sci[0]<time()-2*24*3600) {next}
+      push(@p, [$name,$prod,$ad,$pp,$bonus,$arti]);
+   }
+   return @p;
+}
+
+# input: artifact name (BM1)
+# output: number (e.g. 3851.28 A$)
+sub getartifactprice($)
+{
+   my($arti)=@_;
+   my $p=$awinput::prices{lc($arti)}||0;
+   return $p;
+}
+
+# input: pid
+# output: array of trade partner IDs
+sub playerid2trades($) {
+   my ($pid)=@_;
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT * FROM `trades` WHERE `pid1` = ? OR `pid2` = ? ORDER BY `time`");
+   my $t=$dbh->selectall_arrayref($sth, {}, $pid, $pid);
+   my @t=();
+   foreach my $row (@$t) {
+      my($pid1,$pid2)=@$row;
+      push(@t, (($pid1==$pid)?$pid2 :$pid1));
+   }
+   return @t;
+}
+
 sub gettradepartners($$) { my($maxta,$minad)=@_;
   my @result;
   my $adprice=$prices{pp};
@@ -341,8 +394,7 @@ sub playername2alli($) {my ($user)=@_;
 sub add_trades($@)
 {
    my($ownpid,$otherpids)=@_;
-   require DBAccess;
-   my $dbh=$DBAccess::dbh;
+   my $dbh=get_dbh;
    my $sth=$dbh->prepare_cached("SELECT pid1,pid2 FROM `trades` WHERE `pid1` =  ? OR `pid2` = ?");
    my $old=$dbh->selectall_arrayref($sth, {}, $ownpid, $ownpid);
    my %oldmap;
@@ -380,11 +432,11 @@ sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
 #   awdiag("name:$::options{name} scr:$screen awscr:$awinput::fleetscreen");
 #	untie %planetinfo;
 #	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
-   require DBAccess;
    if($pid) {
+      my $dbh=get_dbh;
       my $cond="";
       if($screen==1) {$cond=" AND ( `trn` != 0 OR `cls` != 0 OR `ds` != 0 OR `cs` != 0 OR `bs` != 0 ) "}
-      my $sth=$DBAccess::dbh->prepare_cached("UPDATE `fleets` SET `iscurrent` = 0 WHERE `alli` = ? AND `owner` = ? $cond");
+      my $sth=$dbh->prepare_cached("UPDATE `fleets` SET `iscurrent` = 0 WHERE `alli` = ? AND `owner` = ? $cond");
       $sth->execute($ENV{REMOTE_USER}, $pid);
    } 
 }
@@ -439,11 +491,24 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 
 sub dblinkadd { my($sid,$url)=@_;
    my $type;
-   if($url=~m!http://xtasisrebellion.free.fr/phpnuke/modules.php\?name=Forums&file=viewtopic&t=(\d+)!) { $type="XR" }
-   elsif($url=~m!http://forum.rebelstudentalliance.co.uk/index.php\?showtopic=(\d+)!) { $type="RSA" }
-   elsif($url=~m!http://lesnains\.darkbb.com/viewtopic\.forum\?[pt]=(\d+)!) { $type="NAIN" }
-   elsif($url=~m!http://quicheinside\.free\.fr/viewtopic\.php\?[pt]=(\d+)!) { $type="QI" }
-   elsif($url=~m!http://(?:www.)vbbyjc.com/phpBB2/viewtopic.php\?[pt]=(\d+)!) { $type="SW" }
+   if($url=~m!http://forum\.rebelstudentalliance\.co\.uk/index\.php\?showtopic=(\d+)!) { $type="RSA" } # IPB
+   elsif($url=~m!http://flebb\.servebeer\.com/sknights/index\.php\?showtopic=(\d+)!) { $type="SK" } # IPB
+   elsif($url=~m!http://z10.invisionfree.com/Trolls/index.php\?showtopic=(\d+)!) { $type="TROL" } # IPB
+   elsif($url=~m!http://s6.invisionfree.com/LOVE/index.php\?showtopic=(\d+)!) { $type="LOVE" } # IPB
+#   elsif($url=~m!http://xtasisrebellion\.free\.fr/phpnuke/modules\.php\?name=Forums&file=viewtopic&t=(\d+)!) { $type="XR" } # hacked and outdated
+   elsif($url=~m!http://xtasisrebellion\.xt\.ohost\.de/forum/index\.php\?topic=([0-9.]+)!) { $type="XR" } # SMF
+   elsif($url=~m!http://www.anacronic.com/FIR/index.php\?topic=([0-9.]+)!) { $type="FIR" } # SMF
+   elsif($url=~m!http://frozenstar.zoreille.info/index.php\?topic=([0-9.]+)!) { $type="FrS" } # SMF
+#   elsif($url=~m!http://lesnains\.darkbb\.com/viewtopic\.forum\?[pt]=(\d+)!) { $type="NAIN" } # phpBB outdated
+   elsif($url=~m!http://lesnains\.darkbb\.com/[a-z-]+/[a-z-]+-[pt](\d+)\.htm!i) { $type="NAIN" } # some custom phpBB mod?
+   elsif($url=~m!http://spin.forumzen.com/[a-z-]+/[a-z-]+-[pt](\d+)\.htm!i) { $type="SpIn" } # some custom phpBB mod?
+   elsif($url=~m!http://quicheinside\.free\.fr/viewtopic\.php\?[pt]=(\d+)!) { $type="QI" } # phpBB
+   elsif($url=~m!http://(?:www\.)vbbyjc\.com/phpBB2/viewtopic\.php\?[pt]=(\d+)!) { $type="SW" } # phpBB
+   elsif($url=~m!http://allianceffa.free.fr/ZeForum/viewtopic\.php\?[pt]=(\d+)!) { $type="FFA" } # phpBB
+   elsif($url=~m!http://www.ionstorm-alliance.com/forum/viewtopic\.php\?[pt]=(\d+)!) { $type="IS" } # phpBB
+   elsif($url=~m!http://www.createforum.com/punx/viewtopic\.php\?[pt]=(\d+)!) { $type="PUNX" } # phpBB
+   elsif($url=~m!http://holi87.webd.pl/forum/viewtopic\.php\?[pt]=(\d+)!) { $type="SoUP" } # phpBB
+   elsif($url=~m!http://www.fishandreef.com/brigada/modules.php\?(?:name=Forums&)?(?:file=viewtopic&)?t=(\d+)!) { $type="LBA" } # Version 2.0.7 by Nuke Cops
    return unless($sid && $type);
    $url=$&;
    my $sidpid=sidpid22sidpid3($sid,0);
@@ -536,10 +601,9 @@ sub get_fleets($;$) { my($sidpid,$cond)=@_;
 
 sub get_fleet($) {
    my $fid=shift;
-   require DBAccess;
-   my $dbh=$DBAccess::dbh;
    my $alli=$ENV{REMOTE_USER};
    if(!$alli) {return [];}
+   my $dbh=get_dbh;
    my $allimatch=get_alli_match($alli);
    my $sth=$dbh->prepare("SELECT * from `fleets` WHERE `fid` = ? AND ($allimatch)");
    my $res=$dbh->selectall_arrayref($sth, {}, $fid);
@@ -599,6 +663,5 @@ sub get_alli_group($)
    my @list=($alli);
    return @list;
 }
-
 
 1;

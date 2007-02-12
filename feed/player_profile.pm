@@ -1,4 +1,5 @@
 use strict;
+use dbaddpl;
 my %timevalue=(""=>1, second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -55,6 +56,11 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 #tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
 #	$name="\L$name";
    dbplayeriradd($name, \@science, \@race, [$logins,$lastonline,$idlei,$inaccuracy]);
+   if($pl=~m/(\d+) - (\d+)%/) {
+      $pl=$1+0.01*$2;
+      dbaddpl(time()-$::deliverytime, $name, $pl);
+      #system("/home/aw/inc/dbaddpl", time()-$::deliverytime, $name, $pl);
+   }
 #	my $oldentry=$relation{$name};
 #	my $newentry=addplayerir($oldentry, \@science, \@race, [$logins,$lastonline,$idlei,$inaccuracy]);
 #	if(!$debug) {$relation{$name}=$newentry;}

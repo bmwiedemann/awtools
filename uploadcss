@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-
+# safe 070204
 use strict;
 use lib("/home/aw/inc");
 use vars qw"$cgi $serverbase $imagedir $errormessage %allowedext";
@@ -19,7 +19,7 @@ $imagedir="/code/css/user/";
 
 sub process {
 	my ($filename,$name,$newname,$buffer,$bytesread,$fullname,$outfile,$ext)=(param("file"),lc(param("name")));
-	$name=~s".*/"";
+	$name=~s".*/""; # strip everything before slash (sanitation)
 	if($name eq ""){$name=$filename}
 $name=~s"^.*[/\\]"";	if($filename=~m/\.([^.]+)$/ && ($allowedext{$1}||return ".$1 - invalid extension")){$ext=$1}
 	if($name=~m/\.([^.]+)$/&& !$allowedext{$1}){return "invalid format"}
@@ -69,7 +69,7 @@ if(!param() or $errormessage) {
 	" Which file? (30KB max)".br,
 	textfield(-name=>"name", -value=>"main.css", -class=>"text"),
 	" name on server".br,
-	submit(-class=>"smbutton", defined($authname)?():(-disabled=>1)),
+	submit(-value=>"upload", -class=>"smbutton", defined($authname)?():(-disabled=>1)),
 	end_form);
 }
 

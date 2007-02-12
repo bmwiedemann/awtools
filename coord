@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-
+# safe 070204
 use strict;
 use CGI ":standard";
 BEGIN {chdir "/home/aw/inc";}
@@ -8,6 +8,7 @@ use awmap;
 my %options;
 for my $p (qw'x y xs ys scale') {
   $options{$p}=param($p);
+  $options{$p}=~s/[^-+0-9.]//g; # sanitize user input (just to be sure)
 }
 if(defined($options{x}) && defined($options{y})) {
 	if(defined($options{xs})) {

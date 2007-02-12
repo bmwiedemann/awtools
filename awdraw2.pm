@@ -65,7 +65,8 @@ sub mapimage($$$$;$$&$) {
    my $imagesizey=$mapsizey*$pixelpersystem;
 
 # Create the main image
-   my $img = new GD::Image($imagesizex*$scale, $imagesizey*$scale);
+   my $truecolor=$mapsizex<3;
+   my $img = new GD::Image($imagesizex*$scale, $imagesizey*$scale, $truecolor);
    mapcoloralloc($img);
    $initdraw && &$initdraw($img);
 	

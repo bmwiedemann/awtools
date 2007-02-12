@@ -33,7 +33,6 @@ if(defined($rel[0])) {
    (my $l)=(m!>Logins</td><td>(\d+)</td></tr>!g);
    if($rel[2]=~m/login:($l:\d+:\d+:\d+)/) {
       my @l=split(":",$1);
-      $_.="@l";
       my $idle=sprintf("%im", (time()-$l[1])/60);
       s!(>Idle</td><td>[^<]*)!$1 = $idle!;
    }

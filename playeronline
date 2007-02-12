@@ -22,6 +22,8 @@ sub time2dt($) { my($time)=@_;
 
 my %options;
 print AWheader("AW player idle time viewer");
+print start_form(-name=>"form",-method=>"get"),textfield(-name=>'name', -class=>'text')," player name",br,
+   submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.name");
 if(param()) {
 	foreach my $p (qw(name)) {
 		$options{$p}=param($p);
@@ -74,9 +76,6 @@ if(param()) {
       }
       print "</pre>";
    }
-} else {
-	print start_form(-name=>"form",-method=>"get"),textfield(-name=>'name', -class=>'text')," player name",br,
-		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.name");
 }
 print AWtail();
 

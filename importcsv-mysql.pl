@@ -9,7 +9,30 @@ use DBAccess;
 #my $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
 
+
 if(0) { # create tables
+$dbh->do(qq!
+CREATE TABLE `imessage` (
+`imid`   INT AUTO_INCREMENT PRIMARY KEY,
+`time` INT NOT NULL,
+`sendpid` INT NOT NULL,
+`recvpid` INT NOT NULL,
+`msg` TEXT NOT NULL,
+INDEX ( `time` ),
+INDEX ( `recvpid` )
+);!);
+exit 0;
+
+$dbh->do(qq!
+CREATE TABLE `plhistory` (
+`time` INT NOT NULL,
+`pid` INT NOT NULL,
+`pl` VARCHAR(6) NOT NULL,
+INDEX ( `time` ),
+UNIQUE ( pid,pl )
+);!);
+exit 0;
+
 $dbh->do(qq!
 CREATE TABLE `battles` (
 `id` INT NOT NULL,
@@ -73,7 +96,8 @@ lastclick INT NOT NULL ,
 ip VARCHAR ( 15 ) NOT NULL,
 auth TINYINT ( 1 ) NOT NULL,
 PRIMARY KEY ( sessionid ),
-KEY `lastclick` ( lastclick )
+KEY ( name ),
+KEY ( lastclick )
 );!);
 #) TYPE=MEMORY;!);
 #exit 0;
@@ -397,6 +421,16 @@ while(my @a=each(%alltrades)) {
    next if $prevtrades{"$a{pid1},$a{pid2}"}; # skip dups
    my $sth=$dbh->prepare_cached(qq!INSERT INTO `trades` VALUES (?, ?, ?)!);
    my $result=$sth->execute($a{pid1}, $a{pid2}, $now);
+}
+
+# re-export:
+if(1){
+   my $prevtrades=$dbh->selectall_arrayref("SELECT pid1,pid2 FROM `trades`");
+   open(F, ">", "html/alltrades.csv");
+   print F "id1\tid2\n";
+   foreach(@$prevtrades) {
+      print F join("\t",@$_),"\n";
+   }
 }
 
 print "done\n";

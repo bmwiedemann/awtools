@@ -10,7 +10,7 @@ use awinput;
 awinput_init(1);
    foreach my $name (keys %relation) {
       my @rel=getrelation($name);
-      if($rel[0]==9) {
+      if($rel[0]>=8) {
          push(@members,$name);
       }
    }

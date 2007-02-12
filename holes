@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+# safe 070204
 use strict;
 use CGI ":standard";
 BEGIN {chdir "/home/aw/inc";}

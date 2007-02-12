@@ -39,7 +39,7 @@ foreach my $row1 (@sidpids) {
    my $planet=sidpid2planet($p);
    my $owner=planet2owner($planet);
    my $sb=planet2sb($planet);
-	my $info=$planetinfo{$p};
+	my $info=$planetinfo{$p}||"";
    $info||="";
    $info=~s!^\d [^ ]+!!;
    $info=~s!automagic:.*!!g;

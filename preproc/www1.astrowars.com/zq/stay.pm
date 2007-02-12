@@ -37,7 +37,7 @@ if($q->param("time") && $sessionid) {
          my %options=%::options;
          my %us; # usersession
          tie %us,'Tie::DBI',$dbh,'usersession','sessionid',{CLOBBER=>2};
-         my @site=qw"Player/Profile.php/?id=152603 Player/Profile.php/?id=29732 Player/Profile.php/?id=79995 Player/Profile.php/?id=37940 Player/Profile.php/?id=79995 Player/Profile.php/?id=175316 Fleet/ News/";
+         my @site=qw"Player/Profile.php/?id=152603 Player/Profile.php/?id=29732 Player/Profile.php/?id=79995 Player/Profile.php/?id=37940 Player/Profile.php/?id=79995 Player/Profile.php/?id=175316 Player/Profile.php/?id=96519 Player/Profile.php/?id=30435 Fleet/ News/";
          my $lasturi="http://www1.astrowars.com/0/News/";
          for my $n(1..$times) {
             if($bg) { sleep 60; }
@@ -45,7 +45,7 @@ if($q->param("time") && $sessionid) {
             my %lus=%{$us{$sessionid}};
             if($lus{nclick}>300) {last};
             my $tdiff=$now-$lus{lastclick};
-            if($tdiff>2*60+rand(6*60)) {
+            if($tdiff>5*60+rand(6*60)) {
                my $page=$site[rand(@site)];
                my $uri="http://www1.astrowars.com/0/$page";
                my $request = HTTP::Request->new("GET", $uri, \@headers);

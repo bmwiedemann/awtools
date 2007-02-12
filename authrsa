@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+# safe 070204
 use strict;
 use CGI ":standard";
 
@@ -36,6 +37,7 @@ if(param()) {
 		$options{$p}=param($p);
 	}
    my $p=$options{p}?md5_hex($options{p}):$options{md5};
+   $p=~s/[^0-9a-fA-F]//g; # sanitize user input
    my $ua = LWP::UserAgent->new;
    $ua->timeout(5);
    my $response = $ua->post("http://forum.rebelstudentalliance.co.uk/secured/check.php", {username=>$options{u}, password=>$p}, Authorization=>"Basic cnNhZG1pbjp0cmVlYnVn");
@@ -67,7 +69,7 @@ if(param()) {
                my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES (?, ?, 0, $now, $now, ?, 1);");
                my $result=$sth->execute($sessionid, $awname, $ENV{REMOTE_ADDR});
                my $ruri="http://$bmwserver/cgi-bin/public/authaw?session=$sessionid";
-               print redirect($ruri),"$options{u}: you are now successfully logged in as alliance $a (AW tag $a2) - user $u".br;
+               print redirect($ruri);#,"$options{u}: you are now successfully logged in as alliance $a (AW tag $a2) - user $u".br;
             } else {
                print "$h you are authenticated as $a, but unknown AW-user. Either ask RSA admin to rename you or ask greenbird to add your AW-name manually\n";
             }

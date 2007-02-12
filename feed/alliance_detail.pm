@@ -56,7 +56,7 @@ my @trade;
       push(@tpid,$tpid);
    }
    print "<br>trades: @trade<br>";
-   eval {awinput::add_trades($pid,\@tpid)};
+   awinput::add_trades($pid,\@tpid);
 }
 
 

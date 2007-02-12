@@ -7,7 +7,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&display_string &display_etc &display_needplanets &sort_num &sort_string &sort_table &sort_param_to_keys
+&display_string &display_round0 &display_round1 &display_round2 &display_etc &display_needplanets &sort_num &sort_string &sort_table &sort_param_to_keys
 );
 use awstandard;
 use CGI qw":standard";
@@ -15,6 +15,12 @@ use CGI qw":standard";
 # this file defines functions to output a sorted table.
 
 sub display_string($) { $_[0]; }
+sub display_round0($) 
+{ sprintf("%i",$_[0]) }
+sub display_round1($)
+{ sprintf("%.1f",$_[0]) }
+sub display_round2($)
+{ sprintf("%.2f",$_[0]) }
 
 sub display_etc($) { my($etc)=@_;
    my $now=time();
@@ -93,6 +99,7 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
 # this takes a CGI argument and converts it into a sortkeys arrayref 
 # suitable for use with sort_table function
 sub sort_param_to_keys($) { my($param)=@_;
+   $param=~s/[^-+0-9.]//g; # sanitize user input;
    return [split(/\./,$param)];
 }
 

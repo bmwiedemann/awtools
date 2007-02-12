@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-
+# safe 070204
 use strict;
 use CGI qw":standard";
 my $title="trade partners [\U$ENV{REMOTE_USER}\E]";
@@ -16,28 +16,47 @@ my %options;
 for my $p (qw'sort') {
    $options{$p}=param($p);
 }
-if(!defined $options{sort}){$options{sort}="-6.5";}
+if(!defined $options{sort}){$options{sort}="8";}
+
+
+
+sub gettradepartners2($$) { my($maxta,$minad)=@_;
+  my @result;
+  my $adprice=$awinput::prices{pp};
+  my @prod=getallproductions();
+  foreach my $e (@prod) {
+    my ($name,$prod,$ad,$pp,$bonus,$arti)=@$e;
+    $ad+=$pp*$adprice;
+    if($ad<$minad) {next}
+    my $adplus=$ad+getartifactprice($arti);
+    my $trades=awinput::playerid2trades(playername2id($name));
+    if($trades>$maxta) {next}
+    push(@result,[$name,$ad, $adplus, $prod*$$bonus[0]*$adprice, $trades]);
+  }
+  return @result;
+}
 
 #print "test";
-my @tap=gettradepartners(4, 000);
+my @tap=gettradepartners2(4, 000);
 my @tap2;
 foreach my $entry (@tap) {
-   my ($name, $ad, $prod, $partners)=@$entry;
+   my ($name, $ad, $adplus, $prod, $partners)=@$entry;
    my $pid=playername2id($name);
    if(!$pid || !$prod) {next}
    $name=playerid2name($pid);
    my @rel=getrelation($name);
    $$entry[0]=$name;
    my $time=(20000-$ad)/$prod;
+   my $timeplus=(20000-$adplus)/$prod;
    $$entry[1]=int($ad);
    $$entry[2]=int($prod);
 #   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
-   push(@tap2, [$pid, $ad, $prod, $partners, sprintf("%.2f",$time), $rel[0]]);
+   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus]);
 }
 
-print sort_table([qw(who ad prod/h partners ready(h) relation)], 
-         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_relation],
-         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti)], 
+         [\&display_pid, \&display_relation, \&display_round0, \&display_round0, \&display_string, \&display_round1, \&display_round0, \&display_round1],
+         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@tap2 );
 
 print AWtail();

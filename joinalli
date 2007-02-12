@@ -1,0 +1,51 @@
+#!/usr/bin/perl -w
+# safe 070204
+use strict;
+use CGI ":standard";
+use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+my $name=awinput::getauthname(); # does not need awinput::input
+my $alli=awinput::playername2alli($name);
+our %options;
+print AWheader("AW join alli");
+if($name && !$alli && !playerid2alliance(playername2id($name)) && param()) {
+	foreach my $p (qw(a p)) {
+		$options{$p}=param($p);
+	}
+   my $passwd=`cat /home/aw/.htpasswd`;
+   $options{a}=~s/[^a-zA-Z0-9]//g; # sanitize user input # password is never printed and only looked up by crypt
+   my $alli=lc($options{a});
+   if($passwd=~m/^${alli}:(.*)/m && $alli ne "guest") {
+      my $crypted=$1;
+      if(crypt($options{p}, $crypted) eq $crypted) {
+         my %db;
+         awinput::opendb(O_RDWR|O_CREAT, "/home/aw/db2/useralli.dbm", \%db);
+         $db{lc($name)}=$alli;
+         untie %db;
+         print "$name, you now belong to alliance $options{a} (in regards to AWTools)",br;
+      } else {
+         print "incorrect credentials",br;
+      }
+   } else {
+      print "alliance $options{a} not found",br;
+   }
+
+} else {
+   $name||="";
+   print "user=$name alli=$alli",br;
+   if(!$name) {
+      print "sorry, you need to ".a({-href=>"authaw"},"authenticate")." first. (Only works with brownie)";
+   } else {
+      print start_form(-name=>"form"),textfield(-name=>'a', -class=>'text'), " Alliance",br,
+         password_field(-name=>'p', -class=>'text'), " Alliance's Access Password for AWTools",br,
+         submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.a");
+   }
+}
+print AWtail();
+

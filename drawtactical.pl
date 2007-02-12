@@ -15,7 +15,7 @@ awinput_init(1);
 my $imagesize=$mapsize*$pixelpersystem+1;
 my $ih=$imagesize/2;
 
-print "Drawing...\n";
+print "Drawing $ENV{REMOTE_USER}...\n";
 
 sub drawaxis($) {my($img)=@_;
 	$img->line(0,$ih, $imagesize+$pixelpersystem,$ih,$mapcommon::axiscolor);

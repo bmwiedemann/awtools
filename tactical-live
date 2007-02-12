@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# safe 070204
 use strict;
 use CGI ":standard";
 
@@ -17,6 +18,7 @@ awstandard_init();
 
 for my $p (qw'map xs ys xe ye scale') {
 	$options{$p}=param($p);
+   $options{$p}=~s/[^-+0-9.]//g; # sanitize user input
 }
 my $xsize=$options{xe};
 my $ysize=$options{ye};
@@ -36,7 +38,7 @@ if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 
 	}
 	$options{map}=0;
  }
- if(!$done && $options{map}==2) {
+ if(!$done) {
   my $xsize=$options{xe}>>1;
   my $ysize=$options{ye}>>1;
   my $totx=bmwround(13*$options{xe});
@@ -47,7 +49,8 @@ if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 
 	start_html(-title=>$title , -style=>"/code/css/tools/tactical.css"), 
 	#AWheader2($title),
 	start_form('get', "coord"),
-	qq!<input type="image" src="?map=1&amp;xs=$options{xs}&amp;ys=$options{ys}&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;scale=$options{scale}" />!,
+   image_button(-src=>"?map=1&xs=$options{xs}&ys=$options{ys}&xe=$options{xe}&ye=$options{ye}&scale=$options{scale}"),
+#	qq!<input type="image" src="?map=1&amp;xs=$options{xs}&amp;ys=$options{ys}&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;scale=$options{scale}" />!,
 	hidden("xs"),
 	hidden("ys"),
 	hidden("scale"),

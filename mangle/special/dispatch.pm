@@ -9,7 +9,7 @@ sub mangle() {
    # remove text ads
       s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
    # disable other ads
-      s/(?:pagead2\.googlesyndication\.com)|(?:games\.advertbox\.com)|(?:oz\.valueclick\.com)|(?:optimize\.doubleclick\.net)/aw.lsmod.de/g;
+      s/(?:pagead2\.googlesyndication\.com)|(?:games\.advertbox\.com)|(?:oz\.valueclick\.com)|(?:optimize\.doubleclick\.net)/nowhere.lsmod.de/g;
    }
    # fix color specification
    s%bgcolor="([0-9a-fA-F]{6})"%bgcolor="#$1"%g;

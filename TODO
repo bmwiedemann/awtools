@@ -1,7 +1,8 @@
+brownie: integrate imessage
 general user preferences DB: tz, customhtml, race+sci for planets,arrival
-remember user timezones from settings page and use for GMT+n display in fleets and arrival
-Timezone for added fleets in AW
-verify +59 feed/alliance_detail.pm
+#remember user timezones from settings page and use for GMT+n display in fleets and arrival
+#Timezone for added fleets in AW
+#verify +59 feed/alliance_detail.pm
 flexible map - coloring by last round's tag (fallback)
 #dynamic PP-A$ price for tradepartners tool
 add last round alliance tag to system-info

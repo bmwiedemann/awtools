@@ -1,4 +1,6 @@
 #!/usr/bin/perl -w
+# safe 070204
+# uses modperl/nphperl
 use strict;
 use warnings;
 use mod_perl;
@@ -20,6 +22,9 @@ if(0) {
    if(!$ret) {
       $image=`cat /home/aw/html/images/awmaperror.png`;
    } else {
+      $o=~s/%2C/,/;
+      $o=~s/[^0-9,]//g; # sanitize user input
+      $o=[split(",",$o)];
       $image=livemap::draw::draw($x,$y,$o);
    }
    my $size=length($image);

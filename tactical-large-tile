@@ -1,4 +1,6 @@
 #!/usr/bin/perl -w
+# safe 070204
+# uses modperl/nphperl
 use strict;
 use warnings;
 use mod_perl;
@@ -7,7 +9,7 @@ use constant MP2 => ($mod_perl::VERSION >= 1.99);
 #use Apache2::RequestIO ();
 #my $dir="/home/aw/db/large-$ENV{REMOTE_USER}";
 my $dir="/home/aw/alli/$ENV{REMOTE_USER}/l";
-my ($x,$y)=$ENV{QUERY_STRING}=~m/x=([^=]*)&y=([^=]*)/;
+my ($x,$y)=$ENV{QUERY_STRING}=~m/x=([-+0-9]*)&y=([-+0-9]*)/;
 my $f="$dir/star$x,$y.png";
 my ($size,$modified)=(stat($f))[7,9];
 

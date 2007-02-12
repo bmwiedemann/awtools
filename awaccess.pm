@@ -1,10 +1,13 @@
 package awaccess;
+use DB_File;
+use Fcntl qw(:flock O_RDONLY);
 require Exporter;
 use vars qw(@ISA @EXPORT);
 
-our (%read_access,%write_access);
-our %allowedalli=("af"=>1, tgd=>1, love=>1, is=>1, kk=>1, tgt=>1, nain=>1, crs=>1, rats=>1, soup=>1, punx=>1, "pop"=>1, tuga=>1, xr=>1, crs=>1, tofw=>1, sk=>1, ld=>1, sky=>1, frs=>1, the=>1, lba=>1, en=>1, ocb=>1, fir=>1, trol=>1, ffa=>1,
-      ""=>0);
+our (%read_access,%write_access,%allowedalli);
+
+tie(%allowedalli, "DB_File", "/home/aw/db2/allowedalli.dbm", O_RDONLY, 0, $DB_HASH);
+
 # crs: temporary until 2006-05-05
 
 @ISA = qw(Exporter);
@@ -13,6 +16,10 @@ our %allowedalli=("af"=>1, tgd=>1, love=>1, is=>1, kk=>1, tgt=>1, nain=>1, crs=>
 
 $read_access{af}=["is"];
 $read_access{is}=["af"];
+$read_access{fir}=["ice"];
+$read_access{ice}=["fir"];
+$read_access{lba}=["lbb"];
+$read_access{lbb}=["lba"];
 #$read_access{rats}=[qw()];
 #$read_access{nain}=[qw()];
 #$read_access{sky}=[qw()];
@@ -32,6 +39,7 @@ our %remap_alli=(
       lbb=>"lba",
       ice=>"fir",
       lxg=>"love",
+      spin=>"trol",
 #      es=>"esb", zob=>"esb", vip=>"esb", qi=>"esb",
 );
 

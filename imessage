@@ -1,0 +1,74 @@
+#!/usr/bin/perl -w
+# safe 20070210
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+use sort_table;
+use awimessage;
+#awstandard_init();
+awinput_init();
+
+my %options;
+sub display_delim
+{ 
+   return a({-href=>"?action=delete&imid=$_[0]"},"del")
+}
+
+sub display_impid($)
+{
+   ($_[0] == $options{authpid}?"":
+      a({-href=>"?action=send&recv=$_[0]"},"rep")." ").display_pid($_[0]);
+}
+
+sub imlist(%)
+{ my($options)=shift;
+   my $ims=awimessage::get_all_ims($options);
+#  foreach my $row (@$ims) {
+#     my ($imid,$time,$sendpid,$recvpid,$msg)=@$row;
+#     print "$imid,$time,$sendpid,$recvpid,$msg\n";
+#  }
+   sort_table(
+         [qw(del time-sent from to msg)],
+         [\&display_delim,\&AWisodatetime,\&display_impid, \&display_impid, \&display_string],
+         [undef,\&sort_num,\&sort_pid,\&sort_pid,undef],
+         sort_param_to_keys($$options{sort}),$ims
+      );
+}
+
+
+print AWheader("AW instant messaging tool");
+my $authname=awinput::getauthname();
+my $authpid=playername2id($authname);
+if(!$authpid) {
+   print "Sorry, you can only use IMs when properly authenticated from brownie\n";
+} else {
+   $options{authpid}=$authpid;
+	foreach my $p (qw(action imid msg recv sort)) {
+		$options{$p}=param($p);
+	}
+   if(!$options{sort}){$options{sort}="2";} # default sort by time
+   if(!$options{action} || $options{action}=~m/[^a-z_-]/){$options{action}="list";}
+   if($options{recv} && $options{recv}=~m/[^0-9]/) { $options{recv}=playername2id($options{recv}); } # counts as sanitizing
+   print a({-href=>"?action=send"},"send")." ".a({-href=>"?action=list"},"list").br;
+   if($options{action} eq "send") {
+      if($options{recv} && $options{msg} && playerid2name($options{recv})){
+         awimessage::send(\%options);
+      } else {
+         print start_form(-name=>"form"),textfield(-name=>'recv', -class=>'text', -size=>6)," Player ID or name",br,
+               textarea(-name=>'msg',-value=>"", -cols=>40, -rows=>9, -class=>'text'),br,
+               hidden(-name=>"action",-value=>"send"),
+               submit(-value=>"send", -class=>'smbutton'),end_form.AWfocus("form.recv");
+      }
+   }
+   elsif($options{imid} && $options{action} eq "delete") {
+      $options{imid}=~s/[^0-9]//g;
+      awimessage::delete(\%options);
+   }
+
+   print imlist(\%options);
+}
+print AWtail();
+

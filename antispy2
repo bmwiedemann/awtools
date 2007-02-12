@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+# safe 070204
 use strict;
 use CGI ":standard";
 
@@ -14,6 +15,7 @@ print AWheader("AW IR spy detector tool");
 if(param() && param("bio")>2) {
 	foreach my $p (qw(bio x y)) {
 		$options{$p}=param($p);
+      $options{$p}=~s/[^-+0-9]//g; # sanitize user input
 	}
    my $bio=$options{bio}||24;
    my @maxxy=($options{x},$options{y});
@@ -25,12 +27,14 @@ if(param() && param("bio")>2) {
       $maxxy[$i]+=$AUdiff;
    }
    my $minsci=$bio-6;
-   print "unspied players in Bio$bio range (@minxy to @maxxy) - probable enemy spies\n".br;
+   my $range=join("/",@minxy)." to ".join("/",@maxxy);
+   print "unspied players in Bio$bio range ($range) - probable enemy spies\n".br;
    my $allplayers=$dbh->selectall_arrayref( qq(
       SELECT  x,y,player.name,pid,science
       FROM  `player`,`starmap` 
-      WHERE science > $minsci AND
-      `home_id` = starmap.`sid` AND starmap.x >= $minxy[0] AND starmap.y >= $minxy[1] AND starmap.x <= $maxxy[0] AND starmap.y <= $maxxy[1]
+      WHERE 
+       /*science > $minsci AND*/
+      `home_id` = starmap.`sid` AND starmap.x >= $minxy[0] AND starmap.y >= $minxy[1] AND starmap.x <= $maxxy[0] AND starmap.y <= $maxxy[1] ORDER BY science DESC, starmap.sid, player.name
    ));
    my $now=time();
    foreach(@$allplayers) {
@@ -38,11 +42,13 @@ if(param() && param("bio")>2) {
 #         next if($esl<=$bio-6); # we are sure to have spied on him
          my @rel=getrelation($ename);
          my @sci=relation2science($rel[2]);
-         my $spytime;
-         if($sci[0]>100){$spytime=shift(@sci)}
-         if($now-$spytime<80000) {next}
-         my $ebio=$sci[0];
-         print "($ex,$ey) ".display_pid($epid)." SL=$esl oldBio=$ebio\n".br;
+         my $spytime=0;
+         if(defined($sci[0]) && $sci[0]>100){$spytime=shift(@sci)}
+         my $age=$now-$spytime;
+         if($age<60000) {next} # this is considered fresh
+         my $irage=(defined($sci[0])? sprintf("%.1fd",$age/3600/24) :"?");
+         my $ebio=$sci[0]; if(!defined($ebio)){$ebio="?"}
+         print profilelink($epid)." ($ex,$ey) ".display_pid($epid)." SL=$esl oldBio=$ebio age=$irage\n".br;
    }
 } else {
    my $s=3;
