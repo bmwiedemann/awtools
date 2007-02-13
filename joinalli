@@ -41,6 +41,8 @@ if($name && !$alli && !playerid2alliance(playername2id($name)) && param()) {
    print "user=$name alli=$alli",br;
    if(!$name) {
       print "sorry, you need to ".a({-href=>"authaw"},"authenticate")." first. (Only works with brownie)";
+   } elsif(playerid2alliance(playername2id($name))) {
+      print "sorry, you are already member of an alliance and can not join another one within AWTools";
    } else {
       print start_form(-name=>"form"),textfield(-name=>'a', -class=>'text'), " Alliance",br,
          password_field(-name=>'p', -class=>'text'), " Alliance's Access Password for AWTools",br,
