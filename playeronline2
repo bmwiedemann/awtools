@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w
+# safe 070204
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+#awstandard_init();
+awinput_init();
+
+my $ticks=4;
+my $granularity=24*$ticks;
+my $unk="?";
+my %cmap=($unk=>"gray", X=>"green", "-"=>"red");
+
+my $firstlog=0;
+my $firstlogt;
+sub time2dt($) { my($time)=@_;
+      my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);
+      $yday*$granularity+ int(($sec+$min*60+$hour*3600)*$granularity/86400)-$firstlog;
+}
+
+my %options;
+#print AWheader("AW player idle time viewer");
+if(param()) {
+	foreach my $p (qw(name)) {
+		$options{$p}=param($p);
+	}
+   $options{name}=~s/[^a-zA-Z0-9.äöüß*û _\]\[-]+//g;
+   my @rel=getrelation($options{name});
+   if(defined($rel[0])) {
+      my @logins=($rel[2]=~m/login:(\d+:\d+:\d+:\d+)/g);
+      my @logs;
+      my @logp;
+      my $lastlog=-1;
+      my $lastlogn=-1;
+      foreach(@logins) {
+         my @l=split(":");
+         my $dt1=time2dt($l[1]-$l[3]);
+         if(!$firstlog) {$firstlogt=$l[1]-$l[3];$firstlog=$dt1-$dt1%$granularity; $dt1-=$firstlog;}
+         my $dt=time2dt($l[1]);
+         my $dt2=time2dt($l[1]+$l[2]);
+         next if($dt1<0 || $dt<0 || $dt2<0);
+         my $width1=(($dt1-$lastlog)/$ticks-1.5);
+         if($width1<=0.1) {$width1=0.1}
+         my $width2=$dt2-$dt||1;
+         my $probab1=($l[0]-($lastlogn+1))/$width1*0.5;
+         if($lastlogn==-1) { $probab1=0; }
+         if($probab1>1) {$probab1=1}
+         if($probab1<0) {$probab1=0}
+         for my $dti ($lastlog+1..$dt1-2) { $logp[$dti]=$probab1; }
+         for my $dti ($lastlog+1..$dt1-1) { $logs[$dti]=($lastlogn+1==$l[0] ?"-":$unk); }
+         for my $dti ($dt1-1..$dt+1) { $logp[$dti]=1; }
+         for my $dti ($dt1..$dt) { $logs[$dti]="X"; }
+         for my $dti ($dt+2..$dt2) { $logp[$dti]=0; }
+         for my $dti ($dt+1..$dt2) { $logs[$dti]="-"; }
+         $lastlog=$dt2;
+         $lastlogn=$l[0];
+#      print "@l $dt $dt1 $dt2<br>";
+      }
+      my $n=0;
+#      print "player: ".playerid2link(playername2id($options{name})),br
+#            "<code>legend: ",br,
+#            "'X': logged in",br,
+#            "'-': idle (or sometimes permanently logged in)",br,
+#            "'$unk': unknown status",br,
+#            "all times in UTC - current time: ".gmtime(),br,
+#            "</code><pre>  day\\hour";
+##"0 1 2 3 4 5 6 7 8 9 1011121314151617181920212223";
+#      for(0..23) {printf("%${ticks}i", $_);}
+      my $currt=$firstlogt;
+      foreach(@logs) {
+         if($n++%$granularity==0) {
+            my $wday=(gmtime($currt))[6];
+            my $s1="";
+            my $s2="";
+            if($wday==6||$wday==0) {
+               $s1="<span style=\"background-color:gray\">";
+               $s2="</span>";
+            }
+#            print br,$s1,AWisodate($currt),$s2," ";
+            $currt+=3600*24;
+         }
+#         print "<span style=\"color:$cmap{$_}\">$_</span>";
+      }
+      $n=0;
+      my $ndays=0;
+      my @psum;
+      foreach(@logp) {
+         my $timeofday=$n++%$granularity;
+         if($timeofday==0) { 
+#            print br;
+            $ndays++;
+         }
+#         print "$_ ";
+         $psum[$timeofday]+=$_;
+      }
+#      print br;
+      my $plotname="/tmp/aw/plot-$$.png";
+      open(PLOT, "| gnuplot") or die $!;
+      print PLOT qq!set terminal png
+set xlabel "time of day"
+set ylabel "probability of login"
+set output "$plotname"
+#set title "$options{name}"
+plot [0:24] [] "-" title "$options{name}" with lines
+      !;
+      my $timeofday=0;
+      foreach(@psum) {$_||=0; $_/=$ndays}
+      foreach(@psum) {
+#         printf("%.2f ",$_);
+         printf PLOT "%.3f %.4f\n", $timeofday, $_;
+         $timeofday+=1/$ticks;
+      }
+      print PLOT "24 $psum[0]\n";
+      close(PLOT);
+      if(open(PLOT, "$plotname")) {
+         local $/;
+         my $png=<PLOT>;
+         print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>length($png)),$png;
+         close(PLOT);
+         unlink($plotname);
+      } else {
+         print AWheader("unavailable");
+      }
+#      print "</pre>";
+   } else {
+      print AWheader("unavailable");
+   }
+} else {
+   print AWheader("AW player idle time viewer");
+	print start_form(-name=>"form",-method=>"get"),textfield(-name=>'name', -class=>'text')," player name",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.name");
+}
+print AWtail();
+

@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+# safe 070204
+use strict;
+use CGI ":standard";
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+
+my %options;
+for my $p (qw'fid') {
+  $options{$p}=param($p);
+}
+if(defined($options{fid})) {
+   awinput_init();
+   my $res=awinput::get_fleet($options{fid});
+   if(!$res || !$$res[0]) {
+      print header(),"fleet $options{fid} not found";
+      exit 0;
+   } else {
+      my ($fid,$alli,$status,$sidpid,$owner,$eta,$firstseen,$lastseen,$trn,$cls,$eds,$ecs,$ebs)=@{$$res[0]};
+      my ($elevel,undef,$ephysics,$emath,undef,$eraceatt,$eracedef)=awinput::playerid2battlestats($owner);
+      
+      my $awuser=cookie('user')||awinput::getauthname(); # prefer cookie data, but fall back to authorization data from AW
+      my $opid=playername2id($awuser);
+      my ($olevel,undef,$ophysics,$omath,undef,$oraceatt,$oracedef)=awinput::playerid2battlestats($opid); # get own/defenders stats if available
+      my @deffleet=(0,0,0);
+
+      # prepare redirect
+      my $params="";
+      my @list=qw(physics math level raceatt racedef);
+      foreach my $f (@list) {
+         $params.="&f$f=".eval("\$e$f");
+         $params.="&p$f=".eval("\$o$f");
+      }
+      my $url="http://$awstandard::awforumserver/about/battlecalculator/?destroyer=$eds&cruiser=$ecs&battleship=$ebs&des=$deffleet[0]&cru=$deffleet[1]&bat=$deffleet[2]&sta=0&submit2=calculate+battle&go=1$params";
+      print (redirect($url),a({href=>$url},"link"));
+      exit(0);
+   }
+}
+print AWheader("fleet to battlecalc"),
+      start_form(-name=>"form", -method=>"get"),textfield(-name=>'fid', -class=>'text'), " fleet id",br,
+      submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.fid");
+
