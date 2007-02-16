@@ -4,6 +4,7 @@ use awstandard;
 use awinput;
 use awaccess;
 use DBAccess;
+use awimessage;
 use Time::HiRes qw(gettimeofday tv_interval); # for profiling
 
 our $g;
@@ -22,8 +23,8 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
    $g=$specialname{$$options{name}};
    my $t2=[gettimeofday];
+   $$options{bmwlink}=$::bmwlink=$origbmwlink;
    %::options=%$options;
-   $::bmwlink=$origbmwlink;
    my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
@@ -52,10 +53,18 @@ sub mangle_dispatch(%) { my($options)=@_;
          else {$nclicks=1}
          if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          $info{clicks}=$nclicks;
+         $$options{authlink}="$origbmwlink/modperl/public/authaw?session=$session&uri=/cgi-bin";
          if($ENV{REMOTE_USER}) {
-            $::bmwlink="$origbmwlink/modperl/public/authaw?session=$session&uri=/cgi-bin";
-         } elsif(!playerid2alliance(playername2id($$options{name}))) {
-            $joinlink="$::bmwlink/modperl/public/authaw?session=$session&uri=/cgi-bin/modperl/joinalli\">I am member of an (extended AWTools) alliance and want to join</a>";
+            $::bmwlink=$$options{authlink};
+         } elsif($$options{pid}) {
+            my $aid=playerid2alliance($$options{pid});
+            if(!$aid) {
+               $joinlink=$$options{authlink}."/modperl/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
+            } elsif($awinput::aliances{$aid} && $awinput::aliances{$aid}->{founder}==$$options{pid}) {
+               # if alliance founder, add extra "accept NAP with AF" link
+#               $joinlink.=" $$options{authlink}/signnapfortools\">As founder of an alliance I want to declare NAP towards AF to use AWTools</a> ";
+            }
+         } else {
          }
       }
       
@@ -108,37 +117,59 @@ sub mangle_dispatch(%) { my($options)=@_;
 #   s%<br>\s*(<TABLE)%$1%; # remove some blanks
 
 # add footer + disclaimer
+   my $imessage="";
+   if($$options{pid}) {
+      $$options{authpid}=$$options{pid};
+      my $ims=awimessage::get_all_ims($options);
+      if($ims && @$ims) { # have im
+         $imessage="<!-- start gb imessage --><div class=awimessage>you have $$options{authlink}/imessage\" class=\"awtools\">instant messages</a><br>";
+         foreach my $im (@$ims) {
+            my ($imid,$time,$sendpid,$recvpid,$msg)=@$im;
+            my $fromto;
+            my $c;
+            if($sendpid==$$options{authpid}) {
+               $fromto=" =&gt ".playerid2link($recvpid);
+               $c="sentimessage";
+            } else {
+               $fromto=" &lt;= ".playerid2link($sendpid);
+               $c="recvimessage";
+            }
+            $imessage.=AWisodatetime($time)."$fromto <span class=\"$c\"> $msg</span> <br>";
+         }
+         $imessage.="</div>";
+      }
+   }
    my $online="";
    if($alli && $$options{name}) {
       my $now=time();
       my $reltime=$now-60*25;
-      my @alli=($alli);
-      my $allimatch=" AND `aid` = `alliance` AND e.name = player.name AND ( `tag` LIKE ? ";
+      my @alli=(lc($alli));
+      my $allimatch=" AND `aid` = `alliance` AND ( `tag` = ? ";
       foreach my $a (@{$read_access{lc($alli)}}) {
-         $allimatch.=" OR `tag` LIKE ? ";
+         $allimatch.=" OR `tag` = ? ";
          push(@alli,$a);
       }
       $allimatch.=" )";
 #      my $allifrom=",`player`,`alliances`";
 #      if(0 && $g) {$allimatch=$allifrom=""}
       my $t1=[gettimeofday];
-      my $sth=$dbh->prepare_cached("SELECT distinct e.`name` , `lastclick`
-         FROM usersession AS e, (
-               SELECT max( i.lastclick ) AS t
-               FROM `usersession` AS i
-               GROUP BY `name`
+      my $sth=$dbh->prepare_cached("SELECT m.`name` , m.`t`
+         FROM (
+               SELECT max( i.lastclick ) AS t, name
+                  FROM `usersession` AS i
+                  WHERE `lastclick` > ? 
+                  AND `name` != ?
+                  GROUP BY `name`
                ) AS m,`player`,`alliances`
-         WHERE e.lastclick = m.t
-         AND `lastclick` > ? $allimatch
-         AND e.`name` != ?
-         ORDER BY `lastclick` DESC");
+         WHERE m.name = player.name
+          $allimatch
+         ORDER BY `t` DESC");
 #      my $sth=$dbh->prepare_cached("SELECT usersession.name,`lastclick` 
 #           FROM `usersession` $allifrom 
 #           WHERE `lastclick` > ? $allimatch AND usersession.name != ?
 #           GROUP BY usersession.name
 #           ORDER BY lastclick DESC;");
-      $sth->execute($reltime, @alli, $$options{name});
-      $$options{sqlelapsed}=tv_interval ( $t1 );
+      $sth->execute($reltime, $$options{name}, @alli);
       my @who2;
       while ( my @row = $sth->fetchrow_array ) {
 #      foreach my $row (@$who) {
@@ -149,6 +180,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 #if($time<$now-60*6) {
          push(@who2,"<span style=\"color:#$c$c$c\">$name</span>");
       }
+      $$options{sqlelapsed}=tv_interval ( $t1 );
       $online=join(", ", @who2);
       if($online){
          $online="<span class=\"bottom_key\">allies online:</span> $online<br>"
@@ -159,7 +191,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
    $$options{totalelapsed}=tv_interval ( $t2 );
-   my $gbcontent="<!-- start greenbird disclaimer -->\n<p id=disclaimer style=\"text-align:center; color:white; background-color:black\">$joinlink<br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
+   my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n<p id=disclaimer style=\"text-align:center; color:white; background-color:black\">$joinlink<br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
    if($ingameuri) {
       my @style=("main");
