@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold7
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html preferences arrival authaw authrsa awlinker joinalli distsqr eta tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd ipban logout nph-brownie.cgi
+tools=index.html preferences arrival authaw authrsa awlinker joinalli distsqr eta tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout nph-brownie.cgi
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate

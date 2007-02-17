@@ -64,7 +64,7 @@ CREATE TABLE `alltrades` (
 `pid2` INT NOT NULL,
 `time` INT,
 PRIMARY KEY ( `tid` ),
-INDEX ( `pid1` ),
+UNIQUE ( `pid1`,pid2 ),
 INDEX (`pid2`)
 );!);
 exit 0;
@@ -74,7 +74,7 @@ CREATE TABLE `trades` (
 `pid1` INT NOT NULL,
 `pid2` INT NOT NULL,
 `time` INT,
-INDEX ( `pid1` ),
+UNIQUE ( `pid1`,pid2 ),
 INDEX (`pid2`)
 );!);
 
@@ -228,6 +228,8 @@ CREATE TABLE `fleets` (
 INDEX ( alli ),
 INDEX (`status`),
 INDEX (`owner`),
+INDEX ( sidpid ),
+INDEX ( eta ),
 PRIMARY KEY ( `fid` )
 );!);
 #$dbh->do(qq!
@@ -411,15 +413,10 @@ untie %h;
 
 print "\tmerging trades\n";
 my $now=time();
-my $prevtrades=$dbh->selectall_arrayref("SELECT pid1,pid2 FROM `trades`");
-my %prevtrades;
-foreach my $t (@$prevtrades) {
-   $prevtrades{"$t->[0],$t->[1]"}=1; # hashing existing trades for efficient access
-}
+my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `trades` VALUES (?, ?, ?)!);
 while(my @a=each(%alltrades)) {
    my %a=%{$a[1]};
-   next if $prevtrades{"$a{pid1},$a{pid2}"}; # skip dups
-   my $sth=$dbh->prepare_cached(qq!INSERT INTO `trades` VALUES (?, ?, ?)!);
+#   next if $prevtrades{"$a{pid1},$a{pid2}"}; # skip dups
    my $result=$sth->execute($a{pid1}, $a{pid2}, $now);
 }
 

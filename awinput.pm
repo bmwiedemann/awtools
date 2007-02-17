@@ -395,22 +395,22 @@ sub add_trades($@)
 {
    my($ownpid,$otherpids)=@_;
    my $dbh=get_dbh;
-   my $sth=$dbh->prepare_cached("SELECT pid1,pid2 FROM `trades` WHERE `pid1` =  ? OR `pid2` = ?");
-   my $old=$dbh->selectall_arrayref($sth, {}, $ownpid, $ownpid);
-   my %oldmap;
+#   my $sth=$dbh->prepare_cached("SELECT pid1,pid2 FROM `trades` WHERE `pid1` =  ? OR `pid2` = ?");
+#   my $old=$dbh->selectall_arrayref($sth, {}, $ownpid, $ownpid);
+#   my %oldmap;
    my $now=time();
-   if($old) {
-      foreach my $row (@$old) {
-         my @a=@$row;
-         $oldmap{"$a[0],$a[1]"}=1;
-      }
-   }
+#   if($old) {
+#      foreach my $row (@$old) {
+#         my @a=@$row;
+#         $oldmap{"$a[0],$a[1]"}=1;
+#      }
+#   }
+   my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `trades` VALUES (?, ?, ?)!);
    foreach my $xpid (@$otherpids) {
       my $pid1=awmax($xpid,$ownpid);
       my $pid2=awmin($xpid,$ownpid);
-      next if($oldmap{"$pid1,$pid2"}); # do not re-add existing entries
+      #next if($oldmap{"$pid1,$pid2"}); # do not re-add existing entries
       # pid1 is always larger than pid2
-      $sth=$dbh->prepare_cached(qq!INSERT INTO `trades` VALUES (?, ?, ?)!);
       my $result=$sth->execute($pid1, $pid2, $now);
    }
 }

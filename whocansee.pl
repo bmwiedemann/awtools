@@ -11,7 +11,7 @@ my $wantbio25 = shift @ARGV;
 awinput_init();
 
 my @sysxy = systemid2coord($sysid);#(59,-12);
-my $delta = 19; # for Bio24
+my $delta = 25; # for Bio25
 
 my (@minxy,@maxxy);
 @minxy=@maxxy=@sysxy;

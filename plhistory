@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+our %options;
+print AWheader("AW PL history tool");
+if(param()) {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+	}
+   if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
+   my $dbh=get_dbh();
+   my $sth=$dbh->prepare_cached("SELECT time,pl from `plhistory` WHERE `pid` = ?");
+   my $aref=$dbh->selectall_arrayref($sth, {}, $options{p});
+   print "<pre>";
+   foreach my $row (@$aref) {
+      my ($time,$pl)=@$row;
+      print AWisodate($time-3*3600)," ",AWisodatetime($time)," $pl",br;
+   }
+   print "</pre>";
+} else {
+	print start_form(-name=>"form",-method=>"get"),textfield(-name=>'p', -class=>'text')," Player ID",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+}
+print AWtail();
+

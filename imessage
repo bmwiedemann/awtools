@@ -68,7 +68,7 @@ if(!$authpid) {
       awimessage::delete(\%options);
    }
 
-   print imlist(\%options);
+   print imlist(\%options), p("Messages expire after 2 weeks. But you can always delete them earlier.");
 }
 print AWtail();
 

@@ -20,6 +20,8 @@ $read_access{fir}=["ice"];
 $read_access{ice}=["fir"];
 $read_access{lba}=["lbb"];
 $read_access{lbb}=["lba"];
+$read_access{sj}=["sjma"];
+$read_access{sjma}=["sj"];
 #$read_access{rats}=[qw()];
 #$read_access{nain}=[qw()];
 #$read_access{sky}=[qw()];
@@ -40,6 +42,7 @@ our %remap_alli=(
       ice=>"fir",
       lxg=>"love",
       spin=>"trol",
+      sjma=>"sj",
 #      es=>"esb", zob=>"esb", vip=>"esb", qi=>"esb",
 );
 
