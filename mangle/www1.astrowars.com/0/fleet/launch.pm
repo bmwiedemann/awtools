@@ -1,3 +1,4 @@
+use strict;
 use awstandard;
 use awinput;
 use Time::HiRes;
@@ -57,9 +58,13 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
    my @c1=systemid2coord($srcsid);
    if(defined($refs) && defined($refe) && $srcsid && defined(@c1)) {
       $refs=1+$refs*$awstandard::racebonus[4];
-      s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/arrival.js"></script>$&%;
+      s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/arrival.js"></script><script type="text/javascript" src="http://aw.lsmod.de/code/js/bmwajax.js"></script>$&%;
       
+      if(m/name="destination2" size="3" class=text value="(\d+)"/) {
+         push(@list, ["",$1]);
+      }
       my @distlist;
+      push(@list, ["",$srcsid]);
       foreach my $e (@list) {
          my $sid=$$e[1];
          my $own="";
@@ -76,7 +81,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
                      $o=($a==$aid);
                   }
                }
-            }
+            } else {$o=-1} # missing planet marker
             $o||=0;
             $own.=",$o";
          }
@@ -89,13 +94,18 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
       <script type="text/javascript">
          <!--
          @distlist;
+         aid=$aid;
+         sx=$c1[0];
+         sy=$c1[1];
          energy=$refe;
          racebonus=$refs;
          starttime=$starttime
          var startdiff = (startd.getTime()/1000) - starttime;
+         window.setInterval("update()", 100);
       //-->
       </script>%;
    }
+   s% name="destination2"%onchange="asyncfetchdist(document.forms[0].destination2.value)"$&%;
    s%</body>%<span class="bmwnotice">note: predicted arrival time will be wrong if your local clock is wrong (or target ownership changed).</span>$&%
 }
 

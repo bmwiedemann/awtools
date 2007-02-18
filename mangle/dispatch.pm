@@ -134,7 +134,7 @@ sub mangle_dispatch(%) { my($options)=@_;
                $fromto=" &lt;= ".playerid2link($sendpid);
                $c="recvimessage";
             }
-            $imessage.=AWisodatetime($time)."$fromto <span class=\"$c\"> $msg</span> <br>";
+            $imessage.=AWisodatetime($time+3600*$$options{tz})."$fromto <span class=\"$c\"> $msg</span> <br>";
          }
          $imessage.="</div>";
       }

@@ -80,7 +80,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	print start_form(-method=>'get', -name=>"form"), 
     awmapcgi::awmapcoordinput(),
     checkbox(-name=>'fast', -label=>'fast', -checked=>1, -value=>'1'), " - uncheck when images are missing",br,
-    popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4], -value=>2)," scaling factor",br,
+    popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4], -default=>2)," scaling factor",br,
 	 submit(-name=>"draw", -class=>'smbutton'), end_form();
    awinput::awinput_finish();
 }

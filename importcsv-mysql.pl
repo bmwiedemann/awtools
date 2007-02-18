@@ -12,6 +12,14 @@ if(!$dbh) {die "DB err: $!"}
 
 if(0) { # create tables
 $dbh->do(qq!
+CREATE TABLE `readaccess` (
+`tag` VARCHAR(5) NOT NULL,
+`readertag` VARCHAR(5) NOT NULL,
+UNIQUE ( `tag`,readertag )
+);!);
+exit 0;
+
+$dbh->do(qq!
 CREATE TABLE `imessage` (
 `imid`   INT AUTO_INCREMENT PRIMARY KEY,
 `time` INT NOT NULL,

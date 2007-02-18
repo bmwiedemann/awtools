@@ -29,7 +29,7 @@ if(param()) {
 		$options{$p}=param($p);
 	}
    my @rel=getrelation($options{name});
-   if(defined($rel[0])) {
+   if(defined($rel[0]) && $rel[2]) {
       my @logins=($rel[2]=~m/login:(\d+:\d+:\d+:\d+)/g);
       my @logs;
       my $lastlog=-1;

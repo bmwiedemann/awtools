@@ -1,6 +1,7 @@
+IM to all brownie users
 IM to whole alli
-brownie: css+image cache to lighten load on AW server http://www.astrowars.com/forums/templates/ http://www.astrowars.com/images/ http://www1.astrowars.com/images/
-brownie: integrate imessage
+#brownie: css+image cache to lighten load on AW server http://www.astrowars.com/forums/templates/ http://www.astrowars.com/images/ http://www1.astrowars.com/images/
+#brownie: integrate imessage
 general user preferences DB: tz, customhtml, race+sci for planets,arrival
 #remember user timezones from settings page and use for GMT+n display in fleets and arrival
 #Timezone for added fleets in AW
@@ -10,7 +11,7 @@ flexible map - coloring by last round's tag (fallback)
 add last round alliance tag to system-info
 add display of player's trades. Maybe I draw another alliance-friendship-graph from that data.
 feed:parse num of SUs and num of Artifacts into DB
-http://aw.lsmod.de/cgi-bin/tradepartners   Then You could also add two more columns: 'AD+artifact_price' and 'new ready(h)' (based on new AD+artifact_price amount). 
+#http://aw.lsmod.de/cgi-bin/tradepartners   Then You could also add two more columns: 'AD+artifact_price' and 'new ready(h)' (based on new AD+artifact_price amount). 
 #automatic state transitions planned->targeted, targeted->sieged|taken
 sieged-by $user and fleets in BB-export
 #planet/buildings: add colours for buildable stuff

@@ -190,6 +190,7 @@ sub getplanet($$) { my($sid,$pid)=@_;
 }
 
 sub playerid2link($) { my($id)=@_;
+   if(!defined($id)) {return "???"}
    if($id==0) {return "free planet"}
    my $name=playerid2name($id);
    $name=~s/O/o/g;

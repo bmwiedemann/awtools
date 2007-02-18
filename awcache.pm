@@ -4,6 +4,7 @@ package awcache;
 use strict;
 use warnings;
 use Time::Local;
+use HTTP::Date;
 use awstandard;
 
 require Exporter;
@@ -18,6 +19,7 @@ foreach my $m (0..11) {
 my %mimemap=qw(
 gif image/gif
 png image/png
+jpg image/jpg
 css text/css
 htm.? text/html
 txt text/plain
@@ -47,19 +49,21 @@ sub awgetcache($)
 		my $request=$::options{request};
 		my $UA=$::options{ua};
 		my $response = $UA->request($request);
+      if($response->code != 200) {return 2}
+		$response->scan(sub {
+			if(lc($_[0]) eq "last-modified") {
+				$mtime=HTTPtoEpoch($_[1]);
+			}
+		});
+      if(!$mtime) {return 2}
 		$content = $response->content;
+      if(!$content) {return 2}
 		(my $dir=$path)=~s![^/]*$!!;
 		system("/bin/mkdir", "-p", $dir);
 		open(my $fd, ">", $path);
 		syswrite($fd, $content);
 		close $fd;
 			
-		$response->scan(sub {
-			if(lc($_[0]) eq "last-modified") {
-				$mtime=HTTPtoEpoch($_[1]);
-			}
-		});
-
 		utime(time(),$mtime,$path);
 	} else {
       local $/;
@@ -73,6 +77,7 @@ sub awgetcache($)
 			$t=$mimemap{$k};
 		}
    }
+   if(!$t) { print STDERR "no mime type for $path\n"}
    return ($content,$mtime,$t);
 }
 
@@ -82,15 +87,21 @@ sub awservecache()
 	$u=~s!http://!$cachedir/!;
 #	print STDERR $u." url \n";
 	my ($c,$mtime,$mimetype)=awgetcache($u);
-	if($c) {
+	if($c && $mtime && $mimetype) {
+#      print STDERR "$mtime $mimetype \n";
 		my $r=$::options{req}; # apache request obj
-		$r->status(200);
+#		$r->status(200);
 		$r->content_type($mimetype);
 		$r->set_content_length(length($c));
+      $r->update_mtime($mtime);
 		$r->set_last_modified($mtime);
-		$r->header_out('Expires', HTTP::Date::time2str(time + 90*24*60*60)); # 90d
+		$r->headers_out->add('Expires', HTTP::Date::time2str(time + 90*24*60*60)); # 90d
 		$r->set_keepalive();
-		$r->print($c);
+      if((my $rc = $r->meets_conditions) != 0) {
+         $r->status($rc);
+      } else {
+   		$r->print($c);
+      }
 		return 1;
 	}
 	return 2;
