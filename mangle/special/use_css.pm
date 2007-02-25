@@ -1,7 +1,8 @@
-package mangle::dispatch::special::use_css;
+package mangle::special::use_css;
 use strict;
 #use awstandard;
 
+sub mangle() {
 my $g=$mangle::dispatch::g;# || ($::options{name} eq "snappyduck");
 if($::options{url}=~/www1\.astrowars\.com\/0/) {
    if($g) {
@@ -15,6 +16,7 @@ if($::options{url}=~/www1\.astrowars\.com\/0/) {
    
    my $c=qr/([34]0)\1\1/;
    s%<tr align=center bgcolor="?#$c"? onMouseOver=this.style.backgroundColor="#206060"   onMouseOut=this.style.backgroundColor="#$c"%<tr class="mouseout$1" onMouseOver="this.className='mousein$1'"   onMouseOut="this.className='mouseout$1'"%go;
+}
 }
 
 1;

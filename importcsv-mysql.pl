@@ -148,7 +148,7 @@ trade SMALLINT( 6 ) NOT NULL ,
 country VARCHAR ( 3 ) NOT NULL ,
 joined INT( 15 ) NOT NULL ,
 alliance SMALLINT( 16 ) NOT NULL ,
-name VARCHAR ( 50 ) NOT NULL ,
+name VARCHAR ( 24 ) NOT NULL ,
 UNIQUE ( name ),
 INDEX ( alliance ),
 PRIMARY KEY ( pid ));!);
@@ -418,6 +418,7 @@ print "\talltrades\n";
 tie %h,'Tie::DBI',$dbh,'alltrades','tid',{CLOBBER=>3};
 %h=%alltrades;
 untie %h;
+$dbh->do("OPTIMIZE TABLE `alltrades`");
 
 print "\tmerging trades\n";
 my $now=time();

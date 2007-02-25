@@ -8,7 +8,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
-qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &sb2cv &title2pm &safe_encode &file_content &url2pm &awmax &awmin
+qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &sb2cv &title2pm &safe_encode &html_encode &file_content &url2pm &awmax &awmin
       $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname);
 
 use CGI ":standard";
@@ -366,6 +366,14 @@ sub safe_encode($) { my($name)=@_;
    $name||="";
    $name=~s/[^a-zA-Z0-9-]/"_".ord($&)/ge;
    return $name;
+}
+my %htmlcode=(
+      "<"=>"&lt;",
+      ">"=>"&gt;",
+   );
+sub html_encode($) {
+   return if not $_[0];
+   $_[0]=~s/[<>]/$htmlcode{$&}/g;
 }
 
 sub file_content($) {my($fn)=@_;

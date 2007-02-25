@@ -56,7 +56,8 @@ if(param()) {
             if(my $r=$rsamap{$awname}) { # map RSA-name to AW-name
                $awname=$r;
             }
-            my $a2=playerid2tag(playername2id($awname));
+            my $awpid=playername2id($awname);
+            my $a2=playerid2tag($awpid);
             my $u;
             if(lc($a2) eq $a) {
                $u=$awname;
@@ -66,8 +67,8 @@ if(param()) {
                my $dbh=$DBAccess::dbh;
                my $now=time();
                my $sessionid=sprintf("%016s%016s",int(rand(1000000000000000)),int(rand(1000000000000000))); # generate random 32 chars
-               my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES (?, ?, 0, $now, $now, ?, 1);");
-               my $result=$sth->execute($sessionid, $awname, $ENV{REMOTE_ADDR});
+               my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES (?, ?, ?, 0, $now, $now, ?, 1);");
+               my $result=$sth->execute($sessionid, $awpid, $awname, $ENV{REMOTE_ADDR});
                my $ruri="http://$bmwserver/cgi-bin/public/authaw?session=$sessionid";
                print redirect($ruri);#,"$options{u}: you are now successfully logged in as alliance $a (AW tag $a2) - user $u".br;
             } else {

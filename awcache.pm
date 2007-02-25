@@ -49,7 +49,7 @@ sub awgetcache($)
 		my $request=$::options{request};
 		my $UA=$::options{ua};
 		my $response = $UA->request($request);
-      if($response->code != 200) {return 2}
+      if($response->code != 200) {$::options{response}=$response; return 2}
 		$response->scan(sub {
 			if(lc($_[0]) eq "last-modified") {
 				$mtime=HTTPtoEpoch($_[1]);

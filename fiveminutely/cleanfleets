@@ -10,4 +10,3 @@ my $result=$DBAccess::dbh->do("UPDATE `fleets`
    WHERE `eta` > 0 AND `eta` < $time AND `iscurrent` = 1");
 
 #print "$result cleaned\n";
-

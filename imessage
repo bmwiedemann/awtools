@@ -6,6 +6,7 @@ use CGI ":standard";
 BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
+use bbcode;
 use sort_table;
 use awimessage;
 #awstandard_init();
@@ -32,7 +33,7 @@ sub imlist(%)
 #  }
    sort_table(
          [qw(del time-sent from to msg)],
-         [\&display_delim,\&AWisodatetime,\&display_impid, \&display_impid, \&display_string],
+         [\&display_delim,\&AWisodatetime,\&display_impid, \&display_impid, \&bbcode_trans],
          [undef,\&sort_num,\&sort_pid,\&sort_pid,undef],
          sort_param_to_keys($$options{sort}),$ims
       );

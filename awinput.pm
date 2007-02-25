@@ -633,7 +633,7 @@ sub show_fleet($) { my($f)=@_;
    if(length($flstr)<$minlen) {$flstr.="&nbsp;" x ($minlen-length($flstr))}
    my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
    if($info) {$info=" ".$info}
-   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://$bmwserver/cgi-bin/edit-fleet?fid=$fid\">edit</a> <a href=\"http://$bmwserver/cgi-bin/fleetbattlecalc?fid=$fid\">bc</a> $eta $flstr ".playerid2link($owner)."$info</span>";
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://$bmwserver/cgi-bin/edit-fleet?fid=$fid\">edit</a> <a href=\"http://$bmwserver/cgi-bin/fleetbattlecalc?fid=$fid\">bc</a> $eta $flstr ".playerid2link($owner).$info."</span>";
 }
 
 # support functions for sort_table

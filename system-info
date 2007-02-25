@@ -7,6 +7,7 @@ use Digest::MD5 "md5_hex";
 BEGIN {chdir "/home/aw/inc";}
 use awstandard;
 use awinput;
+use bbcode;
 use DBAccess;
 #use awmap;
 awstandard_init();
@@ -176,7 +177,7 @@ if(param()) {
             $sysinfo=~s!^<br />!!;
             $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
          }
-			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@lbattleslink)." ".tlink(\@lhistorylink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,$sysinfo,
+			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@lbattleslink)." ".tlink(\@lhistorylink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,bbcode_trans($sysinfo),
 			"planets here: <a name=\"planets\" /><ul>";
 		} else {
 			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
@@ -206,7 +207,7 @@ if(param()) {
                $pinfo=~s!\n!<br />!g;
                $pinfo=~s/$magicstring([^:]*)/$magicstring.span({-style=>
                      "color: ".getrelationcolor((getrelation($1))[0])},$1)/geo;
-					$info=" ".span({-style=>"color: $scolor"},$planetstatusstring{$status})." ".playerid2link($pinfo[1]).": ".$pinfo;
+					$info=" ".span({-style=>"color: $scolor"},$planetstatusstring{$status})." ".playerid2link($pinfo[1]).": ".bbcode_trans($pinfo);
 				}
 			}
          my $fleets = awinput::get_fleets(sidpid22sidpid3m($system,$planetid), $wantcurrent);

@@ -17,7 +17,8 @@ if(param()) {
 		$options{$p}=param($p);
 	}
    if(defined($options{info}) && $options{fid}) { # set entry
-      $options{info}=~s/[<>]//g; # minimal sanitation # TODO
+      html_encode($options{info});
+#      $options{info}=~s/[<>]//g; # minimal sanitation # TODO
       $options{fid}=~s/[^0-9]//g;
       my $sth=$dbh->prepare("UPDATE `fleets` SET `info` = ? WHERE `fid` = ? AND `alli` = ?");
       my $res=$sth->execute($options{info}, $options{fid}, $ENV{REMOTE_USER});

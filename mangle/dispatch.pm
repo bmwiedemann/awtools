@@ -2,10 +2,14 @@ package mangle::dispatch;
 use strict;
 use awstandard;
 use awinput;
+use bbcode;
 use awaccess;
 use DBAccess;
 use awimessage;
 use Time::HiRes qw(gettimeofday tv_interval); # for profiling
+use mangle::special::dispatch;
+use mangle::special::use_css;
+use mangle::special::color;
 
 our $g;
 my %specialname=qw(
@@ -25,7 +29,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $t2=[gettimeofday];
    $$options{bmwlink}=$::bmwlink=$origbmwlink;
    %::options=%$options;
-   my %info=("alli"=>$ENV{REMOTE_USER}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
+   my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
    my $title="";
@@ -110,9 +114,11 @@ sub mangle_dispatch(%) { my($options)=@_;
          }
       }
 
-   do "mangle/special/dispatch.pm"; mangle::special::mangle();
+#   do "mangle/special/dispatch.pm"; 
+   mangle::special::mangle();
 # colorize player links
-   require "mangle/special/color.pm"; mangle::special::color::mangle();
+#   do "mangle/special/color.pm"; 
+   mangle::special::color::mangle();
 
 #   s%<br>\s*(<TABLE)%$1%; # remove some blanks
 
@@ -134,7 +140,7 @@ sub mangle_dispatch(%) { my($options)=@_;
                $fromto=" &lt;= ".playerid2link($sendpid);
                $c="recvimessage";
             }
-            $imessage.=AWisodatetime($time+3600*$$options{tz})."$fromto <span class=\"$c\"> $msg</span> <br>";
+            $imessage.=AWisodatetime($time+3600*$$options{tz})."$fromto <span class=\"$c\">".bbcode_trans($msg)."</span> <br>";
          }
          $imessage.="</div>";
       }
@@ -153,15 +159,15 @@ sub mangle_dispatch(%) { my($options)=@_;
 #      my $allifrom=",`player`,`alliances`";
 #      if(0 && $g) {$allimatch=$allifrom=""}
       my $t1=[gettimeofday];
-      my $sth=$dbh->prepare_cached("SELECT m.`name` , m.`t`
+      my $sth=$dbh->prepare_cached("SELECT player.`name` , m.`t`
          FROM (
-               SELECT max( i.lastclick ) AS t, name
+               SELECT max( i.lastclick ) AS t, pid
                   FROM `usersession` AS i
                   WHERE `lastclick` > ? 
                   AND `name` != ?
-                  GROUP BY `name`
+                  GROUP BY `pid`
                ) AS m,`player`,`alliances`
-         WHERE m.name = player.name
+         WHERE m.pid = player.pid
           $allimatch
          ORDER BY `t` DESC");
 #      my $sth=$dbh->prepare_cached("SELECT usersession.name,`lastclick` 
@@ -190,7 +196,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    else {$notice=""}
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
-   $$options{totalelapsed}=tv_interval ( $t2 );
+   $$options{mangleelapsed}=$$options{totalelapsed}=tv_interval ( $t2 );
    my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n<p id=disclaimer style=\"text-align:center; color:white; background-color:black\">$joinlink<br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
    if($ingameuri) {
@@ -209,12 +215,13 @@ sub mangle_dispatch(%) { my($options)=@_;
 
       s%</body>%$gbcontent $&%;
       if($g) {
-         $_.=sprintf(" benchmark: pre:%ims aw:%ims sql:%ims mangle:%ims ", $$options{prerequestelapsed}*1000, $$options{awelapsed}*1000, $$options{sqlelapsed}*1000, $$options{totalelapsed}*1000);
+         $_.=sprintf(" benchmark: auth:%ims pre:%ims aw:%ims sql:%ims mangle:%ims ", $$options{authelapsed}*1000, $$options{prerequestelapsed}*1000, $$options{awelapsed}*1000, $$options{sqlelapsed}*1000, $$options{mangleelapsed}*1000);
 #         s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
 #         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }
       }
-      do "mangle/special/use_css.pm";
+#      do "mangle/special/use_css.pm"; 
+      mangle::special::use_css::mangle();
       # fix AR's non-standard HTML
       s%(<a href=)([a-zA-Z0-9/.:?&\%=-]+)>%$1"$2">%g;
    }

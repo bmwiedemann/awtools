@@ -11,14 +11,14 @@ my $alli=$ENV{REMOTE_USER};
 my $title="fleets [\U$alli\E]";
 my $wantcurrent=" AND `iscurrent` = 1 ";
 my %options;
-for my $p (qw'history') {
+for my $p (qw'history onlyinc') {
    $options{$p}=param($p);
 }
 if($options{history}) {$wantcurrent=""}
-
+if($options{onlyinc}) {$wantcurrent.=" AND status = 2 ";}
 
 print AWheader($title);
-print p(a({-href=>"?history=".(!$options{history})},"toggle history"));
+print p(a({-href=>"?history=".(!$options{history})},"toggle history")." ".a({-href=>"?onlyinc=".(!$options{onlyinc})},"toggle incomings"));
 
 print "sys#planet: info".br;
 
@@ -45,15 +45,14 @@ foreach my $row1 (@sidpids) {
    $info=~s!automagic:.*!!g;
 	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> of !.display_pid($owner)." SB $sb $info";
 	#my $str=qq!<a href="/cgi-bin/system-info?id=$sid">$p</a> $info<br />\n!;
-   print "$str\n".br;
 
-#   my $sth=$dbh->prepare_cached("SELECT * FROM `fleets` WHERE `alli` = ? $wantcurrent AND `sidpid` = ?");
-   my $res=awinput::get_fleets($sidpid, $wantcurrent); #$dbh->selectall_arrayref($sth, {}, $alli, $sidpid);
+   my $res=awinput::get_fleets($sidpid, $wantcurrent);
+   if(!$res || !@$res) {next}
+   print "$str\n".br;
    foreach my $row2 (@$res) {
 		my($owner,$cv, $xcv)=@$row2[4,13,14];
 		$cvsum{$owner}+=$xcv;
       print awinput::show_fleet($row2).br;
-      #print "@$row2\n".br;
    }
    print br;
 }

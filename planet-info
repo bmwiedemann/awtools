@@ -14,10 +14,7 @@ print AWheader($title);
 for my $p (qw'id status who comment submit') {
 	$options{$p}=param($p);
 }
-if($options{comment}) {
-   $options{comment}=~s/[<>]//g; # minimal sanitazion only - prevent HTML in entries
-#   TODO allow certain safe tags (bbcode)
-}
+html_encode($options{comment});
 if(param("legend")) {
         print "legend: "; 
         for my $n (1..7) {

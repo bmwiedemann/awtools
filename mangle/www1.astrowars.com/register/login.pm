@@ -5,6 +5,7 @@ use awinput;
 
 my $session=awstandard::cookie2session(${$::options{headers}}{Cookie});
 my $name;
+my $pid;
 foreach my $x (@{$::options{headers_out}}) {
    next if $$x[0] ne "Set-Cookie";
    my $c=$$x[1];
@@ -12,7 +13,8 @@ foreach my $x (@{$::options{headers_out}}) {
       $session=$1;
    }
    if($c=~m/login=(\d+)/) { # we can trust this as AW sent the headers
-      $name=awinput::playerid2name($1);
+      $pid=$1;
+      $name=awinput::playerid2name($pid);
    }
 }
 if($session && $name) {
@@ -20,8 +22,8 @@ if($session && $name) {
    my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = '0', `auth` = 1, `ip` = ?, `lastclick` = ?, name = ? WHERE `sessionid` = ?");
    my $res=$sth->execute($::options{ip}, $time, $name, $session);
    if($res eq "0E0") {
-      my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES ( ?, ?, 0, ?, ?, ?, 1);");
-      $sth->execute($session, $name, $time, $time, $::options{ip});
+      my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES ( ?, ?, ?, 0, ?, ?, ?, 1);");
+      $sth->execute($session, $pid, $name, $time, $time, $::options{ip});
    }
 }
 #$_.=" test $sess $name";
