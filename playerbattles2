@@ -1,0 +1,165 @@
+#!/usr/bin/perl -w
+# safe 070204
+use strict;
+use CGI ":standard";
+use Time::Local;
+
+BEGIN {chdir "/home/aw/inc";}
+use DBAccess;
+use awstandard;
+use awinput;
+use xpsim;
+#awstandard_init();
+awinput_init();
+
+sub plround($) { int($_[0]*100)/100 }
+sub roundlocaltime($) { my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = localtime($_[0]);
+   my $date=timegm(0,0,0,$mday, $mon, $year);
+}
+sub awday($) {
+   return roundlocaltime($_[0]-4*3600);
+}
+
+# input: bonus(-12..+12)
+# input: d1=[day,pl] earlier day
+# input: d2=[day,pl] later day
+sub testrace($$$) {
+   my($bonus, $d1, $d2)=@_;
+   my @simpl;
+   foreach my $i (0,1) {
+      my $startxp=awstandard::awpl2xp($d1->[1]+$i*0.01);
+      my $xp=$startxp*daysbonus($bonus, int(($d2->[0]-$d1->[0])/86400));
+      $simpl[$i]=awstandard::awxp2pl($xp);
+   }
+#  print "x $bonus @simpl\n";
+   if($d2->[1]<plround($simpl[0]) or $d2->[1]>$simpl[1]) {
+      return 0; # bonus is impossible
+   }
+   return 1;
+}
+
+
+our %options;
+print AWheader("AW battle race analysis");
+if(param()) {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+	}
+   if($options{p} && $options{p}=~m/[^0-9]/) { $options{p}=playername2id($options{p}); } # counts as sanitizing
+#   $options{p}=~s/[^0-9]//g; # sanitize user input
+   my $pid=$options{p};
+   print profilelink($pid),playerid2link($pid),br;
+   my $sth=$dbh->prepare_cached("SELECT * from `battles` WHERE `win_id` = ? ORDER BY `time` DESC");
+   my $res=$dbh->selectall_arrayref($sth, {}, $pid);
+   my $resplh;
+   if($res) {
+#      my @blist;
+      my %blist;
+      my %blistxp;
+      print "<pre>  XP  ownCV    date      time    ratio".br;
+
+      my $sth=$dbh->prepare_cached("SELECT * from `plhistory` WHERE `pid` = ? ORDER BY `time` DESC");
+      $resplh=$dbh->selectall_arrayref($sth, {}, $pid);
+      foreach my $plh (@$resplh) {
+         my($time,undef,$pl)=@$plh;
+         print AWisodate(awday($time))," ",AWisodatetime($time), " $pl\n";
+
+      }
+      
+      foreach my $row (@$res) {
+         my ($id,$cv_def,$cv_att,$att_id,$def_id, undef, undef,undef, $time)=@$row;
+         my $xp=$cv_att;
+         my $owncv=$cv_def;
+         my $attacked=0;
+         if($pid == $att_id) {
+            $attacked=1;
+            $xp=$cv_def;
+            $owncv=$cv_att;
+         }
+         my $color=$attacked?"blue":"green";
+         my $ratio=0;
+         my $extranote="";
+         my $effxp=$xp;
+         next if $xp<=0;
+         if($owncv>5.5) {$ratio=($owncv-5)/$xp;} #-5 because we need to keep at least 2 ships=6VC
+        if($owncv<5.5 || $ratio<0.82) {$effxp/=4; $extranote=" 25% assumed"}
+        if($owncv<6) {$extranote.=" for sure"}
+        elsif($attacked and $ratio>=15) {$extranote.=" 100% for sure"}
+         my $mtime=awday($time);
+#         $mtime-=$mtime%(3600*24); # doesnt work because of AW timezone daylight saving (which is relevant for 04:00 german time updates)
+         
+#         my $date=myisodate($mtime);
+         print span({-style=>"color:$color"},sprintf("%5i %5i %s ", $xp, $owncv, AWisodate($mtime)).AWisodatetime($time).sprintf("  %.3f %s",$ratio,$extranote)).br;
+#         push(@{$blist{$mtime}}, [$xp,$owncv, $attacked]);
+         unshift(@{$blistxp{$mtime}}, $effxp);
+         
+      }
+      print "</pre>";
+      # now use the gathered battle data for our XP/PL simulation
+      my $lasttime=time();
+      my @ts;
+# if XP/CV ratio is better than 1/14, we always get full XP
+# tested with -89% defence, math0, all DS against SB8
+# http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=1000&cru=0&cruiser=0&bat=0&battleship=0&sta=8&pphysics=0&fphysics=0&pmath=20&fmath=0&plevel=0&flevel=0&praceatt=0&fraceatt=0&pracedef=0&fracedef=-4&submit2=calculate+battle&go=1
+# won defences only need 1/7 but might be done with SB-only, so harder to be sure there. trying high SB-levels until CV-difference is a multiple of 3 sounds good.
+      foreach my $t (reverse sort keys %blistxp) {
+#         foreach my $e (@{$blist{$t}}) {
+#            my ($xp,$othercv, $attacked)=@$e;
+#            print "$xp $othercv ",br;
+#         }
+         my $s="[".join(",", @{$blistxp{$t}})."],".int(($lasttime-$t)/86400);
+         unshift(@ts,$s);
+         $lasttime=$t;
+      }
+      my $ts=join(",",@ts);
+      print a({-href=>"guessrace?p=$ts"}, "guess race")," with $ts",br;
+      print "green lines are won defences, blue lines are won attacks",p,hr;
+
+
+      my %bpossibilities=();
+      foreach my $i (-12..12) { $bpossibilities{$i}=1 }
+# guess fighting bonus right here:
+      my ($prevt,$prevpl);
+      my ($prevt2,$prevpl2);
+      print "<pre>";
+      my $currentday=awday(time);
+      foreach my $plh (@$resplh) {
+         if(keys(%bpossibilities)<=1) {last}
+         my($time,undef,$pl)=@$plh;
+         if($prevt && $prevt<$currentday) {
+            my $day=awday($time);
+            my $prevd=awday($prevt);
+            if($day != $prevd) {
+               my $sth=$dbh->prepare_cached("SELECT * from `battles` WHERE `win_id` = ? AND `time` > ? AND `time` < ? ORDER BY `time` DESC");
+               my $resb=$dbh->selectall_arrayref($sth, {}, $pid, $time, $prevt);
+               if(!@$resb) { # TODO also allow calc when only "for sure" battles occur
+                  foreach my $bonus (keys(%bpossibilities)) {
+                     if(!testrace($bonus, [$day,$pl],[$prevd,$prevpl])) {
+                        delete $bpossibilities{$bonus};
+                     }
+                  }
+                  print(AWisodate($prevd)," ", AWisodate($day)," $prevpl $pl ",join(",",sort {$a<=>$b} keys(%bpossibilities)),"\n");
+               } else {
+                  $prevt2=$prevpl2=undef;
+               }
+            }
+         }
+         $prevpl=$pl;
+         $prevt=$time;
+      }
+      print "</pre>";
+      my ($bguess)=my @a=keys(%bpossibilities);
+      if(defined($bguess) && @a==1) {
+         print "race fighting bonus sum is $bguess".br;
+      } else {
+         print "unguessable";
+      }
+   } else {
+      print "no entries found or error";
+   }
+} 
+	print start_form(-name=>"form", -method=>"get"),textfield(-name=>'p', -class=>'text')," Player ID",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+
+print AWtail();
+
