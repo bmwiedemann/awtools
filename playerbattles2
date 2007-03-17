@@ -122,9 +122,9 @@ if(param()) {
       my ($prevt,$prevpl);
       my ($prevt2,$prevpl2);
       print "<pre>";
-      my $currentday=awday(time);
+      my $currentday=awday(time+4*3600-600); # needed to not have interfering battles from current day - 10min for update
       foreach my $plh (@$resplh) {
-         if(keys(%bpossibilities)<=1) {last}
+#         if(keys(%bpossibilities)<=1) {last}
          my($time,undef,$pl)=@$plh;
          if($prevt && $prevt<$currentday) {
             my $day=awday($time);
@@ -136,12 +136,21 @@ if(param()) {
                   foreach my $bonus (keys(%bpossibilities)) {
                      if(!testrace($bonus, [$day,$pl],[$prevd,$prevpl])) {
                         delete $bpossibilities{$bonus};
+                     } elsif($prevt2 && !testrace($bonus, [$day,$pl],[awday($prevt2),$prevpl2])) {
+#                        print "\n",AWisodatetime($prevt2)," $prevpl2\n";
+                        delete $bpossibilities{$bonus};
                      }
                   }
-                  print(AWisodate($prevd)," ", AWisodate($day)," $prevpl $pl ",join(",",sort {$a<=>$b} keys(%bpossibilities)),"\n");
+                  print(AWisodate($prevd)," ", AWisodate($day)," $prevpl $pl <span style=color:green>",join(",",sort {$a<=>$b} keys(%bpossibilities)),"</span>\n");
+                  if(!$prevt2) {
+                     $prevpl2=$prevpl;
+                     $prevt2=$prevt;
+                  }
                } else {
                   $prevt2=$prevpl2=undef;
                }
+            } else {
+               $prevt2=$prevpl2=undef;
             }
          }
          $prevpl=$pl;
