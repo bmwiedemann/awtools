@@ -13,7 +13,7 @@ our $dbdir="/home/aw/db/db";
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &get_dbh
+&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &get_dbh
 &display_pid &display_relation &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -95,19 +95,19 @@ sub awinput_finish() {
 }
 
 sub getauthname() { 
-   my $cookies=$ENV{HTTP_COOKIE};
-   my $authname;
-   my $session=awstandard::cookie2session($cookies);
-   if($session) {
-      my $ip=$ENV{REMOTE_ADDR};
-      my $dbh=get_dbh;
-      my $sth=$dbh->prepare_cached("SELECT `name` from `usersession` WHERE `auth` = 1 AND `sessionid` = ? AND `ip` = ?");
-      my $aref=$dbh->selectall_arrayref($sth, {}, $session, $ip);
-      if($aref and (my $a=$$aref[0])) {
-         $authname=$$a[0];
-      }
-   }
-   return $authname;
+   return $ENV{HTTP_AWUSER}; # header set by brownie/testauth.pm
+#   my $cookies=$ENV{HTTP_COOKIE};
+#   my $session=awstandard::cookie2session($cookies);
+#   if($session) {
+#      my $ip=$ENV{REMOTE_ADDR};
+#      my $dbh=get_dbh;
+#      my $sth=$dbh->prepare_cached("SELECT `name` from `usersession` WHERE `auth` = 1 AND `sessionid` = ? AND `ip` = ?");
+#      my $aref=$dbh->selectall_arrayref($sth, {}, $session, $ip);
+#      if($aref and (my $a=$$aref[0])) {
+#         $authname=$$a[0];
+#      }
+#   }
+#   return $authname;
 }
 
 sub getrelation($;$) { my($name)=@_;
@@ -201,6 +201,12 @@ sub playerid2link($) { my($id)=@_;
    if($atag) {$alli="[$atag] "}
    elsif($rel[1]) {$alli="[$rel[1]] "}
    return a({-href=>"relations?id=$id", -style=>"color:$col"}, "$alli$name");
+}
+
+sub playerid2link2($) {   
+   my $l=playerid2link($_[0]);
+   $l=~s!relations!/0/Player/Profile.php/!;
+   return $l;
 }
 
 sub getplanetinfo($$;$) { my($sid,$pid)=@_;
@@ -302,13 +308,21 @@ sub sidpid22sidpid3($$) { "$_[0]#$_[1]" }
 sub sidpid22sidpid3m($$) {return $_[0]*13+$_[1];}
 
 # return all know production values, PP/A$,artifact
+sub playername2production($)
+{
+   my($name)=@_;
+   return if not $name;
+   my $rel=$relation{$name};
+   return if not defined $rel;
+   return relation2production($rel);
+}
 sub getallproductions()
 {
    my @p=();
    foreach my $name (keys %relation) {
       my($rel)=$relation{$name};
       if(!$rel) {next}
-      my($prod,undef,undef,$arti,undef,$ad,$pp,$bonus)=relation2production($rel);   
+      my($prod,undef,undef,$arti,undef,$ad,$pp,$bonus)=relation2production($rel);
       if(!defined($prod)) {next}
       my @sci=relation2science($rel);
       if($sci[0]<time()-2*24*3600) {next}
@@ -509,6 +523,7 @@ sub dblinkadd { my($sid,$url)=@_;
    elsif($url=~m!http://www.ionstorm-alliance.com/forum/viewtopic\.php\?[pt]=(\d+)!) { $type="IS" } # phpBB
    elsif($url=~m!http://www.createforum.com/punx/viewtopic\.php\?[pt]=(\d+)!) { $type="PUNX" } # phpBB
    elsif($url=~m!http://holi87.webd.pl/forum/viewtopic\.php\?[pt]=(\d+)!) { $type="SoUP" } # phpBB
+   elsif($url=~m!http://87\.106\.97\.15/forum/blacksheep/viewtopic\.php\?[pt]=(\d+)!) { $type="BLA" } # phpBB
    elsif($url=~m!http://www.fishandreef.com/brigada/modules.php\?(?:name=Forums&)?(?:file=viewtopic&)?t=(\d+)!) { $type="LBA" } # Version 2.0.7 by Nuke Cops
    return unless($sid && $type);
    $url=$&;

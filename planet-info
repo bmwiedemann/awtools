@@ -10,6 +10,27 @@ use awstandard;
 use awinput;
 awinput_init();
 
+
+my @weekday1=qw(sun mon tue wed thu fri sat);
+my @weekday2=qw(sunday monday tuesday wednesday thursday friday saturday);
+my $weekdays=join("\\b|\\b",@weekday2,@weekday1);
+my $weekdayre=qr/($weekdays)/i;
+
+sub weekday2date($) {
+   my $w=lc($_[0]);
+   for my $i (0..6) {
+      if($w eq $weekday1[$i] or $w eq $weekday2[$i]) {
+         my $t=time;# to allow -1..+5 range: -24*3600;
+         my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($t);
+         my $diff=($i-$wday)%7;
+#         print "$wday $diff $w\n";
+         return AWisodate($t+$diff*24*3600);
+      }
+   }
+   return "?";
+}
+
+
 print AWheader($title);
 for my $p (qw'id status who comment submit') {
 	$options{$p}=param($p);
@@ -48,6 +69,7 @@ if($options{status}) {
          s/\byesterday\b/in -1 d/i;
          s/\bin ([-+]?\d+) (days|d)\b/AWisodate(time()+3600*24*$1)/ge;
          s/\bin (\d+) (hours|h)\b/AWisodatetime(time()+3600*$1)/ge;
+         s/$weekdayre(?!=)/$1."=".weekday2date($1)/ge;
          param('comment', $_);
       }
 		$plinfo={"sidpid"=>sidpid22sidpid3($sid,$pid), "status"=>$options{status}, "who"=>$options{who}, "info"=>$options{comment}};

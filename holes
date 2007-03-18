@@ -31,9 +31,28 @@ print "Last Update $mtime GMT\n".br;
 
 foreach(@holes) { chop;$_=[split(/\t/,$_)] }
 
-print sort_table([qw(system members friends others), "worst relation"],
-      [\&display_sid, \&display_string, \&display_string, \&display_string, \&display_relation],
-      [\&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+# calc system-worth
+foreach my $h (@holes) {
+   my $sid=$h->[0];
+#   print $sid.br;
+   my @p=systemid2planets($sid);
+   my $sum=0;
+   my $worth=0;
+   foreach my $p (@p) {
+      my $o=$p->{ownerid};
+      my $tag=lc(playerid2tag($o));
+      next if $tag ne $ENV{REMOTE_USER}; # skip non-members
+      my $pop=$p->{pop};
+      $sum+=$pop;
+      $worth+=$pop-5;
+   }
+   push(@$h, $sum, $worth);
+}
+
+print sort_table([qw(system members friends others), "worst relation", "pop", "worth"],
+      [\&display_sid, \&display_string, \&display_string, \&display_string, \&display_relation, \&display_string, \&display_string],
+      [\&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
       sort_param_to_keys($options{sort}), \@holes);
 
+print "<p><b>note: added sum of pop and sum of (pop-5) which is an approximation for the real worth of member's planets in a system</b>";
 print AWtail();

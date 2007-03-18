@@ -23,6 +23,7 @@ sub bbcode_trans($)
       $count+= s/\[(color)=([a-z_-]+)\]([^[]*)\[\/\1\]/<span style="color:$2;">$3<\/span>/i;
       $count+= s/\[(size)=([0-9.]+)\]([^[]*)\[\/\1\]/<span style="font-size:$2em;">$3<\/span>/i;
    } while($count);
+   s/\n/<br>/g;
    return $_;
 }
 

@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+# safe 070204
+
+use strict;
+use CGI ":standard";
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+use sort_table;
+use arrival;
+awinput_init();
+
+my %options;
+for my $p (qw'sort') {
+   $options{$p}=param($p);
+}
+if(!defined $options{sort}){$options{sort}="-3";}
+
+my $alli=$ENV{REMOTE_USER};
+
+#sub sortfunc {
+#   return ($$b[2]-$$b[4] <=> $$a[2]-$$a[4]);
+#}
+
+print AWheader("fighter listing [\U$alli]");
+
+my $dbh=get_dbh;
+my $sth=$dbh->prepare("SELECT pid, SUM( cv ) , SUM( xcv ), MAX( cv )
+      FROM `alliances` , player, fleets
+      WHERE alliance = aid
+      AND owner = pid
+      AND tag = ?
+      AND alli = ?
+      AND iscurrent =1
+      GROUP BY pid");
+# alternative: SELECT pid,MAX(cv),SUM(cv),SUM(xcv) FROM (SELECT aid FROM `alliances` WHERE tag = 'af') AS a LEFT JOIN player ON alliance=aid LEFT JOIN fleets ON owner=pid WHERE iscurrent=1 AND alli='af' GROUP BY pid
+my $fleets=$dbh->selectall_arrayref($sth, {}, $alli, $alli);
+
+my @data;
+foreach my $row (@$fleets) {
+   my($pid,$sumcv,$sumxcv,$maxcv)=@$row;
+   my $name=playerid2name($pid);
+   my @erel=getrelation($name);
+   my @sci=relation2science($erel[2]);
+   my @race=relation2race($erel[2]);
+   my @prod=relation2production($erel[2]);
+   my $bonus=$prod[7];
+#   print "@prod @race @sci".br;
+   push(@data, [
+         $pid, $sumcv, $sumxcv, $maxcv, 
+         24*$prod[0]*$bonus->[0], @prod[5,6], $player{$pid}{level},
+         arrival::effectiveenergy($race[4], $sci[3]), @sci[3,5,4],
+         @race[4..6]]);
+}
+
+print sort_table([qw(name CV xCV biggestCV 
+         prod/d A$ PP PL 
+         xE E P M 
+         S A D)],
+      [\&display_pid, \&display_string, \&display_string, \&display_string, 
+      \&display_round0, \&display_round0, \&display_round0, \&display_string,
+      \&display_round0, \&display_string, \&display_string, \&display_string, 
+      \&display_string, \&display_string, \&display_string],
+      [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, 
+      \&sort_num, \&sort_num, \&sort_num, \&sort_num,
+      \&sort_num, \&sort_num, \&sort_num, \&sort_num, 
+      \&sort_num, \&sort_num, \&sort_num],
+      sort_param_to_keys($options{sort}), \@data);
+
+print "<p><b>note: xCV is effective CV. It includes attack bonus and 1.5% per level of physics.<br>
+&quot;xE&quot; is effective energy (the level you would need to have with speed +0 to be as fast)<br>
+&quot;biggestCV&quot; means CV of biggest fleet that is in a single chunk</b>";
+print AWtail();

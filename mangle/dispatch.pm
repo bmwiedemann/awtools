@@ -18,17 +18,24 @@ my %specialname=qw(
       Banana9977 1
 );
 my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
-my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period Thursday morning (2006-07-27 02:30-05:00 UTC) and be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
 
 # input options hash reference
 # input $_ with HTML code of a complete page
 # output $_ with HTML of mangled page
 sub mangle_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
-   $g=$specialname{$$options{name}};
+   $g=$specialname{$$options{name}}||($$options{ip} eq "217.11.53.122");
    my $t2=[gettimeofday];
    $$options{bmwlink}=$::bmwlink=$origbmwlink;
    %::options=%$options;
+
+   my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period Thursday morning (2006-07-27 02:30-05:00 UTC) and be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
+
+   local $ENV{REMOTE_USER}=$ENV{REMOTE_USER};
+   if($$options{name} eq "mauritz") { # map user to see AF data, but not feed
+      $ENV{REMOTE_USER}="af";
+   }
+   
    my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
@@ -62,7 +69,7 @@ sub mangle_dispatch(%) { my($options)=@_;
             $::bmwlink=$$options{authlink};
          } elsif($$options{pid}) {
             my $aid=playerid2alliance($$options{pid});
-            if(!$aid) {
+            if(!$aid && $$options{name} && $$options{name} ne "unknown") {
                $joinlink=$$options{authlink}."/modperl/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
             } elsif($awinput::aliances{$aid} && $awinput::aliances{$aid}->{founder}==$$options{pid}) {
                # if alliance founder, add extra "accept NAP with AF" link
@@ -134,10 +141,10 @@ sub mangle_dispatch(%) { my($options)=@_;
             my $fromto;
             my $c;
             if($sendpid==$$options{authpid}) {
-               $fromto=" =&gt ".playerid2link($recvpid);
+               $fromto=" =&gt ".playerid2link2($recvpid);
                $c="sentimessage";
             } else {
-               $fromto=" &lt;= ".playerid2link($sendpid);
+               $fromto=" &lt;= ".playerid2link2($sendpid);
                $c="recvimessage";
             }
             $imessage.=AWisodatetime($time+3600*$$options{tz})."$fromto <span class=\"$c\">".bbcode_trans($msg)."</span> <br>";
@@ -193,7 +200,12 @@ sub mangle_dispatch(%) { my($options)=@_;
       }
    }
 #   if($alli eq "TGD" || $alli eq "AF") {$notice="<b style=\"color:green\">note: RSA forum is down - backup forum is at <a href=\"http://s3.invisionfree.com/RSA_Outpost/index.php?act=idx\">http://s3.invisionfree.com/RSA_Outpost/</a>.</b><br>"}
-   else {$notice=""}
+
+   # aw21 transition
+   if($$options{proxy} eq "brownie-cgi") {
+      $notice="<b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.lsmod.de/proxy-config.html\">brownie.pac</a></b><br>";
+   }
+   
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
    $$options{mangleelapsed}=$$options{totalelapsed}=tv_interval ( $t2 );

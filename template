@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+BEGIN {chdir "/home/aw/inc";}
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+our %options;
+print AWheader("AW xyztool");
+if(param()) {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+	}
+   if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
+} else {
+	print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text'),br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+}
+print AWtail();
+

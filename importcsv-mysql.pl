@@ -36,8 +36,9 @@ CREATE TABLE `plhistory` (
 `time` INT NOT NULL,
 `pid` INT NOT NULL,
 `pl` VARCHAR(6) NOT NULL,
+`alli` VARCHAR(7) NOT NULL,
 INDEX ( `time` ),
-UNIQUE ( pid,pl )
+UNIQUE ( pid,alli,pl )
 );!);
 exit 0;
 

@@ -7,8 +7,7 @@ s%(<tr align=center bgcolor=#\d+><td[^>]*>)(\d+)(</td><td)%$1$::bmwlink/system-i
 # add next and prev buttons
 if($::options{url}=~/id=(\d+)/) {
    my $id=$1;
-   my $url=$::options{url};
-   $url=~s/(id=)\d+/$1/;
+   my $url="?id=";
 
    while(1) { # pseudo loop to exit at several places
       my $user=$::options{name};

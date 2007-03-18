@@ -194,6 +194,16 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
       foreach my $lold (($l2[0]+1)..($l2[0]+4)) {
          $magic=~s/login:${lold}:.*//s; # erase outdated entries
       }
+# login-time can not be before prev login, so reduce accuracy margin accordingly
+      if(($l2[3]>=86399) && (my @l0=($magic=~/login:(\d+):(\d+):(\d+):(\d+)\s*$/))) {
+         my $diff=$l2[1]-$l2[3]-($l0[1]+$l0[2]);
+#         print STDERR "playerir @l2 - @l0 - $diff\n";
+         if($diff<0) {$l2[3]=awmax(1, $l2[3]+$diff)}
+      }
+# merge old and new login data. format is:
+# login-nr, login-timestamp, idle-time, accuracy-margin
+# real login time must have been between time and time-margin
+# no login between time and time+idle
 		if($oldentry=~/login:$l2[0]:(\d+):(\d+):(\d+)/) {
          my @l1=($l2[0],$1,$2,$3);
          my @l3=@l1;
@@ -215,6 +225,7 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
          $magic=~s/ login:$l2[0]:[^ ]*//;
          @l2=@l3;
 		}
+      $l2[3]=awmax(1, $l2[3]);
 		$magic.=" login:".join(":",@l2) if $add;
 	}
 	chomp($rest);
@@ -382,6 +393,11 @@ sub file_content($) {my($fn)=@_;
    my $result=<FCONTENT>;
    close(FCONTENT);
    return $result;
+}
+sub set_file_content($$) {my($fn,$data)=@_;
+   open(my $fc, ">", $fn) or return undef;
+   print $fc $data;
+   close($fc);
 }
 
 sub url2pm($) {my($url)=@_;

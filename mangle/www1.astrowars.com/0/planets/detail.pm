@@ -53,12 +53,17 @@ if(1) {
 my $prodbonus=1;
 my $popbonus=1;
 if($ENV{REMOTE_USER} && $::options{name}) { # use real race info - only for extended tools users
-   my ($race,$sci)=awinput::playername2ir($::options{name});
-   if($race && defined($$race[0])) {
-      $popbonus+=$awstandard::racebonus[0]*$$race[0];
-      $prodbonus+=$awstandard::racebonus[3]*$$race[3];
-#      $_.="@$race $popbonus $prodbonus";
+   my(undef,undef,undef,undef,undef,undef,undef,$bonus)=awinput::playername2production($::options{name});
+   if($bonus) {
+      $popbonus=$bonus->[3];
+      $prodbonus=$bonus->[0];
    }
+#   my ($race,$sci)=awinput::playername2ir($::options{name});
+#   if($race && defined($$race[0])) {
+#      $popbonus+=$awstandard::racebonus[0]*$$race[0];
+#      $prodbonus+=$awstandard::racebonus[3]*$$race[3];
+#      $_.="@$race $popbonus $prodbonus";
+#   }
 }
 
 # add +1 build links when there is enough PP

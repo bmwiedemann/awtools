@@ -20,13 +20,13 @@ sub dbaddpl($$$) { my($t,$name,$pl)=@_;
 
    my $pid=playername2id($name);
 
-   my $sth=$dbh->prepare("SELECT * FROM `plhistory` WHERE `pid` = ? AND `pl` = ?");
-   my $res=$dbh->selectall_arrayref($sth, {}, $pid,$pl);
+   my $sth=$dbh->prepare("SELECT * FROM `plhistory` WHERE `pid` = ? AND `pl` = ? AND `alli` = ?");
+   my $res=$dbh->selectall_arrayref($sth, {}, $pid, $pl, $ENV{REMOTE_USER});
    if($res && $$res[0]) { # already found
       return 0;
    }
-   $sth=$dbh->prepare("INSERT INTO `plhistory`  VALUES (?, ?, ?)");
-   $sth->execute($t, $pid, $pl);
+   $sth=$dbh->prepare("INSERT INTO `plhistory`  VALUES (?, ?, ?, ?)");
+   $sth->execute($t, $pid, $pl, $ENV{REMOTE_USER});
 }
 
 1;

@@ -15,3 +15,4 @@ $dbh->do("DELETE FROM `imessage` WHERE `time` < ".$time3);
 
 $dbh->do("OPTIMIZE TABLE `fleets`");
 $dbh->do("OPTIMIZE TABLE `usersession`");
+$dbh->do("OPTIMIZE TABLE `battles`");

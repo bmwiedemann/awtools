@@ -1,8 +1,9 @@
 use strict;
+use awinput;
 
 sub feed_plain_race() {
-if(0 && $::options{name}=~m/greenbird/i) {
-   if(m/^\s*(\w*)\s/s) { $::options{name}=$1 }
+if(1 || $::options{name}=~m/greenbird/i) {
+   if(m/^\s*(\w*)\s/s && playername2id($1)) { $::options{name}=$1 }
    else {return 1}
 }
 my $racere="";

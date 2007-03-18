@@ -18,7 +18,7 @@ sub manglecolor($$) { my($id,$name)=@_;
 sub mangle() {
 # colorize player links
    s%(<a href=/0/Player/Profile\.php/?\?id=)(\d+)>([^<]*)</a>%$1.$2." style=\"color:".manglecolor($2,$3)."</a>"%ge;
-   s%(<a href="profile\.php\?mode=viewprofile&amp;u=)(\d+)("[^>]*)>([^<]*)</a>%$1.$2.$3." style=\"color:".manglecolor($2,$4)."</a>"%ge;
+   s%(<a href="profile\.php\?mode=viewprofile&amp;u=)(\d+)([^>]*)>([^<]*)</a>%$1.$2.$3." style=\"color:".manglecolor($2,$4)."</a>"%ge;
    s%<a href\s*=("?)/0/Glossary/%<a class="awglossary" href=$1/0/Glossary/%g;
 }
 

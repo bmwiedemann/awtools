@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold7
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html preferences arrival authaw authrsa awlinker joinalli distsqr eta tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout nph-brownie.cgi
+tools=index.html preferences arrival authaw authrsa awlinker awtoolstatistics joinalli distsqr eta fighterlist tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout nph-brownie.cgi
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -24,23 +24,30 @@ updatecsv: dumpdbs
 	tar xjf ${f2}
 	-grep -v id trade.csv >> alltrades.csv
 	wget -x -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
-	umask 2 ; perl importcsv.pl && ( mv db/* olddb ; mv newdb/* db )
+	umask 2 ; perl importcsv.pl && ( ln -f db/* olddb/ ; mv newdb/* db/ )
 	#-cp -a tactical-af.png olddb/tactical-af-$d.png
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
 	for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
 	perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
+	perl importcsv-mysql.pl
+
+#runs once a day
+updatedaily:
 	perl detectalliancerelation.pl > html/${round}/alliancerelation-${mydate}
 	ln -f html/${round}/alliancerelation-${mydate} html/${round}/alliancerelation
-	perl importcsv-mysql.pl
+	(perl alliancerelation2dot.pl html/gold7/alliancerelation-${mydate} | neato -Tsvg > html/${round}/alliancerelation-${mydate}.svg &&\
+	ln -f html/${round}/alliancerelation-${mydate}.svg html/${round}/alliancerelation.svg)&
 	- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
 
-updatemap: updatemaponly updaterank af-relations.txt tgd-relations.txt
+#runs 4 times a day
+updatexdaily: updateholes updatespy
+updatemap: updatemaponly
 updatemapsonly: updatemaponly updatemap2only
 updatemaponly:
 	for a in $(allies) ; do \
 	REMOTE_USER=$$a /usr/bin/nice -n +12 perl drawtactical.pl ; done
-updatemap2: cleandbs updatemapsonly updatespy updateholes
+updatemap2: cleandbs updatemapsonly
 updatemap2only:
 	for a in $(allies) ; do \
 		REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \

@@ -79,7 +79,7 @@ print header(-cookie=>$cookies);
 
 if(param("legend")) {
 	print AWheader2('legend of AW relations');
-	for my $n (1..9) {
+	for my $n (0..9) {
 		my $color=getrelationcolor($n);
 		print span({-style=>'color: '.$color}, br."$n $color = $relationname{$n}\n");
 	}
