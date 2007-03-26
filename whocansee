@@ -18,8 +18,8 @@ my($sysid)=($options{sid}=~m/(\d+)/);
 my $wantbio25=($options{bio25}!=0);
 my @sysxy=systemid2coord($sysid);
 if(!defined($sysxy[0])) {
-   print AWheader("$sysid not found");
-   exit(0);
+   print AWheader("$sysid not found").AWtail();
+   exit(0); # modperl OK
 }
 
 open(IN, "whocansee.pl $sysid $alli $wantbio25 |") or die $!;

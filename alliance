@@ -24,6 +24,12 @@ print AWheader("\U$options{alliance}\E alliance info [\U$ENV{REMOTE_USER}]",
 if(!defined $options{sort}){$options{sort}="-7.14.2";}
 
 if($options{alliance}) {
+	my $alli="\U$options{alliance}\E";
+	my $aid=alliancetag2id($alli);
+	if(!$aid) {
+		print "unknown alliance".AWtail;
+		exit(0); # modperl OK
+	}
    my @displayfuncs=
          (\&display_string, \&display_pid, \&display_sid, 
            \&display_string, \&display_string, \&display_string, \&display_needplanets, \&display_string, \&display_string, \&display_string, \&display_string, 
@@ -32,13 +38,7 @@ if($options{alliance}) {
       $displayfuncs[$_-1]=undef;
    }
 	my $n=0;
-	my $alli="\U$options{alliance}\E";
-	my $aid=alliancetag2id($alli);
 	my $own=("\L$alli" eq $ENV{REMOTE_USER});
-	if(!$aid) {
-		print "unknown alliance";
-		exit(0);
-	}
    my %pointsdb;
    tie(%pointsdb, "DB_File", "/home/bernhard/db/points.dbm");
    my @alliancepoints;

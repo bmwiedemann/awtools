@@ -1,0 +1,5 @@
+# example AW crontab file
+# install with crontab -e
+6 0 * * * cd /home/aw/inc ; /usr/bin/nice -n +7 make updatecsv updatexdaily updatedaily updatemap2 updatemap > /dev/null
+0 6,12,18 * * * cd /home/aw/inc ; /usr/bin/nice -n +7 make updatexdaily updatemap2 > /dev/null
+-*/5 * * * * cd /home/aw/inc ; ./cronrun.pl > /dev/null

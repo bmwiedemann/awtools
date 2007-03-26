@@ -39,7 +39,6 @@ sub mangle_dispatch(%) { my($options)=@_;
    my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
-   my $title="";
    my $joinlink="";
    my $alli="\U$ENV{REMOTE_USER}";
    
@@ -50,10 +49,6 @@ sub mangle_dispatch(%) { my($options)=@_;
    }
 
    
-   if(m&<title>([^<]*)</title>&) {
-      $title=$1;
-   } else { $title="special_no_title" }
-
 # add main AWTool link
       if((my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
          my $nclicks="";
@@ -67,23 +62,23 @@ sub mangle_dispatch(%) { my($options)=@_;
          $$options{authlink}="$origbmwlink/modperl/public/authaw?session=$session&uri=/cgi-bin";
          if($ENV{REMOTE_USER}) {
             $::bmwlink=$$options{authlink};
-         } elsif($$options{pid}) {
+         }
+         if(($interbeta || !$ENV{REMOTE_USER}) && $$options{pid}) {
             my $aid=playerid2alliance($$options{pid});
-            if(!$aid && $$options{name} && $$options{name} ne "unknown") {
-               $joinlink=$$options{authlink}."/modperl/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
+            if(($interbeta || !$aid) && $$options{name} && ($$options{name} ne "unknown")) {
+               $joinlink="<br>".$$options{authlink}."/modperl/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
             } elsif($awinput::aliances{$aid} && $awinput::aliances{$aid}->{founder}==$$options{pid}) {
                # if alliance founder, add extra "accept NAP with AF" link
-#               $joinlink.=" $$options{authlink}/signnapfortools\">As founder of an alliance I want to declare NAP towards AF to use AWTools</a> ";
+               $joinlink.="<br><a href=\"http://aw.lsmod.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
             }
          } else {
          }
       }
       
       $::extralink="$::bmwlink/index.html\">AWTools</a>";
-      $::options{title}=$title;
       my @module=();
-      my $module=title2pm($title);
-      push(@module, url2pm($url), ($gameuri ? $module :()));
+      my $module="";
+      push(@module, url2pm($url));
       foreach my $m (@module) {
          my $include="mangle/$m.pm";
          next if(!-e $include);
@@ -209,7 +204,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
    $$options{mangleelapsed}=$$options{totalelapsed}=tv_interval ( $t2 );
-   my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n<p id=disclaimer style=\"text-align:center; color:white; background-color:black\">$joinlink<br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
+   my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n$joinlink<p id=disclaimer style=\"text-align:center; color:white; background-color:black\"><br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
    if($ingameuri) {
       my @style=("main");

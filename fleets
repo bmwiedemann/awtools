@@ -40,7 +40,7 @@ foreach my $row1 (@sidpids) {
    my $owner=planet2owner($planet);
    my $sb=planet2sb($planet);
 	my $info=$planetinfo{$p}||"";
-   $info||="";
+   if(!defined($sb)){$sb="?"}
    $info=~s!^\d [^ ]+!!;
    $info=~s!automagic:.*!!g;
 	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> of !.display_pid($owner)." SB $sb $info";

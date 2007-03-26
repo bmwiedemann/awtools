@@ -33,7 +33,7 @@ if(defined($options{x}) && defined($options{y})) {
 	undef($/);
 	open(F,"< $f") or die $!;
 	print <F>;
-	exit(0);
+	exit(0); # modperl OK
 }
 
 if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))

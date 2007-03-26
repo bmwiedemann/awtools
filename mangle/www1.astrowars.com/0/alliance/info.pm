@@ -3,4 +3,4 @@ if($::options{url}=~m/\?tag=(\w+)/) {
    s%<b>Alliance / Info</b></td>%$& <td>$::bmwlink/alliance?alliance=$tag">AWtools($tag)</a></td><td>|</td>%;
 }
 
-1;
+2;

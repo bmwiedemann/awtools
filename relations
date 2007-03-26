@@ -41,7 +41,7 @@ if(!$readonly && defined($options{relation})) {
 		$options{alliance} =~ y/a-z/A-Z/;
 #		if($options{name} !~ /^[-_. a-z0-9\[\]*!|הצüִײÜû{}]*$/) { print 'illegal character in user name'; exit(0);} # redundant
 		$options{relation}+=0;
-		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
+		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input", AWtail; exit 0;} # modperl OK
 	}
 	my @rel=getrelation($options{name},1);
 	my $mod=$rel[4] ? "modified" : "added";
@@ -196,18 +196,27 @@ if($options{name}) {# && $options{name} ne "unknown") {
       if(0) {
          printf("xEnergy=%.2f ", arrival::effectiveenergy(1,2));
       }
+      my @logins;
 		while($options{comment}=~/login:(\d+):(\d+)([^ ]*)(.*)/s) {
 			$options{comment}=$4;
-         my($login,$time,$extra)=($1,$2,$3);
-         my $color;
-         if($extra=~/:(\d{5,}):/) { $color="darkred";
-            if($1>60000) { $color="red" }
+         push(@logins, [$1,$2,$3]);
+      }
+      if($logins[0]) {
+         print "<code>";
+         my $firsti=awmax(-8,awmin((-$#logins-1), -1));
+         foreach my $e (@logins[$firsti..-1]) { # last 8 values only
+            my($login,$time,$extra)=@$e;
+            my $color;
+            if($extra=~/:(\d{5,}):/) { $color="darkred";
+               if($1>60000) { $color="red" }
+            }
+            if($color) {
+               $extra=span({-style=>"color:$color"},$extra);
+            }
+            printf(br."login %4i: %s GMT %s ; idle+accuracy %s", $login, AWisodatetime($time),AWreltime($time), $extra);
          }
-         if($color) {
-            $extra=span({-style=>"color:$color"},$extra);
-         }
-			print br,"login $login: ", scalar gmtime($time), " GMT ; idle+accuracy $extra";
-		}
+         print "</code>";
+      }
 	}
 } else {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'name', -class=>'text'), " user name", br,

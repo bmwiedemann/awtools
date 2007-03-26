@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold7
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html preferences arrival authaw authrsa awlinker awtoolstatistics joinalli distsqr eta fighterlist tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk alliance{,2} system-info planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout nph-brownie.cgi
+tools=index.html preferences alliance{,2} arrival authaw authrsa awlinker awtoolstatistics joinalli cdinfo distsqr eta fighterlist tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info testenv planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout nph-brownie.cgi
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -24,7 +24,7 @@ updatecsv: dumpdbs
 	tar xjf ${f2}
 	-grep -v id trade.csv >> alltrades.csv
 	wget -x -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
-	umask 2 ; perl importcsv.pl && ( ln -f db/* olddb/ ; mv newdb/* db/ )
+	umask 2 ; mkdir -p db olddb newdb ; perl importcsv.pl && ( ln -f db/* olddb/ ; mv newdb/* db/ )
 	#-cp -a tactical-af.png olddb/tactical-af-$d.png
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
@@ -49,7 +49,7 @@ updatemaponly:
 	REMOTE_USER=$$a /usr/bin/nice -n +12 perl drawtactical.pl ; done
 updatemap2: cleandbs updatemapsonly
 updatemap2only:
-	for a in $(allies) ; do \
+	#for a in $(allies) ; do \
 		REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \
 	done
 updateholes:
@@ -117,5 +117,15 @@ access:
 	make updatemap updatemap2 allies=$a
 
 tgz:
-	tar --exclude=DBConf.pm -czf html/bmw-awtools-${mydate}.tar.gz *.pl *.pm TA.in TA.done ${tools} feed/*.pm mangle/*.pm LICENSE Makefile
+	rm -rf bmw-awtools
+	mkdir bmw-awtools
+	cp -a *.pl *.pm ${tools} prices.csv aw-crontab preproc feed mangle ../brownie LICENSE Makefile bmw-awtools
+	cp -a --parent html/code/css/{tools,*.css} html/code/js html/images/aw bmw-awtools
+	cd bmw-awtools &&\
+	chmod 755 html &&\
+	cp -a /home/aw/startup.pl . &&\
+	perl -i -pe 's/dbpasswd = .*/dbpasswd = "xxx";/; s/bmwuser/awuser/; ' DBConf.pm &&\
+	find -name CVS -o -name ".*.swp" | xargs rm -rf &&\
+	rm -rf nph-brownie.cgi holes2.pl mangle/special/secure.pm brownie/old preproc/www1.astrowars.com/zq*
+	tar czf html/bmw-awtools-${mydate}.tar.gz bmw-awtools
 

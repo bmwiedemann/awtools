@@ -8,12 +8,12 @@ use awinput;
 #awstandard_init();
 awinput_init();
 
-my $ticks=3;
-my $granularity=24*$ticks;
+our $ticks=3;
+our $granularity=24*$ticks;
 my $unk="?";
 my %cmap=($unk=>"gray", X=>"green", "-"=>"red");
 
-my $firstlog=0;
+our $firstlog=0;
 my $firstlogt;
 sub time2dt($) { my($time)=@_;
       my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);

@@ -38,5 +38,6 @@ popup_menu(-name=>'tz', -values=>[-11..12]), " timezone for AWtools", br,
 textarea(-name=>'customhtml', -class=>'text', -rows=>5, -cols=>80), " custom HTML for AWTools",br,br,
 submit(-name=>"submit", -class=>'smbutton'), end_form, br,
    "This tool sets cookies which are stored in your browser and used by some of my other tools.",
-end_html;
+AWtail();
+#end_html;
 

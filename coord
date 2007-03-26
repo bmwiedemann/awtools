@@ -20,7 +20,7 @@ if(defined($options{x}) && defined($options{y})) {
 	my $target=$ENV{SCRIPT_NAME};
 	$target=~s/coord/system-info/;
 	print redirect("http://$ENV{HTTP_HOST}$target?mapx=$x&mapy=$y");
-	exit(0);
+} else {
+   print header(),"need coords from ".a({-href=>"tactical"},"tactical");
 }
-print header(),"need coords from ".a({-href=>"tactical"},"tactical");
 

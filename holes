@@ -19,10 +19,9 @@ sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 print AWheader("holes list [\U$ENV{REMOTE_USER}\E]");
 
 my $filename="/home/aw/alli/$ENV{REMOTE_USER}/holes.csv";
-unless(open(F, "<", $filename)) {
+if(not open(F, "<", $filename)) {
 	print "data not found";
-	exit 0;
-}
+} else {
 my @holes=<F>;
 close F;
 
@@ -55,4 +54,5 @@ print sort_table([qw(system members friends others), "worst relation", "pop", "w
       sort_param_to_keys($options{sort}), \@holes);
 
 print "<p><b>note: added sum of pop and sum of (pop-5) which is an approximation for the real worth of member's planets in a system</b>";
+}
 print AWtail();

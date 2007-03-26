@@ -1,11 +1,12 @@
 #!/usr/bin/perl -w
 # this code is Copyright Bernhard M. Wiedemann and licensed under GNU GPL
 use strict;
+use awstandard;
 use awinput;
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 awinput_init(1);
 
-{
+if(!$interbeta) {
    my %alliuser;
    awinput::opendb(O_RDWR, "/home/aw/db2/useralli.dbm", \%alliuser);
    my @droplist=();

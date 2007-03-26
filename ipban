@@ -22,9 +22,7 @@ if(param()) {
    my $ip=$options{ip};
    if($ip!~/^\d+\.\d+\.\d+\.\d+$/) {
       print "bad IP";
-      exit 0;
-   }
-   if($options{action} eq "add") {
+   } elsif($options{action} eq "add") {
       $ips{$ip}={timeadded=>time(), reason=>$options{reason}};
       print "added $ip";
    } elsif($options{action} eq "del") {

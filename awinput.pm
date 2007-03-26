@@ -58,6 +58,7 @@ sub awinput_init(;$) { my($nolock)=@_;
          tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
          tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY, 0, $DB_HASH);
       } else {
+         $SIG{"ALRM"}=\&awinput_finish;
          alarm($alarmtime); # make sure locks are free'd
          tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
          tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
@@ -514,16 +515,29 @@ sub dblinkadd { my($sid,$url)=@_;
    elsif($url=~m!http://xtasisrebellion\.xt\.ohost\.de/forum/index\.php\?topic=([0-9.]+)!) { $type="XR" } # SMF
    elsif($url=~m!http://www.anacronic.com/FIR/index.php\?topic=([0-9.]+)!) { $type="FIR" } # SMF
    elsif($url=~m!http://frozenstar.zoreille.info/index.php\?topic=([0-9.]+)!) { $type="FrS" } # SMF
+   elsif($url=~m!http://www.aw-oceans11.de/smf/index.php\?topic=([0-9.]+)!) { $type="OXI" } # SMF
+   elsif($url=~m!http://www.apgaming.com/index.php\?[a-zA-Z0-9&=_]topic=([0-9.]+)!) { $type="APG" } # SMF mod?
 #   elsif($url=~m!http://lesnains\.darkbb\.com/viewtopic\.forum\?[pt]=(\d+)!) { $type="NAIN" } # phpBB outdated
-   elsif($url=~m!http://lesnains\.darkbb\.com/[a-z-]+/[a-z-]+-[pt](\d+)\.htm!i) { $type="NAIN" } # some custom phpBB mod?
-   elsif($url=~m!http://spin.forumzen.com/[a-z-]+/[a-z-]+-[pt](\d+)\.htm!i) { $type="SpIn" } # some custom phpBB mod?
+   elsif($url=~m!http://lesnains\.darkbb\.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="NAIN" } # some custom phpBB mod?
+   elsif($url=~m!http://spin.forumzen.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="SpIn" } # some custom phpBB mod?
+   elsif($url=~m!http://en\.forumactif\.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="EN" } # some custom phpBB mod?
+   elsif($url=~m!http://alien.forum2jeux.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="AN" } # some custom phpBB mod?
+   elsif($url=~m!http://mtg-aw.forumzen.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="MtG" } # some custom phpBB mod?
    elsif($url=~m!http://quicheinside\.free\.fr/viewtopic\.php\?[pt]=(\d+)!) { $type="QI" } # phpBB
    elsif($url=~m!http://(?:www\.)vbbyjc\.com/phpBB2/viewtopic\.php\?[pt]=(\d+)!) { $type="SW" } # phpBB
    elsif($url=~m!http://allianceffa.free.fr/ZeForum/viewtopic\.php\?[pt]=(\d+)!) { $type="FFA" } # phpBB
    elsif($url=~m!http://www.ionstorm-alliance.com/forum/viewtopic\.php\?[pt]=(\d+)!) { $type="IS" } # phpBB
    elsif($url=~m!http://www.createforum.com/punx/viewtopic\.php\?[pt]=(\d+)!) { $type="PUNX" } # phpBB
    elsif($url=~m!http://holi87.webd.pl/forum/viewtopic\.php\?[pt]=(\d+)!) { $type="SoUP" } # phpBB
+   elsif($url=~m!http://www.awocb.com/viewtopic\.php\?[pt]=(\d+)!) { $type="OCB" } # phpBB
    elsif($url=~m!http://87\.106\.97\.15/forum/blacksheep/viewtopic\.php\?[pt]=(\d+)!) { $type="BLA" } # phpBB
+   elsif($url=~m!http://she.m-30.net/viewtopic\.php\?[pt]=(\d+)!) { $type="SHE" } # phpBB
+   elsif($url=~m!http://lordvic.free.fr/ForumADN/viewtopic\.php\?[pt]=(\d+)!) { $type="ADN" } # phpBB
+   elsif($url=~m!http://www.ouebomatik.net/forums/viewtopic\.php\?[pt]=(\d+)!) { $type="CPO" } # phpBB
+   elsif($url=~m!http://whfoundation.7.forumer.com/viewtopic\.php\?[pt]=(\d+)!) { $type="WHF" } # phpBB
+   elsif($url=~m!http://council.14.forumer.com/viewtopic\.php\?[pt]=(\d+)!) { $type="CoRE" } # phpBB
+   elsif($url=~m!http://lba-lbb.iespana.es/viewtopic\.php\?[pt]=(\d+)!) { $type="LBA" } # phpBB
+   elsif($url=~m!http://www\.astrowars\.com/forums/viewtopic\.php\?[pt]=(\d+)!) { $type="main AW" } # phpBB
    elsif($url=~m!http://www.fishandreef.com/brigada/modules.php\?(?:name=Forums&)?(?:file=viewtopic&)?t=(\d+)!) { $type="LBA" } # Version 2.0.7 by Nuke Cops
    return unless($sid && $type);
    $url=$&;

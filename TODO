@@ -1,3 +1,6 @@
+optimize ranking and antispy tools performance
+modperl transition
+making easy to run as non-root
 #fix time-to-pop to use real production (incl arti, trade, race)
 IM to all brownie users
 IM to whole alli
@@ -14,6 +17,7 @@ flexible map - coloring by last round's tag (fallback)
 #dynamic PP-A$ price for tradepartners tool
 add last round alliance tag to system-info
 add display of player's trades. Maybe I draw another alliance-friendship-graph from that data.
+add option: MIDI upon incoming
 feed:parse num of SUs and num of Artifacts into DB
 #http://aw.lsmod.de/cgi-bin/tradepartners   Then You could also add two more columns: 'AD+artifact_price' and 'new ready(h)' (based on new AD+artifact_price amount). 
 #automatic state transitions planned->targeted, targeted->sieged|taken

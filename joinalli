@@ -10,24 +10,40 @@ use awinput;
 awstandard_init();
 #awinput_init();
 
+sub dbset($$)
+{
+   my($name,$alli)=@_;
+   my %db;
+   awinput::opendb(O_RDWR|O_CREAT, "/home/aw/db2/useralli.dbm", \%db);
+   if($alli) {
+      $db{lc($name)}=$alli;
+   } else {
+      delete $db{lc($name)};
+   }
+   untie %db;
+}
+
+
 my $name=awinput::getauthname(); # does not need awinput::input
+my $pid=playername2id($name); # guarantees sane names
 my $alli=awinput::playername2alli($name);
+my $awalli=playerid2alliance($pid);
 our %options;
 print AWheader("AW join alli");
-if($name && !$alli && !playerid2alliance(playername2id($name)) && param()) {
+if($name && $pid && ($interbeta || (!$alli && !$awalli)) && param()) {
 	foreach my $p (qw(a p)) {
 		$options{$p}=param($p);
 	}
    my $passwd=`cat /home/aw/.htpasswd`;
    $options{a}=~s/[^a-zA-Z0-9]//g; # sanitize user input # password is never printed and only looked up by crypt
    my $alli=lc($options{a});
-   if($passwd=~m/^${alli}:(.*)/m && $alli ne "guest") {
+   if(!$alli) {
+      dbset($name,$alli);
+      print "dropped you from the user-alli mapping table".br;
+   } elsif($passwd=~m/^${alli}:(.*)/m && $alli ne "guest") {
       my $crypted=$1;
       if(crypt($options{p}, $crypted) eq $crypted) {
-         my %db;
-         awinput::opendb(O_RDWR|O_CREAT, "/home/aw/db2/useralli.dbm", \%db);
-         $db{lc($name)}=$alli;
-         untie %db;
+         dbset($name,$alli);
          print "$name, you now belong to alliance $options{a} (in regards to AWTools)",br;
       } else {
          print "incorrect credentials",br;
@@ -41,13 +57,16 @@ if($name && !$alli && !playerid2alliance(playername2id($name)) && param()) {
    print "user=$name alli=$alli",br;
    if(!$name) {
       print "sorry, you need to ".a({-href=>"authaw"},"authenticate")." first. (Only works with brownie)";
-   } elsif(playerid2alliance(playername2id($name))) {
+   } elsif(!$interbeta && $awalli) {
       print "sorry, you are already member of an alliance and can not join another one within AWTools";
    } else {
       print start_form(-name=>"form"),textfield(-name=>'a', -class=>'text'), " Alliance",br,
          password_field(-name=>'p', -class=>'text'), " Alliance's Access Password for AWTools",br,
          submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.a");
    }
+   print br."This tool allows you to tell brownie and the AWTools that you shall be considered member/alli of an alliance, thus want to contribute to it's data base and see what it is doing on the other side. 
+      During the normal round, this will only work once and there is no automated way to change or drop the tag afterwards. Once you join an alliance within AW, the extra brownie-tag will be dropped at the CSV update.".br.
+      "However, during interbeta the restrictions do not count and you may change alliances at will (if you know the proper password, of course)";
 }
 print AWtail();
 

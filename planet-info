@@ -42,19 +42,18 @@ if(param("legend")) {
                 my $color=getstatuscolor($n);
                 print span({-style=>'color: '.$color}, br."$n $color = $planetstatusstring{$n}\n");
         }
-        print end_html;
-        exit 0; 
+        print AWtail;
+        exit 0; # modperl OK
 }
 
 
-if($options{status}) {
-	$options{status}+=0;
-	if($options{status}<1 || $options{status}>9) { print "wrong input"; exit 0;}
+$options{status}+=0;
+if($options{status} && $options{status}>=1 && $options{status}<=9) {
 	if($options{who}!~/^[0-9]+$/) {
 		$options{who}=playername2id($options{who}); # sanitizes
 	}
 	if(!$options{who}) {$options{who}=2};
-	if($options{id}!~m/^(\d+)#(\d+)$/) {print "invalid system/planet id\n"; exit 0; }
+	if($options{id}!~m/^(\d+)#(\d+)$/) {print "invalid system/planet id\n",AWtail; exit 0; } # modperl OK
 	my ($sid,$pid)=($1,$2);
 	my @pinfo=getplanetinfo($sid,$pid,1);
 	my $mod=(@pinfo)? "modified" : "added";
@@ -80,7 +79,7 @@ if($options{status}) {
 
 if($options{id}) {
 	my $id=$options{id};
-	if($id!~m/(\d+)#(\d+)/) {print "invalid system/planet id\n"; exit 0; }
+	if($id!~m/(\d+)#(\d+)/) {print "invalid system/planet id\n",AWtail; exit 0; } # modperl OK
 	my ($sid,$pid)=($1,$2);
 	my @pinfo=getplanetinfo($sid,$pid);
 	print qq!<a href="?legend=1">legend</a>!,br;

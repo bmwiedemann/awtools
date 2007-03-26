@@ -9,13 +9,13 @@ use awinput;
 my %options;
 for my $p (qw'fid') {
   $options{$p}=param($p);
+  $options{$p}=~s/[^0-9]//g; # sanitize user input;
 }
 if(defined($options{fid})) {
    awinput_init();
    my $res=awinput::get_fleet($options{fid});
    if(!$res || !$$res[0]) {
-      print header(),"fleet $options{fid} not found";
-      exit 0;
+      print AWheader("error")."fleet $options{fid} not found";
    } else {
       my ($fid,$alli,$status,$sidpid,$owner,$eta,$firstseen,$lastseen,$trn,$cls,$eds,$ecs,$ebs)=@{$$res[0]};
       my ($elevel,undef,$ephysics,$emath,undef,$eraceatt,$eracedef)=awinput::playerid2battlestats($owner);
@@ -34,10 +34,10 @@ if(defined($options{fid})) {
       }
       my $url="http://$awstandard::awforumserver/about/battlecalculator/?destroyer=$eds&cruiser=$ecs&battleship=$ebs&des=$deffleet[0]&cru=$deffleet[1]&bat=$deffleet[2]&sta=0&submit2=calculate+battle&go=1$params";
       print (redirect($url),a({href=>$url},"link"));
-      exit(0);
    }
-}
-print AWheader("fleet to battlecalc"),
+} else {
+   print AWheader("fleet to battlecalc"),
       start_form(-name=>"form", -method=>"get"),textfield(-name=>'fid', -class=>'text'), " fleet id",br,
       submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.fid");
-
+}
+print AWtail;

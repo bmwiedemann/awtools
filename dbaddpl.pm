@@ -13,12 +13,13 @@ our @EXPORT =
 qw(dbaddpl);
 
 sub dbaddpl($$$) { my($t,$name,$pl)=@_;
-   if(!$pl) {return 0}
+   if(!$pl || !$name) {return 0}
 #   open(F, ">>", "/tmp/aw-pl.log") or die $!;
 #   print F "$t $name $pl\n";
 #   close F;
 
    my $pid=playername2id($name);
+   if(!$pid) {return 0}
 
    my $sth=$dbh->prepare("SELECT * FROM `plhistory` WHERE `pid` = ? AND `pl` = ? AND `alli` = ?");
    my $res=$dbh->selectall_arrayref($sth, {}, $pid, $pl, $ENV{REMOTE_USER});

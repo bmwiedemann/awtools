@@ -18,7 +18,7 @@ $imagedir="/code/css/user/";
 %allowedext=qw(css 1);
 
 sub process {
-	my ($filename,$name,$newname,$buffer,$bytesread,$fullname,$outfile,$ext)=(param("file"),lc(param("name")));
+	my ($authname,$filename,$name,$newname,$buffer,$bytesread,$fullname,$outfile,$ext)=($_[0],param("file"),lc(param("name")));
 	$name=~s".*/""; # strip everything before slash (sanitation)
 	if($name eq ""){$name=$filename}
 $name=~s"^.*[/\\]"";	if($filename=~m/\.([^.]+)$/ && ($allowedext{$1}||return ".$1 - invalid extension")){$ext=$1}
@@ -54,7 +54,7 @@ if(!$authname) {
   $errormessage=a({-href=>"/manual/auth.html"},"authenticate first");
 }
 if(param() && $authname) {
-  $errormessage=process();
+  $errormessage=process($authname);
 }
 my $authstr=$authname || "<span style=\"color:red\">no user</span>";
 if(!param() or $errormessage) {
@@ -73,4 +73,11 @@ if(!param() or $errormessage) {
 	end_form);
 }
 
+print p('the first line is recommended to be
+@import url(http://aw.lsmod.de/code/css/main.css);<br/>
+
+or at least draw the basic extensions from
+@import url(http://aw.lsmod.de/code/css/bmwaw.css);');
+
 print (AWtail);
+

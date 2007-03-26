@@ -34,7 +34,7 @@ if(defined($options{relation})) {
 		if($user=~m/^\s*$/) {next}
 #		if($user !~ /^[-_. a-z0-9\[\]]*$/) { print 'illegal character in user name'; exit(0);}
 		$options{relation}+=0;
-		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input"; exit 0;}
+		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input", AWtail; exit 0;} # modperl OK
 		my @rel=getrelation($user);
       $rel[2]||="";
 		$data{$user}="$options{relation} $options{alliance} $options{comment}\n$rel[2]";
