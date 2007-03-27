@@ -3,7 +3,7 @@
 use strict;
 use CGI ":standard";
 
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 awstandard_init();

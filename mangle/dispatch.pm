@@ -10,6 +10,7 @@ use Time::HiRes qw(gettimeofday tv_interval); # for profiling
 use mangle::special::dispatch;
 use mangle::special::use_css;
 use mangle::special::color;
+use mangle::special::secure_nice;
 
 our $g;
 my %specialname=qw(
@@ -29,12 +30,12 @@ sub mangle_dispatch(%) { my($options)=@_;
    $$options{bmwlink}=$::bmwlink=$origbmwlink;
    %::options=%$options;
 
-   my $notice="";#<b style=\"color:green\">notice: brownie + AWTools server will have a scheduled maintenance period Thursday morning (2006-07-27 02:30-05:00 UTC) and be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
+   my $notice="";#<b style=\"color:green\">notice: road works ahead.... brownie + AWTools server has a scheduled maintenance period today (Monday 2007-03-26 12-18:00 UTC) and might be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
 
-   local $ENV{REMOTE_USER}=$ENV{REMOTE_USER};
-   if($$options{name} eq "mauritz") { # map user to see AF data, but not feed
-      $ENV{REMOTE_USER}="af";
-   }
+#   local $ENV{REMOTE_USER}=$ENV{REMOTE_USER};
+#   if($$options{name} eq "mauritz") { # map user to see AF data, but not feed
+#      $ENV{REMOTE_USER}="af";
+#   }
    
    my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
@@ -43,9 +44,13 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $alli="\U$ENV{REMOTE_USER}";
    
    # greenbird special
-   if($g && m/onLoad="document.login.secure.focus\(\);">/) {
-      do "mangle/special/secure.pm";
-      $_=mangle::special::secure::read($_);
+   if(m/onLoad="document.login.secure.focus\(\);">/) {
+      if($g) {
+         do "mangle/special/secure.pm";
+         $_=mangle::special::secure::mangle($_);
+      }
+      #do "mangle/special/secure_nice.pm";
+      mangle::special::secure_nice::mangle($_);
    }
 
    
@@ -198,7 +203,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 
    # aw21 transition
    if($$options{proxy} eq "brownie-cgi") {
-      $notice="<b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.lsmod.de/proxy-config.html\">brownie.pac</a></b><br>";
+      $notice.="<br><b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.lsmod.de/proxy-config.html\">brownie.pac</a></b><br>";
    }
    
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
@@ -212,7 +217,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       if($$options{name}) { unshift(@style, "user/".safe_encode($$options{name})."/main") }
       my $style;
       foreach my $s (@style){
-         if(-r "/home/aw/css/$s.css") {$style=$s;last;}
+         if(-r "$awstandard::cssdir/$s.css") {$style=$s;last;}
       }
       if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
       s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;

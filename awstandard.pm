@@ -9,16 +9,26 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
 qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &file_content &url2pm &awmax &awmin
-      $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname $interbeta);
+      $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir);
 
 use CGI ":standard";
 use Time::Local;
 use Time::HiRes qw(gettimeofday tv_interval);
-use awaccess;
 
 our $server="www1.astrowars.com";
 our $awforumserver="www.astrowars.com";
 our $bmwserver="aw.lsmod.de";
+our $basedir;
+our $dbmdir; 
+BEGIN{
+   $basedir="/home/aw";
+   $dbmdir="$basedir/db2";
+}
+our $dbdir="$basedir/db/db";
+our $codedir="$basedir/inc";
+our $htmldir="$basedir/html";
+our $cssdir="$basedir/css";
+our $allidir="$basedir/alli";
 our $interbeta=1;
 our $style;
 our $timezone;
@@ -36,12 +46,14 @@ our @statuscolor=qw(black black blue cyan red green orange green);
 our $start_time;
 our $customhtml;
 
+use awaccess; # needs 1 var
+
 sub awstandard_init() {
    my $alli=$ENV{REMOTE_USER};
    if($alli && $awaccess::remap_alli{$alli}) {
       $ENV{REMOTE_USER}=$alli=$awaccess::remap_alli{$alli};
    }
-   chdir "/home/aw/db";
+   chdir $codedir;
    $style=cookie('style');
    $timezone=cookie('tz');
    $customhtml=cookie('customhtml');

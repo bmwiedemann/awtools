@@ -3,7 +3,7 @@
 use strict;
 use CGI qw":standard";
 my $title="trade partners [\U$ENV{REMOTE_USER}\E]";
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 awinput_init();

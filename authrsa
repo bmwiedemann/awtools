@@ -2,21 +2,21 @@
 # safe 070204
 use strict;
 use CGI ":standard";
-
-BEGIN {chdir "/home/aw/inc";}
-use awstandard;
-use awinput;
-awstandard_init();
 use LWP::UserAgent;
 use Digest::MD5 qw(md5_hex);
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
+
+
+use awstandard;
+use awinput;
+awstandard_init();
 #awinput_init();
 my %allis=(
-"AF Gold 7", "af",
-"AF Gold 7 Mod", "af",
-"Rat Bastards Gold 7", "rats",
-"Rat Bastards Gold 7 Mod", "rats",
-"TGD Gold 7", "tgd",
+"AF Gold 8", "af",
+"AF Gold 8 Mod", "af",
+"Rat Bastards Gold 8", "rats",
+"Rat Bastards Gold 8 Mod", "rats",
+"TGD Gold 8", "tgd",
 );
 
 my %specialmap=( # inline because I only expect the Administrator group to be problematic
@@ -28,7 +28,7 @@ winterwolf=>"tgd",
 );
 my %rsamap;
 #=( "[RSA]TD"=>"[RSA]Top-Dogg[UK2]*",);
-awinput::opendb(O_RDONLY, "/home/aw/db2/rsamap.dbm", \%rsamap);
+awinput::opendb(O_RDONLY, "$awstandard::dbmdir/rsamap.dbm", \%rsamap);
 
 our %options;
 my $h=AWheader("AW user RSA-authentication tool", '<script type="text/javascript" src="/code/js/webtoolkit.md5.js"></script>');

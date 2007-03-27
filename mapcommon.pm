@@ -1,6 +1,7 @@
 package mapcommon;
 use strict;
 use GD;
+use awstandard;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
@@ -11,7 +12,7 @@ our %colorindex;
 
 # load RGB data for color names
 sub initrgb() {
-  open(RGB, "< /home/aw/inc/rgb.txt") or die "Content-type: text/html\n\nerror opening rgb.txt $!\n";
+  open(RGB, "< $awstandard::codedir/rgb.txt") or die "Content-type: text/html\n\nerror opening rgb.txt $!\n";
   while(<RGB>) {
     next if(/!/);
     if(m/^\s*(\d+)\s+(\d+)\s+(\d+)\s+(\w+[ a-zA-Z0-9]*)$/) {

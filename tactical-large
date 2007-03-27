@@ -3,7 +3,7 @@
 use strict;
 use CGI ":standard";
 
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 #use awmap;
@@ -17,7 +17,7 @@ my $title="large tactical map [\U$alli\E]";
 my %options;
 
 #chdir "large-$alli";
-my $dir="/home/aw/alli/$alli/l";
+my $dir="$awstandard::allidir/$alli/l";
 for my $p (qw'xs xe ys ye x y fast scale') {
 	$options{$p}=param($p);
    $options{$p}=~s/[^-+0-9.]//g; # sanitize user input

@@ -3,7 +3,7 @@
 use strict;
 use CGI ":standard";
 my $title="yesterday's battles";
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 awinput_init();

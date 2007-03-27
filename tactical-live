@@ -7,7 +7,7 @@ my $max=5000;
 #if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
 my $title="live tactical map [\U$ENV{REMOTE_USER}\E]";
 my %options;
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 use awmap;

@@ -2,7 +2,7 @@
 use strict;
 use CGI ":standard";
 #$ENV{REMOTE_USER}="af";
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 awinput_init(1);

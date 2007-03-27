@@ -2,7 +2,7 @@
 use strict;
 use CGI ":standard";
 
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awmap;
 awstandard_init();
@@ -16,7 +16,7 @@ for my $p (qw'map') {
 	$options{$p}=param($p);
 }
 if($options{map}) {
-	my $f="/home/aw/alli/$alli/tactical.png";
+	my $f="$awstandard::allidir/$alli/tactical.png";
 	my ($size,$modified)=(stat($f))[7,9];
 	open(F, "<", $f) or die $!;
 	print header(-type=>'image/png', -last_modified=>awstandard::HTTPdate($modified), -expires=>"+6h", #-last_modified=>$modified,

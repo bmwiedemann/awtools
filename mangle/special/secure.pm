@@ -5,7 +5,7 @@ use strict;
 package mangle::special::secure; # preprocess security check for convenience
 
 #if($::options{name} eq "greenbird" && m/onLoad="document.login.secure.focus();">/) {
-sub read($)
+sub mangle($)
 { local $_=$_[0];
    eval {use strict;
 
@@ -27,7 +27,7 @@ sub read($)
 
 	# read image
 #	chdir "/home/aw/base/awread";
-	require "/home/aw/base/awread/awread.pm";
+	require "$awstandard::basedir/base/awread/awread.pm";
 	my $string=awread::read_awimg($filename);
 #	$_.="found $string";
    if($string=~m/^[0-9a-f]{5}$/) {

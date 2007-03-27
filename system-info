@@ -4,7 +4,7 @@ use strict;
 use CGI ":standard";
 use Digest::MD5 "md5_hex";
 
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 use bbcode;
@@ -172,7 +172,7 @@ if(param("legend")) {
 			my $sysinfo=$systeminfo[2]||"";
          if($sysinfo) {
             $sysinfo=~s!^<br />!!;
-            $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
+            $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/aw/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
          }
 			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@lbattleslink)." ".tlink(\@lhistorylink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,bbcode_trans($sysinfo),
 			"planets here: <a name=\"planets\" /><ul>";
@@ -222,8 +222,8 @@ if(param("legend")) {
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
 			if(!$options{export}) {
-				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/images/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
-				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
+				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/images/aw/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
+				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/aw/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
             if($options{simple}) {$etalink=""}
 				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info.$fleetsstr."</li>\n";
 			} else {

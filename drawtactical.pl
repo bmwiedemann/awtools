@@ -23,7 +23,7 @@ sub drawaxis($) {my($img)=@_;
 }
 my $img=mapimage($mapxoff,$mapyoff, $mapxoff+$mapsize,$mapyoff+$mapsize, 1, \&drawaxis);
 
-my $out="/home/aw/alli/$ENV{REMOTE_USER}/tactical.png";
+my $out="$awstandard::allidir/$ENV{REMOTE_USER}/tactical.png";
 writeimg($img, $out);
 awinput::awinput_finish();
 

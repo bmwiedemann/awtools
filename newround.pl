@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 use DBAccess;
+use awstandard;
 my $oldname="gold7";
 my $newname=$oldname;
 $newname=~s/(\d+)$/1+$1/e;
@@ -20,10 +21,10 @@ $dbh->do("TRUNCATE TABLE `planetinfos`");
 $dbh->do("TRUNCATE TABLE `player`");
 
 system("find html/alli/*/l -name \*.png|xargs rm -f");
-system("cat ../dbm/empty.dbm > ~/db/useralli.dbm");
-system("cat ../dbm/empty.dbm > ~/db/points.dbm");
+system("cat empty.dbm > $awstandard::dbmdir/useralli.dbm");
+system("cat empty.dbm > $awstandard::dbmdir/points.dbm");
 system("perl -i.bak -pe 's/(round=.?)$oldname/\$1$newname/' Makefile topwars");
-system('for f in /home/aw/db2/*planets.dbm ; do cat ../dbm/empty.dbm > $f ; done');
+system("for f in $awstandard::dbmdir/*planets.dbm ; do cat empty.dbm > \$f ; done");
 system("find html/alli/*/l/ -name \*.png|xargs rm -f");
 
 awstandard::set_file_content("alltrades.csv", "id1\tid2\n");

@@ -8,7 +8,7 @@ awinput_init(1);
 
 if(!$interbeta) {
    my %alliuser;
-   awinput::opendb(O_RDWR, "/home/aw/db2/useralli.dbm", \%alliuser);
+   awinput::opendb(O_RDWR, "$awstandard::dbmdir/useralli.dbm", \%alliuser);
    my @droplist=();
    foreach my $k (keys %alliuser) {
       my $pid=playername2id($k);

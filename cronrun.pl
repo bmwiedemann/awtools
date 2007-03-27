@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 use strict;
+use warnings;
 
-chdir("/home/aw/inc");
 for(<fiveminutely/*>) {
    next if /\/CVS$/;
 #   print "running $_...\n";

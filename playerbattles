@@ -4,7 +4,7 @@ use strict;
 use CGI ":standard";
 use Time::Local;
 
-BEGIN {chdir "/home/aw/inc";}
+
 use DBAccess;
 use awstandard;
 use awinput;

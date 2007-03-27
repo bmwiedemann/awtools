@@ -5,7 +5,7 @@ use CGI ":standard";
 
 if($ENV{REMOTE_USER} eq "affeed") {$ENV{REMOTE_USER}="af"}
 
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 #use feed::dispatch;
@@ -23,7 +23,7 @@ if($options{name}){$options{name}=~s/[<>]//g;} # min sanitize user input;
 
 
 if(param()) {
-	chdir("/home/bernhard/code/cvs/perl/awcalc");
+	chdir($awstandard::codedir);
 	my $html=$options{html};
 	if(upload('file')) {
       $options{file}=~s/[^a-zA-Z0-9_.-]//g;

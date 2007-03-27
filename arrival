@@ -2,7 +2,7 @@
 # safe 070204
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use arrival;
 awstandard_init();

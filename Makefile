@@ -12,10 +12,17 @@ all: TA.candidate
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
 links:
-	ln -f ${tools} /srv/www/cgi-bin/aw/
-	ln -f topwars /srv/www/cgi-bin/aw/topallis
-	ln -f ${tools} /srv/www/cgi-bin/aw/public
-	ln -f topwars /srv/www/cgi-bin/aw/public/topallis
+	ln -f ${tools} cgi-bin/
+	ln -f topwars cgi-bin/topallis
+	ln -f ${tools} cgi-bin/public
+	ln -f topwars cgi-bin/public/topallis
+	ln -f html/images/aw/?.gif html/
+
+
+init:
+	$(MAKE) links
+	./create-mysql-tables.pl
+	wget -Oalltrades.csv http://aw.lsmod.de/alltrades.csv
 
 #system-ids.txt:
 #	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
@@ -71,7 +78,7 @@ drawall:
 	for f in www1.astrowars.com/export/history/starmap* ; do ./drawmap.pl $$f ; done
 
 dumpdbs:
-	-cp -a ~/db /no_backup/bernhard/aw/backup/db-${mydate}
+	-cp -a base/db2 /no_backup/bernhard/aw/backup/db-${mydate}
 #	mkdir -p html/alli/$$a/history
 	for a in $(allies) ; do \
 		cp -a html/alli/$$a/{fleets.csv,history/fleets-${mydate}.csv} ; \
@@ -85,7 +92,7 @@ cleandbs:
 	./cleanuseralli.pl > /dev/null
 	for a in $(allies) ; do \
 	   REMOTE_USER=$$a ./cleanplanning.pl ; done
-	cat ../dbm/empty.dbm > ~/db/sessioncache.dbm
+	cat empty.dbm > base/db2/sessioncache.dbm
 lookup7:
 	perl -ne '@a=split("\t",$$_);if($$a[2]==$u){print}' player.csv.beta7
 lookupa7:
@@ -101,29 +108,29 @@ TA.candidate: TA.in TA.done TA.pl
 	./TA.pl > $@
 
 access:
-	-cp -ia ../dbm/empty.dbm ~/db/$a-relation.dbm
-	-cp -ia ../dbm/empty.dbm ~/db/$a-planets.dbm
-	touch ~/db/$a-planets.dbm.lock ~/db/$a-relation.dbm.lock
-	../dbm/add.pl ~/db/$a-relation.dbm af "7 af alliance relation"
-	../dbm/add.pl ~/db/$a-relation.dbm $a "9 $a alliance relation"
-	../dbm/add.pl ~/db/allowedalli.dbm $a ${round}
+	-cp -ia empty.dbm base/db2/$a-relation.dbm
+	-cp -ia empty.dbm base/db2/$a-planets.dbm
+	touch base/db2/$a-planets.dbm.lock base/db2/$a-relation.dbm.lock
+	../dbm/add.pl base/db2/$a-relation.dbm af "7 af alliance relation"
+	../dbm/add.pl base/db2/$a-relation.dbm $a "9 $a alliance relation"
+	../dbm/add.pl base/db2/allowedalli.dbm $a ${round}
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}
-	/usr/sbin/htpasswd2 /home/aw/.htpasswd $a
+	/usr/sbin/htpasswd2 base/.htpasswd $a
 	#vi /srv/www/cgi-bin/aw/.htaccess
-	-chmod 660 ~/db/$a*.dbm*
-	sudo chown wwwrun.bernhard /home/bernhard/db/*.dbm*
+	-chmod 660 base/db2/$a*.dbm*
+	sudo chown wwwrun.bernhard base/db2/*.dbm*
 	echo -n " $a" >> allowed_alliances # keep for human lookup only
 	make updatemap updatemap2 allies=$a
 
 tgz:
 	rm -rf bmw-awtools
 	mkdir bmw-awtools
-	cp -a *.pl *.pm ${tools} prices.csv aw-crontab preproc feed mangle ../brownie LICENSE Makefile bmw-awtools
+	cp -a *.pl *.pm ${tools} prices.csv preproc feed mangle ../brownie Makefile bmw-awtools
 	cp -a --parent html/code/css/{tools,*.css} html/code/js html/images/aw bmw-awtools
 	cd bmw-awtools &&\
-	chmod 755 html &&\
-	cp -a /home/aw/startup.pl . &&\
+	chmod 755 html && mkdir -p cgi-bin/public log &&\
+	cp -a /home/aw/startup.pl ../dist-extra/* ../dist-extra/.ht* . &&\
 	perl -i -pe 's/dbpasswd = .*/dbpasswd = "xxx";/; s/bmwuser/awuser/; ' DBConf.pm &&\
 	find -name CVS -o -name ".*.swp" | xargs rm -rf &&\
 	rm -rf nph-brownie.cgi holes2.pl mangle/special/secure.pm brownie/old preproc/www1.astrowars.com/zq*

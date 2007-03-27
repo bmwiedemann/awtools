@@ -2,7 +2,7 @@
 # safe 070204
 use strict;
 use CGI qw":standard *table";
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 awinput_init();
@@ -40,7 +40,9 @@ if($options{alliance}) {
 	my $n=0;
 	my $own=("\L$alli" eq $ENV{REMOTE_USER});
    my %pointsdb;
-   tie(%pointsdb, "DB_File", "/home/bernhard/db/points.dbm");
+   tie(%pointsdb, "DB_File", "$awstandard::dbmdir/points.dbm");
+#   "SELECT * FROM `cdlive`,`player`,`alliances` WHERE
+#      alliance = aid AND player.pid=cdlive.pid AND tag LIKE ?"
    my @alliancepoints;
 
 # header

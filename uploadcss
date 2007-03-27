@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 # safe 070204
 use strict;
-use lib("/home/aw/inc");
 use vars qw"$cgi $serverbase $imagedir $errormessage %allowedext";
 use IO::File;
 use CGI ":standard";
@@ -13,7 +12,7 @@ use awinput;
 awinput_init();
 my $authname=safe_encode(awinput::getauthname());
 
-$serverbase="http://aw.lsmod.de";
+$serverbase="http://$bmwserver";
 $imagedir="/code/css/user/";
 %allowedext=qw(css 1);
 
@@ -29,7 +28,7 @@ $name=~s"^.*[/\\]"";	if($filename=~m/\.([^.]+)$/ && ($allowedext{$1}||return ".$
 # derive .jp[e]g / .gif from $filename, test for overwrite
 	if($name!~/\./){$name.=".".$ext}
    local $imagedir="$imagedir$authname/";
-   my $dirname="/home/aw/html/$imagedir";
+   my $dirname="$awstandard::htmldir/$imagedir";
    mkdir($dirname);
 	$newname="$dirname$name";
 #	if(-r $newname){return "Die Datei existiert bereits!"}

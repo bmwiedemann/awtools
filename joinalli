@@ -4,17 +4,17 @@ use strict;
 use CGI ":standard";
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
-awstandard_init();
-#awinput_init();
+#awstandard_init();
+awinput_init();
 
 sub dbset($$)
 {
    my($name,$alli)=@_;
    my %db;
-   awinput::opendb(O_RDWR|O_CREAT, "/home/aw/db2/useralli.dbm", \%db);
+   awinput::opendb(O_RDWR|O_CREAT, "$awstandard::dbmdir/useralli.dbm", \%db);
    if($alli) {
       $db{lc($name)}=$alli;
    } else {
@@ -34,7 +34,7 @@ if($name && $pid && ($interbeta || (!$alli && !$awalli)) && param()) {
 	foreach my $p (qw(a p)) {
 		$options{$p}=param($p);
 	}
-   my $passwd=`cat /home/aw/.htpasswd`;
+   my $passwd=`cat $awstandard::basedir/.htpasswd`;
    $options{a}=~s/[^a-zA-Z0-9]//g; # sanitize user input # password is never printed and only looked up by crypt
    my $alli=lc($options{a});
    if(!$alli) {
@@ -54,7 +54,7 @@ if($name && $pid && ($interbeta || (!$alli && !$awalli)) && param()) {
 
 } else {
    $name||="";
-   print "user=$name alli=$alli",br;
+   print "user=$name pid=$pid alli=$alli",br;
    if(!$name) {
       print "sorry, you need to ".a({-href=>"authaw"},"authenticate")." first. (Only works with brownie)";
    } elsif(!$interbeta && $awalli) {

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/aw/db"}
+BEGIN {chdir "/home/aw/inc"}
 use awinput;
 print header();
 use WWW::Mechanize;

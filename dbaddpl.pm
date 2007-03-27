@@ -27,7 +27,8 @@ sub dbaddpl($$$) { my($t,$name,$pl)=@_;
       return 0;
    }
    $sth=$dbh->prepare("INSERT INTO `plhistory`  VALUES (?, ?, ?, ?)");
-   $sth->execute($t, $pid, $pl, $ENV{REMOTE_USER});
+   my $alli=$ENV{REMOTE_USER}||"";
+   $sth->execute($t, $pid, $pl, $alli);
 }
 
 1;

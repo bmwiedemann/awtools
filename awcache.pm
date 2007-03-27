@@ -25,7 +25,7 @@ htm.? text/html
 txt text/plain
 );
 
-my $cachedir="/home/aw/html/awcache";
+my $cachedir="$awstandard::htmldir/awcache";
 
 
 # input: HTTP time format string
@@ -45,7 +45,7 @@ sub awgetcache($)
    my $res=open(FCACHE, "<", $path);
    if(!$res) {
 		# re-fetch now
-		print STDERR "re-fetching $path\n";
+#		print STDERR "re-fetching $path\n";
 		my $request=$::options{request};
 		my $UA=$::options{ua};
 		my $response = $UA->request($request);

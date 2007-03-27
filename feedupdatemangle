@@ -4,7 +4,7 @@ use CGI ":standard";
 
 #print "Content-Type: text/html\n\n";
 
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 use mangle::dispatch;

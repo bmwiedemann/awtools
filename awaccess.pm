@@ -1,4 +1,7 @@
+# this file defines permissions for allis
+# e.g. sharing of info in tools
 package awaccess;
+use awstandard;
 use DB_File;
 use Fcntl qw(:flock O_RDONLY);
 require Exporter;
@@ -6,7 +9,7 @@ use vars qw(@ISA @EXPORT);
 
 our (%read_access,%write_access,%allowedalli);
 
-tie(%allowedalli, "DB_File", "/home/aw/db2/allowedalli.dbm", O_RDONLY, 0, $DB_HASH);
+tie(%allowedalli, "DB_File", "$awstandard::dbmdir/allowedalli.dbm", O_RDONLY, 0, $DB_HASH);
 
 # crs: temporary until 2006-05-05
 

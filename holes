@@ -2,7 +2,7 @@
 # safe 070204
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 use sort_table;
@@ -18,7 +18,7 @@ sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 
 print AWheader("holes list [\U$ENV{REMOTE_USER}\E]");
 
-my $filename="/home/aw/alli/$ENV{REMOTE_USER}/holes.csv";
+my $filename="$awstandard::allidir/$ENV{REMOTE_USER}/holes.csv";
 if(not open(F, "<", $filename)) {
 	print "data not found";
 } else {

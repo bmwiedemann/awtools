@@ -8,7 +8,6 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%prices,%relation,%planetinfo,
    $dbnamer,$dbnamep);
 our $alarmtime=99;
-our $dbdir="/home/aw/db/db";
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
@@ -31,25 +30,26 @@ my $head="Content-type: text/plain\015\012";
 sub awinput_init(;$) { my($nolock)=@_;
    awstandard_init();
 #chdir "/home/aw/db"; # done by awstandard_init
-   tie %alliances, "MLDBM", "db/alliances.mldbm", O_RDONLY, 0666 or die $!;
-   tie %starmap, "MLDBM", "db/starmap.mldbm", O_RDONLY, 0666;
-   tie %player, "MLDBM", "db/player.mldbm", O_RDONLY, 0666;
-   tie %playerid, "MLDBM", "db/playerid.mldbm", O_RDONLY, 0666;
-   tie %planets, "MLDBM", "db/planets.mldbm", O_RDONLY, 0666;
-   tie %battles, "MLDBM", "db/battles.mldbm", O_RDONLY, 0666;
-   tie %trade, "MLDBM", "db/trade.mldbm", O_RDONLY, 0666;
-   tie %prices, "MLDBM", "db/prices.mldbm", O_RDONLY, 0666;
+# use absolute pathes from awstandard
+   tie %alliances, "MLDBM", "$dbdir/alliances.mldbm", O_RDONLY, 0666 or die $!;
+   tie %starmap, "MLDBM", "$dbdir/starmap.mldbm", O_RDONLY, 0666;
+   tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
+   tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
+   tie %planets, "MLDBM", "$dbdir/planets.mldbm", O_RDONLY, 0666;
+   tie %battles, "MLDBM", "$dbdir/battles.mldbm", O_RDONLY, 0666;
+   tie %trade, "MLDBM", "$dbdir/trade.mldbm", O_RDONLY, 0666;
+   tie %prices, "MLDBM", "$dbdir/prices.mldbm", O_RDONLY, 0666;
    my $alli=$ENV{REMOTE_USER};
    if($alli) {
       my $a=$alli;
       if($remap_relations{$alli}) {
          $a=$remap_relations{$alli};
       }
-      $dbnamer="/home/bernhard/db/$a-relation.dbm";
+      $dbnamer="$awstandard::dbmdir/$a-relation.dbm";
       if($remap_planning{$alli}) {
          $alli=$remap_planning{$alli};
       }
-      $dbnamep="/home/bernhard/db/$alli-planets.dbm";
+      $dbnamep="$awstandard::dbmdir/$alli-planets.dbm";
       untie %relation;
       untie %planetinfo;
 
@@ -386,7 +386,7 @@ sub playername2alli($) {my ($user)=@_;
    if(!$user) {return ""}
 #   if($user eq "greenbird") {return ""}
    my %alliuser;
-   awinput::opendb(O_RDONLY, "/home/aw/db2/useralli.dbm", \%alliuser);
+   awinput::opendb(O_RDONLY, "$awstandard::dbmdir/useralli.dbm", \%alliuser);
    my $alli=$alliuser{lc $user};
    untie(%alliuser);
    if(!$alli) {

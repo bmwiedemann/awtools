@@ -95,6 +95,7 @@ PRIMARY KEY ( `sidpid` )
 $dbh->do(qq!
 CREATE TABLE usersession (
 sessionid CHAR ( 32 ) BINARY NOT NULL ,
+pid  MEDIUMINT NOT NULL,
 name VARCHAR ( 64 ) NOT NULL,
 nclick INT ,
 firstclick INT NOT NULL ,

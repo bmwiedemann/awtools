@@ -5,7 +5,7 @@ use CGI ":standard";
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use Digest::MD5 "md5_hex";
 
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 awstandard_init();
@@ -19,7 +19,7 @@ for my $p (qw'pw user awname') {
    $options{$p}=~s/[<>]//g; # min sanitize user input
 }
 if($options{user} && md5_hex('sAlty'.$options{pw}) eq '3b8614d7b6019df32e86f35b1ed300dd') {
-   awinput::opendb(O_RDWR|O_CREAT, "/home/aw/db2/rsamap.dbm", \%db);
+   awinput::opendb(O_RDWR|O_CREAT, "$awstandard::dbmdir/rsamap.dbm", \%db);
    if($options{awname}) {
 #      my $x=awstandard::urldecode($options{user});
       $db{$options{user}}=$options{awname};

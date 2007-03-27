@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 my @paramlist=qw(user refsys style tz customhtml);
 my %options;

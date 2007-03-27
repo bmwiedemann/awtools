@@ -5,11 +5,10 @@ use strict;
 use warnings;
 use mod_perl;
 use constant MP2 => ($mod_perl::VERSION >= 1.99);
-use GD;
+#use GD;
+use awstandard;
 #use Apache::RequestRec ();
 #use Apache2::RequestIO ();
-#my $dir="/home/aw/db/large-$ENV{REMOTE_USER}";
-my $dir="/home/aw/alli/$ENV{REMOTE_USER}/l";
 my ($x,$y,$o)=$ENV{QUERY_STRING}=~m/x=([-+0-9]*)&y=([-+0-9]*)&o=([^=&]*)/;
 
 my $r = shift;
@@ -20,7 +19,7 @@ if(0) {
    my $image;
    my $ret=require "livemap/draw.pm";
    if(!$ret) {
-      $image=`cat /home/aw/html/images/awmaperror.png`;
+      $image=`cat $awstandard::htmldir/images/awmaperror.png`;
    } else {
       $o=~s/%2C/,/;
       $o=~s/[^0-9,]//g; # sanitize user input

@@ -5,7 +5,7 @@ use CGI ":standard";
 
 my $title="manage planet info";
 my %options;
-BEGIN {chdir "/home/aw/inc";}
+
 use awstandard;
 use awinput;
 awinput_init();
