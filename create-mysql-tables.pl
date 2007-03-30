@@ -9,8 +9,9 @@ $dbh->do(qq!
 CREATE TABLE `cdlive` (
 `pid` INT NOT NULL ,
 `time` INT,
-`points` INT,
-`pl` INT,
+`points` SMALLINT NOT NULL,
+`pl` SMALLINT NOT NULL,
+`totalpop` SMALLINT NOT NULL,
 PRIMARY KEY ( `pid` )
 );!);
 
@@ -87,9 +88,12 @@ INDEX (`pid2`)
 $dbh->do(qq!
 CREATE TABLE `cdcv` (
 `sidpid` INT NOT NULL ,
-`time` INT,
-`cv` INT,
-PRIMARY KEY ( `sidpid` )
+`time` INT NOT NULL,
+`cv` INT NOT NULL,
+`pop` SMALLINT NOT NULL,
+`pid` INT NOT NULL,
+PRIMARY KEY ( `sidpid` ),
+INDEX (`pid`)
 );!);
 
 $dbh->do(qq!

@@ -1,0 +1,70 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+use arrival;
+use sort_table;
+#awstandard_init();
+awinput_init();
+
+our %options;
+print AWheader("AW intercept tool");
+print start_form(-name=>"form", -method=>"get"),textfield(-name=>'p', -class=>'text')," sid#pid",br,
+         textfield(-name=>'cvlimit', -class=>'text')," xCV-limit",br,
+         textfield(-name=>'timelimit', -class=>'text')," time-limit(hours)",br,
+         textfield(-name=>'tag', -class=>'text')," target owner [TAG] override",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p"),
+      br,"This tool allows you to check who can intercept a certain fleet. The xCV-limit and time-limit values act as a filter.",br;
+
+if(param()) {
+	foreach my $p (qw(p cvlimit timelimit sort)) {
+		$options{$p}=param($p);
+      if(defined($options{$p})){$options{$p}=~s/[^.0-9#]//g;} # sanitize user input;
+	}
+   $options{tag}=lc(param("tag")||"");
+   if(!defined $options{sort}){$options{sort}="3";}
+   my ($sid,$pid)=sidpid32sidpid2($options{p});
+   my $name=systemid2link($sid);
+   if(!defined($name)) {
+      print "system $sid not found";
+   } else {
+      if(!$options{tag}) {
+         my $p=sidpid2planet($options{p});
+         my $o=planet2owner($p);
+         $options{tag}=lc(playerid2tag($o)||"");
+      } else {
+         $options{tag}=~s/[^a-z]//g;
+      }
+      print "to $name#$pid owned by $options{tag}".br;
+      my $f=awinput::get_fleets2("AND `iscurrent` = 1 AND `xcv` > $options{cvlimit}");
+      my $now=time();
+      my @data;
+      foreach my $row(@$f) {
+         my ($sidpid,$owner,$eta,$cv,$xcv)=@{$row}[3..5,13,14];
+         my($sid2,$pid2)=sidpid32sidpid2m($sidpid);
+         my $dist=arrival::get_distsqr($sid,$sid2);
+         my ($pl,$ener,$phys,$math,$speed,$att,$def)=awinput::playerid2battlestats($owner);
+         next if not defined $ener;
+         my $ett=$eta?awmax(0,$eta-$now)/3600:0; # time to fly
+          # no travel-time if already there
+         my $tt=($sid==$sid2 && $pid==$pid2)?0:
+            arrival::traveltime({distance=>$dist, planet=>abs($pid2-$pid), racespeed=>$speed, energy=>$ener, own=>($options{tag} eq lc(playerid2tag($owner)||""))});
+         $tt+=$ett;
+         if($options{timelimit} && $tt>$options{timelimit}) {next}
+         push(@data, [$owner,$sid2,$tt,$cv,$xcv]);
+            
+#         my($x2,$y2)=systemid2coord($sid2);
+#         print "$x2,$y2 $dist $owner $eta $now $ett ";
+#         print awinput::show_fleet($row).br;
+      }
+      print sort_table([qw(who where when(h) howmuchCV xCV)],
+            [\&display_pid, \&display_sid, \&display_round2, \&display_string, \&display_string],
+            [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+            sort_param_to_keys($options{sort}), \@data);
+   }
+}
+
+print AWtail();
+

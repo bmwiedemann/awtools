@@ -13,6 +13,11 @@ $dbh->do("DELETE FROM `fleets` WHERE `lastseen` < ".$time2);
 my $time3=$now-14*24*3600;
 $dbh->do("DELETE FROM `imessage` WHERE `time` < ".$time3);
 
-$dbh->do("OPTIMIZE TABLE `fleets`");
-$dbh->do("OPTIMIZE TABLE `usersession`");
-$dbh->do("OPTIMIZE TABLE `battles`");
+my $time4=$now-8*3600;
+$dbh->do("DELETE FROM cdcv WHERE pid = 0 OR time < $time"); # delete outdated entries
+$dbh->do("DELETE FROM cdlive WHERE time < $time");
+
+
+foreach my $t (qw(fleets usersession battles imessage cdcv cdlive)) {
+   $dbh->do("OPTIMIZE TABLE `$t`");
+}

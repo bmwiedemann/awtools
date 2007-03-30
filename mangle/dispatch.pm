@@ -46,10 +46,10 @@ sub mangle_dispatch(%) { my($options)=@_;
    # greenbird special
    if(m/onLoad="document.login.secure.focus\(\);">/) {
       if($g) {
-         do "mangle/special/secure.pm";
-         $_=mangle::special::secure::mangle($_);
+         if(do "mangle/special/secure.pm") {
+            $_=mangle::special::secure::mangle($_);
+         }
       }
-      #do "mangle/special/secure_nice.pm";
       mangle::special::secure_nice::mangle($_);
    }
 
@@ -220,7 +220,8 @@ sub mangle_dispatch(%) { my($options)=@_;
          if(-r "$awstandard::cssdir/$s.css") {$style=$s;last;}
       }
       if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
-      s%<style type="text/css"><[^<>]*//-->\n</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;
+      elsif(m%Enter the characters as they are shown in the box below%) {$style="awlogin";}
+      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;
    }
    if($gameuri || $g) {
       # fix AR's broken HTML

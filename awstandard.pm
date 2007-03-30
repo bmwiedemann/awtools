@@ -180,8 +180,8 @@ sub alliancelink($) { my($atag)=@_;
 }
 
 
-sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
-	foreach($race,$sci,$trade) {next unless defined $_; if(!@$_){$_=undef}}
+sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,undef,$prod)=@_;
+	foreach($race,$sci) {next unless defined $_; if(!@$_){$_=undef}}
 	if($race) {$race="race:".join(",",@$race);} else {undef $race}
 	if($sci) {
       my @oldsci=relation2science($oldentry);
@@ -189,7 +189,7 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
       for my $i(0..7) { $oldsci[$i]=$$sci[$i] if defined($$sci[$i]);}
       $sci="science:".time().",".join(",",@oldsci);
    } else {undef $sci}
-	if($trade) {$trade="trade:".join(",",@$trade);} else {undef $trade}
+#	if($trade) {$trade="trade:".join(",",@$trade);} else {undef $trade}
 	if($prod) {$prod="production:".join(",",@$prod);} else {undef $prod}
 	if(!$oldentry) {$oldentry="0 UNKNOWN "}
 	my ($rest,$magic)=($oldentry,$magicstring." ");
@@ -197,7 +197,7 @@ sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,$trade,$prod)=@_;
 		($rest,$magic)=($1,$2);
 	}
 #	if(!$magic) {$magic=$magicstring." "}
-	if($trade && $magic!~s/trade:\S*/$trade/) {$magic=~s/automagic:/$&\n$trade /}
+#	if($trade && $magic!~s/trade:\S*/$trade/) {$magic=~s/automagic:/$&\n$trade /}
 	if($prod && $magic!~s/production:\S*/$prod/) {$magic=~s/automagic:/$&\n$prod /}
 	if($sci && $magic!~s/science:[-+,.0-9?]*/$sci/) {$magic=~s/automagic:/$&\n$sci /}
 	if($race && $magic!~s/race:[-+,0-9?]*/$race/) {$magic=~s/automagic:/$&\n$race /}

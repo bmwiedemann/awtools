@@ -7,6 +7,7 @@ package mangle::special::secure; # preprocess security check for convenience
 #if($::options{name} eq "greenbird" && m/onLoad="document.login.secure.focus();">/) {
 sub mangle($)
 { local $_=$_[0];
+#return $_;
    eval {use strict;
 
 #      $_.="test OK";

@@ -149,10 +149,10 @@ if(param("legend")) {
       my $aref=$dbh->selectall_arrayref($sth, {}, $sidpid1, $sidpid1+11);
       my %planetcdcv;
       foreach my $row (@$aref) {
-         my($sidpid,$time,$cv)=@$row;
+         my($sidpid,$time,$cv,$pop,$plid)=@$row;
          my $pid=awinput::sidpid2pidm($sidpid);
 #         print "$pid $cv ".scalar localtime($time);
-         $planetcdcv{$pid}=$cv;
+         $planetcdcv{$pid}=[$cv,$pop,$plid];
       }
          
 		## start of normal output ##
@@ -213,7 +213,8 @@ if(param("legend")) {
             $fleetsstr.=$eol.awinput::show_fleet($f);
          }
          if(defined(my $plcdcv=$planetcdcv{$planetid})) {
-            $fleetsstr.=$eol.$plcdcv." CV defending (from countdown info)";
+            my($cv,$pop,$plid)=@$plcdcv;
+            $fleetsstr.=$eol."CV=$cv pop=$pop (from countdown info)";
          }
          my $img;
          if($options{simple}) {$img="edit"}

@@ -18,4 +18,12 @@ sub effectiveenergy($$) { my($racespeed, $energy)=@_;
    return $energy - log(1+$rs*$racespeed)/log($e);
 }
 
+# calc square of distance. needs awinput
+sub get_distsqr($$)
+{ my($s1,$s2)=@_;
+   my($x1,$y1)=awinput::systemid2coord($s1);
+   my($x2,$y2)=awinput::systemid2coord($s2);
+   return (($x1-$x2)**2+($y1-$y2)**2);
+}
+
 1;

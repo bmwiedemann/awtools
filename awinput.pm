@@ -12,7 +12,7 @@ our $alarmtime=99;
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid22sidpid3m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &get_dbh
+&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &get_dbh
 &display_pid &display_relation &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -210,6 +210,10 @@ sub playerid2link2($) {
    return $l;
 }
 
+sub systemid2link($) { 
+   display_sid($_[0]);
+}
+
 sub getplanetinfo($$;$) { my($sid,$pid)=@_;
 	my $id="$sid#$pid";
 	my $pinfo=$planetinfo{$id};
@@ -306,7 +310,9 @@ sub sidpid2planet($) {my ($sidpid)=@_;
 }
 sub getplanet2($) { sidpid2planet($_[0]) }
 sub sidpid22sidpid3($$) { "$_[0]#$_[1]" }
+sub sidpid32sidpid2($) { split('#', $_[0]) }
 sub sidpid22sidpid3m($$) {return $_[0]*13+$_[1];}
+sub sidpid32sidpid2m($) {return (int($_[0]/13), $_[0]%13)}
 
 # return all know production values, PP/A$,artifact
 sub playername2production($)
@@ -617,6 +623,19 @@ sub get_alli_match($)
    return $allimatch;
 }
 
+# get all fleets visible to own alli
+# input: SQL condition to add - defaults to ""
+sub get_fleets2($) { my($cond)=@_;
+   my $alli=$ENV{REMOTE_USER};
+   if(!$alli) {return [];}
+   $cond||="";
+   my $allimatch=get_alli_match($alli);
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT * from `fleets` WHERE ($allimatch) $cond");
+   my $res=$dbh->selectall_arrayref($sth, {});
+   return $res;
+}
+
 # input: sidpid
 # input: SQL condition to add - defaults to ""
 sub get_fleets($;$) { my($sidpid,$cond)=@_;
@@ -624,8 +643,9 @@ sub get_fleets($;$) { my($sidpid,$cond)=@_;
    if(!$alli) {return [];}
    $cond||="";
    my $allimatch=get_alli_match($alli);
-   my $sth=$DBAccess::dbh->prepare_cached("SELECT * from `fleets` WHERE ($allimatch) AND `sidpid` = ? $cond ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
-   my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $sidpid);
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT * from `fleets` WHERE ($allimatch) AND `sidpid` = ? $cond ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
+   my $res=$dbh->selectall_arrayref($sth, {}, $sidpid);
    return $res;
 }
 
@@ -660,9 +680,11 @@ sub show_fleet($) { my($f)=@_;
    if($eta) {$eta=AWisodatetime($eta+$tz)." GMT$tz2 ".awstandard::AWreltime($eta)} else {$eta="defending fleet.............."}
    if(length($eta)<$minlen1) {$eta.="&nbsp;" x ($minlen1-length($eta))}
    if(length($flstr)<$minlen) {$flstr.="&nbsp;" x ($minlen-length($flstr))}
-   my $xinfo=sidpid2sidm($sidpid)."#".sidpid2pidm($sidpid).": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
+   my $sid=sidpid2sidm($sidpid);
+   my $pid=sidpid2pidm($sidpid);
+   my $xinfo="$sid#$pid".": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
    if($info) {$info=" ".$info}
-   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://$bmwserver/cgi-bin/edit-fleet?fid=$fid\">edit</a> <a href=\"http://$bmwserver/cgi-bin/fleetbattlecalc?fid=$fid\">bc</a> $eta $flstr ".playerid2link($owner).$info."</span>";
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://$bmwserver/cgi-bin/edit-fleet?fid=$fid\">edit</a> <a href=\"http://$bmwserver/cgi-bin/fleetbattlecalc?fid=$fid\">bc</a> <a href=\"http://$bmwserver/cgi-bin/whocanintercept?p=$sid%23$pid&amp;cvlimit=$cv\">catch</a> $eta $flstr ".playerid2link($owner).$info."</span>";
 }
 
 # support functions for sort_table

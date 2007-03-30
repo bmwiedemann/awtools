@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold7
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html preferences alliance{,2} arrival authaw authrsa awlinker awtoolstatistics joinalli cdinfo distsqr eta fighterlist tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info testenv planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout nph-brownie.cgi
+tools=index.html preferences alliance{,2} arrival authaw authrsa awlinker awtoolstatistics joinalli cdinfo distsqr eta fighterlist tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info testenv planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars whocanintercept coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -21,6 +21,7 @@ links:
 
 init:
 	$(MAKE) links
+	perl -e 'print rand(1000000000000000)."\n"' > systemexportsecret
 	./create-mysql-tables.pl
 	wget -Oalltrades.csv http://aw.lsmod.de/alltrades.csv
 
@@ -126,11 +127,12 @@ access:
 tgz:
 	rm -rf bmw-awtools
 	mkdir bmw-awtools
-	cp -a *.pl *.pm ${tools} prices.csv preproc feed mangle ../brownie Makefile bmw-awtools
+	cp -a *.pl *.pm ${tools} prices.csv livemap preproc feed mangle ../brownie Makefile bmw-awtools
 	cp -a --parent html/code/css/{tools,*.css} html/code/js html/images/aw bmw-awtools
 	cd bmw-awtools &&\
 	chmod 755 html && mkdir -p cgi-bin/public log &&\
 	cp -a /home/aw/startup.pl ../dist-extra/* ../dist-extra/.ht* . &&\
+	perl -i -pe 'if($$n){$$n--;$$_=""} if(m/greenbird 1/){$$n=2};' mangle/dispatch.pm &&\
 	perl -i -pe 's/dbpasswd = .*/dbpasswd = "xxx";/; s/bmwuser/awuser/; ' DBConf.pm &&\
 	find -name CVS -o -name ".*.swp" | xargs rm -rf &&\
 	rm -rf nph-brownie.cgi holes2.pl mangle/special/secure.pm brownie/old preproc/www1.astrowars.com/zq*

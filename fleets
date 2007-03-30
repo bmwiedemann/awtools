@@ -43,8 +43,8 @@ foreach my $row1 (@sidpids) {
    if(!defined($sb)){$sb="?"}
    $info=~s!^\d [^ ]+!!;
    $info=~s!automagic:.*!!g;
-	my $str=qq!<a href="/cgi-bin/planet-info?id=$penc">$p</a> of !.display_pid($owner)." SB $sb $info";
-	#my $str=qq!<a href="/cgi-bin/system-info?id=$sid">$p</a> $info<br />\n!;
+	my $str=qq!<a href="planet-info?id=$penc">$p</a> of !.display_pid($owner)." SB $sb $info";
+	#my $str=qq!<a href="system-info?id=$sid">$p</a> $info<br />\n!;
 
    my $res=awinput::get_fleets($sidpid, $wantcurrent);
    if(!$res || !@$res) {next}

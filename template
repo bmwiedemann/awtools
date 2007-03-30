@@ -12,6 +12,7 @@ print AWheader("AW xyztool");
 if(param()) {
 	foreach my $p (qw(p)) {
 		$options{$p}=param($p);
+#      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
 	}
    if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
 } else {
