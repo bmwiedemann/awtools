@@ -72,7 +72,7 @@ sub mangle_dispatch(%) { my($options)=@_;
             my $aid=playerid2alliance($$options{pid});
             if(($interbeta || !$aid) && $$options{name} && ($$options{name} ne "unknown")) {
                $joinlink="<br>".$$options{authlink}."/modperl/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
-            } elsif($awinput::aliances{$aid} && $awinput::aliances{$aid}->{founder}==$$options{pid}) {
+            } elsif(is_founder($$options{pid})) {
                # if alliance founder, add extra "accept NAP with AF" link
                $joinlink.="<br><a href=\"http://aw.lsmod.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
             }
@@ -135,7 +135,8 @@ sub mangle_dispatch(%) { my($options)=@_;
       $$options{authpid}=$$options{pid};
       my $ims=awimessage::get_all_ims($options);
       if($ims && @$ims) { # have im
-         $imessage="<!-- start gb imessage --><div class=awimessage>you have $$options{authlink}/imessage\" class=\"awtools\">instant messages</a><br>";
+         my $nims=@$ims;
+         $imessage="<!-- start gb imessage --><div class=awimessage>you have $nims $$options{authlink}/imessage\" class=\"awtools\">instant messages</a><br>";
          foreach my $im (@$ims) {
             my ($imid,$time,$sendpid,$recvpid,$msg)=@$im;
             my $fromto;

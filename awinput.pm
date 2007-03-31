@@ -12,7 +12,7 @@ our $alarmtime=99;
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &get_dbh
+&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &is_admin &is_founder &get_dbh
 &display_pid &display_relation &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -26,6 +26,8 @@ use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use awaccess;
 use awstandard;
 my $head="Content-type: text/plain\015\012";
+
+my %adminlist=(greenbird=>1);
 
 sub awinput_init(;$) { my($nolock)=@_;
    awstandard_init();
@@ -109,6 +111,24 @@ sub getauthname() {
 #      }
 #   }
 #   return $authname;
+}
+
+sub is_admin()
+{
+   my $n=getauthname();
+   if(!$n){return}
+   return $adminlist{$n};
+}
+
+sub is_founder($)
+{
+   my ($pid)=@_;
+   if(!$pid) {return 0}
+   my $aid=playerid2alliance($pid);
+   if($aid && $awinput::alliances{$aid} && $awinput::alliances{$aid}->{founder}==$pid) {
+      return 1;
+   }
+   return 0;
 }
 
 sub getrelation($;$) { my($name)=@_;
@@ -611,16 +631,41 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
 
 # input: alli
 # output: SQL to match allies
-sub get_alli_match($)
+sub get_alli_match($;$)
 {
-   my($alli)=@_;
-   my $allimatch="`alli` = '$alli'";
+   my($alli,$n)=@_;
+   $n||="alli"; # default used for fleets
+   if(!$alli) { return "0" }
+   my $allimatch="(`$n` = '$alli'";
    if($read_access{$alli}) {
       foreach my $a (@{$read_access{$alli}}) {
-         $allimatch.=" OR `alli` = '$a'";
+         $allimatch.=" OR `$n` = '$a'";
       }
    }
-   return $allimatch;
+   return $allimatch.")";
+}
+
+sub get_team_pids($)
+{
+   my($team)=@_;
+   if(!$ENV{REMOTE_USER}) {return []}
+   my $m="";
+   if($team) {
+      $m="AND ".awinput::get_alli_match($ENV{REMOTE_USER},'tag');
+   } else {
+      $m="AND `tag` = '$ENV{REMOTE_USER}'";
+   }
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT `pid` FROM alliances,player WHERE aid = alliance $m");
+#   my $res=$dbh->selectall_arrayref("SELECT DISTINCT usersession.pid FROM usersession,alliances,player WHERE usersession.pid = player.pid AND aid = alliance AND $m");
+   my $res=$dbh->selectall_arrayref($sth, {});
+   return $res;
+}
+
+sub get_all_brownie_pids
+{
+   my $dbh=get_dbh;
+   my $res=$dbh->selectall_arrayref("SELECT pid FROM usersession GROUP BY usersession.pid");
 }
 
 # get all fleets visible to own alli

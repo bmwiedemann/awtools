@@ -11,8 +11,8 @@ use awinput;
 awinput_init();
 
 
-my @weekday1=qw(sun mon tue wed thu fri sat);
-my @weekday2=qw(sunday monday tuesday wednesday thursday friday saturday);
+our @weekday1=qw(sun mon tue wed thu fri sat);
+our @weekday2=qw(sunday monday tuesday wednesday thursday friday saturday);
 my $weekdays=join("\\b|\\b",@weekday2,@weekday1);
 my $weekdayre=qr/($weekdays)/i;
 

@@ -12,7 +12,7 @@ use awimessage;
 #awstandard_init();
 awinput_init();
 
-my %options;
+our %options;
 sub display_delim
 { 
    return a({-href=>"?action=delete&imid=$_[0]"},"del")
@@ -39,6 +39,7 @@ sub imlist(%)
       );
 }
 
+my $admin=is_admin;
 
 print AWheader("AW instant messaging tool");
 my $authname=awinput::getauthname();
@@ -46,6 +47,7 @@ my $authpid=playername2id($authname);
 if(!$authpid) {
    print "Sorry, you can only use IMs when properly authenticated from brownie\n";
 } else {
+   %options=(); # clear global var from last mod-perl loop
    $options{authpid}=$authpid;
 	foreach my $p (qw(action imid msg recv sort)) {
 		$options{$p}=param($p);
@@ -53,10 +55,58 @@ if(!$authpid) {
    if(!$options{sort}){$options{sort}="2";} # default sort by time
    if(!$options{action} || $options{action}=~m/[^a-z_-]/){$options{action}="list";}
    if($options{recv} && $options{recv}=~m/[^0-9]/) { $options{recv}=playername2id($options{recv}); } # counts as sanitizing
-   print a({-href=>"?action=send"},"send")." ".a({-href=>"?action=list"},"list").br;
-   if($options{action} eq "send") {
+   my $subtools="";
+   my @tlist=qw(send list delrecv delsent);
+   if($ENV{REMOTE_USER}) {
+      push(@tlist,"sendalli", "sendteam");
+   }
+   if($admin) {
+      push(@tlist,"sendall");
+   }
+   foreach my $t (@tlist) {
+      $subtools.=a({-href=>"?action=$t"}, $t)." ";
+   }
+   print $subtools,br;
+   if($admin && $options{action} eq "sendall") {
+      if($options{msg}){
+         my $to=awinput::get_all_brownie_pids();
+         foreach my $r (@$to) {
+            $options{recv}=$r->[0];
+#print "$options{recv} ";
+            print awimessage::send(\%options),br;
+         }
+         print "sent msg to ",scalar @$to,br;
+      } else {
+         print "send a message to all brownie users",br,
+               start_form(-name=>"form"),
+               textarea(-name=>'msg',-value=>"", -cols=>40, -rows=>9, -class=>'text'),br,
+               hidden(-name=>"action",-value=>"sendall"),
+               submit(-value=>"send", -class=>'smbutton'),end_form.AWfocus("form.msg");
+      }
+   }
+   elsif($ENV{REMOTE_USER} and ($options{action} eq "sendalli" or $options{action} eq "sendteam")) {
+      if($options{msg}){
+         my $to=awinput::get_team_pids($options{action} eq "sendteam");
+         foreach my $r (@$to) {
+            $options{recv}=$r->[0];
+#            print "$options{recv} ";
+            print awimessage::send(\%options),br;
+         }
+         print "sent msg to ",scalar @$to,br;
+      } else {
+         print "send a message to all your team/alliance members (who use brownie)",br,
+               start_form(-name=>"form"),
+               textarea(-name=>'msg',-value=>"", -cols=>40, -rows=>9, -class=>'text'),br,
+               hidden(-name=>"action",-value=>"sendall"),
+               submit(-value=>"send", -class=>'smbutton'),end_form.AWfocus("form.msg");
+      }
+   }
+   elsif($options{action} eq "delrecv" or $options{action} eq "delsent") {
+      print awimessage::delete_all_x(\%options);
+   } 
+   elsif($options{action} eq "send") {
       if($options{recv} && $options{msg} && playerid2name($options{recv})){
-         awimessage::send(\%options);
+         print awimessage::send(\%options);
       } else {
          print start_form(-name=>"form"),textfield(-name=>'recv', -class=>'text', -size=>6)," Player ID or name",br,
                textarea(-name=>'msg',-value=>"", -cols=>40, -rows=>9, -class=>'text'),br,
@@ -69,7 +119,7 @@ if(!$authpid) {
       awimessage::delete(\%options);
    }
 
-   print imlist(\%options), p("Messages expire after 2 weeks. But you can always delete them earlier.");
+   print imlist(\%options), p("Messages expire after 2 weeks. But you can always delete them earlier. sendteam is like sendalli, but includes other alliances that share fleet info with you.");
 }
 print AWtail();
 

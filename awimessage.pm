@@ -38,6 +38,22 @@ sub delete(%)
    }
 }
 
+# delete all received messages
+sub delete_all_x(%)
+{
+   my $options=shift;
+   my $dbh=get_dbh;
+   my $what=($$options{action} eq 'delrecv'?'recvpid':'sendpid');
+   my $sth=$dbh->prepare_cached("DELETE FROM `imessage` WHERE `$what` = ?");
+   my $res=$sth->execute($$options{authpid});
+   if($res > 0) {
+      return "deleted $res messages";
+   } elsif($res eq "0E0") {
+      return "no messages found";
+   }else {
+      return "DB error $res?";
+   }
+}
 
 sub send(%) {
    my $options=shift;
@@ -45,7 +61,7 @@ sub send(%) {
    my $dbh=get_dbh;
    my $sth=$dbh->prepare_cached("INSERT INTO `imessage` VALUES ('', ?, ?, ?, ?);");
    $sth->execute(time(),$$options{authpid},$$options{recv},$$options{msg});
-   print "sent message to ".awinput::playerid2link($$options{recv});
+   return " sent message to ".awinput::playerid2link($$options{recv});
 }
 
 1;

@@ -23,7 +23,7 @@ if(defined($options{relation})) {
 	if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
 	$options{alliance} =~ y/a-z/A-Z/;
 	my %data;
-	tie(%data, "DB_File", $dbnamer) or print "error accessing DB\n";
+	tie(%data, "DB_File", $awinput::dbnamer) or print "error accessing DB\n";
 	$options{user}=~s/[\r\n\t ]+/ /g;
 	my $i=0;
 	foreach my $user(split(" ", $options{user})) {
