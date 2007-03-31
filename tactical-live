@@ -72,7 +72,7 @@ function getMouseXY(e) {
     tempX = e.pageX
     tempY = e.pageY
   }
-  window.status="("+Math.floor((tempX-0)/$options{scale}/$::pixelpersystem+($options{xs}-$xsize))+","+Math.floor((tempY-0)/$options{scale}/$::pixelpersystem+($options{ys}-$ysize))+")"
+  window.status="("+Math.floor((tempX-0)/$options{scale}/$pixelpersystem+($options{xs}-$xsize))+","+Math.floor((tempY-0)/$options{scale}/$pixelpersystem+($options{ys}-$ysize))+")"
   return true
 }
 //--></script>%

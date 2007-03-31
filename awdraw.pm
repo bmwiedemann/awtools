@@ -40,12 +40,12 @@ sub mapimage($$$$;$$) {
    $mapyend++;
    my $mapsizex=$mapxend-$mapxstart;
    my $mapsizey=$mapyend-$mapystart;
-   $::mapxoff=$mapxstart;
-   $::mapyoff=$mapystart;
-   $::mapxoff=$mapxstart; # dummy to avoid warning
-   $::mapyoff=$mapystart;
-   our $imagesizex=$mapsizex*$::pixelpersystem;
-   our $imagesizey=$mapsizey*$::pixelpersystem;
+   $mapxoff=$mapxstart;
+   $mapyoff=$mapystart;
+   $mapxoff=$mapxstart; # dummy to avoid warning
+   $mapyoff=$mapystart;
+   our $imagesizex=$mapsizex*$pixelpersystem;
+   our $imagesizey=$mapsizey*$pixelpersystem;
 
 
 
@@ -64,9 +64,9 @@ sub mapimage($$$$;$$) {
 
     for(my $x=$mapxstart; $x<$mapxend; $x++) {
      for(my $y=$mapystart; $y<$mapyend; $y++) {
-      my ($px,$py)=awmap::maptoimg($x,$y, $::mapxoff, $::mapyoff);
-      my $pxe=$px+$::pixelpersystem;
-      my $pye=$py+$::pixelpersystem;
+      my ($px,$py)=awmap::maptoimg($x,$y, $mapxoff, $mapyoff);
+      my $pxe=$px+$pixelpersystem;
+      my $pye=$py+$pixelpersystem;
       my $px2=$px+1;
       my $px3=$pxe-1;
       my $color;

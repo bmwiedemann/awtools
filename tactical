@@ -2,7 +2,6 @@
 use strict;
 use CGI ":standard";
 
-
 use awstandard;
 use awmap;
 awstandard_init();
@@ -44,7 +43,7 @@ function getMouseXY(e) {
     tempX = e.pageX
     tempY = e.pageY
   }
-  window.status="("+Math.floor((tempX-0)/$::pixelpersystem+($::mapxoff))+","+Math.floor((tempY-0)/$::pixelpersystem+($::mapyoff))+")"
+  window.status="("+Math.floor((tempX-0)/$pixelpersystem+($mapxoff))+","+Math.floor((tempY-0)/$pixelpersystem+($mapyoff))+")"
   return true
 }
 //--></script>%;
