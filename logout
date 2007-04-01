@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-use lib "/home/aw/inc";
 use awinput;
 
 my $auth=getauthname();
