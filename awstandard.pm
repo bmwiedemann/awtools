@@ -15,9 +15,9 @@ use CGI ":standard";
 use Time::Local;
 use Time::HiRes qw(gettimeofday tv_interval);
 
-our $server="www1.astrowars.com";
-our $awforumserver="www.astrowars.com";
-our $bmwserver="aw.lsmod.de";
+our $server="www1.astrowars.com";       # AW game host
+our $awforumserver="www.astrowars.com"; # AW forum host
+our $bmwserver="aw.lsmod.de";           # the domain name you use for the AWTools
 our $basedir;
 our $dbmdir; 
 BEGIN{
@@ -53,7 +53,7 @@ sub awstandard_init() {
    if($alli && $awaccess::remap_alli{$alli}) {
       $ENV{REMOTE_USER}=$alli=$awaccess::remap_alli{$alli};
    }
-   chdir $codedir;
+#   chdir $codedir;
    $style=cookie('style');
    $timezone=cookie('tz');
    $customhtml=cookie('customhtml');
