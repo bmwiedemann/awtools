@@ -21,7 +21,7 @@ print start_form(-name=>"form", -method=>"get"),textfield(-name=>'p', -class=>'t
 if(param()) {
 	foreach my $p (qw(p cvlimit timelimit sort)) {
 		$options{$p}=param($p);
-      if(defined($options{$p})){$options{$p}=~s/[^.0-9#]//g;} # sanitize user input;
+      if(defined($options{$p})){$options{$p}=~s/[^-.0-9#]//g;} # sanitize user input;
 	}
    $options{tag}=lc(param("tag")||"");
    if(!defined $options{sort}){$options{sort}="3";}

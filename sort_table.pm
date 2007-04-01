@@ -7,7 +7,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&display_string &display_round0 &display_round1 &display_round2 &display_etc &display_needplanets &sort_num &sort_string &sort_table &sort_param_to_keys
+&display_string &display_round0 &display_round1 &display_round2 &display_etc &display_needplanets &sort_num &sort_string &sort_istring &sort_table &sort_param_to_keys
 );
 use awstandard;
 use CGI qw":standard";
@@ -42,6 +42,7 @@ sub display_needplanets{ my($n)=@_;
 
 sub sort_num($$) {defined($_[0]) && defined($_[1]) && ($_[0]<=>$_[1])}
 sub sort_string($$) {$_[0] cmp $_[1]}
+sub sort_istring($$) {lc($_[0]) cmp lc($_[1])}
 
 
 sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;

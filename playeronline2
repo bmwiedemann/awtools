@@ -41,7 +41,7 @@ if(param()) {
          if(!$firstlog) {$firstlogt=$l[1]-$l[3];$firstlog=$dt1-$dt1%$granularity; $dt1-=$firstlog;}
          my $dt=time2dt($l[1]);
          my $dt2=time2dt($l[1]+$l[2]);
-         next if($dt1<0 || $dt<0 || $dt2<0);
+         next if($dt1<=0 || $dt<0 || $dt2<0);
          my $width1=(($dt1-$lastlog)/$ticks-1.5);
          if($width1<=0.1) {$width1=0.1}
          my $width2=$dt2-$dt||1;
