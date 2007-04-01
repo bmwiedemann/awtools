@@ -59,5 +59,5 @@ else {
 	print start_form('get'), textfield(-name=>'user'), " user name", br,
 	 submit("query")
 }
-print end_form, end_html;
+print end_form, AWtail();
 

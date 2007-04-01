@@ -3,7 +3,6 @@
 use strict;
 use CGI ":standard";
 
-
 use awstandard;
 use awinput;
 #awstandard_init();
@@ -37,6 +36,7 @@ if($refsys && param()) {
    my $pdiff=abs($refpid-$options{pid});
    #print header(), "eta for: $refsid#$refpid -> $options{sid}#$options{pid}";
    print redirect("/cgi-bin/arrival?distance=$refdist&amp;planet=$pdiff&amp;energy=$refe&amp;racespeed=$refs");
+   awinput::awinput_finish();
 
 } else {
    print AWheader("AW ETA tool"). "This tool uses the value from refsys cookie as second coord which can be ".a({-href=>"preferences"},"set in preferences")." or system-info tools".br;
