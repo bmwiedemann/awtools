@@ -3,26 +3,68 @@ use strict;
 use CGI ":standard";
 
 use awstandard;
+use awinput;
+use sort_table;
 awstandard_init();
 
-my $sortopts="-k15";
-my $round="gold7";
+my %options;
+for my $p (qw'sort') {
+   $options{$p}=param($p);
+}
+if(!defined $options{sort}){$options{sort}="1";}
+
 my $titlestr;
+my $sortfunc;
+my $othertool;
 if($0=~/topwars/) {
+   $othertool="topallis";
 	$titlestr=" wars";
+   $sortfunc=sub{$a->[12]<=>$b->[12]};
 } else {
+   $othertool="topwars";
 	$titlestr=" cooperations";
-	$sortopts="-r -k5";
+   $sortfunc=sub{$b->[2]<=>$a->[2]};
 }
 my $n=50;
 my $title="AW $n largest alliance$titlestr";
 print AWheader($title);
-my $filename="html/$round/alliancerelation";
+my $filename="$awstandard::htmldir/round/alliancerelation";
 my $mtime=gmtime((stat($filename))[9]);
-print "extracted from ".a({-href=>"/$round/alliancerelation"},"alliancerelation data").br.
-	"Last Update $mtime GMT\n".br.
-	"alli -- alli // sum(minpop) shared-systems taken-planets lost-planets killed-pop lost-pop killed-CV lost-CV battling-CV #battles friendlyness";
+print "extracted from ".a({-href=>"/round/alliancerelation"},"alliancerelation data").br.
+	"Last Update $mtime GMT\n".br,
+   a({-href=>$othertool},"see also $othertool");
 
-my $data=`sort $sortopts -n $filename | head -$n`;
-print pre($data);
+my @data=();
+open(FCONTENT, "<", $filename) or return undef;
+while(<FCONTENT>) {
+   chop;
+   my $a=[(split(/ /))[0,2,4..14]];
+   $a->[1]=~s/;$//;
+   push(@data, $a);
+}
+close(FCONTENT);
+@data=(sort $sortfunc @data)[0..49];
+my $rank=0;
+foreach(@data) {
+   unshift(@$_, ++$rank);
+}
+#my $data2=""; foreach(@data) { $data2.="@$_\n"; } 
+#	print "alli -- alli // sum(minpop) shared-systems taken-planets lost-planets killed-pop lost-pop killed-CV lost-CV battling-CV #battles friendlyness";
+#print pre($data2);
+
+print sort_table([qw(rank a1 a2 
+         minpop), "shared systems", "taken planets", "lost planets",
+         "killed pop", "lost pop", "killed CV", "lost CV", "battling CV", qw(battles friendlyness)],
+      [\&display_string, \&display_atag, \&display_atag, 
+      \&display_string, \&display_string, \&display_string, \&display_string, 
+      \&display_string, \&display_string, 
+      \&display_string, \&display_string, \&display_string, \&display_string, 
+      \&display_string, \&display_string],
+      [\&sort_num, \&sort_istring, \&sort_istring,
+      \&sort_num, \&sort_num, \&sort_num, \&sort_num,
+      \&sort_num, \&sort_num,
+      \&sort_num, \&sort_num, \&sort_num, \&sort_num,
+      \&sort_num, \&sort_num],
+      sort_param_to_keys($options{sort}), \@data );
+
 print AWtail();
