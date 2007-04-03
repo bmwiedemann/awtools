@@ -17,7 +17,7 @@ if(!defined $options{sort}){$options{sort}="5.-7";}
 
 my $m=3; # SL margin
 my $alli=$ENV{REMOTE_USER};
-open(IN, "<", "html/alli/$alli/spies.csv");
+open(IN, "<", "$awstandard::allidir/$alli/spies.csv");
 my @spies=<IN>;
 close(IN);
 foreach(@spies) {$_=[split(/\t/,$_)]}

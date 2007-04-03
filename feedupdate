@@ -23,7 +23,7 @@ if($options{name}){$options{name}=~s/[<>]//g;} # min sanitize user input;
 
 
 if(param()) {
-	chdir($awstandard::codedir);
+#	chdir($awstandard::codedir);
 	my $html=$options{html};
 	if(upload('file')) {
       $options{file}=~s/[^a-zA-Z0-9_.-]//g;

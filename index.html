@@ -6,7 +6,7 @@ awstandard_init();
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout antispy antispy2 battles distsqr eta feedupdate fighterlist holes imessage permanentranking planet-info playeronline playeronline2 ranking sim tactical-live2 topwars topallis tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
+foreach(qw(logout antispy antispy2 cdinfo distsqr eta feedupdate fighterlist holes imessage permanentranking planet-info playeronline playeronline2 ranking sim tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 

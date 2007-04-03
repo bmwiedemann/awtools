@@ -57,7 +57,7 @@ updatemaponly:
 	REMOTE_USER=$$a /usr/bin/nice -n +12 perl drawtactical.pl ; done
 updatemap2: cleandbs updatemapsonly
 updatemap2only:
-	#for a in $(allies) ; do \
+	for a in $(allies) ; do \
 		REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \
 	done
 updateholes:

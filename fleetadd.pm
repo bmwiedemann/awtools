@@ -11,6 +11,7 @@ sub dbfleetaddmysql { my($sid,$pid,$plid,$name,$time,$type,$fleet, $tz, $screen)
    return if(!$alli || ($time && $time<$now));
    my $status=$type||0; # use $type and $time
    $time||=0;
+   $fleet->[1]||=0; # incomings have no info about CLS, but we dont want NULL/undef values in DB so far
    my $cv=awstandard::fleet2cv($fleet);
    my $xcv=awinput::estimate_xcv($plid,$cv);
    my $fleetmatch="";

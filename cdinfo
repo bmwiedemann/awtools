@@ -2,12 +2,9 @@
 use strict;
 use CGI ":standard";
 
-use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
-
-
 use awstandard;
 use awinput;
-#awstandard_init();
+awstandard_init(); # for tool theming
 #awinput_init();
 
 our %options;
@@ -19,12 +16,6 @@ if(param()) {
    my $p=$options{p};
    print header("text/plain");
    if($p==1) {
-      my %points;
-      awinput::opendb(O_RDONLY, "$awstandard::dbmdir/points.dbm", \%points);
-      foreach(sort keys %points) {
-         print "$_\t$points{$_}\n";
-      }
-      untie %points;
    } elsif($p==2) {
       my $dbh=get_dbh;
       my $res=$dbh->selectall_arrayref("
@@ -49,7 +40,8 @@ if(param()) {
 	print start_form(-name=>"form", -method=>"get"),
 #      textfield(-name=>'p', -class=>'text'),br,
       popup_menu(-name=>'p',-values=>[2..3], -labels=>{1=>"score",2=>"CV",3=>"points+PL"})," type of dump",br,
-		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+		submit(-name=>"query", -class=>'smbutton'),end_form;
+#.AWfocus("form.p");
 #   print AWtail();
 }
 

@@ -20,12 +20,11 @@ $dbh->do("TRUNCATE TABLE `plhistory`");
 $dbh->do("TRUNCATE TABLE `planetinfos`");
 $dbh->do("TRUNCATE TABLE `player`");
 
-system("find html/alli/*/l -name \*.png|xargs rm -f");
+system("find $awstandard::allidir/*/l -name \*.png|xargs rm -f");
 system("cat empty.dbm > $awstandard::dbmdir/useralli.dbm");
 system("cat empty.dbm > $awstandard::dbmdir/points.dbm");
-system("perl -i.bak -pe 's/(round=.?)$oldname/\$1$newname/' Makefile topwars");
+system("perl -i.bak -pe 's/(round=.?)$oldname/\$1$newname/' Makefile");
 system("for f in $awstandard::dbmdir/*planets.dbm ; do cat empty.dbm > \$f ; done");
-system("find html/alli/*/l/ -name \*.png|xargs rm -f");
 
 awstandard::set_file_content("alltrades.csv", "id1\tid2\n");
 awstandard::set_file_content("systemexportsecret", rand(1000000000000000)."\n");

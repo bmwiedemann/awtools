@@ -3,9 +3,7 @@
 use strict;
 use CGI ":standard";
 
-
 use awstandard;
-use awinput;
 awstandard_init();
 
 our %options;

@@ -1,11 +1,11 @@
-#non-keyboard input with security-code +numbers(spend,launch,buy) for PDAs (non-default)?
+interbeta: prevent dups with cls incomings
 optimize ranking and antispy tools performance
-modperl transition
+#non-keyboard input with security-code +numbers(spend,launch,buy) for PDAs (non-default)?
+#modperl transition
 #making easy to run as non-root
 #fix time-to-pop to use real production (incl arti, trade, race)
 #IM to all brownie users
 #IM to whole alli
-interbeta: prevent dups with cls incomings
 #plan: aw21.zq1.de maps directly to www1.astrowars.com -> fewer translation of cookies and URLS - integrated browniecgi.pm handler avoids double-proxying
 time to arti
 CV below incoming

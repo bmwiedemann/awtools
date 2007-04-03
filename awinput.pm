@@ -13,7 +13,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
 &awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &is_admin &is_founder &get_dbh
-&display_pid &display_relation &display_sid &display_sid2 &sort_pid
+&display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
 
@@ -60,7 +60,7 @@ sub awinput_init(;$) { my($nolock)=@_;
          tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
          tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY, 0, $DB_HASH);
       } else {
-         $SIG{"ALRM"}=\&awinput_finish;
+         $SIG{"ALRM"}=sub{print STDERR "alarm $alarmtime; finish\n";&awinput_finish; require POSIX; POSIX::_exit(0);};
          alarm($alarmtime); # make sure locks are free'd
          tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
          tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
@@ -740,6 +740,9 @@ sub display_relation($) { my($rel)=@_;
    my $c=getrelationcolor($rel);
    my $rn=$awstandard::relationname{$rel};
    return qq'<span style="background-color: $c">&nbsp;$rn&nbsp;</span>';
+}
+sub display_atag($) { my($atag)=@_;
+   a({-href=>"alliance?alliance=$atag&omit=9+12+15"},$atag);
 }
 sub display_sid($) { my($sid)=@_;
    my ($x,$y)=systemid2coord($sid);
