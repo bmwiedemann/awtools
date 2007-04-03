@@ -2,19 +2,9 @@
 use strict;
 use CGI ":standard";
 
+print header("text/plain");
 
-use awstandard;
-use awinput;
-awstandard_init();
-#awinput_init();
-
-print AWheader("AW env test tool");
-
-print "<pre>\n";
 foreach(sort keys %ENV) {
    print "$_=$ENV{$_}\n";
 }
-print "</pre>";
-
-print AWtail();
 
