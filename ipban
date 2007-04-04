@@ -1,23 +1,26 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-
+use Tie::DBI;
+use Digest::MD5 "md5_hex";
 
 use awstandard;
 use awinput;
 #awstandard_init();
 awinput_init();
 use DBAccess;
-use Tie::DBI;
 print AWheader("AW IP banning tool");
 
 
-our %options;
+my %options;
 my %ips;
 tie %ips,'Tie::DBI',$dbh,'ipban','ip',{CLOBBER=>2};
-if(param()) {
+my $pw=param("password");
+#print "hash: ".md5_hex('saLtv'.$pw);
+if($pw && md5_hex('saLtv'.$pw) eq 'b75b63e7e86d2480e0e5f921fa04d730' ) {
 	foreach my $p (qw(ip action reason)) {
 		$options{$p}=param($p);
+      $options{$p}=~s/[<>]//g;
 	}
    my $ip=$options{ip};
    if($ip!~/^\d+\.\d+\.\d+\.\d+$/) {
@@ -34,14 +37,16 @@ if(param()) {
 } 
 
 print start_form(-name=>"form"),textfield(-name=>'ip', -class=>'text')," IP",br,
-      textfield(-name=>'reason', -class=>'text', -size=>50), " reason",br,
-      hidden(-name=>"action", -value=>"add"),
+      textfield(-name=>'reason', -class=>'text'), " reason",br,
+      password_field(-name=>'password', -class=>'text'), " password",br,
+      popup_menu(-name=>'action', -values=>["add","del"]), " action",br,
    submit(-name=>"ban IP", -class=>'smbutton'),end_form.AWfocus("form.ip");
 print br.q'<div style="border: solid white 1px;">';
 foreach my $ip (keys %ips) {
    my $l=a({-href=>"?ip=$ip&action=del"},"un-ban");
    print $l." $ip added ".(scalar localtime $ips{$ip}->{timeadded})." reason: ".$ips{$ip}->{reason}.br;
 }
+untie %ips;
 print "</div>";
 print AWtail();
 

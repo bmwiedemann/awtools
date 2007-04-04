@@ -79,6 +79,8 @@ my $allplayers=$::dbh->selectall_arrayref($sth, undef, $minsci, $minxy[0], $minx
 foreach(@$allplayers) {
    my($ex,$ey,$ename,$epid,$esl)=@$_;
 #print "@$_\n";
+   my @rel=getrelation($ename);
+   if($rel[0]>5){next}
    next if $member{$epid};
    foreach my $pid (@memberids) {
       my $sl=$bio{$pid}; #$::player{$pid}{science};
