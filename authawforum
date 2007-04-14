@@ -1,0 +1,71 @@
+#!/usr/bin/perl -w
+# safe 070408
+use strict;
+use CGI ":standard";
+use LWP::UserAgent;
+
+use DBAccess2;
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+our %options;
+my $h=AWheader("User AW-forum authentication tool");
+if(param("u")) {
+	foreach my $p (qw(u p uri)) {
+		$options{$p}=param($p);
+      if($options{$p}){$options{$p}=~s/[<>]//g;} # min sanitize
+	}
+   my $awpid=playername2idm($options{u});
+   if(!$awpid) {
+      print $h." unknown player '$options{u}'.";
+   } else {
+      my $awname=playerid2namem($awpid); # will prevent leading or trailing spaces to disturb (mysql ignores it on lookup)
+      my $ua = LWP::UserAgent->new(requests_redirectable=>[], parse_head=>0, timeout=>5);
+#   $ua->timeout(5);
+      my $response = $ua->post("http://www.astrowars.com/forums/login.php", {username=>$awname, password=>$options{p}, autologin=>"", redirect=>"", login=>"Log in"});
+      my $status=$response->status_line;
+      if (!$response->is_success && $status ne "302 Found") {
+         print $h,"Error. AW forum server said ".$response->status_line;
+      } elsif($status ne "302 Found") {
+         print "$h Sorry, you supplied an incorrect username or password. ".a({href=>"/cgi-bin/public/index.html"},"Continue with guest access");
+         #print "$awname $awpid $options{p}";
+         #my $c=$response->content;
+#         print $c;
+
+      } else { # properly authenticated
+         my $c=$response->content;
+         print $h."<pre>";
+         my $pid;
+         $response->scan(sub {
+            return unless $_[0] eq "Set-Cookie" && $_[1]=~/astrowarsforums_data=[^;]*userid%22%3Bs%3A5%3A%22(\d+)/;
+            $pid=$1;
+#            print "@_\n";
+         });
+         if(!$pid || $awpid != $pid) {
+            print $h."strange PID mismatch: $awpid != $pid";
+         } else {
+            my $dbh=get_dbh;
+            my $now=time();
+            my $sessionid=sprintf("%016s%016s",int(rand(1000000000000000)),int(rand(1000000000000000))); # generate random 32 chars
+            my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES (?, ?, ?, 0, ?, ?, ?, 1);");
+            my $result=$sth->execute($sessionid, $awpid, $awname, $now, $now, $ENV{REMOTE_ADDR});
+            my $uri=$options{uri}||"";
+            if($uri) {
+               $uri="&uri=$uri";
+            }
+            my $ruri="http://$bmwserver/cgi-bin/public/authaw?session=$sessionid$uri";
+            print redirect($ruri);#,"$options{u}: you are now successfully logged in as $awname".br;
+         }
+      }
+   }
+} else {
+	print $h,start_form(-name=>"form"),textfield(-name=>'u', -class=>'text')," user",br,
+      password_field(-name=>'p', -class=>'text')," pass",br,
+      hidden("uri"),
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.u"),
+      "cookies must be enabled past this point";
+}
+print AWtail();
+
