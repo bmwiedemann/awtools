@@ -50,13 +50,13 @@ sub replacefunc($$$$) {my ($rel,$n,$conq1,$conq2)=@_;
 	return qq! [color=$col$l];!;
 }
 
-print "graph alliances {\n";
 open(F, "<", shift(@ARGV)) or die "error opening input file: $!";
 my @edges;
 { local undef $/;
   my $edges=<F>;
   @edges=split("\n",$edges);
 }
+if(!@edges || !$edges[0]) {exit 0}
 my %allis;
 foreach(@edges) {
 	next unless /^([^ ]+) -- ([^ ;]+)/;
@@ -94,6 +94,7 @@ foreach(sort sortfunc (@edges[0..$aentries-1], @eedges)) {
 	push @newedges,$_;
 }
 #my $nodes=join " ",keys %allis;
+print "graph alliances {\n";
 print #"node [shape=plaintext,height=.1,width=0.1];".
 join("\n",@newedges),"
 //overlap=scale;

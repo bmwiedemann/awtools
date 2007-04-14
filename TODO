@@ -1,5 +1,10 @@
+tool to display useralli = own
+#add recv message count to AWTools header: SELECT count(imid) FROM `imessage` WHERE `recvpid` = ? GROUP BY recvpid
+#authawforum
+#add alliance relation comment to alliance page
 interbeta: prevent dups with cls incomings
 optimize ranking and antispy tools performance
+major rewrite to not use DBM files (mysql instead)
 #non-keyboard input with security-code +numbers(spend,launch,buy) for PDAs (non-default)?
 #modperl transition
 #making easy to run as non-root
@@ -16,10 +21,10 @@ general user preferences DB: tz, customhtml, race+sci for planets,arrival, AW-fo
 #remember user timezones from settings page and use for GMT+n display in fleets and arrival
 #Timezone for added fleets in AW
 #verify +59 feed/alliance_detail.pm
-flexible map - coloring by last round's tag (fallback)
+#flexible map - coloring by last round's tag (fallback)
 #dynamic PP-A$ price for tradepartners tool
-add last round alliance tag to system-info
-add display of player's trades. Maybe I draw another alliance-friendship-graph from that data.
+#add last round alliance tag to system-info
+#add display of player's trades. Maybe I draw another alliance-friendship-graph from that data.
 add option: MIDI upon incoming
 feed:parse num of SUs and num of Artifacts into DB
 #http://aw.lsmod.de/cgi-bin/tradepartners   Then You could also add two more columns: 'AD+artifact_price' and 'new ready(h)' (based on new AD+artifact_price amount). 
@@ -41,7 +46,7 @@ speed table (Bio0, Bio4(2AU)-link arrival,...Bio20)
 #fleet tracker (remove old ones on feeding)
 #fleet screen: show owner+relation of fleet target
 #directory for alliance data with PerlAuthzHandler
-incoming-intercept + defence tool
+#incoming-intercept + defence tool
 fix player/planets index after feeding (e.g. with mysql)
 #tactical-large/live: Bio selector(JS)
 #muffin Feed+Mangle (Upload+Download) filter

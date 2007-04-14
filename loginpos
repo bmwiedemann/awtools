@@ -1,26 +1,20 @@
 #!/usr/bin/perl -w
 use strict;
 use CGI ":standard";
-use awinput;
-print header();
-use WWW::Mechanize;
-#use WWW::Mechanize::FormFiller;
-#use URI::URL;
+use LWP::Simple ("get");
 
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+print AWheader("AW inofficial login position tool");
 
 my $uri1='http://www.astrowars.com/forums/';
-my $agent = WWW::Mechanize->new( autocheck => 1 );
-#my $formfiller = WWW::Mechanize::FormFiller->new();
-$agent->env_proxy();
-
-  $agent->get($uri1);
-#    $agent->form(1) if $agent->forms and scalar @{$agent->forms};
-  $_=$agent->content;
+  $_=get("$uri1");
   /The newest registered user is <b><a href="[^"]*u=(\d+)([^"]*)"/;
   my $pid=$1;
-  $agent->get("http://www1.astrowars.com/about/playerprofile.php?id=$pid");
-#  $agent->follow(qr((?-xism:Public)));
-  $_=$agent->content;
+  $_=get("http://www1.astrowars.com/about/playerprofile.php?id=$pid");
   m!<html><head><title>([^ ]*)!;
   my $name=$1;
   m!<a href ="/about/starmap.php\?dx=([+-]?\d+)&dy=([+-]?\d+)"!;
@@ -29,6 +23,7 @@ $agent->env_proxy();
   awinput_init();
   my $sid=systemcoord2id($x,$y);
   awinput::awinput_finish();
-  print "$time Id=$sid $pid $name ",
+  print "$time sid=$sid pid=$pid $name ",
       "($x,$y)\n";
 
+print AWtail;

@@ -164,6 +164,14 @@ while(my @a=each(%alltrades)) {
    my $result=$sth->execute($a{pid1}, $a{pid2}, $now);
 }
 
+print "\tmerging playerextra\n";
+$sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `playerextra` VALUES (?, ?, '', NULL)!);
+while(my @a=each(%player)) {
+   my $p=$a[1];
+#   print "$a[0], $p->{name}\n";
+   my $result=$sth->execute($a[0], $p->{name});
+}
+
 # re-export:
 if(1){
    my $prevtrades=$dbh->selectall_arrayref("SELECT pid1,pid2 FROM `trades`");

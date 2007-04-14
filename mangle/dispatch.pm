@@ -28,6 +28,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    $g=$specialname{$$options{name}}||($$options{ip} eq "217.11.53.122");
    my $t2=[gettimeofday];
    $$options{bmwlink}=$::bmwlink=$origbmwlink;
+   $$options{authlink}=$origbmwlink;
    %::options=%$options;
 
    my $notice="";#<b style=\"color:green\">notice: road works ahead.... brownie + AWTools server has a scheduled maintenance period today (Monday 2007-03-26 12-18:00 UTC) and might be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
@@ -37,7 +38,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 #      $ENV{REMOTE_USER}="af";
 #   }
    
-   my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}, "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
+   my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}||"?", "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
    my $joinlink="";
@@ -71,7 +72,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          if(($interbeta || !$ENV{REMOTE_USER}) && $$options{pid}) {
             my $aid=playerid2alliance($$options{pid});
             if(($interbeta || !$aid) && $$options{name} && ($$options{name} ne "unknown")) {
-               $joinlink="<br>".$$options{authlink}."/modperl/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
+               $joinlink="<br>".$$options{authlink}."/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
             } elsif(is_founder($$options{pid})) {
                # if alliance founder, add extra "accept NAP with AF" link
                $joinlink.="<br><a href=\"http://aw.lsmod.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
@@ -212,16 +213,18 @@ sub mangle_dispatch(%) { my($options)=@_;
    $$options{mangleelapsed}=$$options{totalelapsed}=tv_interval ( $t2 );
    my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n$joinlink<p id=disclaimer style=\"text-align:center; color:white; background-color:black\"><br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
-   if($ingameuri) {
-      my @style=("main");
-      if($ENV{REMOTE_USER}) { unshift(@style,"alli/$ENV{REMOTE_USER}/main") }
-      if($$options{name}) { unshift(@style, "user/".safe_encode($$options{name})."/main") }
-      my $style;
+   if($gameuri) {
+      my $style="main";
+      if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
+      elsif(m%Enter the characters as they are shown in the box below%) {$style="awlogin";}
+      elsif($url=~m!astrowars\.com/(rankings|about)/!) {$style="awlogin";}
+      
+      my @style=($style);
+      if($ENV{REMOTE_USER}) { unshift(@style,"alli/$ENV{REMOTE_USER}/$style") }
+      if($$options{name}) { unshift(@style, "user/".safe_encode($$options{name})."/$style") }
       foreach my $s (@style){
          if(-r "$awstandard::cssdir/$s.css") {$style=$s;last;}
       }
-      if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
-      elsif(m%Enter the characters as they are shown in the box below%) {$style="awlogin";}
       s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;
    }
    if($gameuri || $g) {

@@ -20,7 +20,7 @@ for my $p (qw'id name alliance relation comment submit') {
 	$options{$p}=param($p);
 }
 if(defined($options{submit}) && $options{submit}=~/delete/) { $options{delete}=1 }
-if($options{id}) { $options{name}=playerid2name($options{id}); param("name",$options{name}) }
+if($options{id}) { $options{name}=playerid2namem($options{id}); param("name",$options{name}) }
 
 if($options{comment}) {
    $options{comment} =~ s/[<>]//g;
@@ -57,7 +57,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	my $user=$options{name};
 #	$user =~ y/A-Z/a-z/;
 	my $new="edit existing entry";
-	my $id=playername2id($user);
+	my $id=playername2idm($user);
 	my $atag=playerid2tag($id);
 	my @rel=getrelation($user);
 	if(!$rel[4]) {
@@ -109,7 +109,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
       }
    }
 	$atag=$atag?" ".alliancelink($atag):"";
-	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getrelationcolor($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, 
+	print start_form(-name=>"form"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, 
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
          a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles")," ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
 	print hidden(-name=>'name', $user);

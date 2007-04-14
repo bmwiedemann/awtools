@@ -8,7 +8,7 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
-qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &file_content &url2pm &awmax &awmin
+qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationclass &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &file_content &url2pm &awmax &awmin &getauthpid
       $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir);
 
 use CGI ":standard";
@@ -29,7 +29,7 @@ our $codedir="$basedir/inc";
 our $htmldir="$basedir/html";
 our $cssdir="$basedir/css";
 our $allidir="$basedir/alli";
-our $interbeta=1;
+our $interbeta=0;
 our $style;
 our $timezone;
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
@@ -38,15 +38,17 @@ our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue");
 our @racestr=qw(growth science culture production speed attack defense);
-our @racebonus=qw(0.07 0.08 0.04 0.04 0.17 0.13 0.16);
+our @racebonus=qw(0.07 0.08 0.04 0.04 0.17 0.12 0.16);
 our $magicstring="automagic:";
 our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HoR"=>15);
 our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "darkturquoise", "LimeGreen", "green");
+our @relationclass=("neutral", "totalwar", "foe", "tense", "neutral", "ineutral", "nap", "friend", "ally", "member");
 our @statuscolor=qw(black black blue cyan red green orange green);
 our $start_time;
 our $customhtml;
 
 use awaccess; # needs 1 var
+use DBAccess2;
 
 sub awstandard_init() {
    my $alli=$ENV{REMOTE_USER};
@@ -57,6 +59,20 @@ sub awstandard_init() {
    $style=cookie('style');
    $timezone=cookie('tz');
    $customhtml=cookie('customhtml');
+   if((my $pid=getauthpid())) {
+      my $dbh=get_dbh;
+      my $sth=$dbh->prepare_cached("SELECT `tz`,`customhtml` FROM `playerprefs` WHERE `pid` = ?");
+      my $res=$dbh->selectall_arrayref($sth, {}, $pid);
+      if($res && $res->[0]) {
+         my($tz,$ch)=@{$res->[0]};
+         if(defined($tz)) {
+            $timezone=$tz;
+         }
+         if(defined($ch)) {
+            $customhtml.=$ch;
+         }
+      }
+   }
    if(!defined($timezone)) {$timezone=0}
    $start_time=[gettimeofday()];
 }
@@ -103,11 +119,17 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	# -head=>qq!<link rel="icon" href="/favicon.ico" type="image/ico" />!).
 	 -head=>$heads);
    autoEscape([$flag]);
+   my $imsg="";
+   use awimessage;
+   my $pid=getauthpid();
+   if($pid && (my $imsgcount=awimessage::get_recv_count($pid))) {
+      $imsg.=div({-class=>"awimessage"}, ("You have received $imsgcount ".a({-href=>"imessage"},"Instant Message".($imsgcount>1?"s":""))));
+   }
 	return $retval.
 #      img({-src=>"/images/greenbird_banner.png", -id=>"headlogo"}).
       div({-align=>'justify',-class=>'header'},
 #a({href=>"index.html"}, "AW tools index").
-	$links)."\n".a({-href=>"?"},h1($title2))."\n";
+	$links)."\n$imsg".a({-href=>"?"},h1($title2))."\n";
 }
 sub AWheader2($;$) { my($title,$extra)=@_; AWheader3($title, $title, $extra);}
 sub AWheader($;$) { my($title,$extra)=@_; header(-connection=>"Keep-Alive", -keep_alive=>"timeout=15, max=99").AWheader2($title,$extra);}
@@ -147,6 +169,10 @@ sub parseawdate($) {my($d)=@_;
         return timegm($val[2],$val[1],$val[0],$val[4], $mon, $year);
 }
 
+sub getrelationclass($) { my($rel)=@_;
+   if(!$rel) { return "bmwrunknown" }
+   return "bmwr".$relationclass[$rel];
+}
 sub getrelationcolor($) { my($rel)=@_;
         if(!$rel) { $rel=4; }
         $relationcolor[$rel];
@@ -447,6 +473,14 @@ sub awsyslink($;$) {
    my $public=$ENV{REMOTE_USER}?"":"";#:"/public";
    my $and=$ENV{REMOTE_USER}?'%':'&';
    my $link=qq($public/system-info?id=$sid${and}simple=$simple">);
+}
+
+sub getauthname() {
+   return $ENV{HTTP_AWUSER};
+}
+sub getauthpid()
+{
+   return $ENV{HTTP_AWPID};
 }
 
 1;

@@ -7,12 +7,13 @@ require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%prices,%relation,%planetinfo,
    $dbnamer,$dbnamep);
+my $startofround=1;
 our $alarmtime=99;
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playerid2name &playerid2home &playerid2country &getplanet &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &is_admin &is_founder &get_dbh
+&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &is_admin &is_founder
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -24,6 +25,7 @@ use DB_File::Lock;
 use CGI ":standard";
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use awaccess;
+use DBAccess2;
 use awstandard;
 my $head="Content-type: text/plain\015\012";
 
@@ -73,16 +75,6 @@ sub awinput_init(;$) { my($nolock)=@_;
       %planetinfo=();
    }
 }
-
-# return DB handle
-# useful when you only need the mysql DB for some stuff
-sub get_dbh()
-{  
-   require DBAccess;
-   no warnings;
-   return $DBAccess::dbh;
-   use warnings;
-}  
 
 
 sub opendb($$%) {my($mode,$file,$db)=@_;
@@ -142,7 +134,7 @@ sub getrelation($;$) { my($name)=@_;
 	}
 	while(!$rel || !$effrel) {
 #		if(!$rel) { return undef; }
-		my $id=playername2id($name);
+		my $id=playername2idm($name);
 		if(!$id) {
 			if($hadentry){last}
 			return undef
@@ -151,12 +143,16 @@ sub getrelation($;$) { my($name)=@_;
 #		print "aid $aid \n";
 		my $atag;
 		if(!$aid && $rel) {$atag=$ally;$aid=-1;}
+      if(!$aid) {
+        if($startofround) { $atag=playerid2lasttag($id); if($atag){$aid=-2} }
+      }
+		elsif($aid>0) {$ally=$atag=$alliances{$aid}{tag};}
 		if(!$aid) { return undef }
-		if($aid>0) {$ally=$atag=$alliances{$aid}{tag};}
 #		print "id $id a $aid at $atag\n<br>";
 		my $rel2=$relation{"\L$atag"};
 		if($rel2) { 
 			$rel2=~/^(\d+) (\w+) /s;
+         if($aid==-2){$atag=undef} # no real tag when using tag from last round
 			return ($1,$atag,$info,0,$hadentry,$lname);
 		}
 		if(!$rel) { return undef }
@@ -191,6 +187,100 @@ sub playername2id($) { my($name)=@_;
 #	print qq!$name = $playerid{"\L$name"}\n!;
 	$playerid{"\L$name"};
 }
+sub playerid2lasttag($) { my($pid)=@_;
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT `lasttag` FROM `playerextra` WHERE `pid` = ? LIMIT 1");
+   my $r=$dbh->selectall_arrayref($sth, {}, $pid);
+   if($r && $r->[0]) {
+      return $r->[0]->[0];
+   }
+   return undef;
+}
+sub playername2idm($) { my($name)=@_;
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT pid FROM `playerextra` WHERE `name` = ? LIMIT 1");
+   my $r=$dbh->selectall_arrayref($sth, {}, $name);
+   if($r && $r->[0]) {
+      return $r->[0]->[0];
+   }
+   if($startofround) {
+      return playername2idaw($name);
+   }
+   return undef;
+}
+sub playername2idaw($) { my($name)=@_;
+   if(!$name || $name eq "unknown") { return undef }
+   return undef;
+   require LWP::Simple;
+   print STDERR "fetching name=$name from AW\n";
+   my $html=LWP::Simple::get("http://www.astrowars.com/forums/profile.php?mode=viewprofile&u=$name");
+   if($html=~m!playerprofile\.php\?id=(\d+)" class="genmed"> Public </a>!) {
+      my $id=$1;
+      my $premium;
+      my $dbh=get_dbh;
+      my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `playerextra` VALUES (?, ?, '', ?)!);
+      $sth->execute($id, $name, $premium);
+      return $id;
+   }
+   return undef;
+}
+sub playername2idaw2($) { my($name)=@_;
+   if(!$name || $name eq "unknown") { return undef }
+   require LWP::Simple;
+   print STDERR "fetching name=$name from AW\n";
+   my $html=LWP::Simple::get("http://www1.astrowars.com/about/playerprofile.php?name=$name");
+   if($html=~m!<tr><td colspan="2"><a href=http://www\.astrowars\.com/forums/privmsg\.php\?mode=post&u=(\d+)>Send Private Message</a></td></tr>!) {
+      my $id=$1;
+      my $premium=($html=~m!<br><small>Premium Member</small>! ? 1:0);
+      my $dbh=get_dbh;
+      my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `playerextra` VALUES (?, ?, '', ?)!);
+      $sth->execute($id, $name, $premium);
+      return $id;
+   }
+   return undef;
+}
+sub playerid2nameaw($) { my($id)=@_;
+   require LWP::Simple;
+   print STDERR "fetching id=$id from AW\n";
+   my $html=LWP::Simple::get("http://www.astrowars.com/forums/profile.php?mode=viewprofile&u=$id");
+   if($html=~m!<span class="gen">Contact ([^<>]{1,25}) </span>!) {
+      my $name=$1;
+      my $dbh=get_dbh;
+      my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `playerextra` VALUES (?, ?, '', ?)!);
+      $sth->execute($id, $name, undef);
+      return $name;
+   }
+   return undef;
+}
+# old/unused active player fetcher
+sub playerid2nameaw2($) { my($id)=@_;
+   require LWP::Simple;
+   print STDERR "fetching id=$id from AW\n";
+   my $html=LWP::Simple::get("http://www1.astrowars.com/about/playerprofile.php?id=$id");
+   if($html=~m/^<html><head><title>([^\n<>]{1,25}) - profile/) {
+      my $name=$1;
+      my $premium=($html=~m!<br><small>Premium Member</small>! ? 1:0);
+      my $dbh=get_dbh;
+      my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `playerextra` VALUES (?, ?, '', ?)!);
+      $sth->execute($id, $name, $premium);
+      return $name;
+   }
+   return undef;
+}
+sub playerid2namem($) { my($id)=@_;
+   if(!defined($id)) {return undef}
+   if($id<=2) {return "unknown"}
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT `name` FROM `playerextra` WHERE `pid` = ? LIMIT 1");
+   my $r=$dbh->selectall_arrayref($sth, {}, $id);
+   if($r && $r->[0]) {
+      return $r->[0]->[0];
+   }
+   if($startofround) {
+      return playerid2nameaw($id);
+   }
+   return undef;
+}
 sub playerid2name($) { my($id)=@_;
 	if(!defined($id)) {return "unknown"}
 	if($id<=2 || !$player{$id}) {return "unknown"}
@@ -210,23 +300,35 @@ sub getplanet($$) { my($sid,$pid)=@_;
 	$$sys[$pid-1];
 }
 
-sub playerid2link($) { my($id)=@_;
-   if(!defined($id)) {return "???"}
-   if($id==0) {return "free planet"}
-   my $name=playerid2name($id);
-   $name=~s/O/o/g;
+# input: valid pid
+# output: string with pseudo-tag from real tag, tools tag or last rounds tag
+sub playerid2pseudotag($) { my($id)=@_;
+   my $name=playerid2namem($id);
    my @rel=getrelation($name);
-   my $col=getrelationcolor($rel[0]);
    my $alli="";
    my $atag=playerid2tag($id);
    if($atag) {$alli="[$atag] "}
    elsif($rel[1]) {$alli="[$rel[1]] "}
-   return a({-href=>"relations?id=$id", -style=>"color:$col"}, "$alli$name");
+   else {
+      my $atag=playerid2lasttag($id);
+      if($atag) {$alli="[($atag)] "}
+   }
+   return $alli;
+}
+sub playerid2link($) { my($id)=@_;
+   if(!defined($id)) {return "???"}
+   if($id==0) {return "free planet"}
+   my $name=playerid2namem($id);
+   $name=~s/O/o/g;
+   my @rel=getrelation($name);
+   my $col=getrelationclass($rel[0]);
+   my $alli=playerid2pseudotag($id);
+   return a({-href=>"relations?id=$id", -class=>"$col"}, "$alli$name");
 }
 
 sub playerid2link2($) {   
    my $l=playerid2link($_[0]);
-   $l=~s!relations!/0/Player/Profile.php/!;
+   $l=~s!relations!http://www1.astrowars.com/0/Player/Profile.php/!;
    return $l;
 }
 
@@ -419,8 +521,8 @@ sub playername2alli($) {my ($user)=@_;
 #      local $ENV{REMOTE_USER};
       tie %alliances, "MLDBM", "$dbdir/alliances.mldbm", O_RDONLY, 0666;
       tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
-      tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
-      my $pid=playername2id($user);
+#      tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
+      my $pid=playername2idm($user);
 #      if($user eq "greenbird") {$pid=68061}
       if($pid && $pid>2) {
          $alli=lc(playerid2tag($pid));
@@ -762,6 +864,15 @@ sub get_alli_group($)
    my($alli)=@_;
    my @list=($alli);
    return @list;
+}
+
+# input: playerid
+sub getuserprefs($) { my($pid)=@_;
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT * from `playerprefs` WHERE `pid` = ?");
+   my $res=$dbh->selectall_arrayref($sth, {}, $pid);
+   if($res) {return $res->[0]}
+   return $res;
 }
 
 1;

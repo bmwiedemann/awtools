@@ -3,8 +3,16 @@ use strict;
 use warnings;
 use DBAccess;
 if(!$dbh) {die "DB err: $!"}
-
 # create tables
+
+$dbh->do(qq!
+CREATE TABLE `playerextra` (
+`pid` INT PRIMARY KEY,
+`name` VARCHAR(25) NOT NULL UNIQUE KEY,
+`lasttag` VARCHAR(4) NULL,
+`premium` TINYINT NULL
+);!);
+
 $dbh->do(qq!
 CREATE TABLE `cdlive` (
 `pid` INT NOT NULL ,

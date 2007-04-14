@@ -26,7 +26,9 @@ for my $day (0..7) {
    if($day) {
       my %oldday;
       my %olddaypop;
-      open(F, "tar -Oxjf www1.astrowars.com/export/history/all$d-$m-$y.tar.bz2 planets.csv |") or next;
+      my $f="www1.astrowars.com/export/history/all$d-$m-$y.tar.bz2";
+      if(not -e $f) {exit 0} # dont work at start of round
+      open(F, "tar -Oxjf $f planets.csv |") or next;
       my $dummy=<F>;
       while(<F>) {
          next if m/^\s*$/;

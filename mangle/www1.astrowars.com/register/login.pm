@@ -14,7 +14,7 @@ foreach my $x (@{$::options{headers_out}}) {
    }
    if($c=~m/login=(\d+)/) { # we can trust this as AW sent the headers
       $pid=$1;
-      $name=awinput::playerid2name($pid);
+      $name=awinput::playerid2namem($pid);
    }
 }
 if($session && $name) {

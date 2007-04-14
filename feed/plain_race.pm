@@ -3,7 +3,7 @@ use awinput;
 
 sub feed_plain_race() {
    # match plain incomings, too
-   if(/(\d\d:\d\d:\d\d - \w{3} \d\d)\s*Attention !!! We have evidence of an incoming fleet around that time(.*)going to attack ([^!]+)\s*\[(\d+)\]\s*(\d+)!\s*We suppose its the Fleet of (.*)\./s) {
+   if(/(\d\d:\d\d:\d\d - \w{3} \d\d)\s*Attention !!! We have evidence of an incoming fleet around that time([^!]+)going to attack ([^!]+)\s*\[(\d+)\]\s*(\d+)!\s*We suppose its the Fleet of (.*)\./s) {
       my ($awdatetime,$fleets,$targetname,$systemid,$planetid,$ename)=($1,$2,$3,$4,$5,$6);
       my $time=parseawdate($awdatetime);
       my @fleet;

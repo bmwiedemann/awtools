@@ -7,6 +7,7 @@ use Digest::MD5 qw(md5_hex);
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 
 
+use DBAccess2;
 use awstandard;
 use awinput;
 awstandard_init();
@@ -56,15 +57,14 @@ if(param()) {
             if(my $r=$rsamap{$awname}) { # map RSA-name to AW-name
                $awname=$r;
             }
-            my $awpid=playername2id($awname);
+            my $awpid=playername2idm($awname);
             my $a2=playerid2tag($awpid);
             my $u;
-            if(lc($a2) eq $a) {
+#            if(lc($a2) eq $a) {
                $u=$awname;
-            }
+#            }
             if($u) {
-               require DBAccess;
-               my $dbh=$DBAccess::dbh;
+               my $dbh=get_dbh;
                my $now=time();
                my $sessionid=sprintf("%016s%016s",int(rand(1000000000000000)),int(rand(1000000000000000))); # generate random 32 chars
                my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES (?, ?, ?, 0, $now, $now, ?, 1);");

@@ -25,7 +25,7 @@ sub dbset($$)
 
 
 my $name=awinput::getauthname(); # does not need awinput::input
-my $pid=playername2id($name); # guarantees sane names
+my $pid=playername2idm($name); # guarantees sane names
 my $alli=awinput::playername2alli($name);
 my $awalli=playerid2alliance($pid);
 our %options;
@@ -53,13 +53,13 @@ if($name && $pid && ($interbeta || (!$alli && !$awalli)) && param()) {
    }
 
 } else {
-   $name||="";
-   print "user=$name pid=$pid alli=$alli",br;
    if(!$name) {
-      print "sorry, you need to ".a({-href=>"authaw"},"authenticate")." first. (Only works with brownie)";
+      print "sorry, you need to ".a({-href=>"authawforum?uri=/cgi-bin/joinalli"},"authenticate")." first. This might even work if you player-ID was seen in earlier rounds.",br;
+#This does not work on the first day of your sign in, because <a href=\"http://forum.rebelstudentalliance.co.uk/index.php?showtopic=20963\">there is no CSV data</a>.",br;
    } elsif(!$interbeta && $awalli) {
       print "sorry, you are already member of an alliance and can not join another one within AWTools";
    } else {
+      print "user=$name pid=$pid alli=$alli",br;
       print start_form(-name=>"form"),textfield(-name=>'a', -class=>'text'), " Alliance",br,
          password_field(-name=>'p', -class=>'text'), " Alliance's Access Password for AWTools",br,
          submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.a");

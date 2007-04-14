@@ -33,7 +33,7 @@ if(defined($options{user})) {
 
 print start_form(-method=>'get', -name=>"form"), textfield(-name=>'user', -class=>'text'), " user name", br.AWfocus("form.user"),
 textfield(-name=>'refsys', -class=>'text'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
-popup_menu(-name=>'style', -values=>[qw(green blue blue2 aw plain)], -default=>"blue"), " color theme for AWtools", br,
+popup_menu(-name=>'style', -values=>[qw(green blue aw plain)], -default=>"blue"), " color theme for AWtools", br,
 popup_menu(-name=>'tz', -values=>[-11..12]), " timezone for AWtools", br,
 textarea(-name=>'customhtml', -class=>'text', -rows=>5, -cols=>80), " custom HTML for AWTools",br,br,
 submit(-name=>"submit", -class=>'smbutton'), end_form, br,

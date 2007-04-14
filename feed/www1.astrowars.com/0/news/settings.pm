@@ -1,6 +1,6 @@
 # find timezone settings
 
-my $pid=playername2id($::options{name});
+my $pid=playername2idm($::options{name});
 if(!$pid) {print "user not found<br>\n";return 1}
 
 if(m!Time Difference</a> \(-12 to \+11\) <br><small>server time - \d+:\d+ / your local time - \d+:\d+</small>\s*</td><td>\s*<input type="text" name="zeitdifferenz" size="8" class=text value="([-+0-9]+)"!) {

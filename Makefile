@@ -3,9 +3,9 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-round=gold7
+round=gold8
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html preferences alliance{,2} arrival authaw authrsa awlinker awtoolstatistics joinalli cdinfo distsqr eta fighterlist tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info testenv planet-info edit-fleet fleets feedupdatemangle feedupdate ranking sim topwars whocanintercept coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout
+tools=index.html alliance{,2} arrival authaw authawforum awlinker awtoolstatistics joinalli cdinfo distsqr eta fighterlist preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info testenv planet-info edit-fleet fleets feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -32,21 +32,25 @@ updatecsv: dumpdbs
 	tar xjf ${f2}
 	-grep -v id trade.csv >> alltrades.csv
 	wget -x -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
-	umask 2 ; mkdir -p db olddb newdb ; perl importcsv.pl && ( ln -f db/* olddb/ ; mv newdb/* db/ )
-	#-cp -a tactical-af.png olddb/tactical-af-$d.png
+	make importcsv
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
-	for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
-	perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
+	-for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
+	-perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
 	perl importcsv-mysql.pl
+	#(cd html/awcache/ ; find -type f ) | perl -pe 's/^..//' > html/awcache/cache-list.txt
+	rm -f html/awcache/www1.astrowars.com/images/galaxymap.png
+
+importcsv:
+	umask 2 ; mkdir -p db olddb newdb ; perl importcsv.pl && ( ln -f db/* olddb/ ; mv newdb/* db/ )
 
 #runs once a day
 updatedaily:
+	- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
 	perl detectalliancerelation.pl > html/${round}/alliancerelation-${mydate}
 	ln -f html/${round}/alliancerelation-${mydate} html/${round}/alliancerelation
-	(perl alliancerelation2dot.pl html/gold7/alliancerelation-${mydate} | neato -Tsvg > html/${round}/alliancerelation-${mydate}.svg &&\
+	-(perl alliancerelation2dot.pl html/round/alliancerelation-${mydate} | neato -Tsvg > html/${round}/alliancerelation-${mydate}.svg &&\
 	ln -f html/${round}/alliancerelation-${mydate}.svg html/${round}/alliancerelation.svg)&
-	- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
 
 #runs 4 times a day
 updatexdaily: updateholes updatespy
@@ -60,6 +64,8 @@ updatemap2only:
 	for a in $(allies) ; do \
 		REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \
 	done
+cleanmap2:
+	find html/alli/*/l -name \*.png|xargs rm -f
 updateholes:
 	for a in $(allies) ; do \
 		REMOTE_USER=$$a perl holes3.pl > html/alli/$$a/holes.csv ; \
@@ -81,7 +87,7 @@ drawall:
 dumpdbs:
 	-cp -a base/db2 /no_backup/bernhard/aw/backup/db-${mydate}
 #	mkdir -p html/alli/$$a/history
-	for a in $(allies) ; do \
+	-for a in $(allies) ; do \
 		cp -a html/alli/$$a/{fleets.csv,history/fleets-${mydate}.csv} ; \
 	done
 #	cp -a ~/db olddb/
@@ -94,6 +100,8 @@ cleandbs:
 	for a in $(allies) ; do \
 	   REMOTE_USER=$$a ./cleanplanning.pl ; done
 	cat empty.dbm > base/db2/sessioncache.dbm
+showua:
+	./dbm-show.pl ~/db/useralli.dbm
 lookup7:
 	perl -ne '@a=split("\t",$$_);if($$a[2]==$u){print}' player.csv.beta7
 lookupa7:

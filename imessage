@@ -43,9 +43,9 @@ my $admin=is_admin;
 
 print AWheader("AW instant messaging tool");
 my $authname=awinput::getauthname();
-my $authpid=playername2id($authname);
+my $authpid=playername2idm($authname);
 if(!$authpid) {
-   print "Sorry, you can only use IMs when properly authenticated from brownie\n";
+   print "Sorry, you can only use IMs when ".a({-href=>"authawforum?uri=/cgi-bin/imessage"},"properly authenticated");
 } else {
    %options=(); # clear global var from last mod-perl loop
    $options{authpid}=$authpid;
@@ -54,7 +54,7 @@ if(!$authpid) {
 	}
    if(!$options{sort}){$options{sort}="2";} # default sort by time
    if(!$options{action} || $options{action}=~m/[^a-z_-]/){$options{action}="list";}
-   if($options{recv} && $options{recv}=~m/[^0-9]/) { $options{recv}=playername2id($options{recv}); } # counts as sanitizing
+   if($options{recv} && $options{recv}=~m/[^0-9]/) { $options{recv}=playername2idm($options{recv}); } # counts as sanitizing
    my $subtools="";
    my @tlist=qw(send list delrecv delsent);
    if($ENV{REMOTE_USER}) {
@@ -67,6 +67,7 @@ if(!$authpid) {
       $subtools.=a({-href=>"?action=$t"}, $t)." ";
    }
    print $subtools,br;
+   print a({-href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br;
    if($admin && $options{action} eq "sendall") {
       if($options{msg}){
          my $to=awinput::get_all_brownie_pids();
@@ -105,7 +106,7 @@ if(!$authpid) {
       print awimessage::delete_all_x(\%options);
    } 
    elsif($options{action} eq "send") {
-      if($options{recv} && $options{msg} && playerid2name($options{recv})){
+      if($options{recv} && $options{msg} && playerid2namem($options{recv})){
          print awimessage::send(\%options);
       } else {
          print start_form(-name=>"form"),textfield(-name=>'recv', -class=>'text', -size=>6)," Player ID or name",br,

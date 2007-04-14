@@ -4,7 +4,7 @@
 package awimessage;
 use strict;
 use warnings;
-use awinput;
+use DBAccess2;
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -62,6 +62,16 @@ sub send(%) {
    my $sth=$dbh->prepare_cached("INSERT INTO `imessage` VALUES ('', ?, ?, ?, ?);");
    $sth->execute(time(),$$options{authpid},$$options{recv},$$options{msg});
    return " sent message to ".awinput::playerid2link($$options{recv});
+}
+
+sub get_recv_count($) { my($pid)=@_;
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT count(imid) FROM `imessage` WHERE `recvpid` = ? GROUP BY recvpid");
+   my $r=$dbh->selectall_arrayref($sth, {}, $pid);
+   if($r && $r->[0]) {
+      return $r->[0]->[0];
+   }
+   return;
 }
 
 1;
