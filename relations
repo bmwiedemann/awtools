@@ -59,6 +59,8 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	my $new="edit existing entry";
 	my $id=playername2idm($user);
 	my $atag=playerid2tag($id);
+   my $lasttag=playerid2lasttag($id);
+   if($lasttag) { $lasttag=" [($lasttag)]" } else {$lasttag=""}
 	my @rel=getrelation($user);
 	if(!$rel[4]) {
 		$options{alliance}=$atag || "unknown";
@@ -109,7 +111,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
       }
    }
 	$atag=$atag?" ".alliancelink($atag):"";
-	print start_form(-name=>"form"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag." ", profilelink($id), $extralinks, 
+	print start_form(-name=>"form"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag.$lasttag." ", profilelink($id), $extralinks, 
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
          a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles")," ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
 	print hidden(-name=>'name', $user);
