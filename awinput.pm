@@ -13,7 +13,9 @@ our $alarmtime=99;
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &is_admin &is_founder
+&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag 
+&sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
+&relation2production &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &is_admin &is_founder
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -323,7 +325,7 @@ sub playerid2link($) { my($id)=@_;
    my @rel=getrelation($name);
    my $col=getrelationclass($rel[0]);
    my $alli=playerid2pseudotag($id);
-   return a({-href=>"relations?id=$id", -class=>"$col"}, "$alli$name");
+   return a({-href=>$toolscgiurl."relations?id=$id", -class=>"$col"}, "$alli$name");
 }
 
 sub playerid2link2($) {   
@@ -436,14 +438,53 @@ sub sidpid32sidpid2($) { split('#', $_[0]) }
 sub sidpid22sidpid3m($$) {return $_[0]*13+$_[1];}
 sub sidpid32sidpid2m($) {return (int($_[0]/13), $_[0]%13)}
 
+
+sub relation2production($;$) { local $_=$_[0];
+	return undef unless($_);
+	return undef unless(/automagic/);
+   my $name=$_[1];
+	my @race=relation2race($_[0]);
+	return undef unless @race;
+	for(my $i=0; $i<7; ++$i){$race[$i]+=0;$race[$i]*=$racebonus[$i]}
+   my @prod=(undef,undef,undef,undef,undef,undef,undef);
+   my $t=0;
+   my @bonus=(1,1,1,1);
+	if(/production:(\S*)/) {
+	   @prod=split(",", $1);
+      my $a=$prod[3];
+      $t=$prod[4]*0.01;
+      if($a=~/(\w+)(\d)/) {
+         my $effect=$artifact{$1}||0;
+         for(my $i=0; $i<@race; ++$i) {
+            if((1<<$i) & $effect)
+            {$race[$i]+=0.1*$2}
+         }
+      }
+   } else { # for extended users without tag
+      my $pid=playername2id($name);
+      if($pid && (my $p=$player{$pid})) {
+         $t=$p->{trade}*0.01;
+      }
+   }
+   foreach my $b (@bonus) {$b+=$t}
+	$bonus[0]+=$race[3]; # prod
+	$bonus[1]+=$race[1]; # sci
+	$bonus[2]+=$race[2]; # cul
+	$bonus[3]+=$race[0]; # grow
+	push(@prod, \@bonus);
+#	for(my $i=0; $i<3; ++$i){ $prod[$i]+=$bonus[$i]; }
+	return @prod;
+}
+
+
 # return all know production values, PP/A$,artifact
 sub playername2production($)
 {
    my($name)=@_;
    return if not $name;
-   my $rel=$relation{$name};
+   my $rel=$relation{lc($name)};
    return if not defined $rel;
-   return relation2production($rel);
+   return relation2production($rel,$name);
 }
 sub getallproductions()
 {
@@ -831,7 +872,7 @@ sub show_fleet($) { my($f)=@_;
    my $pid=sidpid2pidm($sidpid);
    my $xinfo="$sid#$pid".": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
    if($info) {$info=" ".$info}
-   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"http://$bmwserver/cgi-bin/edit-fleet?fid=$fid\">edit</a> <a href=\"http://$bmwserver/cgi-bin/fleetbattlecalc?fid=$fid\">bc</a> <a href=\"http://$bmwserver/cgi-bin/whocanintercept?p=$sid%23$pid&amp;cvlimit=$cv\">catch</a> $eta $flstr ".playerid2link($owner).$info."</span>";
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"${toolscgiurl}edit-fleet?fid=$fid\">edit</a> <a href=\"${toolscgiurl}fleetbattlecalc?fid=$fid\">bc</a> <a href=\"${toolscgiurl}whocanintercept?p=$sid%23$pid&amp;cvlimit=$cv\">catch</a> $eta $flstr ".playerid2link($owner).$info."</span>";
 }
 
 # support functions for sort_table

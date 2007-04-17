@@ -8,8 +8,8 @@ our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
-qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationclass &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &relation2production &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &file_content &url2pm &awmax &awmin &getauthpid
-      $magicstring $style $server $bmwserver $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir);
+qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &mon2id &parseawdate &getrelationclass &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &file_content &url2pm &awmax &awmin &getauthpid
+      $magicstring $style $server $bmwserver $toolscgiurl $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir @racebonus %artifact);
 
 use CGI ":standard";
 use Time::Local;
@@ -18,6 +18,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 our $server="www1.astrowars.com";       # AW game host
 our $awforumserver="www.astrowars.com"; # AW forum host
 our $bmwserver="aw.lsmod.de";           # the domain name you use for the AWTools
+our $toolscgiurl="";#"http://$bmwserver/cgi-bin/";
 our $basedir;
 our $dbmdir; 
 BEGIN{
@@ -59,6 +60,7 @@ sub awstandard_init() {
    $style=cookie('style');
    $timezone=cookie('tz');
    $customhtml=cookie('customhtml');
+   $toolscgiurl="";
    if((my $pid=getauthpid())) {
       my $dbh=get_dbh;
       my $sth=$dbh->prepare_cached("SELECT `tz`,`customhtml` FROM `playerprefs` WHERE `pid` = ?");
@@ -309,32 +311,6 @@ sub relation2science($) { local $_=$_[0];
 	return undef unless(/automagic/);
 	return undef unless(/science:([0-9,.+-]*)/);
 	return split(",", $1);
-}
-sub relation2production($) { local $_=$_[0];
-	return undef unless($_);
-	return undef unless(/automagic/);
-	return undef unless(/production:(\S*)/);
-	my @prod=split(",", $1);
-	my @race=relation2race($_[0]);
-	return undef unless @race;
-	for(my $i=0; $i<7; ++$i){$race[$i]+=0;$race[$i]*=$racebonus[$i]}
-	my $a=$prod[3];
-	my $t=1+$prod[4]*0.01;
-	my @bonus=($t,$t,$t,$t);
-	if($a=~/(\w+)(\d)/) {
-		my $effect=$artifact{$1}||0;
-		for(my $i=0; $i<@race; ++$i) {
-			if((1<<$i) & $effect)
-			{$race[$i]+=0.1*$2}
-		}
-	}
-	$bonus[0]+=$race[3]; # prod
-	$bonus[1]+=$race[1]; # sci
-	$bonus[2]+=$race[2]; # cul
-	$bonus[3]+=$race[0]; # grow
-	push(@prod, \@bonus);
-#	for(my $i=0; $i<3; ++$i){ $prod[$i]+=$bonus[$i]; }
-	return @prod;
 }
 
 sub gmdate($) {
