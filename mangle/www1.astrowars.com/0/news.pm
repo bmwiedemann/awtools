@@ -15,6 +15,9 @@ if(0 && s%Premium\s+Tools\s*</a></td>%$&<td>|</td><td><a href="/0/Alliance/Incom
    s%</body%<span class="bmwnotice">note: AllInc link does only work after viewing alliance screen once (per login)</span>$&%;
 }
 
+# add CSS classes to tables
+s%(?:<table border="0" CELLSPACING="1" CELLPADDING="1" width="600")|(?:<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#303030' width="600")%$& class="sub_inner"%g;
+
 require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
 
 1;
