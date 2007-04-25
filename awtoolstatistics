@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+
+use DBAccess2;
+use awstandard;
+use awinput;
+use awaccess;
+#awstandard_init();
+awinput_init();
+
+print AWheader("AWtool statistics"),"<pre>";
+
+my $dbh=get_dbh();
+
+my $users=$dbh->selectall_arrayref(
+      "SELECT count(DISTINCT name)
+       FROM `usersession"
+   );
+
+my $allis=$dbh->selectall_arrayref(
+      "SELECT tag, count( tag )
+      FROM (
+         SELECT DISTINCT player.name, tag
+         FROM `usersession` , `player` , `alliances`
+         WHERE `aid` = `alliance`
+         AND usersession.name = player.name
+         ) AS e
+      GROUP BY `tag`
+      ORDER BY `count( tag )` DESC
+      "
+   );
+#      LIMIT 0 , 30
+
+my $eusersum=0;
+foreach my $row (@$allis) {
+      my($name,$num)=@$row;
+      if($allowedalli{lc($name)} || $remap_alli{lc($name)}) {
+         $eusersum+=$num;
+      }
+}
+
+print "<h2>brownie users</h2>";
+print (qq(<b style="color:green">$eusersum</b>/),$users->[0]->[0],"\n");
+
+print "<h2>alliance usage</h2>";
+foreach my $row (@{$allis}[0..29]) {
+   my($name,$num)=@$row;
+   my $color="";
+   if($allowedalli{lc($name)} || $remap_alli{lc($name)}) {
+      $color="color:green";
+   }
+   my $m=allianceid2members(alliancetag2id($name));
+   printf("<b style=\"$color\">%-4s</b> %2i/%-2i\n", $name, $num, $m);
+}
+
+print "<h2>fleets</h2>";
+my $fleets=$dbh->selectall_arrayref(
+      "SELECT sum( cv ) , sum( xcv ) , count( fid )
+      FROM `fleets`
+      WHERE iscurrent =1"
+   );
+print "CV, XCV, count\n",join(", ",@{$fleets->[0]});
+
+print "</pre>",AWtail();
+
