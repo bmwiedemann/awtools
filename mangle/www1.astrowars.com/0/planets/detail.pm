@@ -52,7 +52,8 @@ if(1) {
 
 my $prodbonus=1;
 my $popbonus=1;
-if($ENV{REMOTE_USER} && $::options{name}) { # use real race info - only for extended tools users
+if($::options{name}) {
+ if($ENV{REMOTE_USER}) { # use real race info - only for extended tools users
    my(undef,undef,undef,undef,undef,undef,undef,$bonus)=awinput::playername2production($::options{name});
    if($bonus) {
       $popbonus=$bonus->[3];
@@ -64,6 +65,10 @@ if($ENV{REMOTE_USER} && $::options{name}) { # use real race info - only for exte
 #      $prodbonus+=$awstandard::racebonus[3]*$$race[3];
 #      $_.="@$race $popbonus $prodbonus";
 #   }
+ } elsif((my $p=$player{$::options{pid}})) {
+    $prodbonus+=0.01*$p->{trade};
+    $popbonus+=0.01*$p->{trade};
+ }
 }
 
 # add +1 build links when there is enough PP
@@ -75,8 +80,8 @@ foreach my $n (0..$#buildings) {
 #      $debug.="$level $ppneeded<br>";
    }
    if($ppneeded>$pp && $ppplus && $prodbonus) {
-      my $hours=sprintf("<span style=\"color:gray\">in %.1fh</style>",($ppneeded-$realpp)/$ppplus/$prodbonus);
-      s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 $hours$6%;
+      my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%i%%)</style>",($ppneeded-$realpp)/$ppplus/$prodbonus, 100*$prodbonus);
+      s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5&nbsp;$hours$6%;
       next;
    }
    next if(($ppneeded>1000 && $buil ne "Starbase") || $ppneeded>$pp);
@@ -85,8 +90,8 @@ foreach my $n (0..$#buildings) {
 }
 
 if($popplus && $popbonus) { # add hours to pop-growth
-   my $hours=sprintf("<span style=\"color:gray\">in %.1fh</style>", $popneeded/$popplus/$popbonus);
-   s%(id=23>\+\d+</a></td><td>\s*\d+</td>.*\n\d+)(</td></tr>)%$1 $hours$2%;
+   my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%i%%)</style>", $popneeded/$popplus/$popbonus, 100*$popbonus);
+   s%(id=23>\+\d+</a></td><td>\s*\d+</td>.*\n\d+)(</td></tr>)%$1&nbsp;$hours$2%;
 }
 
 # add incomings to this planet below

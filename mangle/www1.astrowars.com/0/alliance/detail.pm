@@ -30,7 +30,7 @@ if($::options{url}=~/id=(\d+)/) {
       if($nextid<@$members) { $prevstring.=qq' <a href="$url$nextid">next</a>'; }
       my $form="";
       my $n=0;
-      $form.=' <form><select style="text-align:left;" name="id" onchange="submit()">';
+      $form.=' <form action=""><select style="text-align:left;" name="id" onchange="submit()">';
       foreach my $m (@$members) {
          my $name=playerid2name($m);
          my $sel=($id == $n)?" selected":"";
@@ -44,6 +44,10 @@ if($::options{url}=~/id=(\d+)/) {
    }
    do "mangle/www1.astrowars.com/0/alliance.pm";
 }
+
+# add classes - but not for main_inner table:
+my $n=1;
+s%<table border=0 cellpadding=1 cellspacing=1 width=600(?=>)%$&.' class="sub_inner" id="alliance_detail'.($n++).'"'%ge;
 
 require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
 

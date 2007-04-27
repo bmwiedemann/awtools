@@ -5,6 +5,7 @@ use warnings;
 use DBAccess;
 use awstandard;
 use awinput;
+use arrival;
 my $sysid = shift @ARGV;
 $ENV{REMOTE_USER} = shift @ARGV;
 my $wantbio25 = shift @ARGV;
@@ -34,9 +35,9 @@ foreach(@$allplayers) {
    $sci[0]||=0;
    if($sci[0]>100){shift(@sci)}
    my $bio=$sci[0]||0;
+   my $biodist=arrival::get_bio_dist([$ex,$ey], \@sysxy);
    if($bio<25 || !$wantbio25) {
-      next if(abs($ex-$sysxy[0])*2>$bio);
-      next if(abs($ey-$sysxy[1])*2>$bio);
+      next if($biodist>$bio);
    }
 #   next if($rel[0]<9);
 #print "@$_\n";

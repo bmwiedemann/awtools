@@ -16,14 +16,16 @@ use awmapfunc;
 use awdraw2;
 awstandard_init();
 
-for my $p (qw'map xs ys xe ye scale o') {
+my $maptypes=\%awmapcgi::maptypestring;
+
+for my $p (qw'map xs ys xe ye scale type') {
 	$options{$p}=param($p);
    $options{$p}=~s/[^-+0-9.,]//g; # sanitize user input
 }
 my $xsize=$options{xe};
 my $ysize=$options{ye};
 my $done;
-my $o=$options{o};
+my $o=$options{type};
 $o=~s/[^0-9,]//g; # sanitize user input
 if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 && $ysize>0 && $xsize*$ysize<=$max && $o) { # validity checks
  if($options{map}==1) {
@@ -33,7 +35,10 @@ if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 
 		$options{xs}-=$xsize>>1;
 		$options{ys}-=$ysize>>1;
       awinput_init(1);
-		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize, $options{scale}, undef, \&awfilterchain, [\&awrelationfunc, \&awplanfunc, \&awsiegefunc])->png();
+		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize, $options{scale}, undef, \&awfilterchain, 
+            [@drawfuncs[@$o]]
+#            [\&awrelationfunc, \&awplanfunc, \&awsiegefunc]
+            )->png();
       awinput::awinput_finish();
 		my $size=length($png);
 		print header(-type=>'image/png', -expires=>"+1h", -content_lenth=>$size), $png;
@@ -52,7 +57,7 @@ if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 
 	start_html(-title=>$title , -style=>"/code/css/tools/tactical.css"), 
 	#AWheader2($title),
 	start_form('get', "coord"),
-   image_button(-src=>"?map=1&xs=$options{xs}&ys=$options{ys}&xe=$options{xe}&ye=$options{ye}&scale=$options{scale}&o=$o"),
+   image_button(-src=>"?map=1&xs=$options{xs}&ys=$options{ys}&xe=$options{xe}&ye=$options{ye}&scale=$options{scale}&type=$o"),
 #	qq!<input type="image" src="?map=1&amp;xs=$options{xs}&amp;ys=$options{ys}&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;scale=$options{scale}" />!,
 	hidden("xs"),
 	hidden("ys"),
@@ -87,7 +92,8 @@ if(!$done) {
     awmapcgi::awmapcoordinput(),
 	 hidden("map",2),
 	 popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4])." scaling factor".br,
-    hidden(-name=>"o", -value=>"1,2,3"),
+    popup_menu(-name=>'type',-values=>[sort keys %$maptypes],-labels=>$maptypes, -default=>"0,1,2"), " type of map",br,
+#    hidden(-name=>"type", -value=>"1,2,3"),
 	 submit(-name=>"draw", -class=>'smbutton'), " (up to $max squares)";
 	 end_form, end_html;
 

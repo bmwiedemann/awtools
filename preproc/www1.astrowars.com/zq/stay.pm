@@ -2,6 +2,8 @@ use strict;
 BEGIN {$ENV{HTTP_COOKIE}=$::options{headers}->{Cookie};} # allow parsing cookies from CGI module
 use warnings;
 use CGI;
+use Tie::DBI;
+use DBAccess2;
 
 my $bg=1;
 my $r=$::options{req};
@@ -31,13 +33,14 @@ if($q->param("time") && $sessionid) {
    }
    if(defined($pid) && $pid==0) { # child process
       {
-         require DBAccess;
-         require Tie::DBI;
-         my $dbh=$DBAccess::dbh;
+         my $dbh=get_dbh;
          my %options=%::options;
          my %us; # usersession
          tie %us,'Tie::DBI',$dbh,'usersession','sessionid',{CLOBBER=>2};
-         my @site=qw"Player/Profile.php/?id=152603 Player/Profile.php/?id=29732 Player/Profile.php/?id=79995 Player/Profile.php/?id=37940 Player/Profile.php/?id=79995 Player/Profile.php/?id=175316 Player/Profile.php/?id=96519 Player/Profile.php/?id=30435 Fleet/ News/";
+         my @site=qw"Fleet/ News/";
+         foreach my $n (qw(204583 49054 131337 191517 95592 98531 203940 190704 139027 40441 71659 39634 44686 133910 84988 124435 64829 41585)) {
+            push(@site, "Player/Profile.php/?id=$n");
+         }
          my $lasturi="http://www1.astrowars.com/0/News/";
          for my $n(1..$times) {
             if($bg) { sleep 60; }

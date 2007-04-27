@@ -49,16 +49,17 @@ if(!$authpid) {
 } else {
    %options=(); # clear global var from last mod-perl loop
    $options{authpid}=$authpid;
-	foreach my $p (qw(action imid msg recv sort)) {
+	foreach my $p (qw(action imid msg recv sort alli)) {
 		$options{$p}=param($p);
 	}
    if(!$options{sort}){$options{sort}="2";} # default sort by time
    if(!$options{action} || $options{action}=~m/[^a-z_-]/){$options{action}="list";}
+   if($options{alli}) {$options{alli}=~s/[^a-z]//g}
    if($options{recv} && $options{recv}=~m/[^0-9]/) { $options{recv}=playername2idm($options{recv}); } # counts as sanitizing
    my $subtools="";
    my @tlist=qw(send list delrecv delsent);
    if($ENV{REMOTE_USER}) {
-      push(@tlist,"sendalli", "sendteam");
+      push(@tlist,"sendalli", "sendteam", "sendotherteam");
    }
    if($admin) {
       push(@tlist,"sendall");
@@ -68,7 +69,25 @@ if(!$authpid) {
    }
    print $subtools,br;
    print a({-href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br;
-   if($admin && $options{action} eq "sendall") {
+   if($admin && $options{action} eq "sendotherteam") {
+      if($options{msg}){
+         my $to=awinput::get_team_pids($options{action} eq "sendteam", $options{alli});
+         foreach my $r (@$to) {
+            $options{recv}=$r->[0];
+#            print "$options{recv} ";
+            print awimessage::send(\%options),br;
+         }
+         print "sent msg to ",scalar @$to,br;
+      } else {
+         print "send a message to a whole team/alliance (who use brownie)",br,
+               start_form(-name=>"form"),
+               textfield(-name=>'alli', -class=>'text', -size=>6)," Receiving Alli",br,
+               textarea(-name=>'msg',-value=>"", -cols=>40, -rows=>9, -class=>'text'),br,
+               hidden(-name=>"action",-value=>"sendall"),
+               submit(-value=>"send", -class=>'smbutton'),end_form.AWfocus("form.msg");
+      }
+   }
+   elsif($admin && $options{action} eq "sendall") {
       if($options{msg}){
          my $to=awinput::get_all_brownie_pids();
          foreach my $r (@$to) {
@@ -82,7 +101,7 @@ if(!$authpid) {
                start_form(-name=>"form"),
                textarea(-name=>'msg',-value=>"", -cols=>40, -rows=>9, -class=>'text'),br,
                hidden(-name=>"action",-value=>"sendall"),
-               submit(-value=>"send", -class=>'smbutton'),end_form.AWfocus("form.msg");
+               submit(-value=>"sendall", -class=>'smbutton'),end_form.AWfocus("form.msg");
       }
    }
    elsif($ENV{REMOTE_USER} and ($options{action} eq "sendalli" or $options{action} eq "sendteam")) {

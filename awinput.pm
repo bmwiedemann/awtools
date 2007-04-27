@@ -243,10 +243,13 @@ sub playername2idaw2($) { my($name)=@_;
 }
 sub playerid2nameaw($) { my($id)=@_;
    require LWP::Simple;
+   my($max)=get_one_row("SELECT max( `pid` ) FROM `playerextra`");
+# sanity check: IDs are positive and rising slowly
+   if($id<0 || ($max && $max>200000 && $id>$max+2000)) {return undef}
    print STDERR "fetching id=$id from AW\n";
    my $html=LWP::Simple::get("http://www.astrowars.com/forums/profile.php?mode=viewprofile&u=$id");
-   if($html=~m!<span class="gen">Contact ([^<>]{1,25}) </span>!) {
-      my $name=$1;
+   if($html=~m!Sorry, but that user does not exist! || $html=~m!<span class="gen">Contact ([^<>]{1,25}) </span>!) {
+      my $name=$1||"";
       my $dbh=get_dbh;
       my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `playerextra` VALUES (?, ?, '', ?)!);
       $sth->execute($id, $name, undef);
@@ -271,12 +274,10 @@ sub playerid2nameaw2($) { my($id)=@_;
 }
 sub playerid2namem($) { my($id)=@_;
    if(!defined($id)) {return undef}
-   if($id<=2) {return "unknown"}
-   my $dbh=get_dbh;
-   my $sth=$dbh->prepare_cached("SELECT `name` FROM `playerextra` WHERE `pid` = ? LIMIT 1");
-   my $r=$dbh->selectall_arrayref($sth, {}, $id);
-   if($r && $r->[0]) {
-      return $r->[0]->[0];
+#   if($id<=2) {return "unknown"}
+   my ($name)=get_one_row("SELECT `name` FROM `playerextra` WHERE `pid` = ? LIMIT 1", [$id]);
+   if(defined($name)) {
+      return $name;
    }
    if($startofround) {
       return playerid2nameaw($id);
@@ -330,7 +331,7 @@ sub playerid2link($) { my($id)=@_;
 
 sub playerid2link2($) {   
    my $l=playerid2link($_[0]);
-   $l=~s!relations!http://www1.astrowars.com/0/Player/Profile.php/!;
+   $l=~s!${toolscgiurl}relations!http://www1.astrowars.com/0/Player/Profile.php/!;
    return $l;
 }
 
@@ -703,6 +704,7 @@ sub dblinkadd { my($sid,$url)=@_;
    elsif($url=~m!http://she.m-30.net/viewtopic\.php\?[pt]=(\d+)!) { $type="SHE" } # phpBB
    elsif($url=~m!http://lordvic.free.fr/ForumADN/viewtopic\.php\?[pt]=(\d+)!) { $type="ADN" } # phpBB
    elsif($url=~m!http://www.ouebomatik.net/forums/viewtopic\.php\?[pt]=(\d+)!) { $type="CPO" } # phpBB
+   elsif($url=~m!http://www.varoquier.name/phpBB2/viewtopic\.php\?[pt]=(\d+)!) { $type="SSS" } # phpBB
    elsif($url=~m!http://whfoundation.7.forumer.com/viewtopic\.php\?[pt]=(\d+)!) { $type="WHF" } # phpBB
    elsif($url=~m!http://council.14.forumer.com/viewtopic\.php\?[pt]=(\d+)!) { $type="CoRE" } # phpBB
    elsif($url=~m!http://lba-lbb.iespana.es/viewtopic\.php\?[pt]=(\d+)!) { $type="LBA" } # phpBB
@@ -768,6 +770,7 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
 # phys adj values: 
 # DS: (107518/100000-1)/5 = 0.015036 ... 0.01525 ?
 # CS: (211633/1.25/100000-1)/40 = 0.0173266
+# CS: (101715/100000-1)/1 = 0.01715
 # BS: (107709/100000-1)/5 = 0.015418
    return int($cv*(1+$phys*0.01525)*(1+$awstandard::racebonus[5]*$att));
 }
@@ -788,15 +791,16 @@ sub get_alli_match($;$)
    return $allimatch.")";
 }
 
-sub get_team_pids($)
+sub get_team_pids($;$)
 {
-   my($team)=@_;
-   if(!$ENV{REMOTE_USER}) {return []}
+   my($team,$alli)=@_;
+   $alli||=$ENV{REMOTE_USER};
+   if(!$alli) {return []}
    my $m="";
    if($team) {
-      $m="AND ".awinput::get_alli_match($ENV{REMOTE_USER},'tag');
+      $m="AND ".awinput::get_alli_match($alli,'tag');
    } else {
-      $m="AND `tag` = '$ENV{REMOTE_USER}'";
+      $m="AND `tag` = '$alli'";
    }
    my $dbh=get_dbh;
    my $sth=$dbh->prepare_cached("SELECT `pid` FROM alliances,player WHERE aid = alliance $m");
@@ -909,11 +913,7 @@ sub get_alli_group($)
 
 # input: playerid
 sub getuserprefs($) { my($pid)=@_;
-   my $dbh=get_dbh;
-   my $sth=$dbh->prepare_cached("SELECT * from `playerprefs` WHERE `pid` = ?");
-   my $res=$dbh->selectall_arrayref($sth, {}, $pid);
-   if($res) {return $res->[0]}
-   return $res;
+   return get_one_rowref("SELECT * from `playerprefs` WHERE `pid` = ?", [$pid]);
 }
 
 1;

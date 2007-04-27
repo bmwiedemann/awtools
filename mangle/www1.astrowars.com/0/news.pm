@@ -16,7 +16,11 @@ if(0 && s%Premium\s+Tools\s*</a></td>%$&<td>|</td><td><a href="/0/Alliance/Incom
 }
 
 # add CSS classes to tables
-s%(?:<table border="0" CELLSPACING="1" CELLPADDING="1" width="600")|(?:<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#303030' width="600")%$& class="sub_inner"%g;
+my $n=1;
+s%(?:<table border="0" CELLSPACING="1" CELLPADDING="1" width="600")|(?:<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#303030' width="600")%$&.' class="sub_inner" id="news'.($n++).'"'%ge;
+
+# fix broken HTML
+s%</td><td><a href="Help.php">Help%$&</a>%;
 
 require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
 

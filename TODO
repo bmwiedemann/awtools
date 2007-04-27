@@ -1,4 +1,10 @@
-tool to display useralli = own
+-tool to display useralli = own (soon obsolete)
+XML-export of systems, players, fleets for integration into phpBB2 and others
+mangle/All_Incomings: könnte hinter dem Namen des Betroffenden ein link zu seiner Alli ansicht liegen..
+auto-IM to team/alli about new incoming fleets
+fighterlist/whocanintercept: yCV mit A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
+#was done: xCV calculation: dont use outdated phys - instead worst-case - (4 days timeout)
+# [AF] SaggitariusA: ein anderes schönes tool wäre es mal, die PPs zu ermitteln, die man braucht, um auf planet #x eine SBy zu bauen (mit FS natürlich)
 #add recv message count to AWTools header: SELECT count(imid) FROM `imessage` WHERE `recvpid` = ? GROUP BY recvpid
 #authawforum
 #add alliance relation comment to alliance page
@@ -72,4 +78,13 @@ changing the map look to look more "AW-like" - much like Mob's tools... I really
 
 wie wäre es mit einer möglichkeit eine sys ID, einen energylevel und einen biolevwel einzugeben und dann werden alle potentiellen jumper mit weniger als 2h flugzeit gesucht, als optionen kann man alle von aktiven und verbündeten, von kleinen spielermn und free/unknown einzeln filtern lassen
 
+
+
+       "bind_param_inout"
+             $rc = $sth->bind_param_inout($p_num, \$bind_value, $max_len)  or di
+e $sth->errstr;
+             $rv = $sth->bind_param_inout($p_num, \$bind_value, $max_len, \%attr
+)     or ...
+             $rv = $sth->bind_param_inout($p_num, \$bind_value, $max_len, $bind_
+type) or ...
 

@@ -46,24 +46,30 @@ foreach my $row (@$fleets) {
    my @race=relation2race($erel[2]);
    my @prod=relation2production($erel[2]);
    my $bonus=$prod[7];
+   foreach my $i (0..2) {
+      $prod[$i]*=24*$bonus->[$i]; # hourly to daily with bonusses
+   }
 #   print "@prod @race @sci".br;
    push(@data, [
          $pid, $sumcv, $sumxcv, $maxcv, 
-         24*$prod[0]*$bonus->[0], @prod[5,6], $player{$pid}{level},
+         @prod[0..2,5,6], $player{$pid}{level},
          arrival::effectiveenergy($race[4], $sci[3]), @sci[3,5,4],
          @race[4..6]]);
 }
 
 print sort_table([qw(name CV xCV biggestCV 
-         prod/d A$ PP PL 
+         prod/d sci/d cul/d
+         A$ PP PL 
          xE E P M 
          S A D)],
       [\&display_pid, \&display_string, \&display_string, \&display_string, 
-      \&display_round0, \&display_round0, \&display_round0, \&display_string,
+      \&display_round0, \&display_round0, \&display_round0,
+      \&display_round0, \&display_round0, \&display_string,
       \&display_round0, \&display_string, \&display_string, \&display_string, 
       \&display_string, \&display_string, \&display_string],
       [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, 
-      \&sort_num, \&sort_num, \&sort_num, \&sort_num,
+      \&sort_num, \&sort_num, \&sort_num,
+      \&sort_num, \&sort_num, \&sort_num,
       \&sort_num, \&sort_num, \&sort_num, \&sort_num, 
       \&sort_num, \&sort_num, \&sort_num],
       sort_param_to_keys($options{sort}), \@data);

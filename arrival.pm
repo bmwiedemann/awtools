@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 package arrival;
-
 use strict;
+use awstandard;
 
 my ($c,$a,$p,$e,$rs)=(850/60, 34, 0.1, 91/100, 0.17);
 
@@ -24,6 +24,14 @@ sub get_distsqr($$)
    my($x1,$y1)=awinput::systemid2coord($s1);
    my($x2,$y2)=awinput::systemid2coord($s2);
    return (($x1-$x2)**2+($y1-$y2)**2);
+}
+
+sub get_bio_dist($$)
+{
+   my($c1, $c2)=@_;
+   if(!$c1 || !$c2) { return }
+   my $dist=awmax(abs($c1->[0] - $c2->[0]),abs($c1->[1] - $c2->[1]));
+   return $dist*2;
 }
 
 1;

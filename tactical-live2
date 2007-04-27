@@ -10,7 +10,7 @@ use awinput;
 use awmapcgi;
 awstandard_init();
 
-my %maptypestring=("0,1,2"=>"relation", "1"=>"plans", "0,3,4"=>"fleets", 5=>"population");
+my $maptypes=\%awmapcgi::maptypestring;
 
 my $alli=$ENV{REMOTE_USER};
 #if(!$ENV{REMOTE_USER}) {$ENV{REMOTE_USER}="af"}
@@ -67,7 +67,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	print start_form(-method=>'get', -name=>"form"), 
     awmapcgi::awmapcoordinput(),
     popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4])," scaling factor",br,
-    popup_menu(-name=>'type',-values=>[sort keys %maptypestring],-labels=>\%maptypestring, -default=>"0,1,2"), " type of map",br,
+    popup_menu(-name=>'type',-values=>[sort keys %$maptypes],-labels=>$maptypes, -default=>"0,1,2"), " type of map",br,
 #    checkbox(-name=>'fast', -label=>'fast', -checked=>1, -value=>'1'), " - uncheck when images are missing",br,
 	 submit(-name=>"draw", -class=>'smbutton'), end_form();
    awinput::awinput_finish();

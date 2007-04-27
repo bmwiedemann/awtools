@@ -95,11 +95,11 @@ sub awservecache()
 		$r->set_content_length(length($c));
       $r->update_mtime($mtime);
 		$r->set_last_modified($mtime);
-		$r->headers_out->add('Expires', HTTP::Date::time2str(time + 90*24*60*60)); # 90d
 		$r->set_keepalive();
       if((my $rc = $r->meets_conditions) != 0) {
          $r->status($rc);
       } else {
+         $r->headers_out->add('Expires', HTTP::Date::time2str(time + 90*24*60*60)); # 90d
    		$r->print($c);
       }
 		return 1;

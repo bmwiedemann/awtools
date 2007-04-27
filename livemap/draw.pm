@@ -8,15 +8,6 @@ use awmapfunc;
 use awdraw2;
 use awinput;
 
-my @drawfuncs=(
-      \&awrelationfunc,
-      \&awplanfunc,
-      \&awsiegefunc,
-      \&awfleetstatusfunc,
-      \&awfleetownerrelationfunc,
-      \&awpopulationfunc,
-      );
-
 # input x,y and options (e.g. [1,3,2] indexing elements from the function array)
 # output 13x13 pixel image of system
 sub draw($$$) { my($x,$y,$options)=@_;

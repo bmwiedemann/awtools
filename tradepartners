@@ -16,7 +16,7 @@ my %options;
 for my $p (qw'sort') {
    $options{$p}=param($p);
 }
-if(!defined $options{sort}){$options{sort}="8";}
+if(!defined $options{sort}){$options{sort}="8.-2";}
 
 
 
@@ -50,6 +50,8 @@ foreach my $entry (@tap) {
    my $timeplus=(20000-$adplus)/$prod;
    $$entry[1]=int($ad);
    $$entry[2]=int($prod);
+   my @race=relation2race($rel[2]);
+   if(@race && $race[-1] <=-6) {$time=0; $timeplus=0}
 #   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
    push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus]);
 }

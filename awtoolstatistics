@@ -41,8 +41,12 @@ foreach my $row (@$allis) {
       }
 }
 
+# TODO how many alliances use brownie
+my $numallis=keys %allowedalli;
+
 print "<h2>brownie users</h2>";
 print (qq(<b style="color:green">$eusersum</b>/),$users->[0]->[0],"\n");
+print "extended brownie alliances: $numallis\n";
 
 print "<h2>alliance usage</h2>";
 foreach my $row (@{$allis}[0..29]) {

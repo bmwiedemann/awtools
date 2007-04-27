@@ -30,6 +30,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    $$options{bmwlink}=$::bmwlink=$origbmwlink;
    $$options{authlink}=$origbmwlink;
    %::options=%$options;
+   $toolscgiurl="http://$bmwserver/cgi-bin/"; # this is initially empty but for mangling we need absolute URLs
 
    my $notice="";#<b style=\"color:green\">notice: road works ahead.... brownie + AWTools server has a scheduled maintenance period today (Monday 2007-03-26 12-18:00 UTC) and might be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
 
@@ -65,7 +66,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          else {$nclicks=1}
          if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          $info{clicks}=$nclicks;
-         $$options{authlink}="$origbmwlink/modperl/public/authaw?session=$session&uri=/cgi-bin";
+         $$options{authlink}="$origbmwlink/modperl/public/authaw?session=$session&amp;uri=/cgi-bin";
          if($ENV{REMOTE_USER}) {
             $::bmwlink=$$options{authlink};
          }
@@ -107,7 +108,7 @@ sub mangle_dispatch(%) { my($options)=@_;
                my $e="</a></td>";
                my $s=qq'<td class="white">$::bmwlink';
                my $l="$e$sep$s";
-               s%^</tr></table>%</tr><tr class="bmwblankrow"><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b>$e
+               s%^</tr></table>%</tr><tr class="bmwblankrow"><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b></td>
                   $s/arrival">arrival
                   $l/tactical">tacmap
                   $l/tactical-large">tlarge
@@ -134,7 +135,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $imessage="";
    if($$options{pid}) {
       $$options{authpid}=$$options{pid};
-      my $ims=awimessage::get_all_ims($options);
+      my $ims=awimessage::get_all_ims($options, 1);
       if($ims && @$ims) { # have im
          my $nims=@$ims;
          $imessage="<!-- start gb imessage --><div class=awimessage>you have $nims $$options{authlink}/imessage\" class=\"awtools\">instant messages</a><br>";
@@ -193,7 +194,11 @@ sub mangle_dispatch(%) { my($options)=@_;
          if($diff<3) {$diff=3}
          my $c=sprintf("%x", $diff);
 #if($time<$now-60*6) {
+         if($g) {
+            push(@who2,"<span class=\"gray$diff\">$name</span>");
+         } else {
          push(@who2,"<span style=\"color:#$c$c$c\">$name</span>");
+         }
       }
       $$options{sqlelapsed}=tv_interval ( $t1 );
       $online=join(", ", @who2);
@@ -205,13 +210,13 @@ sub mangle_dispatch(%) { my($options)=@_;
 
    # aw21 transition
    if($$options{proxy} eq "brownie-cgi") {
-      $notice.="<br><b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.lsmod.de/proxy-config.html\">brownie.pac</a></b><br>";
+      $notice.="<br><b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.lsmod.de/manual/proxy-config\">brownie.pac</a></b><br>";
    }
    
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
    $$options{mangleelapsed}=$$options{totalelapsed}=tv_interval ( $t2 );
-   my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n$joinlink<p id=disclaimer style=\"text-align:center; color:white; background-color:black\"><br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
+   my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n$joinlink<p id=\"disclaimer\"><br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
    if($gameuri) {
       my $style="main";
@@ -240,7 +245,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 #      do "mangle/special/use_css.pm"; 
       mangle::special::use_css::mangle();
       # fix AR's non-standard HTML
-      s%(<a href=)([a-zA-Z0-9/.:?&\%=-]+)>%$1"$2">%g;
+      s%(<a href)\s*=([a-zA-Z0-9/.:?&\%=-]+)([> ])%$1="$2"$3%g;
    }
 }
 

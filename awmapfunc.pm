@@ -9,8 +9,17 @@ use awinput;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
-qw(&awrelationfunc &awpopulationfunc &awplanfunc &awsiegefunc &awfilterchain &awfleetstatusfunc &awfleetownerrelationfunc);
+qw(&awrelationfunc &awpopulationfunc &awplanfunc &awsiegefunc &awfilterchain &awfleetstatusfunc &awfleetownerrelationfunc
+@drawfuncs);
 
+our @drawfuncs=(
+      \&awrelationfunc,
+      \&awplanfunc,
+      \&awsiegefunc,
+      \&awfleetstatusfunc,
+      \&awfleetownerrelationfunc,
+      \&awpopulationfunc,
+      );
 my $s=12;
 
 # all mapping functions:

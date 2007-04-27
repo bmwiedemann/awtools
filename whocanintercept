@@ -41,6 +41,7 @@ if(param()) {
       my $f=awinput::get_fleets2("AND `iscurrent` = 1 AND `xcv` > $options{cvlimit}");
       my $now=time();
       my @data;
+      my $refxy=[systemid2coord($sid)];
       foreach my $row(@$f) {
          my ($sidpid,$owner,$eta,$cv,$xcv)=@{$row}[3..5,13,14];
          my($sid2,$pid2)=sidpid32sidpid2m($sidpid);
@@ -53,15 +54,23 @@ if(param()) {
             arrival::traveltime({distance=>$dist, planet=>abs($pid2-$pid), racespeed=>$speed, energy=>$ener, own=>($options{tag} eq lc(playerid2tag($owner)||""))});
          $tt+=$ett;
          if($options{timelimit} && $tt>$options{timelimit}) {next}
-         push(@data, [$owner,$sid2,$tt,$cv,$xcv]);
+
+         # find Bio distance
+         my $xy=[systemid2coord(playerid2home($owner))];
+         my $biodist=awmin(25,arrival::get_bio_dist($xy,$refxy));
+         my $bio;
+         
+         push(@data, [$owner,$sid2,$tt,$cv,$xcv,$biodist]);
             
 #         my($x2,$y2)=systemid2coord($sid2);
 #         print "$x2,$y2 $dist $owner $eta $now $ett ";
 #         print awinput::show_fleet($row).br;
       }
-      print sort_table([qw(who where when(h) howmuchCV xCV)],
-            [\&display_pid, \&display_sid, \&display_round2, \&display_string, \&display_string],
-            [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+      print sort_table([qw(who where when(h) howmuchCV xCV bioneed)],
+            [\&display_pid, \&display_sid, \&display_round2, 
+             \&display_string, \&display_string, \&display_string],
+            [\&sort_pid, \&sort_num, \&sort_num, 
+             \&sort_num, \&sort_num, \&sort_num],
             sort_param_to_keys($options{sort}), \@data);
    }
 }

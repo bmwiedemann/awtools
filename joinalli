@@ -60,7 +60,7 @@ if($name && $pid && ($interbeta || (!$alli && !$awalli)) && param()) {
       print "sorry, you are already member of an alliance and can not join another one within AWTools";
    } else {
       print "user=$name pid=$pid alli=$alli",br;
-      print start_form(-name=>"form"),textfield(-name=>'a', -class=>'text'), " Alliance",br,
+      print start_form(-name=>"form"),textfield(-name=>'a', -class=>'text'), " Alliance TAG",br,
          password_field(-name=>'p', -class=>'text'), " Alliance's Access Password for AWTools",br,
          submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.a");
    }

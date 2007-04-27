@@ -52,11 +52,12 @@ sub replacefunc($$$$) {my ($rel,$n,$conq1,$conq2)=@_;
 
 open(F, "<", shift(@ARGV)) or die "error opening input file: $!";
 my @edges;
-{ local undef $/;
-  my $edges=<F>;
-  @edges=split("\n",$edges);
+while(<F>) {
+   chop();
+   next if not $_ || /^\s*$/;
+   push(@edges,$_);
 }
-if(!@edges || !$edges[0]) {exit 0}
+if(!@edges || !$edges[0] || @edges<40) {exit 0}
 my %allis;
 foreach(@edges) {
 	next unless /^([^ ]+) -- ([^ ;]+)/;
@@ -65,9 +66,9 @@ foreach(@edges) {
 }
 sub max($$) {my($a,$b)=@_; $a|=0; $b|=0; return $a>$b?$a:$b}
 sub sortfunc {
-	return 0 unless $a=~/^([^ ]+) -- ([^ ;]+)/;
+	return 0 unless $a && $a=~/^([^ ]+) -- ([^ ;]+)/;
 	my $max=max($allis{$1},$allis{$2});
-	return 0 unless $b=~/^([^ ]+) -- ([^ ;]+)/;
+	return 0 unless $b && $b=~/^([^ ]+) -- ([^ ;]+)/;
 	my $max2=max($allis{$1},$allis{$2});
 	return $max2<=>$max;
 }
@@ -81,7 +82,7 @@ my @eedges=(sort sortfunc2 @edges)[0..$eentries-1];
 
 my @newedges;
 foreach(sort sortfunc (@edges[0..$aentries-1], @eedges)) {
-	next unless m/$relre/;
+	next unless $_ && m/$relre/;
 	my ($a1,$a2,$rel,$n,$conq1,$conq2)=($1,$2,$3,$4,$5,$6);
 	#s!; //(\d+) ([+-]?\d+)!replacefunc($1,$2)!e;
 	for($a1,$a2) {

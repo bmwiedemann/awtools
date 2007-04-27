@@ -4,6 +4,9 @@ use awstandard;
 use awinput;
 use CGI ":standard";
 
+
+our %maptypestring=("0,1,2"=>"relation", "1"=>"plans", "0,3,4"=>"fleets", 5=>"population");
+
 sub awmapcoordinput() {
 	my @pos=(0,0);
 	my @s=(29,25);

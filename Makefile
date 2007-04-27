@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold8
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html alliance{,2} arrival authaw authawforum awlinker awtoolstatistics joinalli cdinfo distsqr eta fighterlist preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info testenv planet-info edit-fleet fleets feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli uploadcss playeronline playeronline2 passwd plhistory ipban logout
+tools=index.html alliance{,2} arrival authaw authawforum awlinker awtoolstatistics joinalli cdinfo distsqr eta fighterlist preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info edit-fleet fleets feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,2,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -116,6 +116,13 @@ topn:
 TA.candidate: TA.in TA.done TA.pl
 	./TA.pl > $@
 
+unaccess:
+	mkdir -p old/obsolete
+	./dbm-del.pl base/db2/allowedalli.dbm $a
+	mv base/db2/$a-relation.dbm base/db2/$a-planets.dbm old/obsolete
+	./removealli.pl $a
+	vim +/^$a: base/.htpasswd
+
 access:
 	-cp -ia empty.dbm base/db2/$a-relation.dbm
 	-cp -ia empty.dbm base/db2/$a-planets.dbm
@@ -130,7 +137,10 @@ access:
 	-chmod 660 base/db2/$a*.dbm*
 	sudo chown wwwrun.bernhard base/db2/*.dbm*
 	echo -n " $a" >> allowed_alliances # keep for human lookup only
-	make updatemap updatemap2 allies=$a
+	make reloadapache updatemap updatemap2 allies=$a
+
+reloadapache:
+	sudo /usr/local/bin/reloadapache
 
 tgz:
 	rm -rf bmw-awtools

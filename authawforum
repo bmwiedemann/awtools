@@ -39,11 +39,17 @@ if(param("u")) {
          print $h."<pre>";
          my $pid;
          $response->scan(sub {
-            return unless $_[0] eq "Set-Cookie" && $_[1]=~/astrowarsforums_data=[^;]*userid%22%3Bs%3A5%3A%22(\d+)/;
+            return unless $_[0] eq "Set-Cookie";
+#            print "$h $_[1]\n.br";
+            return unless $_[1]=~/astrowarsforums_data=[^;]*userid%22%3B.%3A.%3A%22(\d+)/;
+#            userid%22%3Bs%3A5%3A%22
+#            userid%22%3Bs%3A6%3A%22203535%22%3B%7D
             $pid=$1;
 #            print "@_\n";
          });
-         if(!$pid || $awpid != $pid) {
+         if(!$pid) {
+            print $h."incorrect AW forum user+pass";
+         } elsif($awpid != $pid) {
             print $h."strange PID mismatch: $awpid != $pid";
          } else {
             my $dbh=get_dbh;

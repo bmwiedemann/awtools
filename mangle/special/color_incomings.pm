@@ -9,9 +9,9 @@ sub add_fleets($$) { my($sid,$pid)=@_;
    return "" if(!$fleets || !@$fleets);
    my $fstr="";
    foreach my $f (@$fleets) {
-      my $fs="<br>\n".awinput::show_fleet($f);
-      $fs=~s/<a href="(relations\?id=)/$::bmwlink\/$1/;
-      $fstr.=$fs;
+      my $fs=awinput::show_fleet($f);
+#      $fs=~s/<a( class="[^"]+")? href="(relations\?id=\d+")/$::bmwlink\/$2$1/;
+      $fstr.="<br>\n".$fs;
    }
    $fstr=~s/^<br>//;
    return "<div class=bmwincoming>$fstr</div>";

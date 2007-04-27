@@ -17,8 +17,9 @@ tie(%allowedalli, "DB_File", "$awstandard::dbmdir/allowedalli.dbm", O_RDONLY, 0,
 @EXPORT = qw(%read_access %write_access %allowedalli %remap_planning %remap_relations %remap_alli);
 
 
-$read_access{af}=["rats"];
-$read_access{rats}=["af"];
+$read_access{af}=["rats","trol"];
+$read_access{rats}=["af","trol"];
+$read_access{trol}=["af","rats"];
 $read_access{fir}=["ice"];
 $read_access{ice}=["fir"];
 $read_access{lba}=["lbb"];

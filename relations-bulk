@@ -51,7 +51,7 @@ if(1) {
 	print textarea(-name=>'user', "all\nmembers"), br;
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{relation},
-		-labels=>\%::relationname), " relation", br,
+		-labels=>\%relationname), " relation", br,
 	textarea('comment', $options{comment}), " who added him, why, contact etc... (will be prepended)", br,
 	submit(-name=>"submit all - really sure?", -class=>'smbutton')
 } 

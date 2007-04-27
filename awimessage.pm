@@ -18,8 +18,13 @@ sub get_all_ims(%;$)
    my $options=shift;
    my $dbh=get_dbh;
    my $what=shift||3;
-   my $sth=$dbh->prepare_cached("SELECT * FROM `imessage` WHERE `recvpid` = ? OR `sendpid` = ? ORDER BY `time`");
-   my $res=$dbh->selectall_arrayref($sth, {}, $$options{authpid}, $$options{authpid});
+   if($what&3==0) {return []}
+   my @selstr=();
+   if($what&1) {push @selstr," `recvpid` = ? "}
+   if($what&2) {push @selstr," `sendpid` = ? "}
+   my $selstr=join(" OR ", @selstr);
+   my $sth=$dbh->prepare_cached("SELECT * FROM `imessage` WHERE $selstr ORDER BY `time`");
+   my $res=$dbh->selectall_arrayref($sth, {}, ($what&1)?$$options{authpid}:(), ($what&2)?$$options{authpid}:());
    return $res;
 }
 
