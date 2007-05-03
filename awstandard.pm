@@ -396,10 +396,11 @@ sub safe_encode($) { my($name)=@_;
 my %htmlcode=(
       "<"=>"&lt;",
       ">"=>"&gt;",
+      "\""=>"&quot;",
    );
 sub html_encode($) {
    return if not $_[0];
-   $_[0]=~s/[<>]/$htmlcode{$&}/g;
+   $_[0]=~s/[<>"]/$htmlcode{$&}/g;
 }
 
 sub file_content($) {my($fn)=@_;

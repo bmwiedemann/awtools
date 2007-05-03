@@ -3,8 +3,22 @@ use strict;
 use CGI ":standard";
 
 use awstandard;
+use DBAccess2;
 awstandard_init();
 
 print AWheader("permanent alliance ranking points")."<pre>";
-print `cut -f2,7 alliances.csv|sort -n -r -k 2|grep -v -e 0 -e permanent\\\$`;
+# bug from grep -e 0
+#print `cut -f2,7 alliances.csv|sort -n -r -k 2|grep -v -e 0 -e permanent\\\$`;
+
+my $dbh=get_dbh;
+my $sth=$dbh->prepare_cached("
+SELECT `tag`, `permanent`
+FROM `alliances`
+WHERE `permanent` > 0
+ORDER BY `alliances`.`permanent` DESC");
+my $aref=$dbh->selectall_arrayref($sth, {});
+foreach my $x (@$aref) {
+   printf "%4s %2i".br, $x->[0], $x->[1];
+}
+
 print "</pre>".AWtail();

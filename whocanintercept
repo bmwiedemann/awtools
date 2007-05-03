@@ -18,12 +18,13 @@ print start_form(-name=>"form", -method=>"get"),textfield(-name=>'p', -class=>'t
 		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p"),
       br,"This tool allows you to check who can intercept a certain fleet. The xCV-limit and time-limit values act as a filter.",br;
 
-if(param()) {
+if(param() && param("p")) {
 	foreach my $p (qw(p cvlimit timelimit sort)) {
 		$options{$p}=param($p);
       if(defined($options{$p})){$options{$p}=~s/[^-.0-9#]//g;} # sanitize user input;
 	}
    $options{tag}=lc(param("tag")||"");
+   $options{cvlimit}||=3;
    if(!defined $options{sort}){$options{sort}="3";}
    my ($sid,$pid)=sidpid32sidpid2($options{p});
    my $name=systemid2link($sid);
@@ -38,7 +39,7 @@ if(param()) {
          $options{tag}=~s/[^a-z]//g;
       }
       print "to $name#$pid owned by $options{tag}".br;
-      my $f=awinput::get_fleets2("AND `iscurrent` = 1 AND `xcv` > $options{cvlimit}");
+      my $f=awinput::get_fleets2("AND `iscurrent` = 1 AND `xcv` > ?", [$options{cvlimit}]);
       my $now=time();
       my @data;
       my $refxy=[systemid2coord($sid)];

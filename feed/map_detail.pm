@@ -1,6 +1,7 @@
 use strict;
 use MLDBM qw(DB_File Storable);
 use Fcntl;
+use DBAccess;
 our %planets; # imported from awinput
 
 my $debug=$::options{debug};
@@ -39,6 +40,10 @@ sub filter() {
       $$p{ownerid}=$playerid;
       $$p{pop}=$pop;
       $$p{sb}=$sb;
+# additionally update in mysql DB:
+      my $sidpid=sidpid22sidpid3m($sid,$pid);
+      my $sth=$dbh->prepare("UPDATE `planets` SET siege=?, starbase=?, population=?, ownerid=? WHERE sidpid = ?");
+      $sth->execute($siege, $sb, $pop, $playerid, $sidpid);
    }
    if(!$debug) {
       $planets{$sid}=\@system;

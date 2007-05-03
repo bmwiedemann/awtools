@@ -38,9 +38,14 @@ $name=~s"^.*[/\\]"";	if($filename=~m/\.([^.]+)$/ && ($allowedext{$1}||return ".$
 	}
 	while ($bytesread=read($filename,$buffer,1024)) {print $outfile $buffer;}
 	undef $outfile;
-	$fullname=$serverbase.$imagedir.$name;
-	print AWheader("success"),
-	qq|is now at: <a href="$fullname">$fullname<br></a>|;
+   if(-z $newname) {
+      unlink $newname;
+      print AWheader("deleted");
+   } else {
+      $fullname=$serverbase.$imagedir.$name;
+      print AWheader("success"),
+      qq|is now at: <a href="$fullname">$fullname<br></a>|;
+   }
 	return "";
 }
 

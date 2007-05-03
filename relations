@@ -10,6 +10,7 @@ use awinput;
 use arrival;
 awinput_init();
 
+
 my $title="manage relation [\U$ENV{REMOTE_USER}\E]";
 my %options;
 
@@ -105,15 +106,16 @@ if($options{name}) {# && $options{name} ne "unknown") {
          a({-href=>"http://www.astrowars.com/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/images/aw/sword.png",-alt=>"attack"}))." ".
          a({-href=>"arrival?energy=$eenergy&racespeed=$espeed"}, img({-src=>"/images/aw/shuttle.png",-alt=>"traveltime"}))." ".
               a({-href=>"http://www.astrowars.com/forums/profile.php?mode=viewprofile&u=".$id}, img({-src=>"/images/icon_profile.gif",-alt=>"forum-profile"}))." ".a({-href=>"imessage?action=send&recv=$id"}, img({-src=>"/images/aw/imessage.gif",-alt=>"IM"}))." ";
-         if(getauthname() eq "greenbird") {
-            $extralinks.=a({-href=>"playerbattles3?p=$id"},"PB3")." ";
-         }
+         $extralinks.=a({-href=>"playerbattles3?p=$id"},"PB")." ";
       }
    }
 	$atag=$atag?" ".alliancelink($atag):"";
 	print start_form(-name=>"form"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag.$lasttag." ", profilelink($id), $extralinks, 
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
-         a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles")," ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
+         a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".
+#a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles"),
+            a({-href=>"http://odbvpn.ath.cx:89/pub/view_battles.php?player=$user&date=all"},"battles"),
+            " ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
@@ -125,7 +127,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
     #.AWfocus("form.relation")
 	;
 	if($id>2) {
-		my @pl=playerid2planets($id);
+		my @pl=playerid2planetsm($id);
 		my $planets=@pl;
       my $pl=$player{$id};
 		my $level=$$pl{level};
@@ -145,7 +147,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
-		foreach my $pp (sort planetpopsort @planets) {
+		foreach my $pp (@planets) {
 			my $sid=planet2sid($pp);
          my $s=planet2siege($pp);
 			my ($x,$y)=systemid2coord($sid);

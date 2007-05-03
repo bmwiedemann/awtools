@@ -79,7 +79,7 @@ if($options{alliance}) {
       }
       my $etc="";
 		my $alink="";
-		my $planets=playerid2planets($pid);
+		my $planets=playerid2planetsm($pid);
 		my $joined=gmtime($$p{joined});#." ".$$p{joined};
 		my ($x,$y)=systemid2coord($$p{home_id});
 		my $home="$$p{home_id}($x,$y)";

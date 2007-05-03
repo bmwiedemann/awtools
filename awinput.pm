@@ -13,7 +13,7 @@ our $alarmtime=99;
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag 
+&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2planetsm &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag 
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
 &relation2production &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &is_admin &is_founder
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
@@ -400,6 +400,21 @@ sub playerid2alliance($) { my($id)=@_;
 sub playerid2planets($) { my($id)=@_;
         $player{$id}?@{$player{$id}{planets}}:undef;
 }
+sub playerid2planetsm($) { my ($pid)=@_;
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT `sidpid` FROM `planets` 
+         WHERE ownerid = ?
+         ORDER BY population DESC 
+         ");
+   my $aref=$dbh->selectall_arrayref($sth, {}, $pid);
+   if(!$aref) {return ()}
+   my @result=();
+   foreach my $row (@$aref) {
+      push(@result, &sidpid22sidpid3(sidpid32sidpid2m($row->[0])));
+   }
+   return @result;
+}
+
 sub playerid2tag($) { my($id)=@_;
 	allianceid2tag(playerid2alliance($id));
 }
@@ -635,20 +650,29 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
 #      local $^W=0;
       require "fleetadd.pm"; my $ret=fleetadd::dbfleetaddmysql($sid,$pid,$plid,$name,$time,$type,$fleet,$tz,$awinput::fleetscreen);
       if($ret==1) {  # there was a new fleet and we need to check+update plannings
-         my $sidpid=sidpid22sidpid3($sid,$pid);
-         untie %planetinfo;
-         opendb(O_RDWR, $dbnamep, \%planetinfo);
-         my $d=AWisodate(time());
-         if($time) { # moving fleet: planned to targeted
-            $planetinfo{$sidpid}=~s/^2 $plid /3 $plid l:$d /;
-         } else { # resting fleet: targeted to sieged
-            my $newstat=($type==0?4:5); # or to taken if fleet is on own planet
-            my $oldstat=($type==0?3:qr([34]));
-            my $text=($type==0?"s":"took").":";
-            $planetinfo{$sidpid}=~s/^$oldstat $plid /$newstat $plid $text$d /;
+         my @pinfo=getplanetinfo($sid,$pid);
+         if($pinfo[1] == $plid) {
+            my ($s,$info)=@pinfo[0,2];
+            my $sidpid=sidpid22sidpid3($sid,$pid);
+            untie %planetinfo;
+            opendb(O_RDWR, $dbnamep, \%planetinfo);
+            my $d=AWisodate(time());
+            if($time) { # moving fleet: planned to targeted
+               if($s==2) {
+                  $planetinfo{$sidpid}=~s/^2 $plid /3 $plid l:$d /;
+                  $s=3;
+                  $info="l:$d $info";
+               }
+            } else { # resting fleet: targeted to sieged
+               my $newstat=($type==0?4:5); # or to taken if fleet is on own planet
+               my $oldstat=($type==0?3:qr([34]));
+               my $text=($type==0?"s":"took").":";
+               $planetinfo{$sidpid}=~s/^$oldstat $plid /$newstat $plid $text$d /;
+            }
+            untie %planetinfo;
+            opendb(O_RDONLY, $dbnamep, \%planetinfo);
+            # TODO use setplanetinfo($pinfo[3], {status=>$s, who=>$plid, info=>$info);
          }
-         untie %planetinfo;
-         opendb(O_RDONLY, $dbnamep, \%planetinfo);
       }
    }
    return 0;
@@ -817,27 +841,29 @@ sub get_all_brownie_pids
 
 # get all fleets visible to own alli
 # input: SQL condition to add - defaults to ""
-sub get_fleets2($) { my($cond)=@_;
+sub get_fleets2($;@) { my($cond, $vars)=@_;
    my $alli=$ENV{REMOTE_USER};
    if(!$alli) {return [];}
+   $vars||=[];
    $cond||="";
    my $allimatch=get_alli_match($alli);
    my $dbh=get_dbh;
    my $sth=$dbh->prepare_cached("SELECT * from `fleets` WHERE ($allimatch) $cond");
-   my $res=$dbh->selectall_arrayref($sth, {});
+   my $res=$dbh->selectall_arrayref($sth, {}, @$vars);
    return $res;
 }
 
 # input: sidpid
 # input: SQL condition to add - defaults to ""
-sub get_fleets($;$) { my($sidpid,$cond)=@_;
+sub get_fleets($;$@) { my($sidpid,$cond, $vars)=@_;
    my $alli=$ENV{REMOTE_USER};
    if(!$alli) {return [];}
+   $vars||=[];
    $cond||="";
    my $allimatch=get_alli_match($alli);
    my $dbh=get_dbh;
    my $sth=$dbh->prepare_cached("SELECT * from `fleets` WHERE ($allimatch) AND `sidpid` = ? $cond ORDER BY `eta` ASC, `lastseen` ASC");# AND `iscurrent` = 1");
-   my $res=$dbh->selectall_arrayref($sth, {}, $sidpid);
+   my $res=$dbh->selectall_arrayref($sth, {}, $sidpid, @$vars);
    return $res;
 }
 

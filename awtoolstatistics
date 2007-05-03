@@ -8,7 +8,7 @@ use awstandard;
 use awinput;
 use awaccess;
 #awstandard_init();
-awinput_init();
+awinput_init(1);
 
 print AWheader("AWtool statistics"),"<pre>";
 
@@ -49,14 +49,15 @@ print (qq(<b style="color:green">$eusersum</b>/),$users->[0]->[0],"\n");
 print "extended brownie alliances: $numallis\n";
 
 print "<h2>alliance usage</h2>";
-foreach my $row (@{$allis}[0..29]) {
+my $n=0;
+foreach my $row (@{$allis}[0..39]) {
    my($name,$num)=@$row;
    my $color="";
    if($allowedalli{lc($name)} || $remap_alli{lc($name)}) {
       $color="color:green";
    }
    my $m=allianceid2members(alliancetag2id($name));
-   printf("<b style=\"$color\">%-4s</b> %2i/%-2i\n", $name, $num, $m);
+   printf("%02i <b style=\"$color\">%-4s</b> %2i/%-2i\n", ++$n, $name, $num, $m);
 }
 
 print "<h2>fleets</h2>";

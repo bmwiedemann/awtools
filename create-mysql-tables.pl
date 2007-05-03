@@ -5,6 +5,38 @@ use DBAccess;
 if(!$dbh) {die "DB err: $!"}
 # create tables
 
+#$dbh->do("DROP TABLE `battlecalc`");
+$dbh->do(qq!
+CREATE TABLE `battlecalc` (
+`ds1`  INT NOT NULL,
+`ds2`  INT NOT NULL,
+`cs1`  INT NOT NULL,
+`cs2`  INT NOT NULL,
+`bs1`  INT NOT NULL,
+`bs2`  INT NOT NULL,
+`sb`   VARBINARY(5) NOT NULL,
+`ph1`   INT NOT NULL,
+`ph2`   INT NOT NULL,
+`ma1`   INT NOT NULL,
+`ma2`   INT NOT NULL,
+`pl1`   INT NOT NULL,
+`pl2`   INT NOT NULL,
+`at1`   INT NOT NULL,
+`at2`   INT NOT NULL,
+`de1`   INT NOT NULL,
+`de2`   INT NOT NULL,
+`att1`   INT NOT NULL,
+`att2`   INT NOT NULL,
+`def1`   INT NOT NULL,
+`def2`   INT NOT NULL,
+`chance` DOUBLE NOT NULL,
+`kill1` DOUBLE NOT NULL,
+`kill2` DOUBLE NOT NULL,
+UNIQUE ( ds1,ds2,cs1,cs2,bs1,bs2,sb, ph1,ph2,ma1,ma2,att1,att2,def1,def2 )
+);!);
+# att/def in percent (e.g. 100 is default for +0%)
+# chance is value for defender
+
 $dbh->do(qq!
 CREATE TABLE `playerextra` (
 `pid` INT PRIMARY KEY,
@@ -185,10 +217,11 @@ CREATE TABLE `planetinfos` (
 `id` INT ( 14 ) NOT NULL AUTO_INCREMENT,
 `alli` VARCHAR( 7 ) NOT NULL ,
 `sidpid` INT( 16 ) UNSIGNED NOT NULL ,
-`status` INT( 2 ) UNSIGNED NOT NULL ,
+`status` TINYINT( 2 ) UNSIGNED NOT NULL ,
 `who` INT( 16 ) UNSIGNED NOT NULL ,
-`time` INT( 16 ) NULL ,
-`added` INT( 16 ) NOT NULL ,
+`modified_by` INT( 16 ) NULL ,
+`modified_at` INT( 16 ) NOT NULL ,
+`created_at` INT( 16 ) NOT NULL ,
 `info` TEXT NULL ,
 INDEX ( who ),
 UNIQUE ( `sidpid`, `alli` ),

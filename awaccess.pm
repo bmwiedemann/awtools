@@ -36,6 +36,7 @@ $read_access{en}=["xr"];
 #our %remap_planning=(frs=>"is");
 our %remap_planning=(
       rats=>"af",
+      trol=>"af",
       en=>"xr",
       );
 our %remap_relations=(

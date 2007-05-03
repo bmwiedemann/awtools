@@ -1,8 +1,9 @@
--tool to display useralli = own (soon obsolete)
+-tool to display useralli = own (soon obsolete with mysql relations DB index)
 XML-export of systems, players, fleets for integration into phpBB2 and others
 mangle/All_Incomings: könnte hinter dem Namen des Betroffenden ein link zu seiner Alli ansicht liegen..
 auto-IM to team/alli about new incoming fleets
-fighterlist/whocanintercept: yCV mit A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
+fighterlist/whocanintercept: yCV with A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
+fighterlist: zCV = yCV + xCV(artifact)
 #was done: xCV calculation: dont use outdated phys - instead worst-case - (4 days timeout)
 # [AF] SaggitariusA: ein anderes schönes tool wäre es mal, die PPs zu ermitteln, die man braucht, um auf planet #x eine SBy zu bauen (mit FS natürlich)
 #add recv message count to AWTools header: SELECT count(imid) FROM `imessage` WHERE `recvpid` = ? GROUP BY recvpid

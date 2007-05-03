@@ -35,14 +35,27 @@ if(param()) {
       foreach(@$res) {
          print join("\t", @$_),"\n";
       }
+   } elsif($p==30) {
+      my $dbh=get_dbh;
+      my $tab="battlecalc";
+      my $fields=get_table_fields($tab);
+      print (join("\t",@$fields),"\n");
+      my $res=$dbh->selectall_arrayref("
+            SELECT * FROM `$tab`
+         ");
+      foreach(@$res) {
+         print join("\t", @$_),"\n";
+      }
    }
 } else {
    print AWheader("AW CD data tool");
 	print start_form(-name=>"form", -method=>"get"),
 #      textfield(-name=>'p', -class=>'text'),br,
       popup_menu(-name=>'p',-values=>[2..3], -labels=>{1=>"score",2=>"CV",3=>"points+PL"})," type of dump",br,
-		submit(-name=>"query", -class=>'smbutton'),end_form;
+		submit(-name=>"query", -class=>'smbutton'),end_form,
+      br,"During countdown, this tool will export live data for use in other tools. When your tool gets many hits, it would be nice if you rate-limit requests to one per minute and cache the result in between."
+      ;
 #.AWfocus("form.p");
-#   print AWtail();
+   print AWtail();
 }
 

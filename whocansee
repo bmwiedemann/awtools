@@ -28,8 +28,8 @@ my @data=<IN>;
 close(IN);
 foreach(@data) {chop; $_=[split(/\t/,$_)]}
 
-print header().AWheader3("Who can see $sysid [\U$alli]", 
-      "Who can see system ".a({-href=>"system-info?id=$sysid"},$sysid)." [\U$alli]");
+print AWheader("Who can see $sysid [\U$alli]"),
+      "system ".a({-href=>"system-info?id=$sysid"},$sysid),br;
 #      " system ".a({-href=>"system-info?id=$sysid"},$sysid);
 $wantbio25=!$wantbio25;
 print a({-href=>"?sid=$sysid&bio25=$wantbio25"},($wantbio25?"in":"ex")."clude bio25 players").br;
@@ -42,7 +42,7 @@ foreach(@data) {
    $rel||=4;
    my $etc=awinput::playername2etc(playerid2name($epid));
    my $p=$player{$epid};
-   my $planets=playerid2planets($epid);
+   my $planets=playerid2planetsm($epid);
    my $needplanets=$$p{culture}-$planets;
    push(@data2, [$epid, $x, $y, $ebio, $dist, $rel, $needplanets, $etc]);
 }
