@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 package awinput;
 use strict "vars";
+#use warnings;
 require 5.002;
 
 require Exporter;
@@ -352,12 +353,23 @@ sub setplanetinfo($%) { my($id,$options)=@_;
 	if(!$id) {$id=$$options{sidpid}}
    if(!$id) {return}
 	#print "set '$id', '$options' $dbnamep ";
-	if(!$options) {delete $planetinfo{$id}; }
-	else {
+	my $idm=sidpid22sidpid3m(sidpid32sidpid2($id));
+	my $dbh=get_dbh;
+	if(!$options) {
+		delete $planetinfo{$id};
+		my $sth=$dbh->prepare_cached("DELETE FROM `planetinfos` WHERE sidpid = ?");
+		$sth->execute($idm);
+;
+	} else {
       $$options{status}||=0;
       $$options{who}||=0;
       $$options{info}||="";
+		my $authpid=getauthpid();
 		$planetinfo{$id}="$$options{status} $$options{who} $$options{info}";
+		my $sth=$dbh->prepare_cached("INSERT INTO `planetinfos` VALUES ('',?,?,?,?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?) ON DUPLICATE KEY UPDATE modified_at = UNIX_TIMESTAMP(), status = ?, who = ?, modified_by = ?, info = ?");
+		$sth->execute($ENV{REMOTE_USER},$idm, 
+		$$options{status},$$options{who}, $authpid, $$options{info},
+		$$options{status},$$options{who}, $authpid, $$options{info});
 	}
 	untie %planetinfo;
 	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
@@ -654,12 +666,10 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
          if($pinfo[1] == $plid) {
             my ($s,$info)=@pinfo[0,2];
             my $sidpid=sidpid22sidpid3($sid,$pid);
-            untie %planetinfo;
-            opendb(O_RDWR, $dbnamep, \%planetinfo);
             my $d=AWisodate(time());
             if($time) { # moving fleet: planned to targeted
                if($s==2) {
-                  $planetinfo{$sidpid}=~s/^2 $plid /3 $plid l:$d /;
+#                  $planetinfo{$sidpid}=~s/^2 $plid /3 $plid l:$d /;
                   $s=3;
                   $info="l:$d $info";
                }
@@ -667,11 +677,20 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
                my $newstat=($type==0?4:5); # or to taken if fleet is on own planet
                my $oldstat=($type==0?3:qr([34]));
                my $text=($type==0?"s":"took").":";
-               $planetinfo{$sidpid}=~s/^$oldstat $plid /$newstat $plid $text$d /;
+#               $planetinfo{$sidpid}=~s/^$oldstat $plid /$newstat $plid $text$d /;
+					if($type==0) {
+						if($s==3) {
+							$s=4;
+							$info="s:$d $info";
+						}
+					} else {
+						if($s==3 || $s==4) {
+							$s=5;
+							$info="took:$d $info";
+						}
+					}
             }
-            untie %planetinfo;
-            opendb(O_RDONLY, $dbnamep, \%planetinfo);
-            # TODO use setplanetinfo($pinfo[3], {status=>$s, who=>$plid, info=>$info);
+            setplanetinfo($pinfo[3], {status=>$s, who=>$plid, info=>$info});
          }
       }
    }
