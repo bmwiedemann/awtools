@@ -712,6 +712,27 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 	if($newentry) {
 		if(!$::options{debug}) {$relation{$name}=$newentry;}
 		else {print "<br />$name new:",$newentry;}
+		my $pid=playername2idm($name);
+		if($pid && $sci && $race && defined($race->[0])) {
+			my @sci=(undef,undef,undef,undef,undef,undef);
+			my @race=(undef,undef,undef,undef,undef,undef,undef, undef,undef);
+			if($sci) {@sci=@{$sci}[0..5]}
+			if($race && defined($race->[0])) {
+				@race=@{$race}[0..6];
+				my $sum=0;
+				foreach my $r (@race){$sum+=$r}
+				$race[7]=$sum<=-6;
+				$race[8]=$sum&1;
+			}
+			my $time=time();
+			my $dbh=get_dbh;
+			my @update=map {"$_=?"} (@awstandard::racestr, "trader", "startuplab");
+			push(@update, map {"\l$_=?"} ("modified_at",@awstandard::sciencestr[0..5]));
+			my $sth=$dbh->prepare_cached("INSERT INTO `intelreport` VALUES (?,?,?, ?,?,?,?,?,?,?, ?,?, ?,?,?,?,?,?) ON DUPLICATE KEY UPDATE ".join(", ", @update));
+			$sth->execute($ENV{REMOTE_USER},$pid,
+				$time, @race, @sci,
+				@race, $time, @sci);
+		}
 	}
 	untie %relation;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
