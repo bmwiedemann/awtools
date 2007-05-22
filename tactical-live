@@ -35,7 +35,7 @@ if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 
 		$options{xs}-=$xsize>>1;
 		$options{ys}-=$ysize>>1;
       awinput_init(1);
-		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize, $options{scale}, undef, \&awfilterchain, 
+		my $png=mapimage($options{xs},$options{ys},$options{xs}+$xsize-1,$options{ys}+$ysize-1, $options{scale}, undef, \&awfilterchain, 
             [@drawfuncs[@$o]]
 #            [\&awrelationfunc, \&awplanfunc, \&awsiegefunc]
             )->png();
