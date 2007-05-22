@@ -1,4 +1,5 @@
 package mangle::player_profile;
+use strict;
 use awstandard;
 use awinput;
 
@@ -37,5 +38,10 @@ if(defined($rel[0])) {
       s!(>Idle</td><td>[^<]*)!$1 = $idle!;
    }
 }
+
+use awsql;
+my $prem=m!<small>Premium Member</small>! || 0;
+my $pid=playername2idm($name);
+update_premium($pid, $prem);
 
 1;

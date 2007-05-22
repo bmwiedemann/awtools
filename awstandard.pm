@@ -33,6 +33,7 @@ our $allidir="$basedir/alli";
 our $interbeta=0;
 our $style;
 our $timezone;
+our $updatetime15=16*60;
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
 our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
@@ -104,7 +105,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/code/css/tools/common.css" />!);
 #   push(@$heads, "<title>$title</title>");
 	$owncgi=~s!/cgi-bin/(?:modperl/)?!!;
-	foreach my $item (qw(index.html preferences arrival tactical tactical-large tactical-live relations alliance system-info fleets)) {
+	foreach my $item (qw(index.html preferences tactical-live tactical-live2 relations alliance system-info fleets)) {
 		my %h=(href=>$item);
 		if($item eq $owncgi) {
 			$h{class}='headeractive';
@@ -125,13 +126,14 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
    use awimessage;
    my $pid=getauthpid();
    if($pid && (my $imsgcount=awimessage::get_recv_count($pid))) {
-      $imsg.=div({-class=>"awimessage"}, ("You have received $imsgcount ".a({-href=>"imessage"},"Instant Message".($imsgcount>1?"s":""))));
+      $imsg.=div({-class=>"awimessage"}, ("You have received $imsgcount ".a({-href=>"imessage"},"BIM".($imsgcount>1?"s":""))));
    }
 	return $retval.
 #      img({-src=>"/images/greenbird_banner.png", -id=>"headlogo"}).
       div({-align=>'justify',-class=>'header'},
 #a({href=>"index.html"}, "AW tools index").
-	$links)."\n$imsg".a({-href=>"?"},h1($title2))."\n";
+	$links).
+   "\n$imsg".a({-href=>"?"},h1($title2))."\n";
 }
 sub AWheader2($;$) { my($title,$extra)=@_; AWheader3($title, $title, $extra);}
 sub AWheader($;$) { my($title,$extra)=@_; header(-connection=>"Keep-Alive", -keep_alive=>"timeout=15, max=99").AWheader2($title,$extra);}

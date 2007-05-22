@@ -14,9 +14,9 @@ our $alarmtime=99;
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2planetsm &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag 
+&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2planets &playerid2planetsm &playerid2tag &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
-&relation2production &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &is_admin &is_founder
+&relation2production &gettradepartners &getartifactprice &getallproductions &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_founder
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -106,6 +106,15 @@ sub getauthname() {
 #      }
 #   }
 #   return $authname;
+}
+
+sub getusernamecookie()
+{
+   cookie('user')||getauthname();
+}
+sub getuseridcookie()
+{
+   playername2id(cookie('user'))||getauthpid();
 }
 
 sub is_admin()
@@ -578,20 +587,27 @@ sub gettradepartners($$) { my($maxta,$minad)=@_;
   return @result;
 }
 
+
+sub playerid2alli($)
+{ 
+   return (get_one_row("SELECT alli FROM useralli WHERE pid=?",[$_[0]]))[0];
+}
+
 # this function is intended to work without init
 sub playername2alli($) {my ($user)=@_;
    if(!$user) {return ""}
 #   if($user eq "greenbird") {return ""}
    my %alliuser;
-   awinput::opendb(O_RDONLY, "$awstandard::dbmdir/useralli.dbm", \%alliuser);
-   my $alli=$alliuser{lc $user};
-   untie(%alliuser);
+#   awinput::opendb(O_RDONLY, "$awstandard::dbmdir/useralli.dbm", \%alliuser);
+#   my $alli=$alliuser{lc $user};
+#   untie(%alliuser);
+   my $pid=playername2idm($user);
+   my $alli=playerid2alli($pid);
    if(!$alli) {
 #      local $ENV{REMOTE_USER};
       tie %alliances, "MLDBM", "$dbdir/alliances.mldbm", O_RDONLY, 0666;
       tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
 #      tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
-      my $pid=playername2idm($user);
 #      if($user eq "greenbird") {$pid=68061}
       if($pid && $pid>2) {
          $alli=lc(playerid2tag($pid));
@@ -979,7 +995,20 @@ sub get_alli_group($)
 
 # input: playerid
 sub getuserprefs($) { my($pid)=@_;
-   return get_one_rowref("SELECT * from `playerprefs` WHERE `pid` = ?", [$pid]);
+   return get_one_rowref("SELECT * FROM `playerprefs` WHERE `pid` = ?", [$pid]);
+}
+
+sub getallidetailurl($) { my($pid)=@_;
+   my($aid,$arank)=get_one_row("SELECT alliance,arank FROM `player` WHERE `pid` = ?", [$pid]);
+   if(!$arank || !$aid) {return}
+   my $authpid=getauthpid();
+   if($authpid) {
+      if(playerid2alliance($authpid)!=$aid) {return}
+   } elsif($ENV{REMOTE_USER} && lc(allianceid2tag($aid)) eq $ENV{REMOTE_USER}) { # use tag
+
+   } else {return}
+   $arank--;
+   return "http://www1.astrowars.com/0/Alliance/Detail.php/?id=$arank";
 }
 
 1;
