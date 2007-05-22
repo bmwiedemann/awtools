@@ -1,3 +1,4 @@
+package feed;
 use strict;
 use awinput;
 
@@ -9,10 +10,10 @@ sub feed_plain_race() {
       my @fleet;
       my $shipn=0;
       # colony ships are not shown in incomings
-      foreach my $ship (qw(Transports Destroyer Cruiser Battleship)) {
+      foreach my $ship (qw(Transports ColonyShip Destroyer Cruiser Battleship)) {
          if($fleets=~/(\d+) $ship/) {
             $fleet[$shipn]=$1;
-         }
+         } else {$fleet[$shipn]=0}
          $shipn++;
       }
       $ename=~s/^\[[a-zA-Z]{1,4}\] //;
@@ -22,6 +23,7 @@ sub feed_plain_race() {
          dbfleetaddinit(undef, 0);
          my $res=dbfleetadd($systemid,$planetid,$epid, $ename, $time, 2, \@fleet);
          dbfleetaddfinish();
+         print "added<br>";
       }
    }
 

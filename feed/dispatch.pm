@@ -11,31 +11,43 @@ my $debug=0;
 sub feed_dispatch($%) { (local $_, my $options)=@_;
    my $gameuri=defined($$options{url}) && $$options{url}=~m%^http://www1\.astrowars\.com/%;
    if($$options{name} && $gameuri && (my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
-      if($$options{url}=~m%^http://www1\.astrowars\.com/register/login\.php%) {
+#      if($$options{url}=~m%^http://www1\.astrowars\.com/register/login\.php%) {
          # reset click counter now
 #         $dbh->do("UPDATE `usersession` SET `nclick` = '0' WHERE `sessionid` = ".$dbh->quote($session));
-      }
+#      }
       my $time=time();
       if($$options{url}=~m%^http://www1\.astrowars\.com/0/%) {
          my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = `nclick` + 1 , `lastclick` = ? WHERE `sessionid` = ? LIMIT 1;");
          my $result=$sth->execute($time, $session);
-         if($result eq "0E0") {
+         
+         my $sth2=$dbh->prepare_cached("
+               INSERT INTO `brownieplayer` VALUES ( ?, ?, ?)
+               ON DUPLICATE KEY UPDATE `lastclick_at` = ?
+               ;");
+         $sth2->execute($$options{pid}, $time,$time,$time);
+         my $sth3=$dbh->prepare_cached("UPDATE `brownieplayer` SET `lastupdate_at` = ? WHERE `pid` = ? AND `lastupdate_at` < ?");
+         $sth3->execute($time, $$options{pid}, $time-$awstandard::updatetime15);
+
+#         if($result eq "0E0") {
             # insert new entry with 1 click
-            my $sth=$dbh->prepare_cached("INSERT INTO `usersession` VALUES ( ?, ?, 1, ?, ?, ?, 0);");
-            $$options{ip}||="";
-            $sth->execute($session, $$options{name}, $time, $time, $$options{ip});
-         }
+#            my $sth=$dbh->prepare_cached("
+#               INSERT INTO `usersession` VALUES ( ?, ?, ?, 1, ?, ?, ?, 0)
+#               ON DUPLICATE KEY UPDATE `nclick` = `nclick` + 1 , `lastclick` = ?
+#               ;");
+#            $$options{ip}||="";
+#            $sth->execute($session, $$options{pid}, $$options{name}, $time, $time, $$options{ip}, $time);
+#         }
       }
    }
    if(! m!<title>([^<>]*)</title>!) { 
 		my @race;
       %::options=%$options;
-		if($$options{name}) { require './feed/plain_race.pm'; feed_plain_race(); }
+		if($$options{name}) { require feed::plain_race; feed::feed_plain_race(); }
 		print "no title found\n"; return -1;
 	}
 	my $title=$1;
 	my $aw="Astro Wars";
-   if($title=~/- profile - $aw/o) { require './feed/profile.pm'; feed_profile(); return 0}
+   if($title=~/- profile - $aw/o) { require feed::profile; feed_profile(); return 0}
    my @time;
 	return unless @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
 	$title=shift(@time);
