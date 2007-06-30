@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use DBAccess2;
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+our %options;
+if(param()) {
+	foreach my $p (qw(playerid systemid key grp_nr)) {
+		$options{$p}=param($p);
+      if(defined($options{$p})){$options{$p}=~s/[^0-9a-f]//g;} # sanitize user input;
+	}
+   if((my $sid=$options{systemid})) {
+      print header("text/xml"), qq'<?xml version="1.0" encoding="iso-8859-1"?>\n';
+      awinput_init();
+      if((my $name=systemid2name($sid))) {
+         my ($x,$y)=systemid2coord($sid);
+         print qq(<system id="$sid" name="$name" x="$x" y="$y">\n);
+         my %olist=();
+         foreach my $p (systemid2planets($sid)) {
+            my $pid=planet2pid($p);
+            my $o=planet2owner($p);
+            $olist{$o}=1;
+            my @pinfo=getplanetinfo($sid,$pid);
+            $pinfo[2]||="";
+            my $extra="";
+            if($pinfo[1]) {
+               $extra.=qq'status="$pinfo[0]" who="$pinfo[1]" ';
+               $olist{$pinfo[1]}=1;
+            }
+            print qq'<planet id="$pid" pop="'.planet2pop($p).
+               '" sb="'.planet2sb($p).qq'" owner="$o" sieged="'.(planet2siege($p)||0).qq'" $extra >\n<comment>$pinfo[2]</comment></planet>\n';
+         }
+         while((my @a=each(%olist))) {
+            my $pid=$a[0];
+#            next if($pid<2);
+            my $name=playerid2namem($pid);
+            next if not $name;
+            my $tag=playerid2tag($pid)||"";
+            my $rel=(getrelation($name))[0];
+            if($rel) {
+               $rel=$relationname{$rel};
+            } else { $rel="" }
+            print qq'<player id="$pid" name="$name" tag="$tag" diplomacy="$rel" />\n';
+         }
+         print "</system>";
+      }
+      awinput::awinput_finish();
+
+   }
+   elsif((my $pid=$options{playerid})) {
+      awinput_init();
+      my $name=playerid2namem($pid);
+      my ($race,$sci)=playerid2ir($pid);
+      my @rel=getrelation($name);
+      my $pl=$player{$pid};
+      my @pl=playerid2planetsm($pid);
+      my $sid=$pl->{home_id};
+      my $racerem=$race->[-1]||0;
+      my %values=(player_id=>$pid, player_name=>$name, 
+         player_tag=>$rel[1], diplomacy=>$relationname{$rel[0]},
+#comments=>$rel[2],
+         last_update=>$sci->[0],
+         planets=>scalar @pl, 
+         system_id=>$sid, system_name=>systemid2name($sid), system_coord=>join(",", systemid2coord($sid)),
+         country=>$pl->{from}, playerlevel=>$pl->{level}, culturelevel=>$pl->{culture}, sciencelevel=>$pl->{science}, tr=>$pl->{trade},
+         trader=>($racerem<=-6), startuplab=>($racerem&1),
+         comments=>$rel[2],
+         );
+      my $i=0;
+      foreach my $n (qw(growth science culture production speed attack defense)) {
+         $values{$n}=$race->[$i++];
+      }
+      $i=1;
+      foreach my $n (qw(biology economy energy mathematics physics social)) {
+         $values{$n}=$sci->[$i++];
+      }
+      foreach my $n (qw(joined logins rank points)) {
+         $values{$n}=$pl->{$n};
+      }
+
+      awinput::awinput_finish();
+      my ($totalbattles)=get_one_row("SELECT COUNT(`id`) FROM `battles` WHERE `att_id` = ? OR `def_id` = ?", [$pid,$pid]);
+      my ($wonbattles)=get_one_row("SELECT COUNT(`id`) FROM `battles` WHERE `win_id` = ?", [$pid]);
+      $values{battles}="$wonbattles,$totalbattles";
+      
+      print header("text/xml"), qq'<?xml version="1.0" encoding="iso-8859-1"?>\n';
+      print "<playerinfo \n";
+      foreach my $n (qw(lefois player_tag player_name player_id logins playerlevel sciencelevel culturelevel rank points country system_id system_name planets joined battles ta tr race_attack race_defence race_math race_physics level_attack level_defence biology economy energy mathematics physics social trader startuplab growth science culture production speed attack defense last_update r_ally_id system_coord comments diplomacy)) {
+         my $v=$values{$n};
+         if(!defined($v)) {$v=12345}
+#         $v=~s/[\\"]/\\$&/; #escape quotes
+         html_encode($v);
+         print " $n=\"$v\"";
+      }
+      print " />\n";
+   }
+#   if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
+} else {
+   print AWheader("AW XML export");
+	print start_form(-name=>"form", -method=>"get"),
+      textfield(-name=>'playerid', -class=>'text'), " Player ID",br,
+      textfield(-name=>'systemid', -class=>'text'), " System ID",br,
+      textfield(-name=>'key', -class=>'text')," key",br,
+      textfield(-name=>'grp_nr', -class=>'text'),br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.playerid");
+   print AWtail();
+}
