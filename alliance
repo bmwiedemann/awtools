@@ -49,16 +49,17 @@ if($options{alliance}) {
    my $forumlink=$alliances{$aid}{url}||"";
    my $allitag=$alliances{$aid}{tag}||"";
    my $alliname=$alliances{$aid}{name}||"";
-   if($forumlink) {$forumlink=" URL:".a({-href=>$forumlink}, $forumlink)}
+   my $members=$alliances{$aid}{members}||"";
+   if($forumlink) {$forumlink=" URL:".a({class=>"othertool", -href=>$forumlink}, $forumlink)}
 	my $rellink=qq! <a href="relations?name=$alli"><img src="/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
    my @members=allianceid2members($aid);
    my @rel=getrelation($allitag);
    my $info=$rel[2]||"";
-	print a({-href=>"http://$server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." "
+	print a({class=>"aw", -href=>"http://$server/rankings/alliances/$allitag.php"},"$alliname (AW)").$rellink." "
    #.a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde")
-      .a({-href=>"http://lefois.de/aw/tool/info.php?R_tag=$alli"},"Lefois")
-      ." ".a({-href=>"http://www1.astrowars.com/0/Alliance/Info.php/?tag=$alli"}, "AW")
-      .$forumlink.br."\n$alli members (".scalar @members.") ".$info.br;
+      .a({class=>"othertool", -href=>"http://lefois.de/aw/tool/info.php?R_tag=$alli"},"Lefois")
+      ." ".a({class=>"aw", -href=>"http://www1.astrowars.com/0/Alliance/Info.php/?tag=$alli"}, "AW")
+      .$forumlink.br."\n$alli members (".scalar @members."/$members) ".$info.br;
 
    my @members2;
    my @membernames;
@@ -77,16 +78,17 @@ if($options{alliance}) {
       if($pointsdb{$name}) {
          push(@alliancepoints, $pointsdb{$name});
       }
-      my $etc="";
+      my $etc=awinput::playerid2etc($pid)||"";
 		my $alink="";
 		my $planets=playerid2planetsm($pid);
 		my $joined=gmtime($$p{joined});#." ".$$p{joined};
 		my ($x,$y)=systemid2coord($$p{home_id});
 		my $home="$$p{home_id}($x,$y)";
 		my @rel=getrelation($name);
-      my @race=relation2race($rel[2]);
-      my @science=relation2science($rel[2]);
-		my @prod=relation2production($rel[2]);
+      my ($race,$science)=playerid2ir($pid);
+#      my @race=relation2race($rel[2]);
+      my @science=@$science;#relation2science($rel[2]);
+		my @prod=@{playerid2production($pid)};
       my $bonus=pop(@prod);
 		{ my $n=0;
                         foreach(@prod[0..2]) { $_*=$$bonus[$n]; $totalprod[$n]+=$_; $n++}
@@ -95,18 +97,13 @@ if($options{alliance}) {
 		if($own) { $alink=alliancedetailslink($n) }
       my $intel="-";
       my $bio25=0;
-      if(defined($science[0]) && $science[0]>100) {
+      if($science && defined($science[0]) && $science[0]>100) {
          $intel=int((time()-$science[0])/3600/24)."d";
          if($science[1]>=25) {$bio25=1}
-         if($science[8]) {
-#            my $diff=$science[8]-time();
-            $etc=$science[8];#sprintf(" %.1fh",(int($science[8])-time())/3600);
-#if($diff<24*3600 && ($diff<-60*3600 || $diff>-20*3600)) { $intel.=span({-style=>"color:red"},$etc)}
-#           else {$intel.=$etc;}
-            
-         }
       }
-      if(defined($race[0])) {$race[7]=".+".-$race[7];$intel=join("",@race)." ".$intel;}
+      if($race && defined($race->[0])) {
+         $race->[7]=".+".(-int($race->[7]));$intel=join("",@$race)." ".$intel;
+      }
       if($bio25) {$intel=div({-style=>"color:green"},$intel)}
       my $cplanets="$planets/$$p{culture}";
       $totalcul+=$$p{culture};

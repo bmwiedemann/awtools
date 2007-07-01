@@ -20,8 +20,7 @@ if(defined($options{fid})) {
       my ($fid,$alli,$status,$sidpid,$owner,$eta,$firstseen,$lastseen,$trn,$cls,$eds,$ecs,$ebs)=@{$$res[0]};
       my ($elevel,undef,$ephysics,$emath,undef,$eraceatt,$eracedef)=awinput::playerid2battlestats($owner);
       
-      my $awuser=cookie('user')||awinput::getauthname(); # prefer cookie data, but fall back to authorization data from AW
-      my $opid=playername2id($awuser);
+      my $opid=getuseridcookie();
       my ($olevel,undef,$ophysics,$omath,undef,$oraceatt,$oracedef)=awinput::playerid2battlestats($opid); # get own/defenders stats if available
       my @deffleet=(0,0,0);
 

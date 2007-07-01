@@ -23,15 +23,16 @@ if(!defined $options{sort}){$options{sort}="8.-2";}
 sub gettradepartners2($$) { my($maxta,$minad)=@_;
   my @result;
   my $adprice=$awinput::prices{pp};
-  my @prod=getallproductions();
-  foreach my $e (@prod) {
-    my ($name,$prod,$ad,$pp,$bonus,$arti)=@$e;
+  my $prod=awinput::getallproductionsm();
+  foreach my $e (@$prod) {
+    my ($pid,$prod,$ad,$pp,$bonus,$arti)=@$e;
+    my $name=playerid2namem($pid);
     $ad+=$pp*$adprice;
     if($ad<$minad) {next}
     my $adplus=$ad+getartifactprice($arti);
-    my $trades=awinput::playerid2trades(playername2id($name));
+    my $trades=awinput::playerid2trades($pid);
     if($trades>$maxta) {next}
-    push(@result,[$name,$ad, $adplus, $prod*$$bonus[0]*$adprice, $trades]);
+    push(@result,[$name,$pid,$ad, $adplus, $prod*$bonus*$adprice, $trades]);
   }
   return @result;
 }
@@ -40,18 +41,13 @@ sub gettradepartners2($$) { my($maxta,$minad)=@_;
 my @tap=gettradepartners2(4, 000);
 my @tap2;
 foreach my $entry (@tap) {
-   my ($name, $ad, $adplus, $prod, $partners)=@$entry;
-   my $pid=playername2id($name);
+   my ($name, $pid, $ad, $adplus, $prod, $partners)=@$entry;
    if(!$pid || !$prod) {next}
-   $name=playerid2name($pid);
    my @rel=getrelation($name);
-   $$entry[0]=$name;
    my $time=(20000-$ad)/$prod;
    my $timeplus=(20000-$adplus)/$prod;
-   $$entry[1]=int($ad);
-   $$entry[2]=int($prod);
-   my @race=relation2race($rel[2]);
-   if(@race && $race[-1] <=-6) {$time=0; $timeplus=0}
+   my ($race)=playerid2ir($pid);
+   if($race && @$race && $race->[-2]) {$time=0; $timeplus=0} # TODO retest
 #   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
    push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus]);
 }

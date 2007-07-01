@@ -5,7 +5,7 @@ use awinput;
 sub add_fleets($$) { my($sid,$pid)=@_;
    return "" if(!$sid || !$pid || !$ENV{REMOTE_USER});
    my $sidpid=sidpid22sidpid3m($sid,$pid);
-   my $fleets=awinput::get_fleets($sidpid, "AND `iscurrent` = 1");
+   my $fleets=awinput::sidpid2fleets($sidpid, "AND `iscurrent` = 1");
    return "" if(!$fleets || !@$fleets);
    my $fstr="";
    foreach my $f (@$fleets) {

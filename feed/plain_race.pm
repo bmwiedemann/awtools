@@ -1,5 +1,6 @@
 package feed;
 use strict;
+use awstandard;
 use awinput;
 
 sub feed_plain_race() {

@@ -38,6 +38,13 @@ UNIQUE ( ds1,ds2,cs1,cs2,bs1,bs2,sb, ph1,ph2,ma1,ma2,att1,att2,def1,def2 )
 # chance is value for defender
 
 $dbh->do(qq!
+CREATE TABLE `brownieplayer` (
+`pid` INT PRIMARY KEY,
+`lastupdate_at` INT NOT NULL,
+`lastclick_at` INT NOT NULL
+);!);
+
+$dbh->do(qq!
 CREATE TABLE `playerextra` (
 `pid` INT PRIMARY KEY,
 `name` VARCHAR(25) NOT NULL UNIQUE KEY,
@@ -56,10 +63,19 @@ PRIMARY KEY ( `pid` )
 );!);
 
 $dbh->do(qq!
-CREATE TABLE `readaccess` (
-`tag` VARCHAR(5) NOT NULL,
-`readertag` VARCHAR(5) NOT NULL,
-UNIQUE ( `tag`,readertag )
+CREATE TABLE `toolsaccess` (
+`tag` CHAR(4) NOT NULL COMMENT 'the party that grants access',
+`othertag` CHAR(4) NOT NULL COMMENT 'the party that is allowed to read/write',
+`rbits` TINYINT UNSIGNED NOT NULL COMMENT '1 for fleets, 2 for plans, 4 for IRs, 8 for relations, 16 for online allies, 32 for maps - reading permission',
+`wbits` TINYINT UNSIGNED NOT NULL COMMENT '1 for fleets, 2 for plans, 4 for IRs, 8 for relations - writing permission',
+UNIQUE ( `tag`,`othertag` ),
+UNIQUE ( `othertag`,`tag` )
+);!);
+
+$dbh->do(qq!
+      CREATE TABLE `useralli` (
+`pid` INT PRIMARY KEY,
+`alli` CHAR(4) NOT NULL
 );!);
 
 $dbh->do(qq!
@@ -78,7 +94,7 @@ CREATE TABLE `plhistory` (
 `time` INT NOT NULL,
 `pid` INT NOT NULL,
 `pl` VARCHAR(6) NOT NULL,
-`alli` VARCHAR(7) NOT NULL,
+`alli` CHAR(4) NOT NULL,
 INDEX ( `time` ),
 UNIQUE ( pid,alli,pl )
 );!);
@@ -137,11 +153,11 @@ INDEX (`pid`)
 );!);
 
 $dbh->do(qq!
-CREATE TABLE usersession (
+CREATE TABLE `usersession` (
 sessionid CHAR ( 32 ) BINARY NOT NULL ,
 pid  MEDIUMINT NOT NULL,
-name VARCHAR ( 64 ) NOT NULL,
-nclick INT ,
+name VARCHAR ( 24 ) NOT NULL,
+nclick SMALLINT ,
 firstclick INT NOT NULL ,
 lastclick INT NOT NULL ,
 ip VARCHAR ( 15 ) NOT NULL,
@@ -165,13 +181,13 @@ PRIMARY KEY ( sid ));!);
 $dbh->do(qq!
 CREATE TABLE alliances (
 aid INT( 16 ) UNSIGNED NOT NULL ,
-tag VARCHAR ( 5 ) NOT NULL ,
+tag VARCHAR ( 4 ) NOT NULL ,
 founder INT( 24 ) NOT NULL ,
-daysleft INT( 8 ) NOT NULL ,
-members INT( 16 ) NOT NULL ,
-points INT( 16 ) NOT NULL ,
+daysleft TINYINT( 8 ) NOT NULL ,
+members SMALLINT( 16 ) NOT NULL ,
+points SMALLINT( 16 ) NOT NULL ,
 permanent SMALLINT ( 6 ) NOT NULL ,
-name VARCHAR( 50 ) NOT NULL ,
+name VARCHAR( 30 ) NOT NULL ,
 url VARCHAR( 50 ) NULL ,
 UNIQUE ( tag ),
 PRIMARY KEY ( aid ));!);
@@ -190,6 +206,9 @@ country VARCHAR ( 3 ) NOT NULL ,
 joined INT( 15 ) NOT NULL ,
 alliance SMALLINT( 16 ) NOT NULL ,
 name VARCHAR ( 24 ) NOT NULL ,
+arank MEDIUMINT NOT NULL ,
+joinn MEDIUMINT NOT NULL ,
+opop SMALLINT NOT NULL ,
 UNIQUE ( name ),
 INDEX ( alliance ),
 PRIMARY KEY ( pid ));!);
@@ -215,9 +234,9 @@ PRIMARY KEY ( sidpid ));!);
 $dbh->do(qq!
 CREATE TABLE `planetinfos` (
 `id` INT ( 14 ) NOT NULL AUTO_INCREMENT,
-`alli` VARCHAR( 7 ) NOT NULL ,
+`alli` CHAR( 4 ) NOT NULL ,
 `sidpid` INT( 16 ) UNSIGNED NOT NULL ,
-`status` TINYINT( 2 ) UNSIGNED NOT NULL ,
+`status` TINYINT( 2 ) UNSIGNED NOT NULL COMMENT '1-7 defined in awstandard.pm %planetstatusstring',
 `who` INT( 16 ) UNSIGNED NOT NULL ,
 `modified_by` INT( 16 ) NULL ,
 `modified_at` INT( 16 ) NOT NULL ,
@@ -227,31 +246,72 @@ INDEX ( who ),
 UNIQUE ( `sidpid`, `alli` ),
 PRIMARY KEY ( id )
 );!);
+
 $dbh->do(qq!
 CREATE TABLE `relations` (
-`id` INT ( 14 ) NOT NULL AUTO_INCREMENT,
-`alli` VARCHAR( 7 ) NOT NULL ,
-`name` VARCHAR( 30 ) NOT NULL ,
-`status` INT( 4 ) UNSIGNED DEFAULT '4' NOT NULL ,
-`atag` VARCHAR( 8 ) NULL ,
-`race` VARCHAR( 30 ) NULL ,
-`science` VARCHAR( 30 ) NULL ,
-`sciencedate` INT (15) NULL,
-`info` TEXT NULL ,
-INDEX ( alli ),
-INDEX ( status ),
-UNIQUE ( `name`,`alli` ),
-PRIMARY KEY ( id )
+`pid` INT NOT NULL ,
+`alli` CHAR( 4 ) NOT NULL ,
+`status` TINYINT UNSIGNED DEFAULT '4' NOT NULL COMMENT '0-9 defined in awstandard.pm %relationname',
+`atag` CHAR( 4 ) NOT NULL COMMENT 'AW tag override - empty str means use AW',
+`modified_by` INT( 16 ) NOT NULL ,
+`modified_at` INT( 16 ) NOT NULL ,
+`info` TEXT NOT NULL ,
+PRIMARY KEY ( pid,alli )
+);!); # tables with TEXT or VARCHAR colums do not use CHAR colums
+$dbh->do(qq!
+CREATE TABLE `internalintel` (
+`alli` CHAR( 4 ) NOT NULL ,
+`pid` INT  NOT NULL,
+`modified_at` INT NOT NULL,
+
+`production` MEDIUMINT NOT NULL,
+`science` MEDIUMINT NOT NULL,
+`culture` MEDIUMINT NOT NULL,
+`artifact` CHAR(4) NOT NULL,
+`tr` SMALLINT NOT NULL,
+`ad` INT NOT NULL,
+`pp` INT NOT NULL,
+
+`etc` INT,
+`sus` SMALLINT,
+
+PRIMARY KEY ( `alli`, `pid`)
 );!);
+
+$dbh->do(qq!
+CREATE TABLE `intelreport` (
+`alli` CHAR( 4 ) NOT NULL ,
+`pid` INT  NOT NULL,
+`modified_at` INT NOT NULL,
+
+`growth` TINYINT,
+`science` TINYINT,
+`culture` TINYINT,
+`production` TINYINT,
+`speed` TINYINT,
+`attack` TINYINT,
+`defense` TINYINT,
+`trader` TINYINT,
+`startuplab` TINYINT,
+
+`biology` TINYINT,
+`economy` TINYINT,
+`energy` TINYINT,
+`mathematics` TINYINT,
+`physics` TINYINT,
+`social` TINYINT,
+PRIMARY KEY ( `alli`, `pid`)
+);!);
+
 $dbh->do(qq!  
 CREATE TABLE `logins` (
 `lid` INT ( 14 ) NOT NULL AUTO_INCREMENT,
-`alli` VARCHAR( 7 ) NOT NULL ,
+`alli` CHAR( 4 ) NOT NULL ,
 `pid` INT ( 8 ) NOT NULL ,
-`n` INT ( 4 ) ,
-`time` INT ( 15 ),
-`idle` INT ( 6 ),
-`fuzz` INT ( 8 ),
+`n` INT ( 4 ) NOT NULL ,
+`time` INT ( 15 ) NOT NULL ,
+`idle` INT ( 6 ) NOT NULL ,
+`fuzz` INT ( 8 ) NOT NULL ,
 INDEX ( `alli` ),
 INDEX ( `pid`,`n` ),
 PRIMARY KEY ( `lid` )
@@ -259,7 +319,7 @@ PRIMARY KEY ( `lid` )
 $dbh->do(qq!
 CREATE TABLE `fleets` (
 `fid` INT ( 14 ) NOT NULL AUTO_INCREMENT,
-`alli` VARCHAR( 7 ) NOT NULL ,
+`alli` CHAR( 4 ) NOT NULL ,
 `status` INT( 2 ) UNSIGNED DEFAULT '0' NOT NULL ,
 `sidpid` INT( 16 ) UNSIGNED NOT NULL ,
 `owner` INT( 16 ) UNSIGNED NOT NULL ,

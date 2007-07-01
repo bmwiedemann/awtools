@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold8
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html alliance{,2} arrival authaw authawforum awlinker awtoolstatistics joinalli cdinfo distsqr eta fighterlist preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info edit-fleet fleets feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
+tools=index.html alliance{,2} arrival authaw authawforum awlinker awtoolstatistics joinalli cdinfo distsqr edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminrsamap adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -46,7 +46,7 @@ importcsv:
 
 #runs once a day
 updatedaily:
-	- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
+	#- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
 	perl detectalliancerelation.pl > html/${round}/alliancerelation-${mydate}
 	ln -f html/${round}/alliancerelation-${mydate} html/${round}/alliancerelation
 	-(perl alliancerelation2dot.pl html/round/alliancerelation-${mydate} | neato -Tsvg > html/${round}/alliancerelation-${mydate}.svg &&\
@@ -61,7 +61,7 @@ updatemaponly:
 	REMOTE_USER=$$a /usr/bin/nice -n +12 perl drawtactical.pl ; done
 updatemap2: cleandbs updatemapsonly
 updatemap2only:
-	for a in $(allies) ; do \
+	#for a in $(allies) ; do \
 		REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \
 	done
 cleanmap2:
@@ -130,6 +130,7 @@ access:
 	../dbm/add.pl base/db2/$a-relation.dbm af "7 af alliance relation"
 	../dbm/add.pl base/db2/$a-relation.dbm $a "9 $a alliance relation"
 	../dbm/add.pl base/db2/allowedalli.dbm $a ${round}
+	./runsql.pl "INSERT INTO toolsaccess VALUES ('$a','$a',255,255)"
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}
 	/usr/sbin/htpasswd2 base/.htpasswd $a

@@ -90,9 +90,10 @@ if(param()) {
       my %blistxp;
       print "<pre>  XP  ownCV    date      time    ratio".br;
 
-      my $allimatch=awinput::get_alli_match($ENV{REMOTE_USER});
-      my $sth=$dbh->prepare_cached("SELECT * from `plhistory` WHERE `pid` = ? AND $allimatch ORDER BY `time` DESC");
-      $resplh=$dbh->selectall_arrayref($sth, {}, $pid);
+      my ($allimatch,$amvars)=awinput::get_alli_match2($ENV{REMOTE_USER},4);
+      if(is_admin()) {$allimatch="alli=tag" ; $amvars=[];}
+      my $sth=$dbh->prepare_cached("SELECT plhistory.* from `plhistory`,toolsaccess WHERE `pid` = ? AND $allimatch ORDER BY `time` DESC");
+      $resplh=$dbh->selectall_arrayref($sth, {}, $pid, @$amvars);
       foreach my $plh (@$resplh) {
          my($time,undef,$pl,$alli)=@$plh;
          print AWisodate(awday($time))," ",AWisodatetime($time), " $alli $pl\n";

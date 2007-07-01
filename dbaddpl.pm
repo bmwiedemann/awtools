@@ -26,7 +26,7 @@ sub dbaddpl($$$) { my($t,$name,$pl)=@_;
    if($res && $$res[0]) { # already found
       return 0;
    }
-   $sth=$dbh->prepare("INSERT INTO `plhistory`  VALUES (?, ?, ?, ?)");
+   $sth=$dbh->prepare("INSERT IGNORE INTO `plhistory`  VALUES (?, ?, ?, ?)");
    my $alli=$ENV{REMOTE_USER}||"";
    $sth->execute($t, $pid, $pl, $alli);
 }

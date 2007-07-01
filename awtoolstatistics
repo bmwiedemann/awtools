@@ -15,7 +15,7 @@ print AWheader("AWtool statistics"),"<pre>";
 my $dbh=get_dbh();
 
 my $users=$dbh->selectall_arrayref(
-      "SELECT count(DISTINCT name)
+      "SELECT count(DISTINCT pid)
        FROM `usersession"
    );
 
@@ -25,7 +25,7 @@ my $allis=$dbh->selectall_arrayref(
          SELECT DISTINCT player.name, tag
          FROM `usersession` , `player` , `alliances`
          WHERE `aid` = `alliance`
-         AND usersession.name = player.name
+         AND usersession.pid = player.pid
          ) AS e
       GROUP BY `tag`
       ORDER BY `count( tag )` DESC
@@ -41,11 +41,12 @@ foreach my $row (@$allis) {
       }
 }
 
-# TODO how many alliances use brownie
-my $numallis=keys %allowedalli;
+# how many alliances use brownie
+my $r=getallowedallis();
+my $numallis=@$r;
 
 print "<h2>brownie users</h2>";
-print (qq(<b style="color:green">$eusersum</b>/),$users->[0]->[0],"\n");
+print (qq(<b style="color:green">$eusersum</b>/),$users->[0]->[0]," (extended/total)\n\n");
 print "extended brownie alliances: $numallis\n";
 
 print "<h2>alliance usage</h2>";

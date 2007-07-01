@@ -8,6 +8,7 @@ my $readonly=0;
 use awstandard;
 use awinput;
 use arrival;
+use DBAccess2;
 awinput_init();
 
 
@@ -82,22 +83,17 @@ if($options{name}) {# && $options{name} ne "unknown") {
 
       # get own stats
       my($oatt,$odef,$omath,$ophys,$opl)=(0,0,0,0,0);
-      my $awuser=cookie('user');
+      my $awuser=getusernamecookie();
       my $oid=playername2id($awuser);
       if($oid && $oid>2) {
-         my @rel;
-         my @race;
-         my @science;
          $opl=$player{$oid}{level};
-         @rel=getrelation($awuser);
-         @race=relation2race($rel[2]);
-         @science=relation2science($rel[2]);
-         if($science[0]) { 
-            if($science[0]>100) {shift @science}
-            ($omath,$ophys)=@science[3,4];
+         my ($race,$sci)=awinput::playerid2ir($oid);
+         if($sci && $sci->[0]) { 
+            if($sci->[0]>100) {shift @$sci}
+            ($omath,$ophys)=@{$sci}[3,4];
          }
-         if($race[0]) { 
-            ($oatt,$odef)=@race[5,6];
+         if($race && $race->[0]) { 
+            ($oatt,$odef)=@{$race}[5,6];
          }
       }
         #$epl=$opl=0; # while bonus is not really working
@@ -110,11 +106,14 @@ if($options{name}) {# && $options{name} ne "unknown") {
       }
    }
 	$atag=$atag?" ".alliancelink($atag):"";
+   my $pldurl=getallidetailurl($id);
+   if($pldurl) {$extralinks=a({-href=>$pldurl},img({-src=>"/images/aw/profile3.gif", -alt=>"alliance profile"})).$extralinks;}
 	print start_form(-name=>"form"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag.$lasttag." ", profilelink($id), $extralinks, 
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
-         a({-href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".
+         a({class=>"othertool", -href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".
 #a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles"),
-            a({-href=>"http://odbvpn.ath.cx:89/pub/view_battles.php?player=$user&date=all"},"battles"),
+            a({class=>"othertool", -href=>"http://azgharde.free.fr/tools/battles.php?pl=$user&da=all"},"azghardebattles"), " ",
+            a({class=>"othertool", -href=>"http://odbvpn.ath.cx:89/pub/view_battles.php?player=$user&date=all"},"battles"),
             " ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
@@ -131,11 +130,11 @@ if($options{name}) {# && $options{name} ne "unknown") {
 		my $planets=@pl;
       my $pl=$player{$id};
 		my $level=$$pl{level};
-		my $pop=0;
+		my ($pop,$scipoints)=get_one_row("SELECT `opop`,points-2*level-opop FROM `player` WHERE `pid` = ?", [$id]);
 		my @planets;
 		foreach my $p (@pl) {
 			my $pp=getplanet2($p);
-			$pop+=planet2opop($pp);
+#			$pop+=planet2opop($pp);
 			push(@planets, $pp);
 		}
       my $trades="";
@@ -143,7 +142,8 @@ if($options{name}) {# && $options{name} ne "unknown") {
          my @t=awinput::playerid2trades($id);
          $trades=join(", ", map {playerid2link($_)} @t);
       }
-		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".2*$level."+$pop+".($$pl{points}-$pop-2*$level).") trade=$$pl{trade}% logins=$$pl{logins} from=$$pl{from} joined=".(gmtime($$pl{joined}))." trades=$trades ";
+      my $homelink=systemid2link($$pl{home_id});
+		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".2*$level."+$pop+$scipoints) trade=$$pl{trade}% logins=$$pl{logins} home=$homelink from=$$pl{from} joined=".(gmtime($$pl{joined}))." trades=$trades ";
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
@@ -155,21 +155,39 @@ if($options{name}) {# && $options{name} ne "unknown") {
 			print li({-style=>"font-family: monospace;".($s?" background-color: red;":"")},sprintf(qq!(%2i,%2i) #%2i : pop=%2i SB=%2i $link\n!, $x, $y, planet2pid($pp), planet2pop($pp), planet2sb($pp)));
 		}
 		print "</ul>\n";
-		my @race=relation2race($options{comment});
+      my $fleets=awinput::playerid2fleets($id, "ORDER BY `sidpid` ASC, `eta` ASC, `lastseen` ASC");
+      print "fleets:<ul>\n";
+      foreach my $f (@$fleets) {
+         my($sidpidm,$cv)=@{$f}[3,13];
+         next if not $cv;
+         my ($sid,$pid)=sidpid32sidpid2m($sidpidm);
+         print li(sprintf("<code><a href=\"system-info?id=$sid\">%4i#%02i</a></code> ",$sid,$pid). show_fleet($f));
+      }
+      print "</ul>\n";
+      my $plans=playerid2plans($id);
+      print "plans:<ul>\n";
+      foreach my $plan (@$plans) {
+         print li(showplan($plan));
+      }
+      print "</ul>\n";
+      my($race,$sci)=playerid2ir($id);
+		my @race=$race?@$race :();
 		if(defined($race[0])) {
 			print p,"race: ",br;
 			my $n=0;
+         my $sul=pop(@race);
+         my $trader=pop(@race);
          my $sum=pop(@race);
 			foreach(@race) {
 				my $bonus=$awstandard::racebonus[$n]*100*$_;
 				if($bonus>=0) {$bonus="+".$bonus}
 				print "$bonus% $awstandard::racestr[$n++] ($_)".br;
 			}
-         if($sum<=-9) {print "Banker".br;$sum+=9}
-         if($sum<=-6) {print "Trader".br;$sum+=6}
-         if($sum<=-1) {print "Start Up Lab".br;$sum+=1}
+#         if($sum<=-9) {print "Banker".br;$sum+=9}
+         if($trader) {print "Trader".br;$sum+=6}
+         if($sul) {print "Start Up Lab".br;$sum+=1}
 		}
-		my @prod=relation2production($options{comment});
+		my @prod=@{playerid2production($id)};
       my $bonus=pop(@prod);
 		if(defined($prod[0])) {
 			print p,"production/sci/cul:",br;
@@ -182,20 +200,19 @@ if($options{name}) {# && $options{name} ne "unknown") {
          if($prod[5]) {print "AD $prod[5]".br}
          if($prod[6]) {print "PP $prod[6]".br}
 		}
-		my @sci=relation2science($options{comment});
-		if(defined($sci[0])) {
+		if($sci && $sci->[0]) {
 			print p,"science";
 			my $n=0;
-			if($sci[0]>100) {
-				my $time=shift(@sci);
-				print " from ".gmdate($time);
-			}
+         my $time=shift(@$sci);
+         print " from ".gmdate($time);
 			print ":<br />\n";
-			foreach(@sci) {
-            if($_>200) {print "ETC: ".AWtime($_).br;next}
+			foreach(@$sci) {
 				print "$awstandard::sciencestr[$n++] $_\n".br;
 			}
+         my $etc=playerid2etc($id);
+         print "ETC: ".AWtime($etc).br;
 		}
+
       if(0) {
          printf("xEnergy=%.2f ", arrival::effectiveenergy(1,2));
       }
@@ -206,7 +223,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
       }
       if($logins[0]) {
          print "<code>";
-         my $firsti=awmax(-8,awmin((-$#logins-1), -1));
+         my $firsti=awmax(-20,awmin((-$#logins-1), -1));
          foreach my $e (@logins[$firsti..-1]) { # last 8 values only
             my($login,$time,$extra)=@$e;
             my $color;

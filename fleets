@@ -22,9 +22,11 @@ print p(a({-href=>"?history=".(!$options{history})},"toggle history")." ".a({-hr
 
 print "sys#planet: info".br;
 
-my $allimatch=awinput::get_alli_match($alli);
-my $res=$dbh->selectall_arrayref("SELECT sidpid,sum(xcv),sum(trn),sum(cls) FROM `fleets` WHERE $allimatch AND `iscurrent` = 1 GROUP BY `sidpid` ");
-
+my ($allimatch,$amvars)=awinput::get_alli_match2($alli,1);
+my $sth=$dbh->prepare_cached(
+   "SELECT sidpid,sum(xcv),sum(trn),sum(cls) FROM `fleets`,toolsaccess 
+   WHERE $allimatch AND `iscurrent` = 1 GROUP BY `sidpid` ");
+my $res=$dbh->selectall_arrayref($sth, {}, @$amvars);
 
 my @sidpids=sort {$$b[1]<=>$$a[1]} @$res;
 my %cvsum;

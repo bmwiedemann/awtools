@@ -31,10 +31,12 @@ foreach(@$allplayers) {
    my($ex,$ey,$ename,$epid,$esl)=@$_;
    my @rel=getrelation($ename);
    next if(!$rel[2]);
-   my @sci=relation2science($rel[2]);
-   $sci[0]||=0;
-   if($sci[0]>100){shift(@sci)}
-   my $bio=$sci[0]||0;
+   my(undef, $sci)=awinput::playername2ir($ename);
+   my $bio=0;
+   if($sci && $sci->[0]) {
+      if($sci->[0]>100){shift(@$sci)}
+      $bio=$sci->[0]||0;
+   }
    my $biodist=arrival::get_bio_dist([$ex,$ey], \@sysxy);
    if($bio<25 || !$wantbio25) {
       next if($biodist>$bio);

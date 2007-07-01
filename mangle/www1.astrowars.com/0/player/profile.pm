@@ -12,7 +12,7 @@ s%(<b>Player / Profile</b></td>\s*<td>)([^<]*)%$1$::bmwlink/relations?name=$2">A
 my $name=$2;
 # test for available intel
 my ($rac,$sci)=awinput::playername2ir($name);
-if($rac && defined($$rac[0])) {
+if($rac && defined($rac->[0])) {
    my($science,$intel)=("-","?");
    if(defined($$sci[0]) && $$sci[0]>100) {
       $intel=int((time()-$$sci[0])/3600/24)."d";

@@ -8,7 +8,7 @@ sub dbfleetaddmysql { my($sid,$pid,$plid,$name,$time,$type,$fleet, $tz, $screen)
    my $ret=0;
    my $now=time();
    my $alli=$ENV{REMOTE_USER};
-   return if(!$alli || ($time && $time<$now));
+   return if(!$alli || ($time && $time<$now) || !$plid);
    my $status=$type||0; # use $type and $time
    $time||=0;
    $fleet->[1]||=0; # incomings have no info about CLS, but we dont want NULL/undef values in DB so far

@@ -1,29 +1,57 @@
 #!/usr/bin/perl -w
-
 use strict;
 use CGI ":standard";
-my $title="yesterday's battles";
 
 use awstandard;
 use awinput;
-awinput_init();
-print AWheader($title);
+use DBAccess2;
+awstandard_init();
+#awinput_init();
 
-our %bat=%battles;
-sub sortfunc { return 
-   -(($bat{$a}{cv_att}+$bat{$a}{cv_def}<=>$bat{$b}{cv_att}+$bat{$b}{cv_def}) || 
-     ($bat{$a}{time}<=>$bat{$b}{time}));
-}
+our %options;
+print AWheader("AW battles");
+if(param()) {
+	foreach my $p (qw(p sid atag1 atag2 atime btime)) {
+		$options{$p}=param($p);
+#      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
+	}
+   if((my $pn=param('pn'))) {$options{p}=playername2idm($pn)}
+   if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
+   if($options{sid}){$options{sid}=~s/[^0-9]//g;} # sanitize user input;
 
-print "<pre>time attCV defCV sys#planet attacker defender".br;
-foreach my $id (sort sortfunc keys %bat) {
+   my @filters;
+   if($options{p}) { push(@filters, "pid = $options{p}") }
+   if($options{sid}) { push(@filters, "system_id = $options{sid}") }
+   my $allitab="";
+   foreach my $a (qw(atag1 atag2)) {
+      if($options{$a}) {
+#         $allitab=",alliances";
+         my $aid=alliancetag2id($options{$a});
+         push(@filters, "alliance = $aid");
+      }
+   }
+#   SELECT * FROM battles LEFT JOIN player AS p1 ON def_id=p1.pid LEFT JOIN player AS p2 ON att_id=p2.pid WHERE
+   my $sql="SELECT * FROM battles,player$allitab WHERE (def_id=pid OR att_id=pid) AND ".join(" AND ",@filters);
+   print $sql.br;
+   my $dbh=get_dbh();
+   my $res=$dbh->selectall_arrayref($sql);
+   my @data;
+   foreach my $row(@$res) {
+      push(@data,[@$row]);
+   }
+   foreach(@data) {
+      print join(" ",@$_),br,"\n";
+   }
    
-   my %b=%{$bat{$id}};
-   my $att=$b{att_id};
-   my $def=$b{def_id};
-   printf("%s: %3i %3i <a href=\"system-info?id=$b{system_id}\">%4i#%2i</a>  %20s %s %20s\n", 
-         AWtime($b{time}),$b{cv_att}, $b{cv_def}, $b{system_id}, $b{planet_id}, playerid2link($att), $b{win_id}==$b{att_id}?">":"<" ,playerid2link($def));
+} else {
+   if(!param('atime')) { param('atime',AWisodate(time-3600*24*3)); }
+	print start_form(-name=>"form",-method=>'get'),textfield(-name=>'pn', -class=>'text'),' player',br,
+         textfield(-name=>'sid', -class=>'text'),' system ID',br,
+         textfield(-name=>'atag1', -class=>'text'),' alliance',br,
+         textfield(-name=>'atag2', -class=>'text'),i(' AND fighting alliance'),br,
+         textfield(-name=>'btime', -class=>'text'), " ",checkbox(-name=>'btimeon',-label=>"before"),br,
+         textfield(-name=>'atime', -class=>'text'), " ",checkbox(-name=>'atimeon',-label=>"after"),br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.pn");
 }
-print "</pre>";
-#print (sort sortfunc @out);
 print AWtail();
+

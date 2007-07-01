@@ -41,20 +41,21 @@ my @data;
 foreach my $row (@$fleets) {
    my($pid,$sumcv,$sumxcv,$maxcv)=@$row;
    my $name=playerid2name($pid);
-   my @erel=getrelation($name);
-   my @sci=relation2science($erel[2]);
-   my @race=relation2race($erel[2]);
-   my @prod=relation2production($erel[2]);
-   my $bonus=$prod[7];
+   my($race,$sci)=playerid2ir($pid);
+#   my @erel=getrelation($name);
+#   my @sci=relation2science($erel[2]);
+#   my @race=relation2race($erel[2]);
+   my $prod=playerid2production($pid);
+   my $bonus=$prod->[7];
    foreach my $i (0..2) {
-      $prod[$i]*=24*$bonus->[$i]; # hourly to daily with bonusses
+      $prod->[$i]*=24*$bonus->[$i]; # hourly to daily with bonusses
    }
 #   print "@prod @race @sci".br;
    push(@data, [
          $pid, $sumcv, $sumxcv, $maxcv, 
-         @prod[0..2,5,6], $player{$pid}{level},
-         arrival::effectiveenergy($race[4], $sci[3]), @sci[3,5,4],
-         @race[4..6]]);
+         @{$prod}[0..2,5,6], $player{$pid}{level},
+         arrival::effectiveenergy($race->[4], $sci->[3]), @{$sci}[3,5,4],
+         @{$race}[4..6]]);
 }
 
 print sort_table([qw(name CV xCV biggestCV 

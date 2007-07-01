@@ -3,6 +3,7 @@ use strict;
 #use CGI ":standard";
 use awstandard;
 use awinput;
+use DBAccess2;
 
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -28,19 +29,31 @@ if(my @a=m!Culture</a>.*INPUT type="text" value="(\d+):(\d+):(\d+)" size="8" nam
    print " ETC: ".AWtime($etc).br();#" @a\n<br>";
 }
 # calc ETC for > 3 days
-if(@science<9 && m!Culture.*href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a>((?: <b>[+-]\d+%)|)!) {
+if(m!Culture.*href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a>((?: <b>[+-]\d+%)|)!) {
    my ($culperh,$culbonus)=($1,$2);
 #   awdiag("$::options{name} $culperh $culbonus");
-   $culbonus=~s/.*([+-]\d+).*/$1/;
-   $culbonus||=0;
-   $culbonus=1+$culbonus/100;
+
+   if($::options{pid}) {
+#      href="/0/Glossary//?id=20"><b>Science</b></a> <a class="awglossary" href="/0/Glossary//?id=23">(+626 per hour)</a>
+      my ($sciperh)=m!Science</b></a> <a href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a>!;
+      my $dbh=get_dbh();
+      my $sth=$dbh->prepare("INSERT INTO `internalintel` (alli,pid,modified_at,science,culture) VALUES (?,?,UNIX_TIMESTAMP(),?,?) ON DUPLICATE KEY UPDATE `science`=VALUES(science), `culture`=VALUES(culture), modified_at=UNIX_TIMESTAMP()");
+#      my $sth=$dbh->prepare("INSERT INTO `internalintel` (alli,pid,science,culture) VALUES (?,?,?,?) UPDATE `internalintel` SET `culture`=?, `science`=? WHERE `alli`=? AND `pid`=?");
+      $sth->execute($ENV{REMOTE_USER}, $::options{pid}, $sciperh, $culperh);
+   }
+   
+   if(@science<9) {
+      $culbonus=~s/.*([+-]\d+).*/$1/;
+      $culbonus||=0;
+      $culbonus=1+$culbonus/100;
 #print "cul: $culperh,$culbonus<br>";
-   if($culperh && m!Culture.*/images/leer.gif" height="10" width="\d+"></td><td>(\d+)<!) {
-      my $culleft=$1;
-      my $etc=time()-$::deliverytime+$culleft*3600/($culperh*$culbonus);
-      print $culleft*3600/($culperh*$culbonus).br();
-      print " ETC: ".gmtime($etc).br();
-      push(@science,$etc);
+      if($culperh && m!Culture.*/images/leer.gif" height="10" width="\d+"></td><td>(\d+)<!) {
+         my $culleft=$1;
+         my $etc=time()-$::deliverytime+$culleft*3600/($culperh*$culbonus);
+         print $culleft*3600/($culperh*$culbonus).br();
+         print " ETC: ".gmtime($etc).br();
+         push(@science,$etc);
+      }
    }
 }
 

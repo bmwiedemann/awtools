@@ -34,11 +34,11 @@ foreach(@spies) {
    my($ename,$epid,$esl,$pid,$bio)=@$_;
    my @erel=getrelation($ename);
    next if($erel[0]>5);
-   my @esci=relation2science($erel[2]);
-   my $ebio=getbio(@esci);
+   my(undef,$esci)=awinput::playerid2ir($epid);
+   my $ebio=getbio(@$esci);
    my $eeffbio;
    if($ebio) {
-      $eeffbio=$ebio+int((time-$esci[0])/86400); # estimation of current value
+      $eeffbio=$ebio+int((time-$esci->[0])/86400); # estimation of current value
       if($eeffbio>$esl) { $eeffbio=$esl }
    } else {$eeffbio=$esl}
    next if($eeffbio && $bio && ($eeffbio<$bio+$m));

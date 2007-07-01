@@ -6,6 +6,7 @@ use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use Digest::MD5 "md5_hex";
 
 
+use DBAccess2;
 use awstandard;
 use awinput;
 awstandard_init();
@@ -18,15 +19,22 @@ for my $p (qw'pw user alli') {
    $options{$p}=lc(param($p));
    $options{$p}=~s/[<>]//g; # min sanitize user input
 }
-if($options{user} && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3daac7e9') {
+my $pid=playername2idm($options{user});
+if($options{user} && $pid && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3daac7e9') {
    awinput::opendb(O_RDWR|O_CREAT, "$awstandard::dbmdir/useralli.dbm", \%db);
+   my %dbm;
+   my $dbh=get_dbh;
+   require Tie::DBI;
+   tie %dbm,'Tie::DBI',$dbh,'useralli','pid',{CLOBBER=>2};
    if($options{alli}) {
 #      my $x=awstandard::urldecode($options{user});
       $db{$options{user}}=$options{alli};
+      $dbm{$pid}={alli=>$options{alli}};
       print "added $options{user}=$options{alli}";
    } else {
       print "$options{user} = $db{$options{user}} ... ";
       delete $db{$options{user}};
+      delete $dbm{$pid};
       print "deleted $options{user}";
    } 
    untie(%db);

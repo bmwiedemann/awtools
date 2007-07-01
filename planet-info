@@ -103,7 +103,11 @@ if($options{id}) {
 		textarea(-name=>'comment', -value=>"\n".$options{comment}, -rows=>9, -cols=>40, -class=>'text'), " why, when, how, plans, etc...", br,
 		hidden(-name=>'id', $id),
 		submit(-name=>"submit", -class=>'smbutton'), " &nbsp;", submit(-name=>"submit",-value=>"delete entry", -class=>'smbutton').
-         AWfocus("form.who");
+         AWfocus("form.who").br;
+   my $fleets=awinput::sidpid2fleets(sidpid22sidpid3m($sid,$pid));
+   foreach my $f (@$fleets) {
+      print show_fleet($f).br;
+   }
 } else {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'id', -class=>'text'), " ID: system#planet".AWfocus("form.id"), br,
 	 submit(-name=>"query", -class=>'smbutton')

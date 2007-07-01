@@ -13,7 +13,7 @@ use DBAccess;
 awstandard_init();
 
 our %options;
-our $awuser=cookie('user');
+our $awuser=getusernamecookie();
 my $refsys=cookie('refsys');
 
 my $wantcurrent=" AND `iscurrent` = 1 ";
@@ -22,7 +22,10 @@ sub tlink(@) { my($a)=@_;
    if($options{export}) {
       return "[url=".$$a[0]."]".$$a[1]."[/url]";
    } else {
-      return a({-href=>$$a[0]},$$a[1]);
+      my @extra=();
+      if($a->[0]=~m/^http:\/\/www.?\.astrowars.com/) {push(@extra, -class=>"aw")}
+      if($a->[0]=~m/^http:\/\/(lefois.de|azgharde.free.fr|neron92.free.fr)/) {push(@extra, -class=>"othertool")}
+      return a({-href=>$$a[0], @extra},$$a[1]);
    }
 }
 
@@ -100,7 +103,7 @@ if(param("legend")) {
    if($options{history}) {$wantcurrent=""}
    $options{name}=~s/\s+$//;
    $options{name}=~s/^\s+//;
-	if($options{export}==2) {
+	if($options{export}==2 && !$options{auth}) {
 		my $u=$ENV{REMOTE_USER};
 		my $expiryinfo="the whole round";
 		if(!$options{expires}) {$options{expires}=""}
@@ -164,18 +167,18 @@ if(param("legend")) {
 		my $output="$bs$sysname ($x/$y)$be${eol}Id=$system level=$syslevel ";
       my @nstarmaplink=("http://neron92.free.fr/AW_Tools/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
       my @lstarmaplink=("http://lefois.de/aw/tool/map.php?R_pid=&R_sysid=$system&lb=1&coord=1&details=1","lefoisstarmap");
-      my @lbattleslink=("http://www.lefois.de/aw/tool/battles.php?&days=all&sysid=$system", "lefoisbattles");
+      my @lbattleslink=("http://lefois.de/aw/tool/battles.php?&days=all&sysid=$system", "lefoisbattles");
       my @abattleslink=("http://azgharde.free.fr/tools/details.php?nr=$system", "azghardebattles");
-      my @lhistorylink=("http://www.lefois.de/aw/tool/systemhistory.php?R_sysid=$system", "lefoishistory");
+      my @lhistorylink=("http://lefois.de/aw/tool/systemhistory.php?R_sysid=$system", "lefoishistory");
       my @mapdetailslink=("http://$server/0/Map/Detail.php/?nr=$system","Map/Details");
       if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
-         if($sysinfo) {
+         if(1 || $sysinfo) {
             $sysinfo=~s!^<br />!!;
             $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/aw/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
          }
-			tprint $output, $eol, a({-href=>"tactical-large?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@abattleslink)." ".tlink(\@lbattleslink)." ".tlink(\@lhistorylink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,bbcode_trans($sysinfo),
+			tprint $output, $eol, a({-href=>"tactical-live2?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@abattleslink)." ".tlink(\@lbattleslink)." ".tlink(\@lhistorylink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,bbcode_trans($sysinfo),
 			"planets here: <a name=\"planets\" /><ul>";
 		} else {
 			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";
@@ -208,7 +211,7 @@ if(param("legend")) {
 					$info=" ".span({-style=>"color: $scolor"},$planetstatusstring{$status})." ".playerid2link($pinfo[1]).": ".bbcode_trans($pinfo);
 				}
 			}
-         my $fleets = awinput::get_fleets(sidpid22sidpid3m($system,$planetid), $wantcurrent);
+         my $fleets = awinput::sidpid2fleets(sidpid22sidpid3m($system,$planetid), $wantcurrent);
          my $fleetsstr="";
          foreach my $f (@$fleets) {
             $fleetsstr.=$eol.awinput::show_fleet($f);

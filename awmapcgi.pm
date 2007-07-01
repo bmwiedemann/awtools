@@ -10,14 +10,14 @@ our %maptypestring=("0,1,2"=>"relation", "1"=>"plans", "0,3,4"=>"fleets", 5=>"po
 sub awmapcoordinput() {
 	my @pos=(0,0);
 	my @s=(29,25);
-	if($ENV{REMOTE_USER} eq "af") { @pos=(40,-35); }
+	if($ENV{REMOTE_USER} eq "af") { @pos=(-35,-35); }
 #	elsif($ENV{REMOTE_USER} eq "sw") { @pos=(-57,47); $s[1]=37; }
 #	elsif($ENV{REMOTE_USER} eq "tgd") { @pos=(69,-15); $s[1]+=10; }
 #	elsif($ENV{REMOTE_USER} eq "xr") { @pos=(60,-54) }
 #	elsif($ENV{REMOTE_USER} eq "kk") { @pos=(-26,-13) }
 #	elsif($ENV{REMOTE_USER} eq "wink") { @pos=(12,42) }
 #	elsif($ENV{REMOTE_USER} eq "love") { @pos=(-75,48) }
-        my $awuid=playername2id(cookie('user'));
+        my $awuid=getuseridcookie();
         if($awuid>2) {
 		my $home=playerid2home($awuid);
 		@pos=systemid2coord($home);

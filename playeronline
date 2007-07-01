@@ -77,5 +77,6 @@ if(param()) {
       print "</pre>";
    }
 }
+print "Note: for AW premium members, the green X only mean <i>'might have been online during that period'</i>... just the same as for non-premiums but login times are much less known for premiums\n";
 print AWtail();
 

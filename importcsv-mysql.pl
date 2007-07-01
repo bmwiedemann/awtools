@@ -5,6 +5,7 @@ use DBAccess;
 if(!$dbh) {die "DB err: $!"}
 
 our (%alliances,%starmap,%player,%playerid,%planets,%alltrades,%battles);
+our @opop;
 my $firstline;
 my (@elements);
 sub dumphash { my ($h)=@_;
@@ -44,6 +45,8 @@ sub alliances {
 	#$h{m}=$alliancemembers[$id];
 	$alliances{$id}=\%h;
 }
+
+my @arank;
 sub player { #rank points id science culture level home_id logins from joined alliance name
 	my %h=();
 	my $id;
@@ -59,6 +62,11 @@ sub player { #rank points id science culture level home_id logins from joined al
 	}
 #	$h{planets}=$playerplanets[$id];
 #	push(@{$alliancemembers[$h{alliance}]},$id);
+   if(my $aid=$h{alliance}) {
+      # this only works because player.csv is sorted by rank
+      $h{arank}=++$arank[$aid];
+   }
+   $h{opop}=$opop[$id]||0;
 	$player{$id}=\%h;
 }
 
@@ -81,6 +89,7 @@ sub planets {
 		{$h{$elements[$i]}=$_[$i];}
 	}
 	$h{opop}=$h{population};
+   $opop[$h{ownerid}]+=$h{opop}; # used in player
 	my $sidpid=$id*13+$pid;
 	$planets{"$sidpid"}=\%h;
 #	my @temp=$planets{$id}?@{$planets{$id}}:();
@@ -180,6 +189,15 @@ if(1){
    foreach(@$prevtrades) {
       print F join("\t",@$_),"\n";
    }
+}
+
+print "updating player.joinn\n";
+my $res=$dbh->selectall_arrayref("SELECT `pid` FROM `player` ORDER BY `joined` ASC");
+$sth=$dbh->prepare_cached(qq!UPDATE `player` SET `joinn` = ? WHERE `pid` =?!);
+my $n=0;
+foreach my $row (@$res) {
+   my($pid)=@$row;
+   $sth->execute(($n++)/100+1, $pid);
 }
 
 print "done\n";

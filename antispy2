@@ -40,22 +40,36 @@ if(param() && param("bio")>2) {
    foreach(@$allplayers) {
          my($ex,$ey,$ename,$epid,$esl)=@$_;
 #         next if($esl<=$bio-6); # we are sure to have spied on him
-         my @rel=getrelation($ename);
-         my @sci=relation2science($rel[2]);
+         my(undef,$sci)=awinput::playerid2ir($epid);
+#         my @rel=getrelation($ename);
+#         my @sci=relation2science($rel[2]);
          my $spytime=0;
-         if(defined($sci[0]) && $sci[0]>100){$spytime=shift(@sci)}
+         if($sci && $sci->[0] && $sci->[0]>100){$spytime=shift(@$sci)}
          my $age=$now-$spytime;
          if($age<60000) {next} # this is considered fresh
-         my $irage=(defined($sci[0])? sprintf("%.1fd",$age/3600/24) :"?");
-         my $ebio=$sci[0]; if(!defined($ebio)){$ebio="?"}
+         my $irage=($spytime? sprintf("%.1fd",$age/3600/24) :"?");
+         my $ebio="?";
+         if($sci && defined($sci->[0])) {
+            $ebio=$sci->[0];
+         }
          print profilelink($epid)." ($ex,$ey) ".display_pid($epid)." SL=$esl oldBio=$ebio age=$irage\n".br;
    }
 } else {
    my $s=3;
+   my $pid=getuseridcookie();
+   my ($bio,$x,$y);
+   if($pid) {
+      my(undef,$sci)=awinput::playerid2ir($pid);
+      if($sci) {
+         $bio=$sci->[1];
+      }
+      my $sid=playerid2home($pid);
+      ($x,$y)=systemid2coord($sid);
+   }
 	print start_form(-name=>"form", -method=>"get"),
-         textfield(-name=>'bio', -class=>'text', -size=>$s)," Bio",br,
-         textfield(-name=>'x', -class=>'text', -size=>$s)," Home x",br,
-         textfield(-name=>'y', -class=>'text', -size=>$s)," Home y",br,
+         textfield(-name=>'bio', -class=>'text', -default=>$bio, -size=>$s)," Bio",br,
+         textfield(-name=>'x', -class=>'text', -default=>$x, -size=>$s)," Home x",br,
+         textfield(-name=>'y', -class=>'text', -default=>$y, -size=>$s)," Home y",br,
 		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.bio");
 }
 print AWtail();

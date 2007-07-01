@@ -12,12 +12,14 @@ $dbh->do("DELETE FROM `fleets` WHERE `lastseen` < ".$time2);
 
 my $time3=$now-14*24*3600;
 $dbh->do("DELETE FROM `imessage` WHERE `time` < ".$time3);
+# do not auto-clean system-info
+$dbh->do("DELETE FROM `planetinfos` WHERE `sidpid`%13 > 0 AND `modified_at` < ".$time3);
 
 my $time4=$now-8*3600;
 $dbh->do("DELETE FROM cdcv WHERE pid = 0 OR time < $time"); # delete outdated entries
 $dbh->do("DELETE FROM cdlive WHERE time < $time");
 
 
-foreach my $t (qw(fleets usersession battles imessage cdcv cdlive)) {
+foreach my $t (qw(fleets usersession battles imessage cdcv cdlive planetinfos intelreport)) {
    $dbh->do("OPTIMIZE TABLE `$t`");
 }

@@ -30,7 +30,7 @@ our $codedir="$basedir/inc";
 our $htmldir="$basedir/html";
 our $cssdir="$basedir/css";
 our $allidir="$basedir/alli";
-our $interbeta=0;
+our $interbeta=1;
 our $style;
 our $timezone;
 our $updatetime15=16*60;
@@ -196,10 +196,10 @@ sub planetlink($) {my ($id)=@_;
         return qq!<a href="planet-info?id=$escaped">$id</a>!;
 }
 sub profilelink($) { my($id)=@_;
-        qq!<a href="http://$server/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a href="http://$server/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
+        qq!<a class="aw" href="http://$server/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a class="aw" href="http://$server/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
 }
 sub alliancedetailslink($) { my($id)=@_;
-        qq!<a href="http://$server/0/Alliance/Detail.php/?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
+        qq!<a class="aw" href="http://$server/0/Alliance/Detail.php/?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
 }
 sub systemlink($) { my($id)=@_;
         qq!<a href="system-info?id=$id">info for system $id</a>\n!;

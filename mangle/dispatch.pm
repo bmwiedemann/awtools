@@ -4,6 +4,7 @@ use awstandard;
 use awinput;
 use bbcode;
 use awaccess;
+use awsql;
 use DBAccess;
 use awimessage;
 use Time::HiRes qw(gettimeofday tv_interval); # for profiling
@@ -71,8 +72,8 @@ sub mangle_dispatch(%) { my($options)=@_;
             $::bmwlink=$$options{authlink};
          }
          if(($interbeta || !$ENV{REMOTE_USER}) && $$options{pid}) {
-            my $aid=playerid2alliance($$options{pid});
-            if(($interbeta || !$aid) && $$options{name} && ($$options{name} ne "unknown")) {
+            my $atag=playerid2tag($$options{pid});
+            if(($interbeta || !$atag) && $$options{name} && ($$options{name} ne "unknown")) {
                $joinlink="<br>".$$options{authlink}."/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
             } elsif(is_founder($$options{pid})) {
                # if alliance founder, add extra "accept NAP with AF" link
@@ -97,7 +98,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          last;
       }
 #      $module="($module)"; #qq'<span style="color:gray">($module)</span>';
-      if($g) {
+      if(0 && $g) {
          $info{page}=join(", ",@module). " $module";
       } else { $info{page}=$module }
 
@@ -111,7 +112,7 @@ sub mangle_dispatch(%) { my($options)=@_;
                s%^</tr></table>%</tr><tr class="bmwblankrow"><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b></td>
                   $s/arrival">arrival
                   $l/tactical">tacmap
-                  $l/tactical-large">tlarge
+                  $l/tactical-live2">tlarge
                   $l/system-info">system
                   $l/relations">player
                   $l/alliance">alliance
@@ -138,7 +139,10 @@ sub mangle_dispatch(%) { my($options)=@_;
       my $ims=awimessage::get_all_ims($options, 1);
       if($ims && @$ims) { # have im
          my $nims=@$ims;
-         $imessage="<!-- start gb imessage --><div class=awimessage>you have $nims $$options{authlink}/imessage\" class=\"awtools\">instant messages</a><br>";
+         my $bims=$nims>1?"$nims BIMs":"a BIM";
+         $imessage="<!-- start gb imessage --><div class=awimessage>You have received $$options{authlink}/imessage\" class=\"awtools\">$bims</a>.<br>";
+         my $imend="</div><!-- end gb imessage -->\n";
+         s!<center>!$imessage$imend$&!;
          foreach my $im (@$ims) {
             my ($imid,$time,$sendpid,$recvpid,$msg)=@$im;
             my $fromto;
@@ -152,53 +156,65 @@ sub mangle_dispatch(%) { my($options)=@_;
             }
             $imessage.=AWisodatetime($time+3600*$$options{tz})."$fromto <span class=\"$c\">".bbcode_trans($msg)."</span> <br>";
          }
-         $imessage.="</div>";
+         $imessage.=$imend;
       }
    }
    my $online="";
    if($alli && $$options{name}) {
+      my $t1=[gettimeofday];
       my $now=time();
       my $reltime=$now-60*25;
-      my @alli=(lc($alli));
-      my $allimatch=" AND `aid` = `alliance` AND ( `tag` = ? ";
-      foreach my $a (@{$read_access{lc($alli)}}) {
-         $allimatch.=" OR `tag` = ? ";
-         push(@alli,$a);
-      }
-      $allimatch.=" )";
+      my $sth;
+      if(0 && !$g) {
+         my @alli=(lc($alli));
+         my $allimatch=" AND `aid` = `alliance` AND ( `tag` = ? ";
+         foreach my $a (@{$read_access{lc($alli)}}) {
+            $allimatch.=" OR `tag` = ? ";
+            push(@alli,$a);
+         }
+         $allimatch.=" )";
 #      my $allifrom=",`player`,`alliances`";
 #      if(0 && $g) {$allimatch=$allifrom=""}
-      my $t1=[gettimeofday];
-      my $sth=$dbh->prepare_cached("SELECT player.`name` , m.`t`
-         FROM (
-               SELECT max( i.lastclick ) AS t, pid
-                  FROM `usersession` AS i
-                  WHERE `lastclick` > ? 
-                  AND `name` != ?
-                  GROUP BY `pid`
-               ) AS m,`player`,`alliances`
-         WHERE m.pid = player.pid
-          $allimatch
-         ORDER BY `t` DESC");
+         $sth=$dbh->prepare_cached("SELECT player.`name` , m.`t`
+            FROM (
+                  SELECT max( i.lastclick ) AS t, pid
+                     FROM `usersession` AS i
+                     WHERE `lastclick` > ? 
+                     AND `name` != ?
+                     GROUP BY `pid`
+                  ) AS m,`player`,`alliances`
+            WHERE m.pid = player.pid
+             $allimatch
+            ORDER BY `t` DESC");
 #      my $sth=$dbh->prepare_cached("SELECT usersession.name,`lastclick` 
 #           FROM `usersession` $allifrom 
 #           WHERE `lastclick` > ? $allimatch AND usersession.name != ?
 #           GROUP BY usersession.name
 #           ORDER BY lastclick DESC;");
-      $sth->execute($reltime, $$options{name}, @alli);
+         $sth->execute($reltime, $$options{name}, @alli);
+      } else {
+         my($allimatch,$amatchvars)=get_alli_match2($alli, 16, "alliances.tag");
+         $sth=$dbh->prepare_cached("
+               SELECT player.name, lastclick_at
+               FROM toolsaccess, brownieplayer, player, alliances
+               WHERE brownieplayer.pid = player.pid AND
+               alliance = aid AND
+               lastclick_at > ? AND
+               player.name != ? AND
+               $allimatch
+               ORDER BY lastclick_at DESC
+               ");
+         $sth->execute($reltime, $$options{name}, @$amatchvars);
+      }
       my @who2;
-      while ( my @row = $sth->fetchrow_array ) {
+      while ( my $row = $sth->fetchrow_arrayref ) {
 #      foreach my $row (@$who) {
-         my ($name,$time)=@row;
+         my ($name,$time)=@$row;
          my $diff=15-int(($now-$time)/60/2);
          if($diff<3) {$diff=3}
          my $c=sprintf("%x", $diff);
 #if($time<$now-60*6) {
-         if($g) {
-            push(@who2,"<span class=\"gray$diff\">$name</span>");
-         } else {
-         push(@who2,"<span style=\"color:#$c$c$c\">$name</span>");
-         }
+         push(@who2,"<span class=\"gray$diff\">$name</span>");
       }
       $$options{sqlelapsed}=tv_interval ( $t1 );
       $online=join(", ", @who2);
@@ -214,6 +230,13 @@ sub mangle_dispatch(%) { my($options)=@_;
    }
    
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
+   if($options->{pid}) {
+      my($u)=get_one_row("SELECT `lastupdate_at` FROM `brownieplayer` WHERE `pid`=?", [$options->{pid}]);
+      if($u) {
+         $u=$u-time+$awstandard::updatetime15;
+         $info{nextupdate}=$u."s";
+      }
+   }
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
    $$options{mangleelapsed}=$$options{totalelapsed}=tv_interval ( $t2 );
    my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n$joinlink<p id=\"disclaimer\"><br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";

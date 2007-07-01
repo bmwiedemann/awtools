@@ -4,6 +4,7 @@ package awaccess;
 use awstandard;
 use DB_File;
 use Fcntl qw(:flock O_RDONLY);
+use DBAccess2;
 require Exporter;
 use vars qw(@ISA @EXPORT);
 
@@ -14,7 +15,9 @@ tie(%allowedalli, "DB_File", "$awstandard::dbmdir/allowedalli.dbm", O_RDONLY, 0,
 # crs: temporary until 2006-05-05
 
 @ISA = qw(Exporter);
-@EXPORT = qw(%read_access %write_access %allowedalli %remap_planning %remap_relations %remap_alli);
+@EXPORT = qw(%read_access %write_access %allowedalli %remap_planning %remap_relations %remap_alli
+      &getallowedallis
+);
 
 
 $read_access{af}=["rats","trol"];
@@ -47,7 +50,13 @@ our %remap_alli=(
       lbb=>"lba",
       ice=>"fir",
       sjma=>"sj",
+#      punx=>"fury",
 #      es=>"esb", zob=>"esb", vip=>"esb", qi=>"esb",
 );
+
+sub getallowedallis() {
+   my $dbh=get_dbh;
+   return $dbh->selectcol_arrayref("SELECT tag FROM `toolsaccess` WHERE `wbits` =255");
+}
 
 1;

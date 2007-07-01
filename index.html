@@ -6,7 +6,7 @@ awstandard_init();
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout antispy antispy2 authaw authawforum cdinfo distsqr eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences2 ranking sim tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
+foreach(qw(logout antispy antispy2 arrival authaw authawforum cdinfo distsqr edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences2 ranking sim tactical tactical-large tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 
@@ -22,7 +22,7 @@ print
  a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,
  a({href=>"http://$bmwserver/$arel.png"},"alliance relations")."
  (".a({href=>"http://$bmwserver/$arel.svg"},"svg").", ".a({href=>"http://$bmwserver/round/alliancerelation.svg"},"current").")",br,
- a({href=>"http://$bmwserver/customize_race.html"},"greenbird's race helper")," ",a({href=>"http://aw21.zq1.de/register/customize_race.php"},"AW race"),br,
+ a({href=>"http://$bmwserver/customize_race.html"},"greenbird's race helper")," ",a({class=>"aw", href=>"http://aw21.zq1.de/register/customize_race.php"},"AW race"),br,
 # a({href=>"/beta10/alliancerelation"},"alliance relation data")." &gt; ".a({href=>"topwars"},"top wars").", ".a({href=>"topallis"},"top allis"),
  p,a({href=>"/manual.html"},"manual").", ".a({href=>"/manual-devel.html"},"developers-manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog"), " / ", a({href=>"http://aw.lsmod.de/TODO"},"ToDo-List"),br,
 "color codes ". a({href=>"system-info?legend=1"}, "for relations"), 
@@ -30,18 +30,20 @@ print
 p,
 
  h2("extra links"),
- a({href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
- a({href=>"http://www1.astrowars.com/rankings/"},"AW rankings"),br,
- a({href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
- a({href=>"http://www.astrowars.com/about/battlecalculator"},"AW battle calculator")," ", a({href=>"http://www1.astrowars.com/0/Trade/prices.txt"},"AW trade prices"),br,
- a({href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
+ a({class=>"aw", href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
+ a({class=>"aw", href=>"http://www1.astrowars.com/rankings/"},"AW rankings"),br,
+ a({class=>"aw", href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
+ a({class=>"aw", href=>"http://www.astrowars.com/about/battlecalculator"},"AW battle calculator")," ", a({class=>"aw", href=>"http://www1.astrowars.com/0/Trade/prices.txt"},"AW trade prices"),br,
+ a({class=>"awglossary", href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
  "other tools: ".
- a({href=>"http://lefois.de/aw/tool/index.php"}, "Lefois"), " ",
- a({href=>"http://azgharde.free.fr/tools/index.php"},"azgharde")," ",
- a({href=>"http://aw.neron92.info/"}, "neron92"), " ",
- a({href=>"http://filix.exx.pl/aw/"}, "Filix"), " ",
+ a({class=>"othertool", href=>"http://lefois.de/aw/tool/index.php"}, "Lefois"), " ",
+ a({class=>"othertool", href=>"http://azgharde.free.fr/tools/index.php"},"azgharde")," ",
+ a({class=>"othertool", href=>"http://aw.neron92.info/"}, "neron92"), " ",
+ a({class=>"othertool", href=>"http://filix.exx.pl/aw/"}, "Filix"), " ",
  #a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
  "outdated: ",
- a({href=>"http://astrostats.reseaulocal.fr/"}, "Astrostats"), " ",
- a({href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",
+ a({class=>"othertool", href=>"http://astrostats.reseaulocal.fr/"}, "Astrostats"), " ",
+ a({class=>"othertool", href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",br,
+"featured links: ",
+a({class=>"othertool", href=>"http://vultures.int.pl/NC/"}, "Northern Cross"),
  AWtail;

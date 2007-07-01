@@ -1,9 +1,13 @@
 use strict;
 use DBAccess2;
 
+# add proper URLs
 s/(form action="" method=")post/$1get/;
 s%</td></tr></table>%$&<a style="color:green" href="$::options{url}">Link to this page</a>%;
 
+
+
+# add in+out to DB:
 
 my %pmap=qw(
 des ds1
@@ -76,6 +80,14 @@ while((my @a=each(%values))) {
 if($killr[0] && $killr[1]) {
    my $sth=$dbh->prepare("INSERT IGNORE INTO `battlecalc` SET ".join(", ",@str));
    $sth->execute(@param);
+}
+
+# bugfix for AR:
+# show SB as float again
+my $sb=$cgi->param("sta");
+if($sb != int($sb)) {
+   $sb=~s/[^0-9.+-]//g;
+   s%(<a href=/portal/Starbase>Starbase</a></td><td><input type="text" name="sta" size="5" value=")\d+(" class=text>)%$1$sb$2%;
 }
 
 1;

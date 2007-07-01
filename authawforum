@@ -10,6 +10,9 @@ use awinput;
 awstandard_init();
 #awinput_init();
 
+our %blacklist=(
+      hnu=>1,
+      );
 our %options;
 my $h=AWheader("User AW-forum authentication tool");
 if(param("u")) {
@@ -52,6 +55,10 @@ if(param("u")) {
          } elsif($awpid != $pid) {
             print $h."strange PID mismatch: $awpid != $pid";
          } else {
+           my $atag=playerid2tagm($pid);
+           if($blacklist{lc($atag)}) {
+            print $h."your alliance ($atag) is blocked from AW forum auth";
+           } else {
             my $dbh=get_dbh;
             my $now=time();
             my $sessionid=sprintf("%016s%016s",int(rand(1000000000000000)),int(rand(1000000000000000))); # generate random 32 chars
@@ -63,6 +70,7 @@ if(param("u")) {
             }
             my $ruri="http://$bmwserver/cgi-bin/public/authaw?session=$sessionid$uri";
             print redirect($ruri);#,"$options{u}: you are now successfully logged in as $awname".br;
+            }
          }
       }
    }

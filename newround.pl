@@ -18,6 +18,7 @@ if($newround) {
 }
 $dbh->do("UPDATE planets SET ownerid=0");
 $dbh->do("TRUNCATE TABLE `cdcv`");
+$dbh->do("TRUNCATE TABLE `cdlive`");
 $dbh->do("TRUNCATE TABLE `alltrades`");
 $dbh->do("TRUNCATE TABLE `trades`");
 $dbh->do("TRUNCATE TABLE `battles`");
@@ -25,6 +26,8 @@ $dbh->do("TRUNCATE TABLE `fleets`");
 $dbh->do("TRUNCATE TABLE `plhistory`");
 $dbh->do("TRUNCATE TABLE `planetinfos`");
 $dbh->do("TRUNCATE TABLE `player`");
+$dbh->do("TRUNCATE TABLE `useralli`");
+$dbh->do("DELETE  FROM `toolsaccess` WHERE `rbits` != 255 AND tag != ''");
 
 system("make cleanmap2");
 system("cat empty.dbm > $awstandard::dbmdir/useralli.dbm");

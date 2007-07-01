@@ -1,16 +1,30 @@
+#IR=race+science: pid, alli, modified_at, race, sci
+#brownie:planets/buildings: spend-all only with PP>=150
+add "next update in x seconds" into brownie - fix add update in security screen
+#IIR=internal: ETC, prod, (SUs, artis)
+internal planet: buildings, PP, fractional pop
+?feed more info into tools: exact planet building levels - e.g. to make up sim
+#fix science ranking points calc in relations
+?findjumpy tool to look for free/unknown planets and friendly planets for attacks
+#interbeta: alliances.tag, *.alli -> CHAR(4)
+relations/system-info: recent battles
+playerprefs: phone, msn, email
+whocansee: add xE
 -tool to display useralli = own (soon obsolete with mysql relations DB index)
 XML-export of systems, players, fleets for integration into phpBB2 and others
+fleet estimator (using attacking CV, killed CV, signed TAs, estimated PP/h)
 mangle/All_Incomings: könnte hinter dem Namen des Betroffenden ein link zu seiner Alli ansicht liegen..
 auto-IM to team/alli about new incoming fleets
 fighterlist/whocanintercept: yCV with A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
 fighterlist: zCV = yCV + xCV(artifact)
+battle reports (fed from news screen - keep in DB with sidpid, time, info)
 #was done: xCV calculation: dont use outdated phys - instead worst-case - (4 days timeout)
 # [AF] SaggitariusA: ein anderes schönes tool wäre es mal, die PPs zu ermitteln, die man braucht, um auf planet #x eine SBy zu bauen (mit FS natürlich)
 #add recv message count to AWTools header: SELECT count(imid) FROM `imessage` WHERE `recvpid` = ? GROUP BY recvpid
 #authawforum
 #add alliance relation comment to alliance page
 interbeta: prevent dups with cls incomings
-optimize ranking and antispy tools performance
+#optimize ranking and antispy tools performance
 major rewrite to not use DBM files (mysql instead)
 #non-keyboard input with security-code +numbers(spend,launch,buy) for PDAs (non-default)?
 #modperl transition
@@ -20,11 +34,11 @@ major rewrite to not use DBM files (mysql instead)
 #IM to whole alli
 #plan: aw21.zq1.de maps directly to www1.astrowars.com -> fewer translation of cookies and URLS - integrated browniecgi.pm handler avoids double-proxying
 time to arti
-CV below incoming
+-CV below incoming (for non-extended users)
 % finished in science
 #brownie: css+image cache to lighten load on AW server http://www.astrowars.com/forums/templates/ http://www.astrowars.com/images/ http://www1.astrowars.com/images/
 #brownie: integrate imessage
-general user preferences DB: tz, customhtml, race+sci for planets,arrival, AW-forum style
+#general user preferences DB: tz, customhtml, race+sci for planets,arrival, AW-forum style
 #remember user timezones from settings page and use for GMT+n display in fleets and arrival
 #Timezone for added fleets in AW
 #verify +59 feed/alliance_detail.pm
@@ -38,14 +52,14 @@ feed:parse num of SUs and num of Artifacts into DB
 #automatic state transitions planned->targeted, targeted->sieged|taken
 sieged-by $user and fleets in BB-export
 #planet/buildings: add colours for buildable stuff
-reserved-planets-list
+#reserved-planets-list
 parsing the owner of sieging fleets (replacing unknown)
 #brownie:planets/detail: add remaining time (minutes) behind remaining PP
-friendly-siege-SB-calc: input(SBlevel,planet) output(PP or A$ needed)
-holes: add speedy-attractivity-heuristic value in separate column
+#friendly-siege-SB-calc: input(SBlevel,planet) output(PP or A$ needed)
+#holes: add speedy-attractivity-heuristic value in separate column
 #javascript arrival calc on fleet/launch
 #alliance/detail: hide/mark non-member incomings
-system-info: rearrange basic player info in table
+relation: rearrange basic player info in table
 #brownie: add incomings to planet/details
 speed table (Bio0, Bio4(2AU)-link arrival,...Bio20)
 #display %.2f PP
@@ -54,20 +68,20 @@ speed table (Bio0, Bio4(2AU)-link arrival,...Bio20)
 #fleet screen: show owner+relation of fleet target
 #directory for alliance data with PerlAuthzHandler
 #incoming-intercept + defence tool
-fix player/planets index after feeding (e.g. with mysql)
+#fix player/planets index after feeding (e.g. with mysql)
 #tactical-large/live: Bio selector(JS)
 #muffin Feed+Mangle (Upload+Download) filter
 #trade tool listing players with $TAs<n  and A$+PP>15k
 #include battles.csv 7-day history in alliancerelation-detector
 #better idle-time tracking (start-end)
-anon export for relations
+-anon export for relations
 #fleets (and others) with local times instead of GMT. not for BB-export
 correlate strongest fleet to best guarded
 merge strongest fleets history to catch moving fleets or see growth/loss
 #RSA thread link - auto from referer. e.g. use $::planetinfo{"$sid#0"}
 #add battlecalc link to relations - def/att from race or just worst-case
 #Arnaken: could you sum up the fleets of everyone ie at the end of the fleet page ?
-RSA-TD: Actually you know what I thought of, possible to code the best planets into your tool? As in it will show up where best planets are?
+-RSA-TD: Actually you know what I thought of, possible to code the best planets into your tool? As in it will show up where best planets are?
 
 #possibly improve muffin AWLink to fetch info from aw.lsmod.de on demand -> brownie
 #muffin: clickable system-IDs in Alliance/Detail (mouseover "AWTools")

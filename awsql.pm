@@ -9,7 +9,7 @@ use DBAccess2;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
-qw(&update_premium);
+qw(&update_premium &get_alli_match2);
 
 sub update_premium($$)
 {
@@ -20,5 +20,14 @@ sub update_premium($$)
    $sth->execute($prem, $pid);
 }
 
+# output: array with SQL string and placeholder vars
+sub get_alli_match2($$;$)
+{ my($alli,$bits,$what)=@_;
+   if(!$alli || $alli eq "guest") {return (0,[])}
+   $what||="alli";
+   return ("( $what = toolsaccess.tag AND
+         othertag = ? AND
+         rbits & ? != 0 )", [$alli,$bits]);
+}
 
 1;

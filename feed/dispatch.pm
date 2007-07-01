@@ -10,6 +10,8 @@ my $debug=0;
 
 sub feed_dispatch($%) { (local $_, my $options)=@_;
    my $gameuri=defined($$options{url}) && $$options{url}=~m%^http://www1\.astrowars\.com/%;
+   my($title)=m!\A.{0,200}<title>([^<>]*)</title>!s;
+	my $aw="Astro Wars";
    if($$options{name} && $gameuri && (my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
 #      if($$options{url}=~m%^http://www1\.astrowars\.com/register/login\.php%) {
          # reset click counter now
@@ -25,8 +27,10 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
                ON DUPLICATE KEY UPDATE `lastclick_at` = ?
                ;");
          $sth2->execute($$options{pid}, $time,$time,$time);
-         my $sth3=$dbh->prepare_cached("UPDATE `brownieplayer` SET `lastupdate_at` = ? WHERE `pid` = ? AND `lastupdate_at` < ?");
-         $sth3->execute($time, $$options{pid}, $time-$awstandard::updatetime15);
+         if($title && ($title ne $aw)) {
+            my $sth3=$dbh->prepare_cached("UPDATE `brownieplayer` SET `lastupdate_at` = ? WHERE `pid` = ? AND `lastupdate_at` < ?");
+            $sth3->execute($time, $$options{pid}, $time-$awstandard::updatetime15);
+         }
 
 #         if($result eq "0E0") {
             # insert new entry with 1 click
@@ -39,14 +43,14 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
 #         }
       }
    }
-   if(! m!<title>([^<>]*)</title>!) { 
+   if(! defined($title)) { 
 		my @race;
       %::options=%$options;
 		if($$options{name}) { require feed::plain_race; feed::feed_plain_race(); }
-		print "no title found\n"; return -1;
+		print "no title found\n";
+      return -1;
 	}
-	my $title=$1;
-	my $aw="Astro Wars";
+   print "title $title\n";
    if($title=~/- profile - $aw/o) { require feed::profile; feed_profile(); return 0}
    my @time;
 	return unless @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);

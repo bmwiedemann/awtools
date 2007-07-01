@@ -51,4 +51,28 @@ s%<table border=0 cellpadding=1 cellspacing=1 width=600(?=>)%$&.' class="sub_inn
 
 require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
 
+
+# add display of prod with bonus
+if(1 || $mangle::dispatch::g) {
+   my ($trade)=m/<td bgcolor=[^>]*>Trade Revenue<\/td><td>(\d+)%</;
+   my ($arti)=m/<td bgcolor=[^>]*>Artifact<\/td><td>([^<]*)</;
+   my @bonus=(1,1,1,1);
+   foreach my $b (@bonus) {$b+=$trade*0.01}
+   if($arti=~/(\w+) (\d)/) {
+      my $effect=$awstandard::artifact{$1}||0;
+      for(my $i=0; $i<@bonus; ++$i) {
+         if((1<<$i) & $effect)
+         {$bonus[$i]+=0.1*$2}
+      }
+   }
+   my $n=0;
+   foreach my $p (qw(Science Culture Production)) {
+      $n++;
+      next unless m/<li>([+-]\d+)% \L$p/;
+      $bonus[$n]+=$1*0.01;
+      s/(<td bgcolor=#303030>$p<\/td><td>\+)(\d+)/$1.$2."=".bmwround($2*$bonus[$n])/e;
+   }
+#   $_.="<br>t:$trade a:$arti b:@bonus<br>";
+}
+
 1;

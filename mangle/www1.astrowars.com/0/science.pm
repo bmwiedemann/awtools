@@ -4,7 +4,7 @@ use sort_table;
 
 my %transtable=(Biology=>"bio", Economy=>"eco", Energy=>"energy", Mathematics=>"math", Physics=>"physics", Social=>"social");
 if($::options{name} && $ENV{REMOTE_USER}) {
-   my $etc=awinput::playername2etc($::options{name});
+   my $etc=awinput::playerid2etc($::options{pid});
    if($etc) {
       $etc=sort_table::display_etc($etc);
       s{(Culture)</a>} {$1</a> in $etc};

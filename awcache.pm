@@ -73,7 +73,7 @@ sub awgetcache($)
    }
 	my $t;
 	foreach my $k (keys(%mimemap)) {
-		if($path=~m/\.$k$/) {
+		if($path=~m/\.$k$/i) {
 			$t=$mimemap{$k};
 		}
    }

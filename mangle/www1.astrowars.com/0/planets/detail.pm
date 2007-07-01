@@ -54,7 +54,8 @@ my $prodbonus=1;
 my $popbonus=1;
 if($::options{name}) {
  if($ENV{REMOTE_USER}) { # use real race info - only for extended tools users
-   my(undef,undef,undef,undef,undef,undef,undef,$bonus)=awinput::playername2production($::options{name});
+   my $prod=playerid2production($::options{pid});
+   my $bonus=pop(@$prod);
    if($bonus) {
       $popbonus=$bonus->[3];
       $prodbonus=$bonus->[0];
@@ -96,7 +97,7 @@ if($popplus && $popbonus) { # add hours to pop-growth
 
 # add incomings to this planet below
 if(1) {
-   my $fleets=awinput::get_fleets($sidpid, "AND `iscurrent` = 1 ");
+   my $fleets=awinput::sidpid2fleets($sidpid, "AND `iscurrent` = 1 ");
    my $fstr="";
    foreach my $f (@$fleets) {
       my $fs=awinput::show_fleet($f)."<br>";

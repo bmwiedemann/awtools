@@ -13,6 +13,9 @@ use awimessage;
 awinput_init();
 
 our %options;
+my $authname=awinput::getauthname();
+our $authpid=playername2idm($authname);
+
 sub display_delim
 { 
    return a({-href=>"?action=delete&imid=$_[0]"},"del")
@@ -24,16 +27,25 @@ sub display_impid($)
       a({-href=>"?action=send&recv=$_[0]"},"rep")." ").display_pid($_[0]);
 }
 
+sub display_tztime($)
+{ my($t)=@_;
+   $t+=$timezone*3600;
+   AWisodatetime($t);
+}
+
 sub imlist(%)
 { my($options)=shift;
    my $ims=awimessage::get_all_ims($options);
-#  foreach my $row (@$ims) {
+   foreach my $row (@$ims) {
 #     my ($imid,$time,$sendpid,$recvpid,$msg)=@$row;
 #     print "$imid,$time,$sendpid,$recvpid,$msg\n";
-#  }
+      my $class="recvimessage";
+      if($row->[2]==$authpid) {$class="sentimessage"};
+      $row->[4]="<span class=\"$class\">".($row->[4])."</span>";
+   }
    sort_table(
          [qw(del time-sent from to msg)],
-         [\&display_delim,\&AWisodatetime,\&display_impid, \&display_impid, \&bbcode_trans],
+         [\&display_delim,\&display_tztime,\&display_impid, \&display_impid, \&bbcode_trans],
          [undef,\&sort_num,\&sort_pid,\&sort_pid,undef],
          sort_param_to_keys($$options{sort}),$ims
       );
@@ -41,9 +53,7 @@ sub imlist(%)
 
 my $admin=is_admin;
 
-print AWheader("AW instant messaging tool");
-my $authname=awinput::getauthname();
-my $authpid=playername2idm($authname);
+print AWheader("Brownie Instant Messaging tool");
 if(!$authpid) {
    print "Sorry, you can only use IMs when ".a({-href=>"authawforum?uri=/cgi-bin/imessage"},"properly authenticated");
 } else {

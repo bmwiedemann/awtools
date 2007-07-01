@@ -8,7 +8,7 @@ use awinput;
 #awstandard_init();
 awinput_init();
 
-my $awuser=cookie('user');
+my $awuser=getusernamecookie();
 my $refsys=cookie('refsys');
 
 our %options;

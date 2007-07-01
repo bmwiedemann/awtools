@@ -29,7 +29,7 @@ if(defined($options{user})) {
 	push(@cookies, cookie(-name=>'tz', -value=>$options{tz}, -expires=>'+600d'));
 	push(@cookies, cookie(-name=>'customhtml', -value=>$options{customhtml}, -expires=>'+600d'));
 	print header(-cookie=>\@cookies).AWheader2("logged in as $options{user} ($options{refsys})");
-} else { print AWheader("login"); }
+} else { print AWheader("cookie-preferences"); }
 
 print start_form(-method=>'get', -name=>"form"), textfield(-name=>'user', -class=>'text'), " user name", br.AWfocus("form.user"),
 textfield(-name=>'refsys', -class=>'text'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,

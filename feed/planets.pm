@@ -1,3 +1,12 @@
+use DBAccess2;
+
+if(m!(?:Growth [+-]\d+%&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)?Production ([+-]\d+)%</td><td>(\d+)</td><td>\+(\d+)!) {
+   my ($pp,$prodperh)=($2,$3);
+   my $dbh=get_dbh();
+   my $sth=$dbh->prepare("UPDATE `internalintel` SET `production`=?, `pp`=? WHERE `alli`=? AND `pid`=?");
+   $sth->execute($prodperh, $pp, $ENV{REMOTE_USER}, $::options{pid});
+}
+
 #exit 0; # dont use atm
 
 if(0) {
@@ -21,6 +30,7 @@ our %data;
 
 return unless /Production Points(.*)/s;
 $_=$1;
+
 my $nplanets=0;
 my $nerrors=0;
 for(;(@a=m!<tr[^>]*><td[^>]*><a [^>]*>([^<]+) (\d+)</a></td><td>(\d+)</td><td>(.*)!); $_=$a[3]) {
