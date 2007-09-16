@@ -1,0 +1,84 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use DBAccess2;
+use awstandard;
+use awinput;
+#awstandard_init();
+awinput_init();
+
+our %cache;
+sub lookup_ip($) {
+   use Net::IP;
+   use Net::DNS;
+   if(my $res=$cache{$_[0]}) {return $res}
+   my $ip = new Net::IP($_[0],4);
+#   print $ip->reverse_ip()."\n";
+#   print "Resolving ...\n";
+   my $res = Net::DNS::Resolver->new;
+   my $answer = $res->query($ip->reverse_ip(),'PTR');
+   my $namer = $answer->{'answer'}[0];
+   $res=$cache{$_[0]}=$namer->{'ptrdname'};
+   return $res;
+}
+
+
+my $admin=is_admin;
+if(!$admin) {print header,"sorry, this is admin-only."; exit 0;}
+
+our %options;
+print AWheader("AW brownie-viewer tool");
+	print start_form(-name=>"form", -method=>"get"),textfield(-name=>'p', -class=>'text')," name",br,
+      textfield(-name=>'ip', -class=>'text'), " IP",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+
+if(param()) {
+	foreach my $p (qw(p ip)) {
+		$options{$p}=param($p);
+#      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
+	}
+   if($options{p}){$options{p}=~s/[<>]//g;} # sanitize user input;
+   if($options{ip}){$options{ip}=~s/[^0-9.]//g;}
+   
+   my $pid=playername2idm($options{p});
+   my $dbh=get_dbh;
+   my $sth;
+   my @param;
+   if($pid && $pid>2) {
+      print "player=$pid=",playerid2link($pid).br;
+      $sth=$dbh->prepare_cached("SELECT * FROM `usersession`,player WHERE player.`name` = ? AND player.pid=usersession.pid ORDER BY lastclick");
+      @param=($options{p});
+   } elsif($options{ip}) {
+      print "IP=$options{ip}=",lookup_ip($options{ip}),br;
+      $sth=$dbh->prepare_cached("SELECT * FROM `usersession`,player WHERE usersession.`ip` = ? AND player.pid=usersession.pid ORDER BY lastclick");
+      @param=($options{ip});
+   } else {
+      print("multi detector",br);
+      $sth=$dbh->prepare(
+     "SELECT usersession.* FROM usersession,
+      (
+        SELECT m1.ip FROM
+        (
+          SELECT * FROM `usersession`
+          GROUP BY pid,ip
+        ) as m1
+        GROUP BY ip
+        HAVING count(m1.pid)>1
+        ORDER BY ip
+      ) as m2
+      WHERE m2.ip=usersession.ip
+      GROUP BY pid
+      ORDER BY usersession.ip");
+   }
+   if($sth) {
+      my $res=$dbh->selectall_arrayref($sth, {}, @param);
+      foreach my $row (@$res) {
+         my($sessionid, $pid, $name, $nclick, $firstclick, $lastclick, $ip, $auth)=@$row;
+         print "$sessionid, ",playerid2link($pid),", ",a({-href=>"?p=$name"},$name),", $nclick, ".scalar localtime($lastclick), ", ",a({-href=>"?ip=$ip"},$ip."=".lookup_ip($ip)),", $auth\n".br;
+      }
+   }
+}
+
+print AWtail();
+
