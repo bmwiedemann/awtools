@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+# safe 070204
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use arrival;
+awstandard_init();
+use sort_table;
+
+
+my %options=qw;
+racespeed 0
+energy 0
+distance 0
+planet 0
+own 0
+;;
+
+sub display_time_h($)
+{
+   my($time)=@_;
+	my $h=int($time);
+	my $m=int(($time-$h)*60);
+   my $sec=($time*3600)%60;
+	return sprintf "time %.3fh = %i = %2i:%.2i:%.2i".br, $time, $time*3600, $h, $m, $sec;
+}
+
+print AWheader('Arrival time calculator');
+printform();
+if(param()) {
+#require "arrival.pm";
+	print h2("input");
+   $options{sort}=param("sort");
+   if(!$options{sort}) {
+      param("sort", $options{sort}="7");
+   }
+   for my $p (qw'mintime maxtime') {
+      $_=param($p);
+      if(m/(\d+):(\d+):(\d+)/) {
+         $_=$1*3600+$2*60+$3;
+      } elsif($_<60) {
+         $_*=3600; # assume fractional hours
+      }
+      s/\D//g; # sanitize user input
+      $options{$p}=$_;
+      print "$p $options{$p}<br>";
+   }
+   $options{maxtime}++;
+	for my $p (qw'planet distance own energy racespeed') {
+      my $x=param($p);
+      $x||=0;
+      $x=~s/[^-+0-9o.,]//g; # sanitize user input
+      my %y;
+      foreach(split(/,/,$x)) {
+         if(m/^[+-]?\d+$/) {
+            $y{$&}=1;
+         }
+         elsif(m/^([+-]?\d+)\.\.([+-]?\d+)$/) {
+            if($1>$2 || $2-$1>100) {
+               print "error in param $p : $1..$2";
+               exit(0);
+            }
+            foreach my $i ($1..$2) {
+               $y{$i}=1;
+            }
+         }
+      }
+      $options{$p}=[sort(keys(%y))];
+      print "$p @{$options{$p}}\n<br>";
+	}
+
+   print h2("result");
+   my %o=%options;
+   if(@{$o{racespeed}}*@{$o{planet}}*@{$o{energy}}*@{$o{distance}}>100000) {
+      print "result range too big (more than 100000)";
+      exit(0);
+   }
+   %options=(own=>$o{own});
+   my @data;
+   foreach my $racespeed (@{$o{racespeed}}) { $options{racespeed}=$racespeed;
+    next if(abs($racespeed)>4);
+   foreach my $planet (@{$o{planet}}) { $options{planet}=$planet;
+    next if($planet<0 || $planet>11);
+   foreach my $energy (@{$o{energy}}) { $options{energy}=$energy;
+    next if($energy<0 || $energy>60);
+   foreach my $distance (@{$o{distance}}) { $options{distance}=$distance;
+    next if($distance<0 || $distance>50000);
+
+   	my $time=arrival::traveltime(\%options);
+      next if($time*3600>$o{maxtime} || $time*3600<$o{mintime});
+      my $eenergy=sprintf("%.2f", arrival::effectiveenergy($options{racespeed},$options{energy}));
+      push(@data, [$options{distance}, $options{planet}, $options{energy}, $options{racespeed}, $eenergy, $options{own}, $time]);
+   }}}}
+
+   print sort_table([qw"dist planets E S xE, own traveltime"],
+         [\&display_string, \&display_string, 
+         \&display_string, \&display_string, \&display_string, \&display_string, \&display_time_h],
+         [\&sort_num, \&sort_num, 
+         \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+         sort_param_to_keys($o{"sort"}), \@data);
+#   print "distance/planets: ".sprintf("%.2f",sqrt($options{distance}))."=&radic;".span({-style=>"text-decoration:overline;"},$options{distance})." / $options{planet}".br."energy/speed/xEnergy: $options{energy} / $options{racespeed} / $eenergy".br."allied destination: ".($options{own}?"yes":"no");
+   
+} 
+
+print h2("general"),
+'When going from Planet a in System A(x/y) to Planet b in System B(X/Y) then '.br.'Planet diff is the absolute of a-b  and  Dist sqr is (x-X)<sup>2</sup>+(y-Y)<sup>2</sup>'.
+#br.'Energy level accepts fractions like 10.5'.
+br.'input values are enumerated with comma(,) or dotdot(..). They are capped as follows: <br/>planet: 0..11<br/>energy: 0..60<br/>speed: -4..+4<br/>distsqr: 0..50000 (but only calc a range of 100 at a time)'.br;
+
+sub printform { 
+	my $s=5;
+	print start_form(-method=>'get', -name=>"form"),
+   hidden("sort"),
+	textfield(-name=>'planet', -size=>$s, -class=>'text', -value=>"1..11"), " Planet difference", br.AWfocus("form.planet"),
+	textfield(-name=>'distance', -size=>$s, -class=>'text'), " ",a({-href=>"distsqr"},"Distance squared"), br,
+	textfield(-name=>'energy', -size=>$s, -class=>'text'), " Energy level", br,
+	textfield(-name=>'racespeed', -size=>$s, -class=>'text', -value=>"-4..+4"), " Race speed modifier", br,
+	checkbox(-name=>'own', -label=>''), " Own or allied destination", br,
+	textfield(-name=>'mintime', -size=>$s, -class=>'text'), " min time(hh:mm:ss)", br,
+	textfield(-name=>'maxtime', -size=>$s, -class=>'text', -value=>"20:00:00"), " max time(hh:mm:ss)", br,
+	  submit(-class=>'smbutton'), end_form, p;
+}
+print AWtail;
+
