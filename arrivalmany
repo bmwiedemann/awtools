@@ -31,9 +31,10 @@ printform();
 if(param()) {
 #require "arrival.pm";
 	print h2("input");
+   $options{own}=param("own");
    $options{sort}=param("sort");
    if(!$options{sort}) {
-      param("sort", $options{sort}="7");
+      param("sort", $options{sort}="8");
    }
    for my $p (qw'mintime maxtime') {
       $_=param($p);
@@ -47,7 +48,7 @@ if(param()) {
       print "$p $options{$p}<br>";
    }
    $options{maxtime}++;
-	for my $p (qw'planet distance own energy racespeed') {
+	for my $p (qw'planet distance energy racespeed') {
       my $x=param($p);
       $x||=0;
       $x=~s/[^-+0-9o.,]//g; # sanitize user input
@@ -58,26 +59,25 @@ if(param()) {
          }
          elsif(m/^([+-]?\d+)\.\.([+-]?\d+)$/) {
             if($1>$2 || $2-$1>100) {
-               print "error in param $p : $1..$2";
-               exit(0);
+               print "error in param $p : $1..$2",AWtail;
+               exit(0); # modperl OK
             }
-            foreach my $i ($1..$2) {
+            foreach my $i (($1+0)..($2+0)) {
                $y{$i}=1;
             }
          }
       }
-      $options{$p}=[sort(keys(%y))];
+      $options{$p}=[sort {$a<=>$b} (keys(%y))];
       print "$p @{$options{$p}}\n<br>";
 	}
 
    print h2("result");
    my %o=%options;
+   my @data;
    if(@{$o{racespeed}}*@{$o{planet}}*@{$o{energy}}*@{$o{distance}}>100000) {
       print "result range too big (more than 100000)";
-      exit(0);
-   }
+   } else {
    %options=(own=>$o{own});
-   my @data;
    foreach my $racespeed (@{$o{racespeed}}) { $options{racespeed}=$racespeed;
     next if(abs($racespeed)>4);
    foreach my $planet (@{$o{planet}}) { $options{planet}=$planet;
@@ -88,25 +88,27 @@ if(param()) {
     next if($distance<0 || $distance>50000);
 
    	my $time=arrival::traveltime(\%options);
-      next if($time*3600>$o{maxtime} || $time*3600<$o{mintime});
+      next if($time*3600<$o{mintime});
+      last if($time*3600>$o{maxtime}); # next -> last because distance list is sorted
       my $eenergy=sprintf("%.2f", arrival::effectiveenergy($options{racespeed},$options{energy}));
-      push(@data, [$options{distance}, $options{planet}, $options{energy}, $options{racespeed}, $eenergy, $options{own}, $time]);
-   }}}}
+      my $dist=sqrt($options{distance})+0.1*$options{planet};
+      push(@data, [$options{distance}, $options{planet}, $dist, $options{energy}, $options{racespeed}, $eenergy, $options{own}, $time]);
+   }}}}}
 
-   print sort_table([qw"dist planets E S xE, own traveltime"],
-         [\&display_string, \&display_string, 
+   print scalar @data," results",br,sort_table([qw"Dist Planets xDist E S xE, Own Traveltime"],
+         [\&display_string, \&display_string, \&display_round2,
          \&display_string, \&display_string, \&display_string, \&display_string, \&display_time_h],
-         [\&sort_num, \&sort_num, 
+         [\&sort_num, \&sort_num, \&sort_num,
          \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($o{"sort"}), \@data);
 #   print "distance/planets: ".sprintf("%.2f",sqrt($options{distance}))."=&radic;".span({-style=>"text-decoration:overline;"},$options{distance})." / $options{planet}".br."energy/speed/xEnergy: $options{energy} / $options{racespeed} / $eenergy".br."allied destination: ".($options{own}?"yes":"no");
    
 } 
 
-print h2("general"),
+print h2("general notes"),
 'When going from Planet a in System A(x/y) to Planet b in System B(X/Y) then '.br.'Planet diff is the absolute of a-b  and  Dist sqr is (x-X)<sup>2</sup>+(y-Y)<sup>2</sup>'.
 #br.'Energy level accepts fractions like 10.5'.
-br.'input values are enumerated with comma(,) or dotdot(..). They are capped as follows: <br/>planet: 0..11<br/>energy: 0..60<br/>speed: -4..+4<br/>distsqr: 0..50000 (but only calc a range of 100 at a time)'.br;
+br.'Input values are enumerated with comma(,) and you can use dotdot(..) for ranges. They are capped as follows: <br/>planet: 0..11<br/>energy: 0..60<br/>speed: -4..+4<br/>distsqr: 0..50000 (but only calc a range of 100 at a time)'.br;
 
 sub printform { 
 	my $s=5;
