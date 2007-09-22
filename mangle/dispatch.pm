@@ -194,22 +194,31 @@ sub mangle_dispatch(%) { my($options)=@_;
          $sth->execute($reltime, $$options{name}, @alli);
       } else {
          my($allimatch,$amatchvars)=get_alli_match2($alli, 16, "alliances.tag");
+         my($allimatch2,$amatchvars2)=get_alli_match2($alli, 16);
          $sth=$dbh->prepare_cached("
-               SELECT player.name, lastclick_at
+               (SELECT player.name, lastclick_at
                FROM toolsaccess, brownieplayer, player, alliances
                WHERE brownieplayer.pid = player.pid AND
                alliance = aid AND
                lastclick_at > ? AND
-               player.name != ? AND
-               $allimatch
-               ORDER BY lastclick_at DESC
-               ");
-         $sth->execute($reltime, $$options{name}, @$amatchvars);
+               $allimatch)
+
+               UNION DISTINCT 
+               (SELECT player.name, lastclick_at
+               FROM `useralli` , player, brownieplayer, toolsaccess
+               WHERE brownieplayer.pid = player.pid
+               AND player.pid = useralli.pid
+               AND lastclick_at > ?
+               AND $allimatch2)
+               ORDER BY lastclick_at DESC 
+               "); # would need join with alliances,toolsaccess and $allimatch in 2nd part
+         $sth->execute($reltime, @$amatchvars, $reltime, @$amatchvars2);
       }
       my @who2;
       while ( my $row = $sth->fetchrow_arrayref ) {
 #      foreach my $row (@$who) {
          my ($name,$time)=@$row;
+         next if ($name eq $$options{name});
          my $diff=15-int(($now-$time)/60/2);
          if($diff<3) {$diff=3}
          my $c=sprintf("%x", $diff);
@@ -260,7 +269,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 
       s%</body>%$gbcontent $&%;
       if($g) {
-         $_.=sprintf(" benchmark: auth:%ims pre:%ims aw:%ims sql:%ims mangle:%ims ", $$options{authelapsed}*1000, $$options{prerequestelapsed}*1000, $$options{awelapsed}*1000, $$options{sqlelapsed}*1000, $$options{mangleelapsed}*1000);
+         $_.=sprintf(" benchmark: auth:%ius pre:%ius aw:%ius sql:%ius mangle:%ius ", $$options{authelapsed}*1000000, $$options{prerequestelapsed}*1000000, $$options{awelapsed}*1000000, $$options{sqlelapsed}*1000000, $$options{mangleelapsed}*1000000);
 #         s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
 #         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }

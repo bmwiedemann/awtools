@@ -8,6 +8,7 @@ my $readonly=0;
 use awstandard;
 use awinput;
 use arrival;
+use awhtmlout;
 use DBAccess2;
 awinput_init();
 
@@ -31,7 +32,7 @@ if($options{alliance}) {
 	$options{alliance} =~ s/[^a-zA-Z0-9._-]+//g;
 }
 if($options{name}) {
-	$options{name} =~ s/[^a-zA-Z0-9.äöüÖÜÄß*û _!|{}\]\[-]+//g;
+	$options{name} =~ s/[^a-zA-Z0-9.äöüÖÜÄß*û _:()!|{}\]\[-]+//g;
 }
 
 if(!$readonly && defined($options{relation})) {
@@ -171,21 +172,10 @@ if($options{name}) {# && $options{name} ne "unknown") {
       }
       print "</ul>\n";
       my($race,$sci)=playerid2ir($id);
+      my ($racestr,$scistr)=ir2string($race,$sci);
 		my @race=$race?@$race :();
 		if(defined($race[0])) {
-			print p,"race: ",br;
-			my $n=0;
-         my $sul=pop(@race);
-         my $trader=pop(@race);
-         my $sum=pop(@race);
-			foreach(@race) {
-				my $bonus=$awstandard::racebonus[$n]*100*$_;
-				if($bonus>=0) {$bonus="+".$bonus}
-				print "$bonus% $awstandard::racestr[$n++] ($_)".br;
-			}
-#         if($sum<=-9) {print "Banker".br;$sum+=9}
-         if($trader) {print "Trader".br;$sum+=6}
-         if($sul) {print "Start Up Lab".br;$sum+=1}
+			print p,"race: ".br.$racestr
 		}
 		my @prod=@{playerid2production($id)};
       my $bonus=pop(@prod);
@@ -205,12 +195,12 @@ if($options{name}) {# && $options{name} ne "unknown") {
 			my $n=0;
          my $time=shift(@$sci);
          print " from ".gmdate($time);
-			print ":<br />\n";
-			foreach(@$sci) {
-				print "$awstandard::sciencestr[$n++] $_\n".br;
-			}
+			print ":<br />\n",$scistr;
+         
          my $etc=playerid2etc($id);
-         print "ETC: ".AWtime($etc).br;
+         if($etc) {
+            print "ETC: ".AWtime($etc).br;
+         }
 		}
 
       if(0) {

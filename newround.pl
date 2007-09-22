@@ -16,17 +16,14 @@ if($newround) {
    }
    system("sudo cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
 }
+$dbh->do("UPDATE playerextra SET premium=NULL");
 $dbh->do("UPDATE planets SET ownerid=0");
-$dbh->do("TRUNCATE TABLE `cdcv`");
-$dbh->do("TRUNCATE TABLE `cdlive`");
-$dbh->do("TRUNCATE TABLE `alltrades`");
-$dbh->do("TRUNCATE TABLE `trades`");
-$dbh->do("TRUNCATE TABLE `battles`");
-$dbh->do("TRUNCATE TABLE `fleets`");
-$dbh->do("TRUNCATE TABLE `plhistory`");
-$dbh->do("TRUNCATE TABLE `planetinfos`");
-$dbh->do("TRUNCATE TABLE `player`");
-$dbh->do("TRUNCATE TABLE `useralli`");
+$dbh->do("UPDATE intelreport SET racecurrent=0");
+$dbh->do("UPDATE intelreport SET biology=NULL, economy=NULL, energy=NULL, mathematics=NULL, physics=NULL, social=NULL");
+foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhistory planetinfos player useralli internalintel)) {
+   $dbh->do("TRUNCATE TABLE `$name`");
+}
+
 $dbh->do("DELETE  FROM `toolsaccess` WHERE `rbits` != 255 AND tag != ''");
 
 system("make cleanmap2");

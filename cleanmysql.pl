@@ -12,6 +12,7 @@ $dbh->do("DELETE FROM `fleets` WHERE `lastseen` < ".$time2);
 
 my $time3=$now-14*24*3600;
 $dbh->do("DELETE FROM `imessage` WHERE `time` < ".$time3);
+$dbh->do("DELETE FROM `internalintel` WHERE `modified_at` < ".$time3);
 # do not auto-clean system-info
 $dbh->do("DELETE FROM `planetinfos` WHERE `sidpid`%13 > 0 AND `modified_at` < ".$time3);
 

@@ -6,7 +6,7 @@ require Exporter;
 use vars qw(@ISA @EXPORT);
 
 @ISA = qw(Exporter);
-@EXPORT = qw($dbh &get_one_row &get_one_rowref);
+@EXPORT = qw($dbh &get_one_row &get_one_rowref &get_dbh);
 
 our $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
@@ -33,5 +33,9 @@ sub get_one_rowref($;@) {
    $sth->finish;
    return $row;
 }
+
+sub get_dbh()
+{ return $dbh }
+
 
 1;

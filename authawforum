@@ -12,6 +12,7 @@ awstandard_init();
 
 our %blacklist=(
       hnu=>1,
+      the=>1,
       );
 our %options;
 my $h=AWheader("User AW-forum authentication tool");

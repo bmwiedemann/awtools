@@ -29,7 +29,7 @@ if(param()) {
 	my $h=int($time);
 	my $m=int(($time-$h)*60);
    my $sec=($time*3600)%60;
-	print h2("results")."distance/planets: ".sprintf("%.2f",sqrt($options{distance}))."=&radic;".span({-style=>"text-decoration:overline;"},$options{distance})." / $options{planet}".br."energy/speed/xEnergy: $options{energy} / $options{racespeed} / $eenergy".br."allied destination: ".($options{own}?"yes":"no").br.br;
+	print h2("input")."distance/planets: ".sprintf("%.2f",sqrt($options{distance}))."=&radic;".span({-style=>"text-decoration:overline;"},$options{distance})." / $options{planet}".br."energy/speed/xEnergy: $options{energy} / $options{racespeed} / $eenergy".br."allied destination: ".($options{own}?"yes":"no").br.h2("result");
 	printf "time %.3fh = %2i:%.2i:%.2i".br, $time, $h, $m, $sec;
 #	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = 
    print "ETA ".AWtime(time()+$time*3600);

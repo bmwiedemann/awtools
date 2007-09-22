@@ -1,3 +1,13 @@
+#admin: lookup ip->hostname+username
+#admin: lookup name->ips
+#admin-index: viewbrownie, useralli, lookup
+#brownie: fleet/send target planet highlight
+#arrival-find: E=0..4 speed=22..26 dist=0 planet=1,2,4
+use login table to take load off relations dbm
+orange-bg incomings
+green.css tests+fixes
+planet/details feed own fleet and sieging owner into tools.
+#nicer in-game IR
 #IR=race+science: pid, alli, modified_at, race, sci
 #brownie:planets/buildings: spend-all only with PP>=150
 add "next update in x seconds" into brownie - fix add update in security screen
@@ -61,7 +71,7 @@ parsing the owner of sieging fleets (replacing unknown)
 #alliance/detail: hide/mark non-member incomings
 relation: rearrange basic player info in table
 #brownie: add incomings to planet/details
-speed table (Bio0, Bio4(2AU)-link arrival,...Bio20)
+#speed table (Bio0, Bio4(2AU)-link arrival,...Bio20)
 #display %.2f PP
 #calc PP/h sci/h cul/h with bonusses (from trade field of player DB + Arti)
 #fleet tracker (remove old ones on feeding)

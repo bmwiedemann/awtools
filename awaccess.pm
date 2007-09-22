@@ -1,6 +1,7 @@
 # this file defines permissions for allis
 # e.g. sharing of info in tools
 package awaccess;
+use strict;
 use awstandard;
 use DB_File;
 use Fcntl qw(:flock O_RDONLY);
@@ -8,48 +9,33 @@ use DBAccess2;
 require Exporter;
 use vars qw(@ISA @EXPORT);
 
-our (%read_access,%write_access,%allowedalli);
+our (%read_access);
 
-tie(%allowedalli, "DB_File", "$awstandard::dbmdir/allowedalli.dbm", O_RDONLY, 0, $DB_HASH);
-
-# crs: temporary until 2006-05-05
+#tie(%allowedalli, "DB_File", "$awstandard::dbmdir/allowedalli.dbm", O_RDONLY, 0, $DB_HASH);
 
 @ISA = qw(Exporter);
-@EXPORT = qw(%read_access %write_access %allowedalli %remap_planning %remap_relations %remap_alli
-      &getallowedallis
+@EXPORT = qw(%read_access %remap_alli
+      &getallowedallis &is_allowedalli
 );
 
-
-$read_access{af}=["rats","trol"];
-$read_access{rats}=["af","trol"];
-$read_access{trol}=["af","rats"];
-$read_access{fir}=["ice"];
-$read_access{ice}=["fir"];
-$read_access{lba}=["lbb"];
-$read_access{lbb}=["lba"];
-$read_access{sj}=["sjma"];
-$read_access{sjma}=["sj"];
-$read_access{xr}=["en"];
-$read_access{en}=["xr"];
-#$read_access{rats}=[qw()];
-#$read_access{nain}=[qw()];
-#$read_access{sky}=[qw()];
+#$read_access{af}=["rats","trol"];
+#$read_access{rats}=["af","trol"];
+#$read_access{trol}=["af","rats"];
 #$read_access{tgd}=[qw(af)];
-#$write_access{af}="af"; # unused yet
-#our %remap_planning=(frs=>"is");
 our %remap_planning=(
-      rats=>"af",
-      trol=>"af",
-      en=>"xr",
+#      rats=>"af",
+#      trol=>"af",
+#      en=>"xr",
       );
 our %remap_relations=(
-      rats=>"af",
-      en=>"xr",
+#      rats=>"af",
+#      en=>"xr",
+#      seux=>"niai",
       );
 our %remap_alli=(
-      lbb=>"lba",
-      ice=>"fir",
-      sjma=>"sj",
+#      lbb=>"lba",
+#      ice=>"fir",
+#      sjma=>"sj",
 #      punx=>"fury",
 #      es=>"esb", zob=>"esb", vip=>"esb", qi=>"esb",
 );
@@ -57,6 +43,17 @@ our %remap_alli=(
 sub getallowedallis() {
    my $dbh=get_dbh;
    return $dbh->selectcol_arrayref("SELECT tag FROM `toolsaccess` WHERE `wbits` =255");
+}
+
+sub is_allowedalli($) {
+   my($alli)=@_;
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare("SELECT tag FROM `toolsaccess` WHERE `wbits` =255 AND tag=? AND othertag=tag");
+   my ($r)=$dbh->selectall_arrayref($sth,{}, $alli);
+   if(!$r || !@$r) {
+      return 0;
+   }
+   return 1;
 }
 
 1;

@@ -68,22 +68,22 @@ if(!$authpid) {
    if($options{recv} && $options{recv}=~m/[^0-9]/) { $options{recv}=playername2idm($options{recv}); } # counts as sanitizing
    my $subtools="";
    my @tlist=qw(send list delrecv delsent);
-   if($ENV{REMOTE_USER}) {
-      push(@tlist,"sendalli", "sendteam", "sendotherteam");
+   if(is_extended()) {
+      push(@tlist,"sendalli", "sendteam");
    }
    if($admin) {
-      push(@tlist,"sendall");
+      push(@tlist,"sendall", "sendotheralli", "sendotherteam");
    }
    foreach my $t (@tlist) {
       $subtools.=a({-href=>"?action=$t"}, $t)." ";
    }
    print $subtools,br;
    print a({-href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br;
-   if($admin && $options{action} eq "sendotherteam") {
+   if($admin && ($options{action} eq "sendotheralli" || $options{action} eq "sendotherteam")) {
       if($options{msg}){
-         my $to=awinput::get_team_pids($options{action} eq "sendteam", $options{alli});
+         my $to=awinput::get_team_pids($options{action} eq "sendotherteam", $options{alli});
          foreach my $r (@$to) {
-            $options{recv}=$r->[0];
+            $options{recv}=$r;
 #            print "$options{recv} ";
             print awimessage::send(\%options),br;
          }
@@ -118,7 +118,7 @@ if(!$authpid) {
       if($options{msg}){
          my $to=awinput::get_team_pids($options{action} eq "sendteam");
          foreach my $r (@$to) {
-            $options{recv}=$r->[0];
+            $options{recv}=$r;
 #            print "$options{recv} ";
             print awimessage::send(\%options),br;
          }

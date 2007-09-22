@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+our %options;
+print AWheader("AW lookup tool");
+if(!is_admin()) {
+   print "sorry, this tool is admin-only.";
+   exit(0);
+}
+if(param()) {
+	foreach my $p (qw(p a)) {
+		$options{$p}=param($p);
+#      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
+	}
+   if($options{p}){$options{p}=~s/[^0-9.]//g;} # sanitize user input;
+   if($options{a}){$options{a}=~tr/A-Z/a-z/;$options{a}=~s/[^a-z]//g;} # sanitize user input;
+   my $pid=playername2idm(param("user"));
+   if($pid) {
+
+   } elsif($options{p}) {
+      
+   }
+   open(my $logf, "sudo /home/aw/base/awcalc/apachelogextract $options{a} |") or die $!;
+   print "<pre>";
+   print <$logf>;
+   print "</pre>";
+} else {
+	print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," IP",br,
+      textfield(-name=>'a', -class=>'text')," alli",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+}
+print AWtail();
+

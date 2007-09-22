@@ -36,7 +36,7 @@ my $allis=$dbh->selectall_arrayref(
 my $eusersum=0;
 foreach my $row (@$allis) {
       my($name,$num)=@$row;
-      if($allowedalli{lc($name)} || $remap_alli{lc($name)}) {
+      if(is_allowedalli($name) || $remap_alli{lc($name)}) {
          $eusersum+=$num;
       }
 }
@@ -54,7 +54,7 @@ my $n=0;
 foreach my $row (@{$allis}[0..39]) {
    my($name,$num)=@$row;
    my $color="";
-   if($allowedalli{lc($name)} || $remap_alli{lc($name)}) {
+   if(is_allowedalli($name) || $remap_alli{lc($name)}) {
       $color="color:green";
    }
    my $m=allianceid2members(alliancetag2id($name));

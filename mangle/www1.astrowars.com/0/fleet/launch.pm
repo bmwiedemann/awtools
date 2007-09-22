@@ -29,7 +29,7 @@ $_=$page;
 #$_.=$extra;
 
 sub piddropdown($) {
-   my $ret='<select name="planet">';
+   my $ret='<select name="planet"><option></option>';
    for my $i (1..12) {
       my $sel=$_[0]==$i?" selected":"";
       $ret.=qq%<option$sel>$i</option>%;

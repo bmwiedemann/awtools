@@ -8,15 +8,15 @@ require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%prices,%relation,%planetinfo,
    $dbnamer,$dbnamep);
-my $startofround=1;
+my $startofround=1; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan
+&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
-&playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &gettradepartners &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_founder
+&playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &gettradepartners &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
 %alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
 );
@@ -35,6 +35,12 @@ my $head="Content-type: text/plain\015\012";
 
 my %adminlist=(greenbird=>1);
 
+sub get_relation_dbname($)
+{ my($alli)=@_;
+   my($a)=get_one_row("SELECT t1.othertag FROM `toolsaccess` as t1, `toolsaccess` as t2 WHERE t1.tag=t2.othertag AND t2.tag=t1.othertag AND t1.`tag` = ? AND t1.rbits&8 AND t2.rbits&8 ORDER BY t1.othertag DESC LIMIT 1", [$alli]);
+   return $a;
+}
+
 sub awinput_init(;$) { my($nolock)=@_;
    awstandard_init();
 #chdir "/home/aw/db"; # done by awstandard_init
@@ -50,33 +56,31 @@ sub awinput_init(;$) { my($nolock)=@_;
    my $alli=$ENV{REMOTE_USER};
    if($alli) {
       my $a=$alli;
-      if($remap_relations{$alli}) {
-         $a=$remap_relations{$alli};
+      if($alli ne "guest") {
+         $a=get_relation_dbname($alli);
       }
+#      if($remap_relations{$alli}) {
+#         $a=$remap_relations{$alli};
+#      }
       $dbnamer="$awstandard::dbmdir/$a-relation.dbm";
-      if($remap_planning{$alli}) {
-         $alli=$remap_planning{$alli};
-      }
+#      if($remap_planning{$alli}) {
+#         $alli=$remap_planning{$alli};
+#      }
       $dbnamep="$awstandard::dbmdir/$alli-planets.dbm";
       untie %relation;
-      untie %planetinfo;
 
 #     if($ENV{REMOTE_USER} ne "guest") {
       if($nolock) {
          tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
-         tie(%planetinfo, "DB_File", $dbnamep, O_RDONLY, 0, $DB_HASH);
       } else {
          $SIG{"ALRM"}=sub{print STDERR "alarm $alarmtime; finish\n";&awinput_finish; require POSIX; POSIX::_exit(0);};
          alarm($alarmtime); # make sure locks are free'd
          tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
-         tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
       }
    } else {
       # make sure it isnt tied and stored
       untie %relation;
-      untie %planetinfo;
       %relation=();
-      %planetinfo=();
    }
 }
 
@@ -118,6 +122,11 @@ sub getuseridcookie()
    playername2id(cookie('user'))||getauthpid();
 }
 
+sub is_startofround()
+{
+# 91 is a good approximate of a quarter year because 4*91 = 364
+   return ((gmtime())[7]%91) <21;
+}
 sub is_admin()
 {
    my $n=getauthname();
@@ -125,10 +134,17 @@ sub is_admin()
    return $adminlist{$n};
 }
 
+sub is_extended()
+{
+   return $ENV{REMOTE_USER} && $ENV{REMOTE_USER} ne "guest";
+}
+
 sub is_founder($)
 {
    my ($pid)=@_;
    if(!$pid) {return 0}
+   my($delegate)=get_one_row("SELECT alliaccess.pid FROM `alliaccess`,player WHERE alliaccess.aid=alliance AND alliaccess.pid=player.pid AND player.pid=?",[$pid]);
+   if($delegate) {return 1}
    my($founder)=get_one_row("SELECT founder FROM alliances, player WHERE aid=alliance AND pid=?",[$pid]);
    return $pid == $founder;
 #   my $aid=playerid2alliance($pid);
@@ -181,6 +197,18 @@ sub setrelation($%) { my($id,$options)=@_;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or die $!;
 	if(!$id) {$id=$$options{name}}
 	#print "set '$id', '$options' $dbnamer ";
+   my $pid=playername2idm($id);
+   if($pid) {  # mysql relations insert
+      my $dbh=get_dbh;
+      my $alli=$ENV{REMOTE_USER};
+      if(!$options) {
+         my $sth=$dbh->prepare("DELETE FROM `relations` WHERE `pid`=? AND `alli`=?");
+         $sth->execute($pid, $alli);
+      } else {
+         my $sth=$dbh->prepare("REPLACE INTO `relations` VALUES (?,?,?,?,?,?,?)");
+         $sth->execute($pid, $alli, $$options{status}, $$options{atag}, 0, time(), $$options{info});
+      }
+   }
 	if(!$options) {delete $relation{$id}; }
 	else {
 		$relation{$id}="$$options{status} $$options{atag} $$options{info}";
@@ -271,9 +299,11 @@ sub playerid2nameaw($) { my($id)=@_;
    my $html=LWP::Simple::get("http://www.astrowars.com/forums/profile.php?mode=viewprofile&u=$id");
    if($html=~m!Sorry, but that user does not exist! || $html=~m!<span class="gen">Contact ([^<>]{1,25}) </span>!) {
       my $name=$1||"";
+      if($name=~m/\S/) {
       my $dbh=get_dbh;
       my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `playerextra` VALUES (?, ?, '', ?)!);
       $sth->execute($id, $name, undef);
+      }
       return $name;
    }
    return undef;
@@ -379,15 +409,12 @@ sub getplanetinfo($$;$) { my($sid,$pid)=@_;
 	return ($1,$2,$3,$id);
 }
 sub setplanetinfo($%) { my($id,$options)=@_;
-	untie %planetinfo;
-	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or die $!;
 	if(!$id) {$id=$$options{sidpid}}
    if(!$id) {return}
 	#print "set '$id', '$options' $dbnamep ";
 	my $idm=sidpid22sidpid3m(sidpid32sidpid2($id));
 	my $dbh=get_dbh;
 	if(!$options) {
-		delete $planetinfo{$id};
 		my $sth=$dbh->prepare_cached("DELETE FROM `planetinfos` WHERE sidpid = ?");
 		$sth->execute($idm);
 ;
@@ -396,14 +423,11 @@ sub setplanetinfo($%) { my($id,$options)=@_;
       $$options{who}||=0;
       $$options{info}||="";
 		my $authpid=getauthpid();
-		$planetinfo{$id}="$$options{status} $$options{who} $$options{info}";
 		my $sth=$dbh->prepare_cached("INSERT INTO `planetinfos` VALUES ('',?,?,?,?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?) ON DUPLICATE KEY UPDATE modified_at = UNIX_TIMESTAMP(), status = ?, who = ?, modified_by = ?, info = ?");
 		$sth->execute($ENV{REMOTE_USER},$idm, 
 		$$options{status},$$options{who}, $authpid, $$options{info},
 		$$options{status},$$options{who}, $authpid, $$options{info});
 	}
-	untie %planetinfo;
-	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 sub systemname2id($) { my($name)=@_;
    if($name=~m/^\((\d+)\)$/) { return $1 }
@@ -696,7 +720,7 @@ sub playername2alli($) {my ($user)=@_;
       if($pid && $pid>2) {
          $alli=lc(playerid2tag($pid));
          if($awaccess::remap_alli{$alli}) { $alli=$awaccess::remap_alli{$alli} }
-         if(!$allowedalli{$alli}) {$alli=""}
+         if(!is_allowedalli($alli)) {$alli=""}
       }
    }
    return $alli;
@@ -733,8 +757,6 @@ our $fleetscreen="uninitialized";
 # prepare DB for adding planet/planning info
 # input: screen = integer identifying source of data (1=system-info, 2=cleanplanning)
 sub dbplanetaddinit(;$) { my($screen)=@_;
-	untie %planetinfo;
-	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
 }
 # prepare DBs for adding new fleets
 # input pid = player ID of whose fleets are viewed
@@ -805,7 +827,6 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
    return if(!$ENV{REMOTE_USER});
 	$name="\L$name";
 	untie %relation;
-	untie %planetinfo;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
 	my $oldentry=$relation{$name};
 	my $newentry=addplayerir($oldentry, $sci,$race,$newlogin,$trade,$prod);
@@ -817,31 +838,30 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
       my $etc=$sci->[7]; # TODO check if sci array is modified in awstandard::addplayerir
       my $dbh=get_dbh;
       my $time=time();
-		if($pid && $sci && $race && defined($race->[0])) {
+		if($pid && $race && defined($race->[0])) {
 			my @sci=(undef,undef,undef,undef,undef,undef);
 			my @race=(undef,undef,undef,undef,undef,undef,undef, undef,undef);
-			if($sci) {@sci=@{$sci}[0..5]}
 			if($race && defined($race->[0])) {
 				@race=@{$race}[0..6];
 				my $sum=0;
 				foreach my $r (@race){$sum+=$r}
-				$race[7]=$sum<=-6;
+				$race[7]=$sum<=-7;
+            if($race[7]){$sum-=7}
 				$race[8]=$sum&1;
 			}
 			my @update=map {"$_=?"} (@awstandard::racestr, "trader", "startuplab");
-			push(@update, map {"\l$_=?"} ("modified_at",@awstandard::sciencestr[0..5]));
 			my $sth=$dbh->prepare_cached("INSERT INTO `intelreport` 
-               VALUES (?,?,?, ?,?,?,?,?,?,?, ?,?, ?,?,?,?,?,?) 
-               ON DUPLICATE KEY UPDATE ".join(", ", @update));
+               VALUES (?,?,?, ?,?,?,?,?,?,?, ?,?, ?,?,?,?,?,?,1) 
+               ON DUPLICATE KEY UPDATE modified_at=?, racecurrent=1, ".join(", ", @update));
 			$sth->execute($ENV{REMOTE_USER},$pid,
 				$time, @race, @sci,
-				@race, $time, @sci);
+				$time, @race);
 		}
-      if($pid && $sci) {
+      if($pid && $sci && defined($sci->[1])) {
          my @sci;
 			if($sci) {@sci=@{$sci}[0..5]}
          my $sth=$dbh->prepare("UPDATE `intelreport` 
-            SET biology=?, economy=?, energy=?, mathematics=?, physics=?, social=? 
+            SET racecurrent=1, biology=?, economy=?, energy=?, mathematics=?, physics=?, social=? 
             WHERE `alli`=? AND `pid`=?");
          my $r=$sth->execute(@sci, $ENV{REMOTE_USER},$pid);
       }
@@ -859,7 +879,6 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 	}
 	untie %relation;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
-	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 
 sub dblinkadd { my($sid,$url)=@_;
@@ -928,7 +947,7 @@ sub playerid2ir($) { my($plid)=@_;
 #   return playername2ir(playerid2name($plid));
    my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},4);
    my @r=get_one_row("SELECT intelreport.*,growth+science+culture+production+speed+attack+defense FROM `intelreport`,toolsaccess WHERE `pid`=? AND $allimatch ORDER BY `modified_at` DESC LIMIT 1", [$plid, @$amvars]);
-   my @race=@r[3..9,18,10..11];
+   my @race=@r[3..9,19,10..11,18];
    foreach my $m (@race[0..6]) {if(defined($m) && $m>=0){$m="+$m"}}
    return (\@race, [@r[2,12..17]]);
 }
@@ -980,7 +999,7 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
 
 # input: alli
 # output: SQL to match allies
-sub get_alli_match($;$)
+sub get_alli_match_old($;$)
 {
    my($alli,$n)=@_;
    $n||="alli"; # default used for fleets
@@ -999,16 +1018,25 @@ sub get_team_pids($;$)
    my($team,$alli)=@_;
    $alli||=$ENV{REMOTE_USER};
    if(!$alli) {return []}
-   my $m="";
+#   my $m="";
+   my ($allimatch,$amvars)=("alliances.`tag` = ? AND alliances.tag=toolsaccess.tag AND alliances.tag=othertag", [$alli]);
+   my($allimatch2,$amvars2)=("`alli` = ? AND alli=toolsaccess.tag AND alli=othertag", [$alli]);
    if($team) {
-      $m="AND ".awinput::get_alli_match($alli,'tag');
+      ($allimatch,$amvars)=get_alli_match2($alli,1,'alliances.tag');
+      ($allimatch2,$amvars2)=get_alli_match2($alli, 1);
    } else {
-      $m="AND `tag` = '$alli'";
    }
    my $dbh=get_dbh;
-   my $sth=$dbh->prepare_cached("SELECT `pid` FROM alliances,player WHERE aid = alliance $m");
-#   my $res=$dbh->selectall_arrayref("SELECT DISTINCT usersession.pid FROM usersession,alliances,player WHERE usersession.pid = player.pid AND aid = alliance AND $m");
-   my $res=$dbh->selectall_arrayref($sth, {});
+   my $sth=$dbh->prepare_cached("
+         (SELECT `pid` FROM alliances,player,toolsaccess 
+         WHERE `aid` = `alliance` AND $allimatch
+         )
+         
+         UNION DISTINCT
+         (SELECT `pid` FROM useralli,toolsaccess
+         WHERE $allimatch2)
+         ");
+   my $res=$dbh->selectcol_arrayref($sth, {}, @$amvars, @$amvars2);
    return $res;
 }
 
@@ -1075,7 +1103,7 @@ sub show_fleet($) { my($f)=@_;
    my $minlen=21;
    my $minlen1=34;
    #fid alli status sidpid owner eta firstseen lastseen trn cls ds cs bs cv xcv iscurrent info
-   my($fid, $sidpid, $owner, $eta, $firstseen, $lastseen, $trn, $cls, $cv, $xcv, $iscurrent, $info)=@$f[0,3..9,13..16];
+   my($fid, $status, $sidpid, $owner, $eta, $firstseen, $lastseen, $trn, $cls, $cv, $xcv, $iscurrent, $info)=@$f[0,2,3..9,13..16];
    if($cv==0 && $cls==0 && $trn==0) {return ""}
    my $color=!$iscurrent;
    my $tz=$timezone*3600;
@@ -1084,6 +1112,7 @@ sub show_fleet($) { my($f)=@_;
    if($cls){$flstr.=", $cls CLS";}
    if($color) {$color="; color:$fleetcolormap{$color}"}
    if(!$eta && $iscurrent){$color.="; text-decoration:underline"}
+   if($status==2) {$color.="; background-color: orange"}
    my $tz2=($timezone>=0?"+":"").$timezone;
    if($eta) {$eta=AWisodatetime($eta+$tz)." GMT$tz2 ".awstandard::AWreltime($eta)} else {$eta="defending fleet.............."}
    if(length($eta)<$minlen1) {$eta.="&nbsp;" x ($minlen1-length($eta))}
@@ -1160,5 +1189,25 @@ sub getallidetailurl($) { my($pid)=@_;
    $arank--;
    return "http://$server/0/Alliance/Detail.php/?id=$arank";
 }
+
+# input: alliance id
+# output: arrayref with all
+sub getlivealliscores($)
+{
+   my($aid)=@_;
+   my $dbh=get_dbh();
+
+   my $sth=$dbh->prepare("SELECT cdlive.points
+      FROM `cdlive` , player
+      WHERE cdlive.pid = player.pid
+      AND `alliance`=?
+      AND `time`>?
+      ORDER BY `points` DESC");
+   return $dbh->selectcol_arrayref($sth, {}, $aid, time()-12*3600);
+}
+
+# input: alliance id
+# output: float score points value
+#sub getlivealliscore($) see alliance tool
 
 1;

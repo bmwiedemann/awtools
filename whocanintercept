@@ -28,7 +28,7 @@ if(param() && param("p")) {
    if(!defined $options{sort}){$options{sort}="3";}
    my ($sid,$pid)=sidpid32sidpid2($options{p});
    my $name=systemid2link($sid);
-   if(!defined($name)) {
+   if(!defined($name) || !defined($pid)) {
       print "system $sid not found";
    } else {
       if(!$options{tag}) {

@@ -89,7 +89,7 @@ if(param("legend")) {
 	print br;
 } elsif(param()) {
 	my($x,$y,$system);
-	for my $p (qw'mapx mapy id name export auth expires uniq history simple') {
+	for my $p (qw'mapx mapy id name export auth expires uniq history simple target') {
 	  $options{$p}=param($p);
 	}
    for my $p (qw'mapx mapy id expires history simple export') {
@@ -185,10 +185,14 @@ if(param("legend")) {
 		}
 		my @planets=systemid2planets($system);
 		foreach my $h (@planets) {
-			tprint "<li>";
+			my $planetid=planet2pid($h);
+         my $target="";
+         if($h && $planetid && $options{target} && $options{target}==$planetid) {
+            $target=' class="bmwtarget"';
+         }
+			tprint "<li$target>";
 			next if(!$h);
 #			foreach my $item (sort keys %$h) { print " $item=$$h{$item}\n"; }
-			my $planetid=planet2pid($h);
 			my $id="$system%23$planetid";
 			my $pinfo;
 			my @pinfo=getplanetinfo($system,$planetid);

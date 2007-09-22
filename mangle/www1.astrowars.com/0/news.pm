@@ -7,6 +7,7 @@ s%>([^<>]+)( accepted your TA offer.</td></tr>)%"><a href=/0/Player/Profile.php/
 # add links to systems
 my $maplink='<a href="/0/Map/Detail.php/?nr=';
 s%((?:We just colonized|We conquered|We lost|The people are not willing to take over) )([^.!]+)( \d+)[.!]%$1.$maplink.systemname2id($2).qq'">$2</a>$3.'%ge;
+s%(The people are not willing to colonize )([^.!]+)( \d+) and follow your leadership.%$1.$maplink.systemname2id($2).qq'">$2</a>$3.'%ge;
 s%((?:The population decreased by \d+ at) )([^.!]+)( \d+)[.]%$1.$maplink.systemname2id($2).qq'">$2</a>$3.'%ge;
 s%(Congratulations! (?:Your attacking fleet was|We were) victorious at )([^.]+)( \d+)\.%$1.$maplink.systemname2id($2).qq'">$2</a>$3.'%ge;
 s%(Your (?:attack|defend)ing fleet was defeated by <a href=[^<]*</a> at )([^.]+)( \d+)(\. You killed about \d+\%\.)%$1.$maplink.systemname2id($2).qq'">$2</a>$3$4'%ge;

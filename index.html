@@ -2,11 +2,12 @@
 use CGI ":standard";
 
 use awstandard;
-awstandard_init();
+use awinput;
+awinput_init(1);
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout antispy antispy2 arrival authaw authawforum cdinfo distsqr edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences2 ranking sim tactical tactical-large tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
+foreach(qw(logout antispy antispy2 arrival arrivalmany authaw authawforum cdinfo distsqr edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences2 ranking sim tactical tactical-large tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 
@@ -15,8 +16,8 @@ print p;
 print a({href=>"/alli/$ENV{REMOTE_USER}/"},"\U$ENV{REMOTE_USER}\E data dir"),br;
 #print a({href=>"/$ENV{REMOTE_USER}-holes.html"},"\U$ENV{REMOTE_USER}\E holes"),br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
-my $reldate="070220";
-my $arel="gold7/alliancerelation-$reldate";
+my $reldate="070731";
+my $arel="gold9/alliancerelation-$reldate";
 print 
  a({href=>"http://aw.lsmod.de/manual.html#brownie"}, "brownie")." and ".a({href=>"http://aw21.zq1.de/"}, "no-install-brownie"),br,
  a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,
@@ -27,9 +28,20 @@ print
  p,a({href=>"/manual.html"},"manual").", ".a({href=>"/manual-devel.html"},"developers-manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog"), " / ", a({href=>"http://aw.lsmod.de/TODO"},"ToDo-List"),br,
 "color codes ". a({href=>"system-info?legend=1"}, "for relations"), 
 " and ".a({href=>"planet-info?legend=1"}, "for planet/plannings"),
-p,
+p;
 
- h2("extra links"),
+if(is_founder(getauthpid())||is_admin()) {
+ print h2("founder links"),
+ a({href=>"passwd"}, "Change AWtools password"),br,
+ a({href=>"edit-sharing"}, "Set AWtools' data sharing with other alliances"),br;
+}
+if(is_admin()) {
+	print h2("AWtools admin links");
+	foreach(qw(adminuseralli adminviewbrownie awtoolstatistics hoststats)) {
+		print a({-href=>$_},$_)," &nbsp; ";
+	}
+}
+ print h2("extra links"),
  a({class=>"aw", href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
  a({class=>"aw", href=>"http://www1.astrowars.com/rankings/"},"AW rankings"),br,
  a({class=>"aw", href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,

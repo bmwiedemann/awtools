@@ -154,13 +154,13 @@ sub awfleetownerrelationfunc
 	my @v=awfilterchain($x,$y,$sid,$pid,$data);
    my $sidpid=sidpid22sidpid3m($sid,$pid);
 	my $alli=$ENV{REMOTE_USER};
-	my $allimatch=awinput::get_alli_match($alli);
+   my ($allimatch,$amvars)=awinput::get_alli_match2($alli,1);
    my $sth=$DBAccess::dbh->prepare_cached("
 		SELECT `owner`
-		FROM `fleets` 
-		WHERE ($allimatch) AND `sidpid` = ? AND `iscurrent` = 1 AND `cv` > 0 
+		FROM `fleets`,`toolsaccess`
+		WHERE `sidpid` = ? AND `iscurrent` = 1 AND `cv` > 0 AND $allimatch
 		ORDER BY `xcv`");
-	my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $sidpid);
+	my $res=$DBAccess::dbh->selectall_arrayref($sth, {}, $sidpid, @$amvars);
 	foreach my $row (@$res) {
 		my $ownerid=$$row[0];
 #		print "$pid $o\n";

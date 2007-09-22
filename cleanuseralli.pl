@@ -15,6 +15,7 @@ if(!$interbeta) {
       my $pid=playername2id($k);
       if(!$pid) {push(@droplist,$k);next} # wipe non-existent players
       my $a=playerid2tag($pid);
+      if(lc($k) eq "klappstuhl") {next}
       if($a) {push(@droplist,$k);next} # drop tagged players
    }
    my $dbh=get_dbh;

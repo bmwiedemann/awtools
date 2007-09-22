@@ -10,12 +10,12 @@ if($::options{url}=~/id=(\d+)/) {
    my $url="?id=";
 
    while(1) { # pseudo loop to exit at several places
-      my $user=$::options{name};
-      my $pid=playername2id($user);
+      my $pid=$::options{pid};
       last unless($pid && $pid>2);
       my $aid=lc(playerid2alliance($pid));
-      last unless($aid);
-      my $members=awinput::allianceid2membersr($aid);
+      my $s=is_startofround();
+      last unless($aid || $s);
+      my $members=awinput::allianceid2membersr($aid)||[];
 
       my $previd=$id-1;
       my $nextid=$id+1;
@@ -27,17 +27,19 @@ if($::options{url}=~/id=(\d+)/) {
          if($id) { $x="<a href=\"/0/Player/Profile.php/?id=$id\">$1</a>"; }
          $x.$2%e;
       if($previd>=0) { $prevstring.=qq'<a href="$url$previd">prev</a>'; }
-      if($nextid<@$members) { $prevstring.=qq' <a href="$url$nextid">next</a>'; }
-      my $form="";
+      if($nextid<@$members || $s) { $prevstring.=qq' <a href="$url$nextid">next</a>'; }
       my $n=0;
-      $form.=' <form action=""><select style="text-align:left;" name="id" onchange="submit()">';
-      foreach my $m (@$members) {
-         my $name=playerid2name($m);
-         my $sel=($id == $n)?" selected":"";
-         $form.=qq' <option value="$n"$sel>$name</option>';
-         $n++;
+      my $form="";
+      if(@$members) {
+         $form.=' <form action=""><select style="text-align:left;" name="id" onchange="submit()">';
+         foreach my $m (@$members) {
+            my $name=playerid2name($m);
+            my $sel=($id == $n)?" selected":"";
+            $form.=qq' <option value="$n"$sel>$name</option>';
+            $n++;
+         }
+         $form.='</select><input type="submit" class="smbutton" value="Go"></form> ';
       }
-      $form.='</select><input type="submit" class="smbutton" value="Go"></form> ';
    
       s%<br><table border=0%<br>$prevstring$form$&%;
       last;

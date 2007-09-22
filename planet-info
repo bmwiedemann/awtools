@@ -64,6 +64,7 @@ if($options{status} && $options{status}>=1 && $options{status}<=9) {
 		#$options{info}=$options{comment};
       for($options{comment}) {
          s/\btomorrow\b/in 1 d/i;
+         s/\bnow\b/in 0 h/i;
          s/\btoday\b/in 0 d/i;
          s/\byesterday\b/in -1 d/i;
          s/\bin ([-+]?\d+) (days|d)\b/AWisodate(time()+3600*24*$1)/ge;

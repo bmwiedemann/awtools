@@ -63,6 +63,11 @@ PRIMARY KEY ( `pid` )
 );!);
 
 $dbh->do(qq!
+CREATE TABLE `alliaccess` (
+`pid` MEDIUMINT PRIMARY KEY,
+`aid` MEDIUMINT NOT NULL
+);!);
+$dbh->do(qq!
 CREATE TABLE `toolsaccess` (
 `tag` CHAR(4) NOT NULL COMMENT 'the party that grants access',
 `othertag` CHAR(4) NOT NULL COMMENT 'the party that is allowed to read/write',
@@ -106,7 +111,7 @@ CREATE TABLE `battles` (
 `cv_att` INT,
 `att_id` INT,
 `def_id` INT,
-`win_id` INT,
+`win_id` INT INDEX,
 `planet_id` TINYINT,
 `system_id` INT,
 `time` INT NOT NULL,
@@ -248,11 +253,19 @@ PRIMARY KEY ( id )
 );!);
 
 $dbh->do(qq!
+CREATE TABLE `allirelations` (
+`tag` VARCHAR (8) NOT NULL ,
+`alli` CHAR( 4 ) NOT NULL ,
+`status` TINYINT UNSIGNED DEFAULT '4' NOT NULL COMMENT '0-9 defined in awstandard.pm %relationname',
+`info` TEXT NOT NULL ,
+PRIMARY KEY ( tag,alli )
+);!);
+$dbh->do(qq!
 CREATE TABLE `relations` (
 `pid` INT NOT NULL ,
 `alli` CHAR( 4 ) NOT NULL ,
 `status` TINYINT UNSIGNED DEFAULT '4' NOT NULL COMMENT '0-9 defined in awstandard.pm %relationname',
-`atag` CHAR( 4 ) NOT NULL COMMENT 'AW tag override - empty str means use AW',
+`atag` CHAR( 8 ) NOT NULL COMMENT 'AW tag override - empty str means use AW',
 `modified_by` INT( 16 ) NOT NULL ,
 `modified_at` INT( 16 ) NOT NULL ,
 `info` TEXT NOT NULL ,
@@ -300,6 +313,7 @@ CREATE TABLE `intelreport` (
 `mathematics` TINYINT,
 `physics` TINYINT,
 `social` TINYINT,
+`racecurrent` TINYINY,
 PRIMARY KEY ( `alli`, `pid`)
 );!);
 
@@ -312,8 +326,9 @@ CREATE TABLE `logins` (
 `time` INT ( 15 ) NOT NULL ,
 `idle` INT ( 6 ) NOT NULL ,
 `fuzz` INT ( 8 ) NOT NULL ,
-INDEX ( `alli` ),
-INDEX ( `pid`,`n` ),
+/*INDEX ( `alli` ),
+INDEX ( `pid`,`n` ),*/
+UNIQUE (`alli`,`pid`,`n`),
 PRIMARY KEY ( `lid` )
 );!);
 $dbh->do(qq!

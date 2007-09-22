@@ -30,7 +30,7 @@ our $codedir="$basedir/inc";
 our $htmldir="$basedir/html";
 our $cssdir="$basedir/css";
 our $allidir="$basedir/alli";
-our $interbeta=1;
+our $interbeta=0;
 our $style;
 our $timezone;
 our $updatetime15=16*60;
@@ -446,12 +446,12 @@ sub awxp2pl($) {
    ($_[0]/5)**(1/2.7)
 }
 
-sub awsyslink($;$) {
-   my($sid,$simple)=@_;
+sub awsyslink($;$$) {
+   my($sid,$simple,$pid)=@_;
    $simple||=1;
    my $public=$ENV{REMOTE_USER}?"":"";#:"/public";
    my $and=$ENV{REMOTE_USER}?'%':'&';
-   my $link=qq($public/system-info?id=$sid${and}simple=$simple">);
+   my $link=qq($public/system-info?id=$sid${and}simple=$simple${and}target=$pid">);
 }
 
 sub getauthname() {

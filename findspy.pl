@@ -11,14 +11,11 @@ awinput_init(1);
    foreach my $name (keys %relation) {
       my @rel=getrelation($name);
       if($rel[0]>=8) {
-         push(@members,$name);
+         my $pid=playername2id($name);
+         my ($r,$s)=playerid2ir($pid);
+         next if not $pid or not $s or not $s->[0];
+         push(@members,[$name,$pid, $s->[1]]);
       }
-   }
-   foreach(@members){
-      my @sci=relation2science($relation{"\L$_"});
-      if($sci[0]>100){shift(@sci)}
-      my $bio=$sci[0];
-      $_.=" $bio\n"
    }
 
 #print @members,"\n";exit 0;
@@ -31,13 +28,9 @@ my $minsci=100;
 my $scidiff=3;
 my $AUdiff=20;
 my $distmargin=1;
-foreach my $name (@members) {
-   $name=~/(.*) (\d*)/;
-   $name=$1;
-   my $bio=$2;
-   my $pid=playername2id($name);
+foreach my $e (@members) {
+   my($name,$pid,$bio)=@$e;
    $member{$pid}=1;
-   next unless $pid;
    push(@memberids,$pid);
    my $sid=playerid2home($pid);
    my ($x,$y)=systemid2coord($sid);

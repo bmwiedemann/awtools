@@ -16,6 +16,7 @@ for my $p (qw'alliance sort omit') {
 $options{omit}=~s/[^ 0-9]//g; # sanitize user input
 $options{alliance}=~s/[^A-Za-z]//g; # sanitize user input
 
+
 print AWheader("\U$options{alliance}\E alliance info [\U$ENV{REMOTE_USER}]", 
       '<link rel="stylesheet" type="text/css" href="/code/css/alliance.css" />'
 #      border-left: 1px solid gray;  
@@ -39,8 +40,6 @@ if($options{alliance}) {
    }
 	my $n=0;
 	my $own=("\L$alli" eq $ENV{REMOTE_USER});
-   my %pointsdb;
-   tie(%pointsdb, "DB_File", "$awstandard::dbmdir/points.dbm");
 #   "SELECT * FROM `cdlive`,`player`,`alliances` WHERE
 #      alliance = aid AND player.pid=cdlive.pid AND tag LIKE ?"
    my @alliancepoints;
@@ -75,9 +74,6 @@ if($options{alliance}) {
 		my $name=playerid2name($pid);
       push(@membernames, $name);
 
-      if($pointsdb{$name}) {
-         push(@alliancepoints, $pointsdb{$name});
-      }
       my $etc=awinput::playerid2etc($pid)||"";
 		my $alink="";
 		my $planets=playerid2planetsm($pid);
@@ -102,7 +98,9 @@ if($options{alliance}) {
          if($science[1]>=25) {$bio25=1}
       }
       if($race && defined($race->[0])) {
+         my $cur=pop(@$race);
          $race->[7]=".+".(-int($race->[7]));$intel=join("",@$race)." ".$intel;
+         if(!$cur) {$intel=div({-style=>"color:gray"},$intel)}
       }
       if($bio25) {$intel=div({-style=>"color:green"},$intel)}
       my $cplanets="$planets/$$p{culture}";
@@ -128,12 +126,14 @@ if($options{alliance}) {
          sort_param_to_keys($options{sort}), \@members2 );
 
 
+   my $livealliscore=getlivealliscores($aid);
    if(@members>0) {
       # footer
+      @alliancepoints=@$livealliscore;
       if(scalar @alliancepoints == scalar @members) {
          my $counted=@members;
          if($counted>=10) {$counted-=int(($counted-5)/5)}
-         @alliancepoints = reverse sort @alliancepoints;
+#         @alliancepoints = reverse sort @alliancepoints;
 #print "$counted: @alliancepoints\n".br;
          my $sum=0;
          foreach(@alliancepoints[0..$counted-1]) { $sum+=$_ }
