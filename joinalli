@@ -8,24 +8,22 @@ use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use DBAccess2;
 use awstandard;
 use awinput;
+use awsql;
 #awstandard_init();
 awinput_init();
 
 sub dbset($$$)
 {
    my($name,$alli,$pid)=@_;
+   set_useralli($pid,$alli);
    my %db;
    awinput::opendb(O_RDWR|O_CREAT, "$awstandard::dbmdir/useralli.dbm", \%db);
    my %dbm;
    my $dbh=get_dbh;
-   require Tie::DBI;
-   tie %dbm,'Tie::DBI',$dbh,'useralli','pid',{CLOBBER=>2};
    if($alli) {
       $db{lc($name)}=$alli;
-      $dbm{$pid}={alli=>$alli};
    } else {
       delete $db{lc($name)};
-      delete $dbm{$pid};
    }
    untie %db;
 }

@@ -834,6 +834,8 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 		if(!$::options{debug}) {$relation{$name}=$newentry;}
 		else {print "<br />$name new:",$newentry;}
 		my $pid=playername2idm($name);
+      require awlogins;
+      awlogins::add_login($ENV{REMOTE_USER}, $pid, $newlogin);
 #      print STDERR "$pid @$sci\n";
       my $etc=$sci->[7]; # TODO check if sci array is modified in awstandard::addplayerir
       my $dbh=get_dbh;

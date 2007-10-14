@@ -58,10 +58,12 @@ if($param) {
       my $suf="L";
       my $flighttime="";
       if(defined $tz) { # convert to UTC
+         my $tl=AWisodatetime($altime);
          $altime-=$tz;
          $suf="UTC";
          my $t=$altime-$time;
          $flighttime=sprintf("<tr><td$align>Flight time$delim</td><td> %is = %.2fh = %i:%.2i:%.2i</td></tr>", $t, $t/3600, $t/3600, $t/60%60, $t%60);
+         $extrainfo2.="<tr><td$align>Local Arrival time</td><td>$tl</td></tr>";
       }
       $extrainfo2.="<tr><td$align>Arrival time$delim</td><td> <!--inserthere-->".AWisodatetime($altime)." $suf </td></tr>$flighttime";
    }

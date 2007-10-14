@@ -3,8 +3,10 @@
 #admin-index: viewbrownie, useralli, lookup
 #brownie: fleet/send target planet highlight
 #arrival-find: E=0..4 speed=22..26 dist=0 planet=1,2,4
+allow dropping toolsaccess bits granted by others
 use login table to take load off relations dbm
-orange-bg incomings
+move relations to mysql
+#orange-bg incomings
 green.css tests+fixes
 planet/details feed own fleet and sieging owner into tools.
 #nicer in-game IR
@@ -18,6 +20,7 @@ internal planet: buildings, PP, fractional pop
 ?findjumpy tool to look for free/unknown planets and friendly planets for attacks
 #interbeta: alliances.tag, *.alli -> CHAR(4)
 relations/system-info: recent battles
+reverse-engineer battle formulas (chance(att) + kills(def))
 playerprefs: phone, msn, email
 whocansee: add xE
 -tool to display useralli = own (soon obsolete with mysql relations DB index)

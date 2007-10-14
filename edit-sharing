@@ -1,0 +1,105 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+use DBAccess2;
+awstandard_init();
+#awinput_init();
+
+our $alli=$ENV{REMOTE_USER};
+our %bitmap=(fleets=>1, plans=>2, intel=>4, relations=>8, "online"=>16, "internaldata"=>32);
+our $readonly=0;
+
+sub listrow($$$$;$)
+{ my($a, $otag, $rbits, $rrbits, $del)=@_;
+   my $checkboxes="";
+   foreach my $name (sort keys(%bitmap)) {
+      my $n=$bitmap{$name};
+      $checkboxes.=
+         checkbox(-checked=>($rrbits & $n)!=0, -disabled=>1).
+         checkbox(-name=>$name, -checked=>($rbits & $n)!=0)." &nbsp; ";
+   }
+   print div({-class=>"grouping"},($del?a({-href=>"?action=del&p=$otag"},"del"):"")." $a $otag $rbits $rrbits".
+   start_form(-method=>"get").
+   hidden(-name=>"p", -value=>$otag).
+   $checkboxes.
+   hidden("alli").
+   ($readonly?"":submit(-name=>"action", value=>"edit")).
+   end_form).br;
+}
+sub listbits()
+{
+   return if not my $a=$alli;
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare_cached("SELECT * FROM toolsaccess WHERE tag=? AND othertag!=? ORDER BY othertag");
+   my $aref1=$dbh->selectall_arrayref($sth, {}, $a,$a);
+   $sth=$dbh->prepare_cached("SELECT * FROM toolsaccess WHERE othertag=? AND tag!=?");
+   my $href2=$dbh->selectall_hashref($sth, "tag", {}, $a,$a);
+   foreach my $ae (@$aref1) {
+      my (undef,$otag,$rbits)=@$ae;
+      my $revers=$href2->{$otag};
+      my $rrbits=0;
+      if($revers) {$rrbits=$revers->{rbits}; delete $href2->{$otag};}
+      listrow($a, $otag, $rbits, $rrbits, 1);
+   }
+   print "Entries below this line appear because someone else lets you see his data".hr;
+   while(my @a=each %$href2) {
+      # display entries left in $href2
+      listrow($a, $a[0], 0, $a[1]->{rbits});
+   }
+}
+
+our %options;
+print AWheader("Manage sharing of alliance data");
+my $apid=getauthpid();
+if(!is_admin && !is_founder($apid)) {
+   $readonly=1;
+   print "this tool is for alliance founders only".br;
+} else {
+
+if(is_admin && param("alli")) {
+   $alli=param("alli");
+}
+
+if($alli && param()) {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+#      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
+	}
+   if($options{p}){$options{p}=~tr/A-Z/a-z/;$options{p}=~s/[^a-z]//g;} # sanitize user input;
+   if($options{p} eq lc($alli)) {exit(0)}
+   my $dbh=get_dbh;
+   my $sth=$dbh->prepare("INSERT INTO `toolsaccess` VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE rbits=?");
+   my $action=param("action");
+   if($action eq "add") {
+      my $r=0;
+      $sth->execute($alli,$options{p},$r,0,$r);
+      print "added $options{p}",br;
+   } elsif($action eq "edit") {
+      my $r=0;
+      foreach my $name (keys %bitmap) {
+         $r|=$bitmap{$name}*(param($name)?1:0);
+      }
+      $sth->execute($alli,$options{p},$r,0,$r);
+      print "modified $options{p}",br;
+   } elsif($action eq "del") {
+      my $sth=$dbh->prepare("DELETE FROM `toolsaccess` WHERE tag=? AND othertag=?");
+      $sth->execute($alli,$options{p});
+      print "deleted",br;
+   }
+   
+} 
+print div({-class=>"grouping"},start_form(-name=>"form").textfield(-name=>'p', -class=>'text')." tag".br.
+      hidden("alli").
+		submit(-name=>"action", -value=>"add", -class=>'smbutton').end_form.AWfocus("form.p")).br.br;
+}
+
+
+listbits();
+print 
+   br."This tool allows to configure sharing of alliance-internal data with another alliance to allow for much improved coordination. The greyed out checkboxes show the access the other gives to you.",
+   br.span({-class=>"bmwnotice"}, "Note: self-sharing fully works now. You can give read access to fleets, plans, intel, internaldata(prod,PP,A\$,ETC) and online-status. relations and login data are shared when both sides enabled the checkbox.");
+print AWtail();
+

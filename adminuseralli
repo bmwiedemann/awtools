@@ -9,6 +9,7 @@ use Digest::MD5 "md5_hex";
 use DBAccess2;
 use awstandard;
 use awinput;
+use awsql;
 awstandard_init();
 
 print AWheader("admin");
@@ -22,19 +23,14 @@ for my $p (qw'pw user alli') {
 my $pid=playername2idm($options{user});
 if($options{user} && $pid && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3daac7e9') {
    awinput::opendb(O_RDWR|O_CREAT, "$awstandard::dbmdir/useralli.dbm", \%db);
-   my %dbm;
-   my $dbh=get_dbh;
-   require Tie::DBI;
-   tie %dbm,'Tie::DBI',$dbh,'useralli','pid',{CLOBBER=>2};
+   set_useralli($pid,$options{alli});
    if($options{alli}) {
 #      my $x=awstandard::urldecode($options{user});
       $db{$options{user}}=$options{alli};
-      $dbm{$pid}={alli=>$options{alli}};
       print "added $options{user}=$options{alli}";
    } else {
       print "$options{user} = $db{$options{user}} ... ";
       delete $db{$options{user}};
-      delete $dbm{$pid};
       print "deleted $options{user}";
    } 
    untie(%db);

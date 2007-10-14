@@ -3,7 +3,7 @@
 my %neg=(
       "+"=>"-",
       "-"=>"+");
-s!<td>([+-])([1-6])</td>!<td>$neg{$1}$2</td>!g;
+s!<td>([+-])([1-7])</td>!<td>$neg{$1}$2</td>!g;
 
 # colorize bad and non-recommended races
 my $badlimit=-25;

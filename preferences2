@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+awstandard_init();
+use DBAccess2;
+#awinput_init();
+
+our %options;
+print AWheader("AW preferences tool");
+my $name=getauthname();
+my $authpid=getauthpid();
+if(!$authpid) {
+   print "Sorry, you can only use this tool when ".a({-href=>"authawforum?uri=/cgi-bin/preferences2"},"properly authenticated");
+} else {
+   if(param()) {
+      foreach my $p (qw(p awfstyle customhtml)) {
+         $options{$p}=param($p);
+#      if(defined($options{$p})){$options{$p}=~s/[^a-zA-Z0-9]//g;} # sanitize user input;
+      }
+      if($options{p}){$options{p}=~s/[^0-9-]//g;} # sanitize user input;
+      if($options{awfstyle}){$options{awfstyle}=~s/[^a-zA-Z]//g;$options{awfstyle}=~s/^subBlack$//} # sanitize user input;
+      my $dbh=get_dbh();
+      my %h;
+      tie %h,'Tie::DBI',$dbh,'playerprefs','pid',{CLOBBER=>1};
+#      my $sth=$dbh->prepare("UPDATE `playerprefs` SET `tz` = ? , `forumstyle` = ? , customhtml = ? WHERE `pid` = ?");
+#      my $res = $sth->execute($options{p}, $options{awfstyle}, $options{customhtml}, $authpid);
+      my %data=%{$h{$authpid}||{}};
+      $data{tz}=$options{p};
+      $data{forumstyle}=$options{awfstyle};
+      $data{customhtml}=$options{customhtml};
+      $h{$authpid}=\%data;
+      print "data saved";
+   } else {
+      my $prefs=awinput::getuserprefs($authpid);
+      if($prefs) {
+         my($pid,$tz,$customhtml,$storeir,$forumstyle)=@$prefs;
+         param("p",$tz);
+         param("awfstyle",$forumstyle);
+         param("customhtml",$customhtml);
+      }
+      print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," TimeZone",br,
+         popup_menu(-name=>'awfstyle', -values=>[qw(subBlack subSilver)])," AW forum style",br,
+         textarea(-name=>'customhtml', -cols=>40, -rows=>9, -class=>'text'), " custom HTML here",br,
+         submit(-name=>"save", -class=>'smbutton'),end_form.AWfocus("form.p");
+   }
+}
+print br,"The major difference of this tool compared to preferences is that this one does not store data in cookies, but in a DB on the server. Thus changes will also apply to other machines where you log in.";
+print AWtail();
+

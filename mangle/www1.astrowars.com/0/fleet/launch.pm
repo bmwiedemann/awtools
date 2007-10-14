@@ -89,8 +89,9 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
          my $dist=($c2[0]-$c1[0])**2 + ($c2[1]-$c1[1])**2;
          push(@distlist, "disttable[$sid]=[$dist$own];\n");
       }
+      my $tz=$timezone;
       my $starttime=sprintf("%i.%.6i ;", Time::HiRes::gettimeofday());
-      s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="28" disabled></form>
+      s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="35" disabled></form>
       <script type="text/javascript">
          <!--
          @distlist;
@@ -99,6 +100,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
          sy=$c1[1];
          energy=$refe;
          racebonus=$refs;
+         tz=$tz;
          starttime=$starttime
          var startdiff = (startd.getTime()/1000) - starttime;
          window.setInterval("update()", 100);

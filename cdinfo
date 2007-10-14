@@ -5,6 +5,7 @@ use CGI ":standard";
 use DBAccess2;
 use awstandard;
 use awinput;
+use awsql;
 awstandard_init(); # for tool theming
 #awinput_init();
 
@@ -35,6 +36,19 @@ if(param()) {
       foreach(@$res) {
          print join("\t", @$_),"\n";
       }
+   } elsif($p==29) {
+      my $dbh=get_dbh;
+      my ($allimatch,$amvars)=get_alli_match2($ENV{REMOTE_USER}, 1);
+      my $sth=$dbh->prepare("
+            SELECT `fleets`.*
+            FROM `fleets`, `toolsaccess`
+            WHERE $allimatch
+         ");
+      my $res=$dbh->selectall_arrayref($sth,{},@$amvars);
+      foreach(@$res) {
+         print join("\t", @$_),"\n";
+      }
+
    } elsif($p==30) {
       my $dbh=get_dbh;
       my $tab="battlecalc";

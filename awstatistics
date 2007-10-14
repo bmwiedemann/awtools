@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+use DBAccess2;
+use sort_table;
+
+our %options;
+print AWheader("AW alliance statistics tool");
+my @os=(qw"pl sl cl tr points pop logins");
+my %os;
+for(0..$#os) {
+   $os{$_}=$os[$_];
+}
+print start_form(-name=>"form", -method=>"get"),popup_menu(-name=>'p', -class=>'text', -values=>[0..$#os], -labels=>\%os)," top 50",br,
+   submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+
+if(param()) {
+	foreach my $p (qw(p sort)) {
+		$options{$p}=param($p);
+	}
+   if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
+   if(!defined $options{sort}){$options{sort}="";}
+   my $order=$os[$options{p}];
+   if(!$order) {
+      print "error";
+   } else {
+      my $dbh=get_dbh();
+      my $data=$dbh->selectall_arrayref("
+         SELECT tag,avg(level) as pl, avg(science) as sl, avg(culture) as cl, avg(trade) as tr, avg(player.points) as points, avg(opop) as pop, avg(logins) as logins 
+         FROM `player`,alliances
+         WHERE alliance=aid
+         GROUP BY alliance
+         ORDER BY $order DESC
+         LIMIT 50");
+      my $n=0;
+      foreach my $e (@$data){
+         unshift(@$e, ++$n); # this adds index/rank counters
+      }
+      print sort_table(["n", "tag", @os],
+            [\&display_string, \&display_string, \&display_round2, \&display_round2, \&display_round2, \&display_round1, \&display_round0, \&display_round0, \&display_round0],
+            [\&sort_num, \&sort_istring, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+            sort_param_to_keys($options{sort}), $data);
+   }
+} else {
+}
+print AWtail();
+

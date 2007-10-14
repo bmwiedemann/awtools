@@ -13,15 +13,22 @@ awinput_init();
 our %options;
 print AWheader("AW edit fleet-info");
 if(param()) {
-	foreach my $p (qw(fid info)) {
+	foreach my $p (qw(fid info status)) {
 		$options{$p}=param($p);
 	}
+   if($options{status}) { $options{status} =~ s/[^0-9]//g; }
    if(defined($options{info}) && $options{fid}) { # set entry
       html_encode($options{info});
 #      $options{info}=~s/[<>]//g; # minimal sanitation # TODO
       $options{fid}=~s/[^0-9]//g;
-      my $sth=$dbh->prepare("UPDATE `fleets` SET `info` = ? WHERE `fid` = ? AND `alli` = ?");
-      my $res=$sth->execute($options{info}, $options{fid}, $ENV{REMOTE_USER});
+      my $extrasql="";
+      my @extraparams=();
+      if(defined($options{status})) {
+         $extrasql=", status=?";
+         push(@extraparams, $options{status});
+      }
+      my $sth=$dbh->prepare("UPDATE `fleets` SET `info` = ? $extrasql WHERE `fid` = ? AND `alli` = ?");
+      my $res=$sth->execute($options{info}, @extraparams, $options{fid}, $ENV{REMOTE_USER});
       if($res && $res>0) {
          print "entry $options{fid} updated".br.br;
       }
@@ -34,8 +41,19 @@ if(param()) {
       my ($sidpid,$info)=@$row[3,$#$row];
       my $sid=awinput::sidpid2sidm($sidpid);
       my $pid=awinput::sidpid2pidm($sidpid);
-      print "planet: ".a({-href=>"planet-info?id=$sid%23$pid"}, "$sid#$pid")." system: ".a({-href=>"system-info?id=$sid"}, $sid).br;
-      print start_form(-name=>"form").hidden('fid').textfield(-name=>'info', -class=>'text', -value=>$info)." fleet info".br.submit(-name=>"set", -class=>'smbutton').end_form.AWfocus("form.info");
+
+      my %status;
+      if($row->[2]&2) {
+         %status=(2=>"unhandled incoming", 3=>"move", 6=>"handled incoming");
+      } else {
+         %status=(0=>"sieging", 1=>"defending");
+      }
+      param('status', $row->[2]);
+      
+      print "planet: ".a({-href=>"planet-info?id=$sid%23$pid"}, "$sid#$pid")." system: ".a({-href=>"system-info?id=$sid"}, $sid).br,
+         start_form(-name=>"form", -method=>"post").hidden('fid').textfield(-name=>'info', -class=>'text', -value=>$info)." fleet info",br,
+         popup_menu(-name=>'status', -values=>[sort(keys(%status))], -labels=>\%status),br,
+         submit(-name=>"set", -class=>'smbutton').end_form.AWfocus("form.info");
    }
 } else {
 	print start_form(-method=>'get', -name=>"form"),textfield(-name=>'fid', -class=>'text')," fleet id",br,

@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+my $max=4;
+my $totalpix=100;
+
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+our %options;
+print AWheader("AW host status tool");
+
+my $loadstr=file_content("/proc/loadavg");
+#print $load;
+my @a=split(/ /,$loadstr);
+print "averaged system load over 1/5/15 minutes",br;
+foreach my $value(@a[0..2]) {
+   my $p1=int($totalpix*($value/$max));
+   my $p2=$totalpix-$p1;
+   print qq'<img src="/images/dot.gif" height="10" width="$p1"><img src="/images/leer.gif" height="10" width="$p2"> $value',br;
+}
+
+print AWtail();
+

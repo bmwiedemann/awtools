@@ -53,8 +53,9 @@ if(m%Race Mod Attack</td>(.*)Race Mod Defense</td>(.*)Chance to win</td><td cols
 }
 #$_.=$p;
 
-my @kill;
+#my @kill;
 my @killr;
+my @oships;
 foreach my $s (qw(des destroyer cru cruiser bat battleship sta)) {
    my($left)=m!input type="text" name="$s" size="5" value="\d+" class=text></td><td>([0-9.]*)</td>!;
    my $p2=$pmap{$s};
@@ -64,7 +65,12 @@ foreach my $s (qw(des destroyer cru cruiser bat battleship sta)) {
       $n=$&-1;
    }
    my $kill=$values{$p2}-$left;
-   if(!$kill[$n] || $kill>$kill[$n]) { $kill[$n]=$kill; $killr[$n]=$kill/$values{$p2}}
+   if(!$oships[$n] || $values{$p2}>$oships[$n]) {
+      $oships[$n]=$values{$p2};
+#   if(!$kill[$n] || $kill>$kill[$n]) { 
+#      $kill[$n]=$kill;
+      $killr[$n]=$kill/$values{$p2}
+   }
 }
 $values{kill1}=$killr[0];
 $values{kill2}=$killr[1];
@@ -78,8 +84,8 @@ while((my @a=each(%values))) {
 }
 #$_.="@str @param";
 if($killr[0] && $killr[1]) {
-   my $sth=$dbh->prepare("INSERT IGNORE INTO `battlecalc` SET ".join(", ",@str));
-   $sth->execute(@param);
+   my $sth=$dbh->prepare("REPLACE INTO `battlecalc` SET ".join(", ",@str).", modified_at=?");
+   $sth->execute(@param, time());
 }
 
 # bugfix for AR:

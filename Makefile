@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold9
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html alliance{,2} allirelations arrival arrivalmany authaw authawforum awlinker awtoolstatistics joinalli cdinfo distsqr edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
+tools=index.html alliance{,2} allirelations arrival arrivalmany authaw authawforum awlinker awstatistics awtoolstatistics joinalli cdinfo distsqr edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -122,17 +122,17 @@ chpasswd:
 unaccess:
 	mkdir -p old/obsolete
 	./dbm-del.pl base/db2/allowedalli.dbm $a
-	mv base/db2/$a-relation.dbm base/db2/$a-planets.dbm old/obsolete
+	mv base/db2/$a-relation.dbm old/obsolete
 	./removealli.pl $a
 	vim +/^$a: base/.htpasswd
 
 access:
 	-cp -ia empty.dbm base/db2/$a-relation.dbm
-	-cp -ia empty.dbm base/db2/$a-planets.dbm
-	touch base/db2/$a-planets.dbm.lock base/db2/$a-relation.dbm.lock
+#	-cp -ia empty.dbm base/db2/$a-planets.dbm
+	touch base/db2/$a-relation.dbm.lock
 #	./dbm-add.pl base/db2/$a-relation.dbm af "7 af alliance relation"
 #	./dbm-add.pl base/db2/$a-relation.dbm rats "7 rats alliance relation"
-	./dbm-add.pl base/db2/$a-relation.dbm $a "9 $a alliance relation"
+	./dbm-add.pl base/db2/$a-relation.dbm $a "9 $a own alliance relation"
 	./dbm-add.pl base/db2/allowedalli.dbm $a ${round}
 	-./runsql.pl "INSERT INTO toolsaccess VALUES ('$a','$a',255,255)"
 #	rm -rf large-$a ;	mkdir -p large-$a
@@ -160,4 +160,8 @@ tgz:
 	find -name CVS -o -name ".*.swp" | xargs rm -rf &&\
 	rm -rf nph-brownie.cgi holes2.pl mangle/special/secure.pm brownie/old preproc/www1.astrowars.com/zq*
 	tar czf html/bmw-awtools-${mydate}.tar.gz bmw-awtools
+
+
+relationspng:
+	convert -density 70 html/round/alliancerelation-$(mydate).svg html/round/alliancerelation-$(mydate).png
 

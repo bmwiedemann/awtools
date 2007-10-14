@@ -72,7 +72,8 @@ CREATE TABLE `toolsaccess` (
 `tag` CHAR(4) NOT NULL COMMENT 'the party that grants access',
 `othertag` CHAR(4) NOT NULL COMMENT 'the party that is allowed to read/write',
 `rbits` TINYINT UNSIGNED NOT NULL COMMENT '1 for fleets, 2 for plans, 4 for IRs, 8 for relations, 16 for online allies, 32 for maps - reading permission',
-`wbits` TINYINT UNSIGNED NOT NULL COMMENT '1 for fleets, 2 for plans, 4 for IRs, 8 for relations - writing permission',
+`wbits` TINYINT UNSIGNED NOT NULL COMMENT 'as rbits - mostly unused yet',
+`rmask` TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '255',
 UNIQUE ( `tag`,`othertag` ),
 UNIQUE ( `othertag`,`tag` )
 );!);

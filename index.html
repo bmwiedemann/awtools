@@ -7,7 +7,7 @@ awinput_init(1);
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout antispy antispy2 arrival arrivalmany authaw authawforum cdinfo distsqr edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences2 ranking sim tactical tactical-large tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
+foreach(qw(logout antispy antispy2 arrival arrivalmany authaw authawforum awstatistics cdinfo distsqr edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences2 ranking sim tactical tactical-large tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 
@@ -51,6 +51,7 @@ if(is_admin()) {
  a({class=>"othertool", href=>"http://lefois.de/aw/tool/index.php"}, "Lefois"), " ",
  a({class=>"othertool", href=>"http://azgharde.free.fr/tools/index.php"},"azgharde")," ",
  a({class=>"othertool", href=>"http://aw.neron92.info/"}, "neron92"), " ",
+ a({class=>"othertool", href=>"http://www.astrowars-tools.com/"}, "Rasta31"), " ",
  a({class=>"othertool", href=>"http://filix.exx.pl/aw/"}, "Filix"), " ",
  #a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
  "outdated: ",
