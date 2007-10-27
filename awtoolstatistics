@@ -52,6 +52,7 @@ print "extended brownie alliances: $numallis\n";
 print "<h2>alliance usage</h2>";
 my $n=0;
 foreach my $row (@{$allis}[0..39]) {
+   next if not $row;
    my($name,$num)=@$row;
    my $color="";
    if(is_allowedalli($name) || $remap_alli{lc($name)}) {

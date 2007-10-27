@@ -81,7 +81,9 @@ print p('the first line is recommended to be
 @import url(http://aw.lsmod.de/code/css/main.css);<br/>
 
 or at least draw the basic extensions from
-@import url(http://aw.lsmod.de/code/css/bmwaw.css);');
+@import url(http://aw.lsmod.de/code/css/bmwaw.css);
+<p>
+example CSS files can be found at <a href="http://aw.lsmod.de/code/css/user/">http://aw.lsmod.de/code/css/user/</a>');
 
 print (AWtail);
 

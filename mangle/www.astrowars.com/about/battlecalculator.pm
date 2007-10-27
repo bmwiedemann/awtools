@@ -37,7 +37,7 @@ foreach my $e ($cgi->param()) {
 #   $_.=" $p2=".$cgi->param($e);
    $values{$p2}=$cgi->param($e);
 }
-if(m%Race Mod Attack</td>(.*)Race Mod Defense</td>(.*)Chance to win</td><td colspan="2">([0-9.]+)%s) {
+if(m%Race Mod Attack</td>(.*)Race Mod Defense</td>(.*)Chance to win</td><td colspan="2">([0-9.E-]+)%s) {
    my ($att,$def,$chance)=($1,$2,$3);
    my @att=$att=~m!^(.{0,10})</td>!gm;
    my @def=$def=~m!^(.{0,10})</td>!gm;
@@ -80,10 +80,11 @@ my @str;
 my @param;
 while((my @a=each(%values))) {
    push(@str,"$a[0]=?");
+   $a[1]=~s/[^0-9.E+-]//g;
    push(@param, $a[1]);
 }
 #$_.="@str @param";
-if($killr[0] && $killr[1]) {
+if($killr[0] && $killr[1] && $values{def1} && $values{att1}) {
    my $sth=$dbh->prepare("REPLACE INTO `battlecalc` SET ".join(", ",@str).", modified_at=?");
    $sth->execute(@param, time());
 }

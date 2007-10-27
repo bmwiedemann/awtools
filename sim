@@ -19,17 +19,18 @@ foreach(qw(turns print tactic pop pp cul sci social trades initialp maxbuilding 
 foreach(qw(trader startuplab)){
    if(param($_)) {push(@params, "--$_");}
 }
-if(@params && param("turns")<=9999) {
+if(@params && param("turns")<=14999) {
 	print "simulating...".br."\n<pre>";
 	print `./awsim.pl @params`;# or print "failed executing\n";
 	print "</pre>\n";
 } else {
 	my $s=5;
-	my @default=(7300,7300,6);
+   my $t=9500;
+	my @default=($t,$t/4,6);
 #	my @default=(400,40,3);
 	print start_form(-method=>'get', -name=>"form"), 
    i("simulation options"),br,
-	textfield(-name=>'turns', -value=>$default[0], -size=>$s, -class=>'text'), " how many turns (of 15 min) to simulate", br,
+	textfield(-name=>'turns', -value=>$default[0], -size=>$s, -class=>'text'), " how many turns (of 15 min) to simulate (old rounds were ~7300 long)", br,
 	textfield(-name=>'print', -value=>$default[1], -size=>$s, -class=>'text'), " print only each n turns", br,
 	textfield(-name=>'initialp', -value=>72, -size=>$s, -class=>'text'), " starting time in hours (initial starting points depend on this (default: 72h=3d=144PP))", br,
 #textfield(-name=>'tactic', -value=>$default[2], -size=>$s, -class=>'text'), " use tactic (1..6)", 

@@ -42,22 +42,29 @@ open(IN, "< input") or die $!;
 
 while(<IN>) {
 	if(/science/) {
-		for my $l(1..35) {
+		for my $l(1..40) {
 			$sci[$l]=<IN>;
 		}
 	}
 	if(/population/) {
-		for my $l(2..28) {
+		for my $l(2..30) {
 			$pop[$l]=<IN>;
 		}
 	}
 	if(/culture/) {
-		for my $l(1..29) {
+		for my $l(1..32) {
 			$_=<IN>;
 			/\d+\s+(\d+)/;
 			$cul[$l]=$1;
 		}
 	}
+}
+
+for my $n (30..60) {
+   $sci[$n]=(((0.00604082*$n +0.138947)*$n+8.46566)*$n+17.3427)*$n+4.40132;
+}
+for my $n (2..100) {
+   $pop[$n]=(9*($n-2) + 27)*($n-2) + 21;
 }
 
 $sci[0]=0;
@@ -142,11 +149,11 @@ sub update()
   my $tr=$player{tas}*gettradebonus($turn,$taplanets);
   $player{tr}=$tr;
   foreach(qw(pop pp sci cul)) {
-    $bonus{$_}=$player{"race$_"}+$tr;
+    $bonus{$_}=$player{"race$_"}*(1+$tr);
   }
   if($player{artifact}=~/(.*)(\d)/) {
     my $whichbonus=$artifactbonus{$1};
-    $bonus{$whichbonus}+=$2*0.1; # 10 20 or 30%
+    $bonus{$whichbonus}*=(1+$2*0.1); # 10 20 or 30%
   }
   for my $planet(@planet) {
     my $pop=int($$planet{pop});
@@ -201,9 +208,10 @@ sub printstate()
 }
 sub finish(){
   my $sci=0;
-  my $pkt=int($player{cul});
+  my $pkt=0;#int($player{cul});
   foreach my $p (@planet) {
-    $pkt+=$$p{pop}-0.5;
+     next if($$p{pop}<10.5);
+    $pkt+=$$p{pop}-0.5-10;
     #$pkt+=int($$p{pop});
   }
   while(1){

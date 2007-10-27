@@ -2,7 +2,7 @@
 use strict;
 use DBAccess;
 use awstandard;
-my $oldname="gold8";
+my $oldname="gold10";
 my $newname=$oldname;
 $newname=~s/(\d+)$/1+$1/e;
 my $newround=1;
@@ -20,7 +20,7 @@ $dbh->do("UPDATE playerextra SET premium=NULL");
 $dbh->do("UPDATE planets SET ownerid=0");
 $dbh->do("UPDATE intelreport SET racecurrent=0");
 $dbh->do("UPDATE intelreport SET biology=NULL, economy=NULL, energy=NULL, mathematics=NULL, physics=NULL, social=NULL");
-foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhistory planetinfos player useralli internalintel)) {
+foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhistory planetinfos player useralli internalintel logins)) {
    $dbh->do("TRUNCATE TABLE `$name`");
 }
 
@@ -35,6 +35,7 @@ system("for f in $awstandard::dbmdir/*relation.dbm ; do ./clear.pl \$f ; done");
 
 awstandard::set_file_content("alltrades.csv", "id1\tid2\n");
 awstandard::set_file_content("player.csv", "rank\tpoints\tid\tscience\tculture\tlevel\thome_id\tlogins\tfrom\tjoined\talliance\tname\ttrade\n");
+awstandard::set_file_content("battles.csv", "id\tcv_def\tcv_att\tatt_id\tdef_id\twin_id\tplanet_id\tsystem_id\ttime\n");
 awstandard::set_file_content("systemexportsecret", rand(1000000000000000)."\n");
 
 system("make importcsv");

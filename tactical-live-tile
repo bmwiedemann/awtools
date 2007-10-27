@@ -18,6 +18,7 @@ if(0) {
 } else {
    my $image;
    my $ret=require "livemap/draw.pm";
+   if(!$o) {$o="1,2,3"}
    if(!$ret) {
       $image=`cat $awstandard::htmldir/images/awmaperror.png`;
    } else {

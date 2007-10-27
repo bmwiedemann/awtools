@@ -3,7 +3,7 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-round=gold9
+round=gold10
 allies=$(shell ./get_allowed_alliances.pl)
 tools=index.html alliance{,2} allirelations arrival arrivalmany authaw authawforum awlinker awstatistics awtoolstatistics joinalli cdinfo distsqr edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
 #allies=
@@ -134,7 +134,7 @@ access:
 #	./dbm-add.pl base/db2/$a-relation.dbm rats "7 rats alliance relation"
 	./dbm-add.pl base/db2/$a-relation.dbm $a "9 $a own alliance relation"
 	./dbm-add.pl base/db2/allowedalli.dbm $a ${round}
-	-./runsql.pl "INSERT INTO toolsaccess VALUES ('$a','$a',255,255)"
+	-./runsql.pl "INSERT INTO toolsaccess VALUES ('$a','$a',255,255,255)"
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}
 	/usr/sbin/htpasswd2 base/.htpasswd $a

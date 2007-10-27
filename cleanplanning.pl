@@ -4,7 +4,8 @@ use strict;
 use Time::Local;
 use awstandard;
 use awinput;
-awinput_init();
+exit 0;
+#awinput_init();
 
 my $cleantime=7; # hours
 my $ecleantime=24*5; # hours
