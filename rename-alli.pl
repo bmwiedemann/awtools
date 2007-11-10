@@ -10,7 +10,7 @@ use DBAccess2;
 my $oldtag=shift;
 my $newtag=shift;
 
-$oldtag=~s/[^a-z]//g;
+#$oldtag=~s/[^a-z]//g;
 $newtag=~s/[^a-z]//g;
 if(!$oldtag || !$newtag) {
    print STDERR "usage: $0 oldtag newtag\n";
@@ -24,20 +24,13 @@ foreach my $n (qw(fleets intelreport planetinfos logins plhistory relations)) {
 }
 
 $dbh->do("DELETE FROM `toolsaccess` WHERE tag='$oldtag' AND othertag='$oldtag'");
-$dbh->do("INSERT INTO `toolsaccess` VALUES('$newtag','$newtag',255,255)");
+$dbh->do("INSERT INTO `toolsaccess` VALUES('$newtag','$newtag',255,255,255)");
 
 
-foreach(qw(relation.dbm relation.dbm.lock planets.dbm planets.dbm.lock)) {
+#foreach(qw(relation.dbm relation.dbm.lock planets.dbm planets.dbm.lock)) {
+foreach(qw(relation.dbm relation.dbm.lock)) {
    rename("$awstandard::dbmdir/$oldtag-$_", "$awstandard::dbmdir/$newtag-$_");
    print "mv $awstandard::dbmdir/$oldtag-$_ $awstandard::dbmdir/$newtag-$_\n";
-}
-
-if(0) {
-   my %aa;
-   awinput::opendb(O_RDWR, "$awstandard::dbmdir/allowedalli.dbm", \%aa);
-   $aa{$newtag}=$aa{$oldtag};
-   delete $aa{$oldtag};
-   untie %aa;
 }
 
 #rename...
