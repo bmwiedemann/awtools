@@ -46,7 +46,7 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
    if(! defined($title)) { 
 		my @race;
       %::options=%$options;
-		if($$options{name}) { require feed::plain_race; feed::feed_plain_race(); }
+		if(1||$$options{name}) { require feed::plain_race; feed::feed_plain_race(); }
 		print "no title found\n";
       return -1;
 	}
