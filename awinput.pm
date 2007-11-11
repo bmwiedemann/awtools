@@ -33,7 +33,7 @@ use awstandard;
 use awsql;
 my $head="Content-type: text/plain\015\012";
 
-my %adminlist=(greenbird=>1);
+my %adminlist=(greenbird=>1, cutebird=>1);
 
 sub get_relation_dbname($)
 { my($alli)=@_;
@@ -58,6 +58,7 @@ sub awinput_init(;$) { my($nolock)=@_;
       my $a=$alli;
       if($alli ne "guest") {
          $a=get_relation_dbname($alli);
+         if(!$a) {$a="guest"}
       }
 #      if($remap_relations{$alli}) {
 #         $a=$remap_relations{$alli};
@@ -191,6 +192,9 @@ sub getrelation($;$) { my($name)=@_;
 	}
 	$realrel=$effrel unless defined $realrel;
 	return ($effrel,$ally,$info,$realrel,1,$lname);
+}
+sub playerid2relation($) { my($pid)=@_;
+   return getrelation(playerid2namem($pid));
 }
 sub setrelation($%) { my($id,$options)=@_;
 	untie %relation;
