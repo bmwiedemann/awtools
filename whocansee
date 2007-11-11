@@ -5,8 +5,11 @@ use CGI ":standard";
 
 use awstandard;
 use awinput;
+use awsql;
+use arrival;
 use sort_table;
-awinput_init();
+use DBAccess;
+awinput_init(1);
 
 if(param) {
 my $alli=$ENV{REMOTE_USER};
@@ -23,33 +26,48 @@ if(!defined($sysxy[0])) {
    exit(0); # modperl OK
 }
 
-open(IN, "whocansee.pl $sysid $alli $wantbio25 |") or die $!;
-my @data=<IN>;
-close(IN);
-foreach(@data) {chop; $_=[split(/\t/,$_)]}
+
+
+my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},4);
+my $sql="SELECT player.pid,starmap.x,starmap.y,biology,speed,energy FROM toolsaccess,starmap,player LEFT JOIN intelreport ON intelreport.pid=player.pid
+WHERE player.home_id=starmap.sid 
+AND (
+	(starmap.x=? AND starmap.y=?) 
+	OR (ABS(starmap.x-?)<=biology/2 AND ABS(starmap.y-?)<=biology/2 AND racecurrent>0) 
+	OR (?>0 AND biology>=25 AND racecurrent>0)
+) AND $allimatch  ORDER BY `modified_at` DESC";
+my $sth=$dbh->prepare($sql);
+my $data=$dbh->selectall_arrayref($sth, {}, @sysxy,@sysxy, $wantbio25||0, @$amvars);
 
 print AWheader("Who can see $sysid [\U$alli]"),
       "system ".a({-href=>"system-info?id=$sysid"},$sysid),br;
 #      " system ".a({-href=>"system-info?id=$sysid"},$sysid);
+
+#print "$sql<br>".scalar(@$data)." entries<br>";
+#foreach my $row(@$data) { print "@$row\n<br>"; }
+
+
 $wantbio25=!$wantbio25;
 print a({-href=>"?sid=$sysid&bio25=$wantbio25"},($wantbio25?"in":"ex")."clude bio25 players").br;
 
 
 my @data2;
-foreach(@data) {
-	my($x,$y,$ename,$epid,$esl,$ebio,$rel)=@$_;
+foreach my $row (@$data) {
+	my($epid,$x,$y,$ebio,$speed,$energy)=@$row;
+	my($rel)=awinput::playerid2relation($epid);
+	my $xe=arrival::effectiveenergy($speed,$energy);
    my $dist=sprintf("%.2f", sqrt(($x-$sysxy[0])**2 + ($y-$sysxy[1])**2));
    $rel||=4;
    my $etc=awinput::playerid2etc($epid);
    my $p=$player{$epid};
    my $planets=playerid2planetsm($epid);
    my $needplanets=$$p{culture}-$planets;
-   push(@data2, [$epid, $x, $y, $ebio, $dist, $rel, $needplanets, $etc]);
+   push(@data2, [$epid, $x, $y, $ebio, $dist, $rel, $needplanets, $etc, $xe]);
 }
  
-print sort_table([qw(who x y bio dist relation need ETC)],
-         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_relation, \&display_needplanets, \&display_etc],
-         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+print sort_table([qw(who x y bio dist relation need ETC xE)],
+         [\&display_pid, \&display_string, \&display_string, \&display_string, \&display_string, \&display_relation, \&display_needplanets, \&display_etc, \&display_round1],
+         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@data2);
 
 } else {
