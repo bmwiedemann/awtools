@@ -29,8 +29,9 @@ if(!defined($sysxy[0])) {
 
 
 my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},4);
-my $sql="SELECT player.pid,starmap.x,starmap.y,biology,speed,energy FROM toolsaccess,starmap,player LEFT JOIN (
-   SELECT * FROM intelreport
+my $sql="SELECT player.pid,starmap.x,starmap.y,biology,speed,energy FROM starmap,player JOIN (
+   SELECT intelreport.* FROM intelreport,toolsaccess
+	WHERE $allimatch
    ORDER BY `modified_at` DESC
 ) AS ir ON ir.pid=player.pid
 WHERE player.home_id=starmap.sid 
@@ -38,11 +39,11 @@ AND (
 	(starmap.x=? AND starmap.y=?) 
 	OR (ABS(starmap.x-?)<=biology/2 AND ABS(starmap.y-?)<=biology/2 AND racecurrent>0) 
 	OR (?>0 AND biology>=25 AND racecurrent>0)
-) AND $allimatch
+)
 GROUP BY player.pid
 ";
 my $sth=$dbh->prepare_cached($sql);
-my $data=$dbh->selectall_arrayref($sth, {}, @sysxy,@sysxy, $wantbio25||0, @$amvars);
+my $data=$dbh->selectall_arrayref($sth, {}, @$amvars, @sysxy,@sysxy, $wantbio25||0 );
 
 print AWheader("Who can see $sysid [\U$alli]"),
       "system ".a({-href=>"system-info?id=$sysid"},$sysid),br;
