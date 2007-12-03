@@ -18,6 +18,7 @@ my %specialname=qw(
       greenbird 1
       pentabarf 1
       Banana9977 1
+      cutebird 1
 );
 my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
 

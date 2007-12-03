@@ -11,8 +11,6 @@ use vars qw(@ISA @EXPORT);
 
 our (%read_access);
 
-#tie(%allowedalli, "DB_File", "$awstandard::dbmdir/allowedalli.dbm", O_RDONLY, 0, $DB_HASH);
-
 @ISA = qw(Exporter);
 @EXPORT = qw(%read_access %remap_alli
       &getallowedallis &is_allowedalli

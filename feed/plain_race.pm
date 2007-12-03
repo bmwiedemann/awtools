@@ -30,7 +30,7 @@ sub feed_plain_race() {
 
 # for plain race feeding we expect a name right at the beginning
 if(1 || $::options{name}=~m/greenbird/i) {
-   if(m/^\s*(\w*)\s/s && playername2id($1)) { $::options{name}=$1 }
+   if(m/^\s*(\w+)\s/s && playername2idm($1)) { $::options{name}=$1 }
    else {return 1}
 }
 my $racere="";
@@ -52,7 +52,7 @@ if(@science=/$sciencere/) {
 	print "science: @science<br>\n";
 }
 if(@race || @science) {
-	if(!playername2id($name)) {print "player $name not found<br>\n"}
+	if(!playername2idm($name)) {print "player $name not found<br>\n"}
    else { dbplayeriradd($name, \@science, \@race); }
 }
 }

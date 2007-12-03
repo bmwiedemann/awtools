@@ -26,7 +26,7 @@ my $alli=$ENV{REMOTE_USER};
 print AWheader("fighter listing [\U$alli]");
 
 my $dbh=get_dbh;
-my $sth=$dbh->prepare("SELECT pid, SUM( cv ) , SUM( xcv ), MAX( cv )
+my $sth=$dbh->prepare("SELECT pid, SUM( cv ) , SUM( xcv ), MAX( cv ), opop
       FROM `alliances` , player, fleets
       WHERE alliance = aid
       AND owner = pid
@@ -39,7 +39,7 @@ my $fleets=$dbh->selectall_arrayref($sth, {}, $alli, $alli);
 
 my @data;
 foreach my $row (@$fleets) {
-   my($pid,$sumcv,$sumxcv,$maxcv)=@$row;
+   my($pid,$sumcv,$sumxcv,$maxcv,$opop)=@$row;
    my $name=playerid2name($pid);
    my($race,$sci)=playerid2ir($pid);
 #   my @erel=getrelation($name);
@@ -53,24 +53,24 @@ foreach my $row (@$fleets) {
 #   print "@prod @race @sci".br;
    push(@data, [
          $pid, $sumcv, $sumxcv, $maxcv, 
-         @{$prod}[0..2,5,6], $player{$pid}{level},
+         @{$prod}[0..2,5,6], $player{$pid}{level}, $player{$pid}{culture}, $opop,
          arrival::effectiveenergy($race->[4], $sci->[3]), @{$sci}[3,5,4],
          @{$race}[4..6]]);
 }
 
 print sort_table([qw(name CV xCV biggestCV 
          prod/d sci/d cul/d
-         A$ PP PL 
+         A$ PP PL CL pop
          xE E P M 
          S A D)],
       [\&display_pid, \&display_string, \&display_string, \&display_string, 
       \&display_round0, \&display_round0, \&display_round0,
-      \&display_round0, \&display_round0, \&display_string,
+      \&display_round0, \&display_round0, \&display_string, \&display_string, \&display_string,
       \&display_round0, \&display_string, \&display_string, \&display_string, 
       \&display_string, \&display_string, \&display_string],
       [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, 
       \&sort_num, \&sort_num, \&sort_num,
-      \&sort_num, \&sort_num, \&sort_num,
+      \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num,
       \&sort_num, \&sort_num, \&sort_num, \&sort_num, 
       \&sort_num, \&sort_num, \&sort_num],
       sort_param_to_keys($options{sort}), \@data);

@@ -27,10 +27,10 @@ foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhi
 $dbh->do("DELETE  FROM `toolsaccess` WHERE `rbits` != 255 AND tag != ''");
 
 system("make cleanmap2");
-system("cat empty.dbm > $awstandard::dbmdir/useralli.dbm");
-system("cat empty.dbm > $awstandard::dbmdir/points.dbm");
+#system("cat empty.dbm > $awstandard::dbmdir/useralli.dbm");
+#system("cat empty.dbm > $awstandard::dbmdir/points.dbm");
 system("perl -i.bak -pe 's/(round=.?)$oldname/\$1$newname/' Makefile");
-system("for f in $awstandard::dbmdir/*planets.dbm ; do cat empty.dbm > \$f ; done");
+#system("for f in $awstandard::dbmdir/*planets.dbm ; do cat empty.dbm > \$f ; done");
 system("for f in $awstandard::dbmdir/*relation.dbm ; do ./clear.pl \$f ; done");
 
 awstandard::set_file_content("alltrades.csv", "id1\tid2\n");

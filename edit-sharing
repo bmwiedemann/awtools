@@ -12,16 +12,19 @@ our $alli=$ENV{REMOTE_USER};
 our %bitmap=(fleets=>1, plans=>2, intel=>4, relations=>8, "online"=>16, "internaldata"=>32);
 our $readonly=0;
 
-sub listrow($$$$;$)
-{ my($a, $otag, $rbits, $rrbits, $del)=@_;
+sub listrow($$$$;$$)
+{ my($a, $otag, $rbits, $rrbits, $del, $mask)=@_;
    my $checkboxes="";
+   $mask+=0;
+   $rrbits+=0;
+   $rbits+=0;
    foreach my $name (sort keys(%bitmap)) {
       my $n=$bitmap{$name};
       $checkboxes.=
-         checkbox(-checked=>($rrbits & $n)!=0, -disabled=>1).
-         checkbox(-name=>$name, -checked=>($rbits & $n)!=0)." &nbsp; ";
+         checkbox(-name=>"mask$name", -label=>"", -checked=>(($rrbits & $mask & $n)!=0), (($rrbits & $n)?():(-disabled=>1) )).
+         checkbox(-name=>$name, -checked=>($rbits & $n)!=0)." &nbsp;&nbsp; ";
    }
-   print div({-class=>"grouping"},($del?a({-href=>"?action=del&p=$otag"},"del"):"")." $a $otag $rbits $rrbits".
+   print div({-class=>"grouping"},($del?a({-href=>"?action=del&p=$otag"},"del"):"")." $a $otag $rbits $rrbits $mask".
    start_form(-method=>"get").
    hidden(-name=>"p", -value=>$otag).
    $checkboxes.
@@ -38,16 +41,17 @@ sub listbits()
    $sth=$dbh->prepare_cached("SELECT * FROM toolsaccess WHERE othertag=? AND tag!=?");
    my $href2=$dbh->selectall_hashref($sth, "tag", {}, $a,$a);
    foreach my $ae (@$aref1) {
-      my (undef,$otag,$rbits)=@$ae;
+      my (undef,$otag,$rbits,$wbits,$rmask)=@$ae;
       my $revers=$href2->{$otag};
       my $rrbits=0;
-      if($revers) {$rrbits=$revers->{rbits}; delete $href2->{$otag};}
-      listrow($a, $otag, $rbits, $rrbits, 1);
+      my $rrmask=255;
+      if($revers) {$rrbits=$revers->{rbits};  $rrmask=$revers->{rmask}; delete $href2->{$otag};}
+      listrow($a, $otag, $rbits, $rrbits, 1, $rrmask);
    }
    print "Entries below this line appear because someone else lets you see his data".hr;
    while(my @a=each %$href2) {
       # display entries left in $href2
-      listrow($a, $a[0], 0, $a[1]->{rbits});
+      listrow($a, $a[0], 0, $a[1]->{rbits}, 0, $a[1]->{rmask});
    }
 }
 
@@ -72,6 +76,7 @@ if($alli && param()) {
    if($options{p} && $options{p} eq lc($alli)) {exit(0)}
    my $dbh=get_dbh;
    my $sth=$dbh->prepare("INSERT INTO `toolsaccess` VALUES (?,?,?,?,255) ON DUPLICATE KEY UPDATE rbits=?");
+   my $sth2=$dbh->prepare("UPDATE `toolsaccess` SET rmask=? WHERE tag=? AND othertag=?");
    my $action=param("action")||"";
    if($action eq "add") {
       my $r=0;
@@ -83,6 +88,18 @@ if($alli && param()) {
          $r|=$bitmap{$name}*(param($name)?1:0);
       }
       $sth->execute($alli,$options{p},$r,0,$r);
+
+      # set masking out bits
+      my $newmask=255;
+      my (undef,undef,$rbits,undef,$rmask)=get_one_row("SELECT * FROM toolsaccess WHERE tag=? AND othertag=?",[$options{p}, $alli]);
+      foreach my $name (keys %bitmap) {
+         my $bit=(param("mask".$name)?1:0);
+         next if ($bitmap{$name} & $rbits)==0 or $bit;
+         $newmask&=~$bitmap{$name};
+#         print " $name = $bit  $newmask ";
+      }
+      $sth2->execute($newmask, $options{p}, $alli);
+      
       print "modified $options{p}",br;
    } elsif($action eq "del") {
       my $sth=$dbh->prepare("DELETE FROM `toolsaccess` WHERE tag=? AND othertag=?");

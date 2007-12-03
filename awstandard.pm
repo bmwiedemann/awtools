@@ -30,7 +30,7 @@ our $codedir="$basedir/inc";
 our $htmldir="$basedir/html";
 our $cssdir="$basedir/css";
 our $allidir="$basedir/alli";
-our $interbeta=1;
+our $interbeta=0;
 our $style;
 our $timezone;
 our $updatetime15=16*60;

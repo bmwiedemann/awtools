@@ -48,6 +48,10 @@ if(m!>Points: (\d+)</td><td>(\d+)! && $opid) {
    $opid+=0;
    my @a=(m%<a href=/about/playerprofile\.php\?id=(\d+)>[^<]+</a><br>%g);
    awinput::add_trades($opid,\@a);
+
+   if(m!>Trade Revenue</td><td bgcolor="?#202020"?>(\d+)%</td>!) {
+      $dbh->do("REPLACE INTO `tradelive` VALUES ($opid,$1)");
+   }
 }
 
 1;

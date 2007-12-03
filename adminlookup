@@ -11,7 +11,7 @@ our %options;
 print AWheader("AW lookup tool");
 if(!is_admin()) {
    print "sorry, this tool is admin-only.";
-   exit(0);
+   exit(0); # awinput OK
 }
 if(param()) {
 	foreach my $p (qw(p a)) {

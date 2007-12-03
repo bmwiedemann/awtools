@@ -16,16 +16,6 @@ sub dbset($$$)
 {
    my($name,$alli,$pid)=@_;
    set_useralli($pid,$alli);
-   my %db;
-   awinput::opendb(O_RDWR|O_CREAT, "$awstandard::dbmdir/useralli.dbm", \%db);
-   my %dbm;
-   my $dbh=get_dbh;
-   if($alli) {
-      $db{lc($name)}=$alli;
-   } else {
-      delete $db{lc($name)};
-   }
-   untie %db;
 }
 
 

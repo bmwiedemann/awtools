@@ -1,14 +1,22 @@
+#auto daily alliancerelations.png
+#eco check tool
+#alltrades live update
+#public updated trade bonus table
+man/FAQ: it uses known IRs or worst case (att=+4, phys=SL) to calc xCV. you can see the original fleet numbers by pointing your mouse over the line.
+parse every page into JSON-exported structure (and possibly use that for feeding DBs)
+
 #admin: lookup ip->hostname+username
 #admin: lookup name->ips
 #admin-index: viewbrownie, useralli, lookup
 #brownie: fleet/send target planet highlight
 #arrival-find: E=0..4 speed=22..26 dist=0 planet=1,2,4
-allow dropping toolsaccess bits granted by others
-use login table to take load off relations dbm
+#allow dropping toolsaccess bits granted by others (set mask)
+use allirelations table (in addition to prev method)
+use login table to take load off relations dbm (missing/broken data?)
 move relations to mysql
 #orange-bg incomings
 green.css tests+fixes
-planet/details feed own fleet and sieging owner into tools.
+?planet/details feed own fleet and sieging owner into tools.
 #nicer in-game IR
 #IR=race+science: pid, alli, modified_at, race, sci
 #brownie:planets/buildings: spend-all only with PP>=150
@@ -20,13 +28,14 @@ internal planet: buildings, PP, fractional pop
 ?findjumpy tool to look for free/unknown planets and friendly planets for attacks
 #interbeta: alliances.tag, *.alli -> CHAR(4)
 relations/system-info: recent battles
-reverse-engineer battle formulas (chance(att) + kills(def))
+reverse-engineer battle formulas (chance(att)) - use in whocanintercept
 playerprefs: phone, msn, email
-whocansee: add xE
+#whocansee: rewrite to work without whocansee.pl , add xE
+whocansee: in cases where both XR and EN have an intelreport... I think it would be best to just display the newer one
 -tool to display useralli = own (soon obsolete with mysql relations DB index)
-XML-export of systems, players, fleets for integration into phpBB2 and others
+#XML-export of systems, players, fleets for integration into phpBB2 and others
 fleet estimator (using attacking CV, killed CV, signed TAs, estimated PP/h)
-mangle/All_Incomings: könnte hinter dem Namen des Betroffenden ein link zu seiner Alli ansicht liegen..
+#mangle/All_Incomings: könnte hinter dem Namen des Betroffenden ein link zu seiner Alli ansicht liegen..
 auto-IM to team/alli about new incoming fleets
 fighterlist/whocanintercept: yCV with A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
 fighterlist: zCV = yCV + xCV(artifact)
@@ -46,7 +55,7 @@ major rewrite to not use DBM files (mysql instead)
 #IM to all brownie users
 #IM to whole alli
 #plan: aw21.zq1.de maps directly to www1.astrowars.com -> fewer translation of cookies and URLS - integrated browniecgi.pm handler avoids double-proxying
-time to arti
+-time to arti
 -CV below incoming (for non-extended users)
 % finished in science
 #brownie: css+image cache to lighten load on AW server http://www.astrowars.com/forums/templates/ http://www.astrowars.com/images/ http://www1.astrowars.com/images/
@@ -104,15 +113,5 @@ merge strongest fleets history to catch moving fleets or see growth/loss
 
 changing the map look to look more "AW-like" - much like Mob's tools... I really think that would encourage people to use the tools more than they do today...
 
-wie wäre es mit einer möglichkeit eine sys ID, einen energylevel und einen biolevwel einzugeben und dann werden alle potentiellen jumper mit weniger als 2h flugzeit gesucht, als optionen kann man alle von aktiven und verbündeten, von kleinen spielermn und free/unknown einzeln filtern lassen
-
-
-
-       "bind_param_inout"
-             $rc = $sth->bind_param_inout($p_num, \$bind_value, $max_len)  or di
-e $sth->errstr;
-             $rv = $sth->bind_param_inout($p_num, \$bind_value, $max_len, \%attr
-)     or ...
-             $rv = $sth->bind_param_inout($p_num, \$bind_value, $max_len, $bind_
-type) or ...
+-wie wäre es mit einer möglichkeit eine sys ID, einen energylevel und einen biolevwel einzugeben und dann werden alle potentiellen jumper mit weniger als 2h flugzeit gesucht, als optionen kann man alle von aktiven und verbündeten, von kleinen spielermn und free/unknown einzeln filtern lassen
 

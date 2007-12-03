@@ -1,0 +1,78 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+use DBAccess2;
+use awsql;
+use sort_table;
+awstandard_init();
+awinput_init(1);
+
+my $margin=2;
+my $limit=100;
+
+our %options;
+our $awuser=getusernamecookie();
+if((my $tmpp=param("p"))) {
+   $awuser=$tmpp;
+} else {param("p", $awuser) }
+
+for my $p (qw'sort') {
+      $options{$p}=param($p);
+}
+if(!defined $options{sort}){$options{sort}="9.-4";}
+
+
+print AWheader("AW Eco check tool");
+print start_form(-name=>"form", -method=>"get"),textfield(-name=>'p', -class=>'text'),br,
+   submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+
+if($awuser && (my $awpid=playername2idm($awuser))) {
+#   print "$awpid";
+   my($race,$sci)=playerid2ir($awpid);
+   my $ecolimit=0;
+   if($sci && (my $owneco=$sci->[2])) {
+      $ecolimit=$owneco-$margin;
+   }
+#   my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},4);
+   my $dbh=get_dbh();
+   my $sth=$dbh->prepare("SELECT tradelive.trade,p2.* FROM tradelive,`player` AS p1, `player` AS p2
+      WHERE p2.pid=tradelive.pid AND p1.pid=? AND ABS(p2.joinn-p1.joinn)<$limit AND p2.science>=? LIMIT ".(2*$limit));
+
+#   SELECT p2.*,economy FROM `player` AS p1, `player` AS p2, toolsaccess LEFT JOIN `intelreport` ON (intelreport.pid=p2.pid AND alli=tag)
+#            WHERE p1.pid=222362 AND ABS(p2.joinn-p1.joinn)<100 AND p2.science>=15 AND tag='rats' AND othertag='rats'
+   my $r=$dbh->selectall_arrayref($sth, {}, $awpid, $ecolimit);
+   my @data;
+   foreach my $row (@$r) {
+      my($trl)=shift(@$row);
+      my($pid)=$row->[0];
+      my($sl)=$row->[3];
+      my($tr)=$row->[8];
+      my($otr)=$row->[16];
+      my ($race,$sci)=playerid2ir($pid);
+      my $oeco="";
+      if($sci && ($oeco=$sci->[2])) {
+         next if($oeco<$ecolimit);
+      }
+      
+      push(@data, [profilelink($pid), $pid, @{$row}[14], $sl, $oeco, $tr, $trl, $otr, ($otr-$trl)]);
+   }
+#   foreach my $row (@$r) { print "@$row <br>"; }
+   print 
+      "<pre>legend: SL=science level
+        tr=trade from CSV
+        trl=live trade from brownie
+        otr=trade expected from midnight CSV pop levels
+        diff=otr-trl</pre>",
+      scalar @data, " entries",br,
+      sort_table([qw(links name join SL Eco tr trl otr diff)],
+      [\&display_string, \&display_pid, \&display_string, \&display_string, \&display_string, 
+       \&display_string, \&display_string, \&display_string, \&display_string],
+      [undef, \&sort_pid, \&sort_num, \&sort_num, \&sort_num, 
+       \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+      sort_param_to_keys($options{sort}), \@data);
+} 
+print AWtail();
+

@@ -5,7 +5,7 @@ f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
 round=gold10
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html alliance{,2} allirelations arrival arrivalmany authaw authawforum awlinker awstatistics awtoolstatistics joinalli cdinfo distsqr edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
+tools=index.html alliance{,2} allirelations arrival arrivalmany authaw authawforum awlinker awstatistics awtoolstatistics joinalli cdinfo distsqr ecocheck edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -27,6 +27,13 @@ init:
 
 #system-ids.txt:
 #	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
+updateprices:
+	wget -x -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
+	perl importcsv.pl prices
+	chmod 660 newdb/*
+	mv newdb/prices.mldbm db/
+	rm -f newdb/*
+
 updatecsv: dumpdbs
 	wget -x -nc -o/dev/null http://${f2}
 	tar xjf ${f2}
@@ -43,17 +50,23 @@ updatecsv: dumpdbs
 
 importcsv:
 	umask 2 ; mkdir -p db olddb newdb ; perl importcsv.pl && ( ln -f db/* olddb/ ; mv newdb/* db/ )
+	-./checkrenames.pl
 
 #runs once a day
 updatedaily:
 	#- cd /home/bernhard/code/cvs/perl/awcalc/html/images/sig/auto; make slotd background.png background-large.png ; make
-	perl detectalliancerelation.pl > html/${round}/alliancerelation-${mydate}
-	ln -f html/${round}/alliancerelation-${mydate} html/${round}/alliancerelation
-	-(perl alliancerelation2dot.pl html/round/alliancerelation-${mydate} | neato -Tsvg > html/${round}/alliancerelation-${mydate}.svg &&\
-	ln -f html/${round}/alliancerelation-${mydate}.svg html/${round}/alliancerelation.svg)&
+	-perl detectalliancerelation.pl > html/${round}/alliancerelation-${mydate} &&\
+	ln -f html/${round}/alliancerelation-${mydate} html/${round}/alliancerelation && \
+	(perl alliancerelation2dot.pl html/round/alliancerelation-${mydate} | neato -Tsvg > html/${round}/alliancerelation-${mydate}.svg &&\
+	ln -f html/${round}/alliancerelation-${mydate}.svg html/${round}/alliancerelation.svg &&\
+	convert -density 70 html/round/alliancerelation.svg html/round/alliancerelation.png )&
+
+banupdate: html/badproxylist.txt banbadproxies.pl
+	touch $@
+	-perl banbadproxies.pl
 
 #runs 4 times a day
-updatexdaily: updateholes updatespy
+updatexdaily: updateholes updatespy banupdate
 updatemap: updatemaponly
 updatemapsonly: updatemaponly updatemap2only
 updatemaponly:
@@ -87,9 +100,9 @@ drawall:
 dumpdbs:
 	-cp -a base/db2 /no_backup/bernhard/aw/backup/db-${mydate}
 #	mkdir -p html/alli/$$a/history
-	-for a in $(allies) ; do \
-		cp -a html/alli/$$a/{fleets.csv,history/fleets-${mydate}.csv} ; \
-	done
+#	-for a in $(allies) ; do \
+#		cp -a html/alli/$$a/{fleets.csv,history/fleets-${mydate}.csv} ; \
+#	done
 #	cp -a ~/db olddb/
 #	~/code/cvs/perl/dbm/show.pl ~/db/af-relation.dbm > dump/af-relation-`date +%y%m%d`
 #	~/code/cvs/perl/dbm/show.pl ~/db/af-planets.dbm > dump/af-planets-`date +%y%m%d`
@@ -101,7 +114,7 @@ cleandbs:
 	   REMOTE_USER=$$a ./cleanplanning.pl ; done
 	cat empty.dbm > base/db2/sessioncache.dbm
 showua:
-	./dbm-show.pl ~/db/useralli.dbm
+	./showuseralli.pl
 lookup7:
 	perl -ne '@a=split("\t",$$_);if($$a[2]==$u){print}' player.csv.beta7
 lookupa7:
@@ -121,7 +134,6 @@ chpasswd:
 
 unaccess:
 	mkdir -p old/obsolete
-	./dbm-del.pl base/db2/allowedalli.dbm $a
 	mv base/db2/$a-relation.dbm old/obsolete
 	./removealli.pl $a
 	vim +/^$a: base/.htpasswd
@@ -133,7 +145,6 @@ access:
 #	./dbm-add.pl base/db2/$a-relation.dbm af "7 af alliance relation"
 #	./dbm-add.pl base/db2/$a-relation.dbm rats "7 rats alliance relation"
 	./dbm-add.pl base/db2/$a-relation.dbm $a "9 $a own alliance relation"
-	./dbm-add.pl base/db2/allowedalli.dbm $a ${round}
 	-./runsql.pl "INSERT INTO toolsaccess VALUES ('$a','$a',255,255,255)"
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}

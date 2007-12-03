@@ -8,6 +8,7 @@ use awstandard;
 use awinput;
 awinput_init();
 use sort_table;
+use DBAccess2;
 
 print AWheader($title);
 
@@ -40,6 +41,9 @@ sub gettradepartners2($$) { my($maxta,$minad)=@_;
 #print "test";
 my @tap=gettradepartners2(4, 000);
 my @tap2;
+my $dbh=get_dbh;
+my $sth=$dbh->prepare("SELECT COUNT(*) FROM planets
+                       WHERE ownerid=? AND population>=10");
 foreach my $entry (@tap) {
    my ($name, $pid, $ad, $adplus, $prod, $partners)=@$entry;
    if(!$pid || !$prod) {next}
@@ -47,14 +51,15 @@ foreach my $entry (@tap) {
    my $time=(20000-$ad)/$prod;
    my $timeplus=(20000-$adplus)/$prod;
    my ($race)=playerid2ir($pid);
-   if($race && @$race && $race->[-2]) {$time=0; $timeplus=0} # TODO retest
+   if($race && @$race && $race->[-3]) {$time=0; $timeplus=0} # TODO retest
+   my ($playerbonus)=$dbh->selectrow_array($sth, {}, $pid);
 #   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
-   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus]);
+   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus]);
 }
 
-print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti)], 
-         [\&display_pid, \&display_relation, \&display_round0, \&display_round0, \&display_string, \&display_round1, \&display_round0, \&display_round1],
-         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti pop10)], 
+         [\&display_pid, \&display_relation, \&display_round0, \&display_round0, \&display_string, \&display_round1, \&display_round0, \&display_round1, \&display_string],
+         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@tap2 );
 
 print AWtail();

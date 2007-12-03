@@ -8,3 +8,11 @@ for(<fiveminutely/*>) {
 	system($_);
 }
 
+my ($sec,$min,$hour)=localtime();
+if($min<5) {
+   for(<hourly/*>) {
+      next if /\/CVS$/;
+#   print "running $_...\n";
+      system($_);
+   }
+}

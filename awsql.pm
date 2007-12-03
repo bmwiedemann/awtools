@@ -43,4 +43,8 @@ sub get_alli_match2($$;$)
          rbits & rmask & ? != 0 )", [$alli,$bits]);
 }
 
+
+# for cleanup
+#SELECT *,count(alliances.tag) as c FROM `toolsaccess` LEFT JOIN alliances ON alliances.tag=toolsaccess.tag LEFT JOIN player ON alliance=aid WHERE toolsaccess.tag=othertag GROUP BY toolsaccess.tag ORDER BY c ASC
+
 1;

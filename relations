@@ -7,6 +7,7 @@ my $readonly=0;
 #if($ENV{REMOTE_USER} eq "is") {$ENV{REMOTE_USER}="fun"; $readonly=1;} # TODO: only for beta10
 use awstandard;
 use awinput;
+use awlogins;
 use arrival;
 use awhtmlout;
 use DBAccess2;
@@ -112,9 +113,9 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	print start_form(-name=>"form"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag.$lasttag." ", profilelink($id), $extralinks, 
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
          a({class=>"othertool", -href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".
-#a({-href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"battles"),
+         a({class=>"othertool", -href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"Lefoisbattles")," ",
             a({class=>"othertool", -href=>"http://azgharde.free.fr/tools/battles.php?pl=$user&da=all"},"azghardebattles"), " ",
-            a({class=>"othertool", -href=>"http://odbvpn.ath.cx:89/pub/view_battles.php?player=$user&date=all"},"battles"),
+#            a({class=>"othertool", -href=>"http://odbvpn.ath.cx:89/pub/view_battles.php?player=$user&date=all"},"battles"),
             " ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
 	print hidden(-name=>'name', $user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
@@ -131,12 +132,15 @@ if($options{name}) {# && $options{name} ne "unknown") {
 		my $planets=@pl;
       my $pl=$player{$id};
 		my $level=$$pl{level};
-		my ($pop,$scipoints)=get_one_row("SELECT `opop`,points-2*level-opop FROM `player` WHERE `pid` = ?", [$id]);
+		my ($pop,$scipoints)=get_one_row("SELECT `opop`,points-1*level FROM `player` WHERE `pid` = ?", [$id]);
 		my @planets;
+      my $poppts=0;
 		foreach my $p (@pl) {
 			my $pp=getplanet2($p);
-#			$pop+=planet2opop($pp);
 			push(@planets, $pp);
+         my $ppop=planet2opop($pp);
+         next if $ppop<10;
+			$poppts+=$ppop-10;
 		}
       my $trades="";
       {
@@ -144,7 +148,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
          $trades=join(", ", map {playerid2link($_)} @t);
       }
       my $homelink=systemid2link($$pl{home_id});
-		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".2*$level."+$pop+$scipoints) trade=$$pl{trade}% logins=$$pl{logins} home=$homelink from=$$pl{from} joined=".(gmtime($$pl{joined}))." trades=$trades ";
+		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".(1*$level)."+$poppts+".($scipoints-$poppts).") trade=$$pl{trade}% logins=$$pl{logins} home=$homelink from=$$pl{from} joined=".(gmtime($$pl{joined}))." trades=$trades ";
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
@@ -207,23 +211,25 @@ if($options{name}) {# && $options{name} ne "unknown") {
          printf("xEnergy=%.2f ", arrival::effectiveenergy(1,2));
       }
       my @logins;
-		while($options{comment}=~/login:(\d+):(\d+)([^ ]*)(.*)/s) {
-			$options{comment}=$4;
-         push(@logins, [$1,$2,$3]);
+		while($options{comment}=~/login:(\d+):(\d+):(\d+):([^ ]*)(.*)/s) {
+			$options{comment}=$5;
+         push(@logins, [$1,$2,$3,$4]);
       }
+#      @logins=@{awlogins::get_logins($ENV{REMOTE_USER}, $id)};
       if($logins[0]) {
          print "<code>";
          my $firsti=awmax(-20,awmin((-$#logins-1), -1));
          foreach my $e (@logins[$firsti..-1]) { # last 8 values only
-            my($login,$time,$extra)=@$e;
+            my($login,$time,$idle, $acc)=@$e;
             my $color;
-            if($extra=~/:(\d{5,}):/) { $color="darkred";
-               if($1>60000) { $color="red" }
-            }
+#            if($extra=~/:(\d{5,}):/) { $color="darkred";
+#               if($1>60000) { $color="red" }
+#            }
+            my $extra="idle=$idle accuracy=$acc";
             if($color) {
-               $extra=span({-style=>"color:$color"},$extra);
+               $extra=span({-style=>"color:$color"}, $extra);
             }
-            printf(br."login %4i: %s GMT %s ; idle+accuracy %s", $login, AWisodatetime($time),AWreltime($time), $extra);
+            printf(br."login %4i: %s GMT %s ; %s", $login, AWisodatetime($time),AWreltime($time), $extra);
          }
          print "</code>";
       }

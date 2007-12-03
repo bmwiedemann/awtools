@@ -4,6 +4,7 @@ use MLDBM qw(DB_File Storable);
 use Fcntl;
 use strict;
 our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%prices);
+umask 2;
 tie %alliances, "MLDBM", "newdb/alliances.mldbm", O_RDWR|O_CREAT, 0666 or die $!;
 tie %starmap, "MLDBM", "newdb/starmap.mldbm", O_RDWR|O_CREAT, 0666;
 tie %player, "MLDBM", "newdb/player.mldbm", O_RDWR|O_CREAT, 0666;
@@ -19,6 +20,13 @@ my @alliancemembers; #who is member
 my %tempplanets;
 my $firstline;
 my (@elements);
+
+
+my @mods=qw(planets player alliances starmap trade battles prices);
+my $mods=shift;
+if($mods) { @mods=split(/ /, $mods); }
+
+
 sub dumphash { my ($h)=@_;
 	foreach(keys %$h) {
 		print "$_=$$h{$_}\n";
@@ -122,8 +130,7 @@ sub planets {
 }
 
 print "reading CSV files\n";
-#for my $f (@::files) {
-for my $f (qw(planets player alliances starmap trade battles prices)) {
+for my $f (@mods) {
 	my $file="$f.csv";
 	my $head=1;
 	$firstline=1;

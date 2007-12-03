@@ -7,7 +7,7 @@ awinput_init(1);
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout antispy antispy2 arrival arrivalmany authaw authawforum awstatistics cdinfo distsqr edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences2 ranking sim tactical tactical-large tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
+foreach(qw(logout antispy antispy2 arrival arrivalmany authaw authawforum awstatistics cdinfo distsqr ecocheck edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences preferences2 ranking sim tactical tactical-large tactical-live2 topallis topwars tradepartners uploadcss whocansee whocanintercept /jstools.html)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 
@@ -22,7 +22,7 @@ print
  a({href=>"http://aw.lsmod.de/manual.html#brownie"}, "brownie")." and ".a({href=>"http://aw21.zq1.de/"}, "no-install-brownie"),br,
  a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,
  a({href=>"http://$bmwserver/$arel.png"},"alliance relations")."
- (".a({href=>"http://$bmwserver/$arel.svg"},"svg").", ".a({href=>"http://$bmwserver/round/alliancerelation.svg"},"current").")",br,
+ (".a({href=>"http://$bmwserver/$arel.svg"},"svg").", ".a({href=>"http://$bmwserver/round/alliancerelation.png"},"currentpng").", ".a({href=>"http://$bmwserver/round/alliancerelation.svg"},"currentsvg").")",br,
  a({href=>"http://$bmwserver/customize_race.html"},"greenbird's race helper")," ",a({class=>"aw", href=>"http://aw21.zq1.de/register/customize_race.php"},"AW race"),br,
 # a({href=>"/beta10/alliancerelation"},"alliance relation data")." &gt; ".a({href=>"topwars"},"top wars").", ".a({href=>"topallis"},"top allis"),
  p,a({href=>"/manual.html"},"manual").", ".a({href=>"/manual-devel.html"},"developers-manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog"), " / ", a({href=>"http://aw.lsmod.de/TODO"},"ToDo-List"),br,

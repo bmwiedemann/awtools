@@ -40,7 +40,7 @@ if(param("u")) {
 
       } else { # properly authenticated
          my $c=$response->content;
-         print $h."<pre>";
+#         print $h."<pre>"; # breaks redirect below
          my $pid;
          $response->scan(sub {
             return unless $_[0] eq "Set-Cookie";

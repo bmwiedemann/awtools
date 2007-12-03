@@ -35,6 +35,9 @@ sub dbfleetaddmysql { my($sid,$pid,$plid,$name,$time,$type,$fleet, $tz, $screen)
          $xcvset="";
       }
    }
+   if($status==2 and $cv==0 and $time and $fleet->[0]==0 and $fleet->[1]==0) {
+      return; # do not add CLS-only incoming twice
+   }
 # update fleets that are still there...
    my $query="UPDATE `fleets` SET `iscurrent` = 1, `lastseen` = ?$xcvset$ownerset
          WHERE (`owner` = ? $ownermatch) AND `alli` = ? AND `sidpid` = ? AND `eta` = ? $fleetmatch LIMIT 2;";

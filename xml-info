@@ -61,7 +61,6 @@ if(param()) {
       my $pl=$player{$pid};
       my @pl=playerid2planetsm($pid);
       my $sid=$pl->{home_id};
-      my $racerem=$race->[-1]||0;
       my %values=(player_id=>$pid, player_name=>$name, 
          player_tag=>$rel[1], diplomacy=>$relationname{$rel[0]},
 #comments=>$rel[2],
@@ -69,7 +68,7 @@ if(param()) {
          planets=>scalar @pl, 
          system_id=>$sid, system_name=>systemid2name($sid), system_coord=>join(",", systemid2coord($sid)),
          country=>$pl->{from}, playerlevel=>$pl->{level}, culturelevel=>$pl->{culture}, sciencelevel=>$pl->{science}, tr=>$pl->{trade},
-         trader=>($racerem<=-6), startuplab=>($racerem&1),
+         trader=>$race->[8], startuplab=>$race->[9],
          comments=>$rel[2],
          );
       my $i=0;

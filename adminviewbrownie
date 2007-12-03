@@ -25,7 +25,7 @@ sub lookup_ip($) {
 
 
 my $admin=is_admin;
-if(!$admin) {print header,"sorry, this tool is admin-only."; exit 0;}
+if(!$admin) {print header,"sorry, this tool is admin-only.",AWtail(); exit 0;}
 
 our %options;
 print AWheader("AW brownie-viewer tool");

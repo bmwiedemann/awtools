@@ -27,7 +27,7 @@ for my $day (0..7) {
       my %oldday;
       my %olddaypop;
       my $f="www1.astrowars.com/export/history/all$d-$m-$y.tar.bz2";
-      if(not -e $f) {exit 0} # dont work at start of round
+      if(not -e $f) {exit 1} # dont work at start of round
       open(F, "tar -Oxjf $f planets.csv |") or next;
       my $dummy=<F>;
       while(<F>) {

@@ -1,44 +1,71 @@
-#GE9 AF: klappstuhl
-GE9 RATS: BigE
-GE8 TGD: winterwolf
+
+GE10 AF: klappstuhl
+GE10 RATS: BigE
+#GE8 TGD: winterwolf
+
+?GE11 +TROL: speter/Mythwin
+
+GE10 +UFO: (old:pikansjos) rollyp (rolf_oest@hotmail.com)
+GE10 +FARt: Yawgmoth (alberto.ciampini@virgilio.it, "Vincenzo Mottola" <enzo_mottola@yahoo.it>)
+GE10 +GBB colix javier.cadena@upc.edu
+GE10 +TROL Mythwin(mygubbins@gmail.com)/Harmony (speter=Xavier Josep Viñals Blasco <jvinyals@yahoo.com>  (old:Avempace)) 
+GE10 +CCCP Rasta31 (ffmandu13@hotmail.com)
+GE10 SSS: Telly & CountCount (Petra Dufek)
+GE10 BBA: ST0RMTR00PER(starcatcher)
+GE10 FOG: dealtadawn
+
+GE10 LAA: cheesedown
+#GE10 RYA: farsalos
+GE10 RIP: ? GigantusX
+GE10 DOM: tigerteam
+GE10 SITH: hasnak (NAP with RATS?)
+GE10 XR: CHIG/AstroHocke (McMalone Arnaken)
+GE10 ABP: sausage
+GE10 LOAD: Sorteslyngel
+
+
+#GE10 FURY: monster (renamed PUNX)
+GE10 WAV: cpkoma (undercover)
+GE10 EN: Haensu (Jowy & sh0rty (& emile13))
+GE10 WHF: verbaluzi (Chans)
+GE10 HOS: JamzHetfield
+GE10 SK: Izeldon
+GE10 CoRE: TJ2805
+GE10 SOUP: mysz
+GE10 SpIn: GreenKnight
+?GE10 SW: jca
+GE10 xCOP: eggignadl (with COP)
+GE10 SoB: crickan
+GE10 WAR: phoos/DaMuttz
+GE10 AFK: NaRu1/1flaw
+GE10 HoS: JamzHetfield
+GE10 TGC: trouble
+
+
 
 GE9 +NAIN: ThanksForXP(Rasta31)
-GE9 +FARt: Yawgmoth
-GE9 SW: jca
-GE9 +THE: orphebus=MrCellophane=QueenOfSheba
-GE9 +HNU: yosoyyoytuno (rulf) - rgarciag@gmail.com
+GE9 +THE: orphebus=MrCellophane=QueenOfSheba= Miguel Garcia de la Fuente <orphebus@orphebus.com>
+GE9 +HNU: yosoyyoytuno (rulf) - RAUL GARCIA GARCIA <rgarciag@gmail.com>
 GE9 AuA: cpkoma
-GE9 XR: CHIG/AstroHocke (McMalone Arnaken)
-GE9 +SSS: Telly & CountCount
-GE9 +FBSP: vaport vaportonaw@yahoo.com
+GE9 +FBSP: vaport  "Sean C Byers" <vaportonaw@yahoo.com>
 GE9 NIAI+SEUX: vaneagle
-GE9 +FFU: ? ffuffu9 julien.latour@gmail.com
-GE9 UFO: pikansjos
+#GE9 +FFU: ? ffuffu9 julien.latour@gmail.com
 GE9 ROTA: Simena
-GE9 SK: Izeldon
-GE9 +TROL speter(Avempace)
-GE9 +GBB colix javier.cadena@upc.edu
 GE9 UnBC: Trolic (juglemon)
 GE9 WAR: phoos
 GE9 PYS: mysz aka ?
 GE9 KP: GigantusX
 GE9 MEX: Huehueteotl=Kronic, gucumatz=jlpm87
-GE9 WORM: judochop
-GE9 ROTA: Simena
-GE9 WHF: Chans
+#GE9 WORM: judochop
 GE9 DI: plinko
 GE9 Kon/QDT: Mythwin
-GE9 BBA: ST0RMTR00PER(starcatcher)
 GE9 COP: Ugignadl
 
-GE9 DOM: tigerteam
 GE8 +CCCP Rasta31
 GE8 +VOX+??: (Capricorne=Remi Nguyen)
-GE9 +CRS: LadyGoonie&ManuMilitari
-GE8 FURY: monster (renamed PUNX)
+GE9 +CRS: LadyGoonie&ManuMilitari (=DANTIN Guenael)
 GE8 OCB: kommanda
 GE8 LXG: AllanQmain
-GE9 EN: Jowy & sh0rty (& emile13)
 GE8 Spin: Firefly2
 GE8 MPG: Judochop
 GE8 APP: nachete
@@ -49,11 +76,11 @@ GE9 TUGA: darfel (regular NAP)
 GE8 GLUC: glucagon
 GE8 ADN: LordVic
 GE8 LD: tanaqqash (regular NAP)
-GE8 BKA: peterulf
+#GE8 BKA: peterulf
 GE8 SED: EvilEyeBG
 GE8 KotC: Simena
 GE8 TNA: MadFlying
-GE8 DAW ???
+#GE8 DAW ???
 GE9 UFsR: MaLaGasy
 
 
@@ -64,7 +91,6 @@ TGT?
 
 #GE8 *V: NyOGthA / CygnusX1 (renamed VV)
 #GE7 ?SJ
-#GE7 +FIR+ICE judochop
 #GE7 FRS: nean
 #GE7 IS: cyclops, NT
 #GE7 +LOVE: Bungle/Mythwin
@@ -91,7 +117,7 @@ GE4 ASF: mjinthehouse
 GE4 TGT: Rolle (10 Eur)
 GE4 LOVE: Mythwin (10 Eur)
 #GE4 NAIN: Rasta31
-GE4 ESF: LongKong
+#GE4 ESF: LongKong
 #GE4 DHS: holi87
 GE4 NOD: tabouuu 
 #GE4 FRS: Musiq81

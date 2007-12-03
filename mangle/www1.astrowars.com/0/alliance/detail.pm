@@ -55,7 +55,7 @@ require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::ma
 
 
 # add display of prod with bonus
-if(1 || $mangle::dispatch::g) {
+if(0) {
    my ($trade)=m/<td bgcolor=[^>]*>Trade Revenue<\/td><td>(\d+)%</;
    my ($arti)=m/<td bgcolor=[^>]*>Artifact<\/td><td>([^<]*)</;
    my @bonus=(1,1,1,1);

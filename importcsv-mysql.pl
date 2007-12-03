@@ -4,7 +4,7 @@ use strict;
 use DBAccess;
 if(!$dbh) {die "DB err: $!"}
 
-our (%alliances,%starmap,%player,%playerid,%planets,%alltrades,%battles);
+our (%alliances,%starmap,%player,%playerid,%planets,%alltrades,%battles,%prices,%baseprices);
 our @opop;
 my $firstline;
 my (@elements);
@@ -12,6 +12,16 @@ sub dumphash { my ($h)=@_;
 	foreach(keys %$h) {
 		print "$_=$$h{$_}\n";
 	}
+}
+
+sub prices {
+   for(my $i=0; $i<=$#elements; ++$i) {
+      my $e=lc($elements[$i]);
+      $e=~s/ //;
+      $_[$i]=~s/,/./;
+      $prices{$e}=$_[$i];
+      if(not ($baseprices{$e})) {$baseprices{$e}=$_[$i];}
+   }
 }
 
 sub battles {
@@ -107,9 +117,12 @@ sub alltrades
    $alltrades{$tid++}={pid1=>$pid1, pid2=>$pid2};
 }
 
+
+# main import code starts here
+
 print "reading CSV files\n";
 #for my $f (@::files) {
-for my $f (qw(planets player alliances starmap alltrades battles)) {
+for my $f (qw(planets player alliances starmap alltrades battles prices)) {
 	my $file="$f.csv";
 	my $head=1;
 	$firstline=1;
@@ -134,6 +147,7 @@ for my $f (qw(planets player alliances starmap alltrades battles)) {
 
 print "pushing into MySQL DB\n";
 use Tie::DBI;
+if(1){
 print "\tplanets\n";
 my %h;
 tie %h,'Tie::DBI',$dbh,'planets','sidpid',{CLOBBER=>3};
@@ -151,6 +165,8 @@ print "\tstarmap\n";
 tie %h,'Tie::DBI',$dbh,'starmap','sid',{CLOBBER=>3};
 %h=%starmap;
 untie %h;
+
+
 print "\tadding battles\n";
 tie %h,'Tie::DBI',$dbh,'battles','id',{CLOBBER=>1};
 #%h=%battles; # battles.csv only delivers incremental data
@@ -158,12 +174,6 @@ while(my @a=each(%battles)) {
    $h{$a[0]}=$a[1];
 }
 untie %h;
-print "\talltrades\n";
-tie %h,'Tie::DBI',$dbh,'alltrades','tid',{CLOBBER=>3};
-%h=%alltrades;
-untie %h;
-$dbh->do("OPTIMIZE TABLE `alltrades`");
-
 print "\tmerging trades\n";
 my $now=time();
 my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `trades` VALUES (?, ?, ?)!);
@@ -172,6 +182,29 @@ while(my @a=each(%alltrades)) {
 #   next if $prevtrades{"$a{pid1},$a{pid2}"}; # skip dups
    my $result=$sth->execute($a{pid1}, $a{pid2}, $now);
 }
+$sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `alltrades` VALUES ('',?, ?)!);
+my $trades=$dbh->selectall_arrayref("SELECT pid1,pid2 FROM `trades`");
+foreach my $row (@$trades) {
+   $sth->execute($row->[0], $row->[1]);
+   $sth->execute($row->[1], $row->[0]);
+}
+system("hourly/otr.pl");
+
+#$dbh->do("UPDATE `tradelive` SET trade=(SELECT trade FROM player WHERE player.pid=tradelive.pid)");
+$sth=$dbh->prepare(qq!REPLACE INTO `tradelive` VALUES (?,?)!);
+while(my @a=each(%player)) {
+   $sth->execute($a[0], $a[1]->{trade});
+}
+
+if(0) {
+   print "\talltrades\n";
+   tie %h,'Tie::DBI',$dbh,'alltrades','tid',{CLOBBER=>3};
+   %h=%alltrades;
+   untie %h;
+   $dbh->do("OPTIMIZE TABLE `alltrades`");
+}
+
+
 
 print "\tmerging playerextra\n";
 $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `playerextra` VALUES (?, ?, '', NULL)!);
@@ -183,6 +216,7 @@ while(my @a=each(%player)) {
 
 # re-export:
 if(1){
+   system("./playertradecheck.pl");
    my $prevtrades=$dbh->selectall_arrayref("SELECT pid1,pid2 FROM `trades`");
    open(F, ">", "html/alltrades.csv");
    print F "id1\tid2\n";
@@ -191,13 +225,27 @@ if(1){
    }
 }
 
+}
+
 print "updating player.joinn\n";
 my $res=$dbh->selectall_arrayref("SELECT `pid` FROM `player` ORDER BY `joined` ASC");
-$sth=$dbh->prepare_cached(qq!UPDATE `player` SET `joinn` = ? WHERE `pid` =?!);
+my $sth=$dbh->prepare_cached(qq!UPDATE `player` SET `joinn` = ? WHERE `pid` =?!);
 my $n=0;
 foreach my $row (@$res) {
    my($pid)=@$row;
-   $sth->execute(($n++)/100+1, $pid);
+   $sth->execute(($n++), $pid);
+}
+
+
+print "\tprices\n";
+$sth=$dbh->prepare("REPLACE INTO `prices` VALUES (?,?)");
+delete($prices{date});
+delete($baseprices{date});
+for my $p (keys %prices) {
+   $sth->execute($p,$prices{$p});
+}
+for my $p (keys %baseprices) {
+   $sth->execute("b$p",$baseprices{$p});
 }
 
 print "done\n";

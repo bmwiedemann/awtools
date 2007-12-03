@@ -53,6 +53,13 @@ CREATE TABLE `playerextra` (
 );!);
 
 $dbh->do(qq!
+CREATE TABLE `prices` (
+`item` CHAR(4) NOT NULL,
+`price` FLOAT NOT NULL,
+PRIMARY KEY ( `item` )
+);!);
+
+$dbh->do(qq!
 CREATE TABLE `cdlive` (
 `pid` INT NOT NULL ,
 `time` INT,
@@ -60,6 +67,17 @@ CREATE TABLE `cdlive` (
 `pl` SMALLINT NOT NULL,
 `totalpop` SMALLINT NOT NULL,
 PRIMARY KEY ( `pid` )
+);!);
+$dbh->do(qq!
+CREATE TABLE `tradelive` (
+`pid` INT NOT NULL PRIMARY KEY,
+`trade` SMALLINT NOT NULL
+);!);
+
+$dbh->do(qq!
+CREATE TABLE `config` (
+`key` VARCHAR(10) PRIMARY KEY,
+`value` VARCHAR(20) NOT NULL
 );!);
 
 $dbh->do(qq!
@@ -129,13 +147,11 @@ PRIMARY KEY ( `ip` )
 
 $dbh->do(qq!
 CREATE TABLE `alltrades` (
-`tid` INT NOT NULL,
+`tid` INT NOT NULL AUTO_INCREMENT,
 `pid1` INT NOT NULL,
 `pid2` INT NOT NULL,
-`time` INT,
 PRIMARY KEY ( `tid` ),
-UNIQUE ( `pid1`,pid2 ),
-INDEX (`pid2`)
+UNIQUE ( `pid1`,pid2 )
 );!);
 
 $dbh->do(qq!
@@ -215,6 +231,7 @@ name VARCHAR ( 24 ) NOT NULL ,
 arank MEDIUMINT NOT NULL ,
 joinn MEDIUMINT NOT NULL ,
 opop SMALLINT NOT NULL ,
+otr  SMALLINT NOT NULL ,
 UNIQUE ( name ),
 INDEX ( alliance ),
 PRIMARY KEY ( pid ));!);
@@ -314,7 +331,7 @@ CREATE TABLE `intelreport` (
 `mathematics` TINYINT,
 `physics` TINYINT,
 `social` TINYINT,
-`racecurrent` TINYINY,
+`racecurrent` TINYINT,
 PRIMARY KEY ( `alli`, `pid`)
 );!);
 

@@ -532,6 +532,8 @@ sub sidpid22sidpid3m($$) {return $_[0]*13+$_[1];}
 sub sidpid32sidpid2m($) {return (int($_[0]/13), $_[0]%13)}
 
 
+our @bonusmap=(3,1,2,0); # prod sci cul grow
+
 sub playerid2production($) { my($pid)=@_;
    next unless $pid;
    my($race,$sci)=playerid2ir($pid);
@@ -541,6 +543,7 @@ sub playerid2production($) { my($pid)=@_;
    my $t=0;
    my @bonus=(1,1,1,1);
    my $iir=playerid2iir($pid);
+   for my $i(0..3) {$race->[$i]+=1}
 	if($iir) {
 	   @prod=@{$iir}[3..9];
       my $a=$prod[3];
@@ -549,19 +552,20 @@ sub playerid2production($) { my($pid)=@_;
          my $effect=$artifact{$1}||0;
          for(my $i=0; $i<@$race; ++$i) {
             if((1<<$i) & $effect)
-            {$race->[$i]+=0.1*$2}
+            {$race->[$i]*=1+0.1*$2}
+#            {$race->[$i]+=0.1*$2} old GE9
          }
       }
    } else { # for extended users without tag
       if($pid && (my $p=$player{$pid})) {
-         $t=$p->{trade}*0.01;
+         ($t)=get_one_row("SELECT `trade` FROM `tradelive` WHERE `pid`=?", [$pid]);
+#         $t=$p->{trade}*0.01;
+         $t*=0.01;
       }
    }
-   foreach my $b (@bonus) {$b+=$t}
-	$bonus[0]+=$race->[3]; # prod
-	$bonus[1]+=$race->[1]; # sci
-	$bonus[2]+=$race->[2]; # cul
-	$bonus[3]+=$race->[0]; # grow
+   for(my $i=0; $i<4; ++$i){
+      $bonus[$i]=$race->[$bonusmap[$i]]*(1+$t);
+   }
 	push(@prod, \@bonus);
 #	for(my $i=0; $i<3; ++$i){ $prod[$i]+=$bonus[$i]; }
 	return \@prod;
@@ -747,12 +751,15 @@ sub add_trades($@)
 #      }
 #   }
    my $sth=$dbh->prepare_cached(qq!INSERT IGNORE INTO `trades` VALUES (?, ?, ?)!);
+   my $sth2=$dbh->prepare_cached(qq!INSERT IGNORE INTO `alltrades` VALUES ('', ?, ?)!);
    foreach my $xpid (@$otherpids) {
       my $pid1=awmax($xpid,$ownpid);
       my $pid2=awmin($xpid,$ownpid);
       #next if($oldmap{"$pid1,$pid2"}); # do not re-add existing entries
       # pid1 is always larger than pid2
       my $result=$sth->execute($pid1, $pid2, $now);
+      $sth2->execute($pid1, $pid2);
+      $sth2->execute($pid2, $pid1);
    }
 }
 
@@ -828,7 +835,7 @@ sub dbfleetaddfinish() {
 }
 
 sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
-   return if(!$ENV{REMOTE_USER});
+   return if(!$ENV{REMOTE_USER} or $ENV{REMOTE_USER} eq "guest");
 	$name="\L$name";
 	untie %relation;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
@@ -953,7 +960,7 @@ sub playerid2ir($) { my($plid)=@_;
 #   return playername2ir(playerid2name($plid));
    my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},4);
    my @r=get_one_row("SELECT intelreport.*,growth+science+culture+production+speed+attack+defense FROM `intelreport`,toolsaccess WHERE `pid`=? AND $allimatch ORDER BY `modified_at` DESC LIMIT 1", [$plid, @$amvars]);
-   my @race=@r[3..9,19,10..11,18];
+   my @race=@r[3..9,-1,10..11,18];
    foreach my $m (@race[0..6]) {if(defined($m) && $m>=0){$m="+$m"}}
    return (\@race, [@r[2,12..17]]);
 }
@@ -1133,7 +1140,7 @@ sub show_fleet($) { my($f)=@_;
 sub playerid2plans($)
 { my($pid)=@_;
    my $dbh=get_dbh;
-   my ($allimatch,$amvars)=get_alli_match2($ENV{REMOTE_USER}, 1);
+   my ($allimatch,$amvars)=get_alli_match2($ENV{REMOTE_USER}, 2);
    my $sth=$dbh->prepare("SELECT planetinfos.* FROM `planetinfos`,toolsaccess WHERE `who` = ? AND ($allimatch)");
    my $res=$dbh->selectall_arrayref($sth, {}, $pid, @$amvars);
    return $res;

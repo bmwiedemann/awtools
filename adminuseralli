@@ -15,25 +15,19 @@ awstandard_init();
 print AWheader("admin");
 
 my %options;
-my %db;
 for my $p (qw'pw user alli') {
    $options{$p}=lc(param($p));
    $options{$p}=~s/[<>]//g; # min sanitize user input
 }
 my $pid=playername2idm($options{user});
 if($options{user} && $pid && md5_hex('sAltx'.$options{pw}) eq 'd954c6b3f0a24db8fbfd435f3daac7e9') {
-   awinput::opendb(O_RDWR|O_CREAT, "$awstandard::dbmdir/useralli.dbm", \%db);
    set_useralli($pid,$options{alli});
    if($options{alli}) {
 #      my $x=awstandard::urldecode($options{user});
-      $db{$options{user}}=$options{alli};
       print "added $options{user}=$options{alli}";
    } else {
-      print "$options{user} = $db{$options{user}} ... ";
-      delete $db{$options{user}};
       print "deleted $options{user}";
    } 
-   untie(%db);
 } 
 
 # form
