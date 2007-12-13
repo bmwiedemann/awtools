@@ -122,6 +122,25 @@ if(1) {
       next if $p eq "calc";
       $form.="\n<input type=\"hidden\" name=\"$p\" value=\"".($cgi->param($p)).'">';
    }
+# avoid mislaunches by requiring a plan for the target
+	my $possiblemislaunch=0;
+	if(is_extended()) {
+		my $pim=getplanetinfom($destsid,$destpid);
+		if(!$pim || !defined($pim->[0])) {
+			my $p=getplanet($destsid,$destpid);
+			my $owner=planet2owner($p);
+			if($owner != $::options{pid}) {
+				$possiblemislaunch=1;
+			}
+		}
+	}
+	if($possiblemislaunch) {
+		my $mislaunchreason="no plan on target planet";
+		$form.="<input type=\"checkbox\" name=\"calc\" value=\"1\" checked=\"checked\">
+		<span class=\"bmwwarning\">Warning: possible mislaunch detected ($mislaunchreason).</span>
+		When you double-checked your target, deactivate the checkbox to override<br>";
+	}
+
    $form.="<label for=\"launch\"> Or click <input type=\"submit\" id=\"launch\" value=\"Launch !!!\" class=smbutton></label></form>";
    s%</small>% $& $form%;
 
