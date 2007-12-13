@@ -835,7 +835,7 @@ sub dbfleetaddfinish() {
 }
 
 sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
-   return if(!$ENV{REMOTE_USER} or $ENV{REMOTE_USER} eq "guest");
+   return if(!is_extended());
 	$name="\L$name";
 	untie %relation;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
