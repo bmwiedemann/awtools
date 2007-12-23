@@ -4,6 +4,7 @@ use warnings;
 use strict;
 use DBAccess2;
 use awsql;
+use awstandard; # for awmax
 use awinput;
 
 
@@ -24,7 +25,7 @@ sub add_login($$@) {
    }
 
 # fetch previous login entry
-   if($loginacc>=86398) {
+   if($loginacc>=86398) { # 86k for premium idle entry accuracy
       my @l0n=get_one_row("SELECT logins.* FROM logins,
        (
         SELECT `alli`,`pid`,MAX(`n`) AS maxn
