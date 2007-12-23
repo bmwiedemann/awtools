@@ -59,8 +59,9 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
    my $module=title2pm($title);
    my $url=$$options{url};
    push(@module, url2pm($url), (1 ? $module :()));
+   my $include;
    foreach my $m (@module) {
-      my $include="feed/$m.pm";
+      $include="$awstandard::codedir/feed/$m.pm";
       next if(!-e $include);
       $module=$m;
       last;
@@ -85,7 +86,6 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
       }
 	}
 
-   my $include="feed/$module.pm";
    print "$module feed".br;
    if(-e $include) {
       if($debug) {
