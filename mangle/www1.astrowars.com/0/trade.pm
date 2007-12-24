@@ -5,7 +5,7 @@ s%<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#000000' width="600
 
 # add artifact number info
 if(1 || $mangle::dispatch::g) {
-   our %artmap=(1=>"bm", 2=>"al", 4=>"cp", 8=>"cd", 3=>"cr", 12=>"mj", 15=>"hor");
+   our %artmap=(1=>"bm", 2=>"al", 4=>"cp", 8=>"cd", 5=>"cr", 10=>"mj", 15=>"hor");
    sub maparti($$) {
       my($code,$price)=@_;
       my $art;

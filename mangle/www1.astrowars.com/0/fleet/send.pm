@@ -141,8 +141,8 @@ if(1) {
 		When you double-checked your target, deactivate the checkbox to override<br>";
 	}
 
-   $form.="<label for=\"launch\"> Or click <input type=\"submit\" id=\"launch\" value=\"Launch !!!\" class=smbutton></label></form>";
-   s%</small>% $& $form%;
+   $form.="<label for=\"launch\"> <input type=\"submit\" id=\"launch\" value=\"Launch !!!\" class=smbutton></label></form>";
+   s%<small>To launch your fleet deactivate the Arrival Time Calculator.{0,4}</small>% $form%;
 
    my $link=$::bmwlink.awstandard::awsyslink($destsid,1,$destpid);
    $link=~s/.*(http:)/$1/;
