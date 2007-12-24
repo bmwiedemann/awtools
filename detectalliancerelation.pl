@@ -2,6 +2,7 @@
 # this code is Copyright Bernhard M. Wiedemann and licensed under GNU GPL
 use strict;
 use awinput;
+use DBAccess2;
 awinput_init(1);
 
 if(scalar keys %::alliances<10) {exit 0}
@@ -13,6 +14,7 @@ my %battlecv;
 my %battlenum;
 my %killedcv;
 my $maxkilledcv=0;
+my %bonuspoints;
 
 sub max($$) {$_[0]>$_[1]?$_[0]:$_[1]}
 
@@ -112,6 +114,27 @@ for my $sid (1..6000) {
  }
 }
 
+my $dbh=get_dbh();
+if($dbh) {
+my $intertrades=$dbh->selectall_arrayref("
+SELECT p1.alliance, p2.alliance, COUNT( p1.alliance )
+FROM `alltrades` , player AS p1, player AS p2
+WHERE pid1 = p1.pid
+AND pid2 = p2.pid
+AND p1.alliance !=0
+AND p2.alliance !=0
+AND p1.alliance < p2.alliance
+GROUP BY p1.alliance, p2.alliance
+");
+   foreach my $a (@$intertrades) {
+      my ($a1,$a2,$n)=@$a;
+      my $bonus=0.7*$n*1.1**$n;
+#     print "debug: $a1 x $a2 x $n $bonus\n";
+      $bonuspoints{"$a1,$a2"}+=$bonus;
+      $bonuspoints{"$a2,$a1"}+=$bonus;
+   }
+}
+
 #sub sortfunc { return $relation{$b}<=>$relation{$a} }
 sub sortfunc { return $nsystems{$b}<=>$nsystems{$a} || $relation{$b}<=>$relation{$a}}
 
@@ -131,10 +154,11 @@ foreach my $rel (sort sortfunc keys %relation) {
    my $battlenum=$battlenum{$rel}||0;
    my $killedcv=$killedcv{$rel}||0;
    my $killedcv2=$killedcv{$rrel}||0;
+   my $bonusp=$bonuspoints{$rel}||0;
 	$a[0]=allianceid2tag($a[0]);
 	$a[1]=allianceid2tag($a[1]);
    my $cvpoints=1.5*max(0, $killedcv+$killedcv2-$maxkilledcv/2)/($maxkilledcv+1);
-	my $f=sprintf "%.4f",$relation{$rel}/$n-3-$conq/($n**0.25) -$cvpoints; # friendship rating
+	my $f=sprintf "%.4f",$relation{$rel}/$n-3-$conq/($n**0.25) -$cvpoints+$bonusp; # friendship rating
    my $allis="$a[0] -- $a[1]; //";
    while(length($allis)<16) {$allis.="/"}
 	print "$allis $relation{$rel} $nsystems{$rel} $conq1 $conq2 $pop1 $pop2 $killedcv2 $killedcv $battlecv $battlenum $f\n";
