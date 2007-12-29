@@ -1,0 +1,44 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+use DBAccess;
+awstandard_init();
+#awinput_init();
+
+our %options;
+print AWheader("AW alliance relations tool");
+print start_form(-name=>"form", -method=>"get"),textfield(-name=>'p', -class=>'text')," Alliance",br,
+   submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p"),hr;
+if(param()) {
+	foreach my $p (qw(p relation comment)) {
+		$options{$p}=param($p);
+	}
+   if($options{p}){$options{p}=~s/[^a-zA-Z]//g;} # sanitize user input;
+   
+   if(!$options{relation}) {
+      # query existing values
+      my $entry=get_one_rowref("SELECT status,info FROM allirelations WHERE alli=? AND tag=?", [$ENV{REMOTE_USER},$options{p}]);
+      if(!$entry) {
+         param("relation", "4");
+      } else {
+         param("relation", $entry->[0]);
+         param("comment", $entry->[1]);
+      }
+   } else {
+      # save new values
+      my $sth=$dbh->prepare("REPLACE INTO allirelations VALUES (?,?,?,?)");
+      $sth->execute($options{p},$ENV{REMOTE_USER},$options{relation},$options{comment});
+   }
+
+   print start_form(-name=>"form2"),hidden("p"),
+         popup_menu(-name=>'relation', -values=>[1..9],   
+                     -labels=>\%awstandard::relationname), " relation", br,
+         textarea(-name=>'comment', -value=>$options{comment}, -class=>'text', -rows=>9, -cols=>40), " who added them, why, contact, etc...", br,
+         submit(-name=>"submit", -class=>"smbutton");
+   
+} 
+print AWtail();
+
