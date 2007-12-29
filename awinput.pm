@@ -180,7 +180,13 @@ sub getrelation($;$) { my($name)=@_;
       }
 		elsif($aid>0) {$ally=$atag=$alliances{$aid}{tag};}
 		if(!$aid) { return undef }
+		
 #		print "id $id a $aid at $atag\n<br>";
+		my($status)=get_one_row("SELECT `status` FROM `allirelations` WHERE `alli` = ? AND `tag` = ?", [$ENV{REMOTE_USER}, $atag]);
+		if(defined($status)) {
+         if($aid==-2){$atag=undef} # no real tag when using tag from last round
+			return($status,$atag,$info,0,$hadentry,$lname)
+		}
 		my $rel2=$relation{"\L$atag"};
 		if($rel2) { 
 			$rel2=~/^(\d+) (\w+) /s;

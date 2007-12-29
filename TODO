@@ -11,7 +11,7 @@ parse every page into JSON-exported structure (and possibly use that for feeding
 #brownie: fleet/send target planet highlight
 #arrival-find: E=0..4 speed=22..26 dist=0 planet=1,2,4
 #allow dropping toolsaccess bits granted by others (set mask)
-use allirelations table (in addition to prev method)
+#use allirelations table (in addition to prev method)
 use login table to take load off relations dbm (missing/broken data?)
 move relations to mysql
 #orange-bg incomings
