@@ -24,7 +24,7 @@ sub tlink(@) { my($a)=@_;
    } else {
       my @extra=();
       if($a->[0]=~m/^http:\/\/www.?\.astrowars.com/) {push(@extra, -class=>"aw")}
-      if($a->[0]=~m/^http:\/\/(lefois.de|azgharde.free.fr|neron92.free.fr)/) {push(@extra, -class=>"othertool")}
+      if($a->[0]=~m/^http:\/\/(lefois.de|azgharde.free.fr|neron92.free.fr|www.astrowars-tools.com)/) {push(@extra, -class=>"othertool")}
       return a({-href=>$$a[0], @extra},$$a[1]);
    }
 }
@@ -168,7 +168,9 @@ if(param("legend")) {
       my @nstarmaplink=("http://neron92.free.fr/AW_Tools/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
       my @lstarmaplink=("http://lefois.de/aw/tool/map.php?R_pid=&R_sysid=$system&lb=1&coord=1&details=1","lefoisstarmap");
       my @lbattleslink=("http://lefois.de/aw/tool/battles.php?&days=all&sysid=$system", "lefoisbattles");
-      my @abattleslink=("http://azgharde.free.fr/tools/details.php?nr=$system", "azghardebattles");
+#      my @abattleslink=("http://azgharde.free.fr/tools/details.php?nr=$system", "azghardebattles");
+      my @rbattleslink=("http://www.astrowars-tools.com/tools/battles.php?date=all&sys_id=$system", "Rastabattles");
+      my @rhistorylink=("http://www.astrowars-tools.com/tools/infos.php?sys_id_history=1&sys_id=$system","Rastahistory");
       my @lhistorylink=("http://lefois.de/aw/tool/systemhistory.php?R_sysid=$system", "lefoishistory");
       my @mapdetailslink=("http://$server/0/Map/Detail.php/?nr=$system","Map/Details");
       if(!$options{export}) {
@@ -178,7 +180,7 @@ if(param("legend")) {
             $sysinfo=~s!^<br />!!;
             $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/aw/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
          }
-			tprint $output, $eol, a({-href=>"tactical-live2?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@abattleslink)." ".tlink(\@lbattleslink)." ".tlink(\@lhistorylink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,bbcode_trans($sysinfo),
+			tprint $output, $eol, a({-href=>"tactical-live2?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@rbattleslink)." ".tlink(\@rhistorylink)." ".tlink(\@lbattleslink)." ".tlink(\@lhistorylink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,bbcode_trans($sysinfo),
 			"planets here: <a name=\"planets\" /><ul>";
 		} else {
 			$output.=tlink(\@nstarmaplink)." ".tlink(\@lstarmaplink)." ".tlink(\@mapdetailslink)." [url=http://$bmwserver/cgi-bin/system-info?id=$system]AWtool-link[/url]$eol";

@@ -123,7 +123,8 @@ if($options{name}) {# && $options{name} ne "unknown") {
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
          a({class=>"othertool", -href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".
          a({class=>"othertool", -href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"Lefoisbattles")," ",
-            a({class=>"othertool", -href=>"http://azgharde.free.fr/tools/battles.php?pl=$user&da=all"},"azghardebattles"), " ",
+         a({class=>"othertool", -href=>"http://www.astrowars-tools.com/tools/battles.php?player=$user"},"Rastabattles")," ",
+#            a({class=>"othertool", -href=>"http://azgharde.free.fr/tools/battles.php?pl=$user&da=all"},"azghardebattles"), " ",
 #            a({class=>"othertool", -href=>"http://odbvpn.ath.cx:89/pub/view_battles.php?player=$user&date=all"},"battles"),
             " ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
 	print hidden(-name=>'name', $user);

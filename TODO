@@ -3,7 +3,8 @@
 #alltrades live update
 #public updated trade bonus table
 man/FAQ: it uses known IRs or worst case (att=+4, phys=SL) to calc xCV. you can see the original fleet numbers by pointing your mouse over the line.
-parse every page into JSON-exported structure (and possibly use that for feeding DBs)
+#warn if launch-target is someone else's planet and there is no "plan" to that target
+big: parse every page into JSON-exported structure (and possibly use that for feeding DBs)
 
 #admin: lookup ip->hostname+username
 #admin: lookup name->ips
@@ -114,4 +115,8 @@ merge strongest fleets history to catch moving fleets or see growth/loss
 changing the map look to look more "AW-like" - much like Mob's tools... I really think that would encourage people to use the tools more than they do today...
 
 -wie wäre es mit einer möglichkeit eine sys ID, einen energylevel und einen biolevwel einzugeben und dann werden alle potentiellen jumper mit weniger als 2h flugzeit gesucht, als optionen kann man alle von aktiven und verbündeten, von kleinen spielermn und free/unknown einzeln filtern lassen
+
+#alliance: add player.trade column
+[AF] Teddy_200: another thing too that would be nice is an alliance TA statistics page, with things like average number of TAs in an alliance, Average TR, prehaps date when the members got their TAs etc. Thins like that
+[AF] Teddy_200: at least if someone got a TA last update it would be marked somehow - that way you would know that player has just "lost" 20kA$...
 

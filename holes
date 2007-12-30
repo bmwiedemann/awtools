@@ -12,7 +12,7 @@ my %options;
 for my $p (qw'sort') {
    $options{$p}=param($p);
 }
-if(!defined $options{sort}){$options{sort}="5.-7.4";}
+if(!defined $options{sort}){$options{sort}="-7.4";}
 
 sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 

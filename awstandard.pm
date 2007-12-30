@@ -105,7 +105,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/code/css/tools/common.css" />!);
 #   push(@$heads, "<title>$title</title>");
 	$owncgi=~s!/cgi-bin/(?:modperl/)?!!;
-	foreach my $item (qw(index.html preferences tactical-live tactical-live2 relations alliance system-info fleets)) {
+	foreach my $item (qw(index.html tactical-live tactical-live2 relations allirelations alliance system-info fleets)) {
 		my %h=(href=>$item);
 		if($item eq $owncgi) {
 			$h{class}='headeractive';
@@ -206,7 +206,7 @@ sub systemlink($) { my($id)=@_;
 }
 
 sub alliancelink($) { my($atag)=@_;
-   a({-href=>"alliance?alliance=$atag&omit=9+12"},"[$atag]");
+   a({-href=>"alliance?alliance=$atag&omit=10+13+16"},"[$atag]");
 }
 
 

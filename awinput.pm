@@ -8,7 +8,7 @@ require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%prices,%relation,%planetinfo,
    $dbnamer,$dbnamep);
-my $startofround=1; # ((gmtime())[7]%91) <20
+my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
@@ -126,7 +126,7 @@ sub getuseridcookie()
 sub is_startofround()
 {
 # 91 is a good approximate of a quarter year because 4*91 = 364
-   return ((gmtime())[7]%91) <21;
+   return $startofround; #((gmtime())[7]%91) <21;
 }
 sub is_admin()
 {
@@ -905,7 +905,7 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
          my $sth=$dbh->prepare("UPDATE `internalintel` SET `etc`=? WHERE `alli`=? AND `pid`=?");
          my $r=$sth->execute($etc, $ENV{REMOTE_USER},$pid);
       }
-	}
+   }
 	untie %relation;
 	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
@@ -1179,7 +1179,7 @@ sub display_relation($) { my($rel)=@_;
    return qq'<span style="background-color: $c">&nbsp;$rn&nbsp;</span>';
 }
 sub display_atag($) { my($atag)=@_;
-   a({-href=>"alliance?alliance=$atag&omit=9+12+15"},$atag);
+   a({-href=>"alliance?alliance=$atag&omit=10+13+16"},$atag);
 }
 sub display_sid($) { my($sid)=@_;
    my ($x,$y)=systemid2coord($sid);
