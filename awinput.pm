@@ -14,7 +14,7 @@ our $alarmtime=99;
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores
+&awinput_init &getrelation &getallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
 &playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &gettradepartners &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
@@ -155,6 +155,22 @@ sub is_founder($)
 #   return 0;
 }
 
+# input: atag 
+# in env: $ENV{REMOTE_USER}
+# output: (status,info) , undef if not found
+sub getallirelation($) {
+	my($atag)=@_;
+	my($status,$info)=get_one_row("SELECT `status`,`info` FROM `allirelations` WHERE `alli` = ? AND `tag` = ?", [$ENV{REMOTE_USER}, $atag]);
+	# TODO remove fallback to old DBM relation in GE10
+	if(!defined($status)) {
+		my $rel2=$relation{"\L$atag"};
+		if($rel2 && $rel2=~/^(\d+) \w+ /s) {
+			return($1,$');
+		}
+	}
+	return($status,$info);
+}
+
 sub getrelation($;$) { my($name)=@_;
 	my $lname="\L$name";
 	my $rel=$relation{$lname};
@@ -182,16 +198,10 @@ sub getrelation($;$) { my($name)=@_;
 		if(!$aid) { return undef }
 		
 #		print "id $id a $aid at $atag\n<br>";
-		my($status)=get_one_row("SELECT `status` FROM `allirelations` WHERE `alli` = ? AND `tag` = ?", [$ENV{REMOTE_USER}, $atag]);
+		my($status)=getallirelation($atag);
 		if(defined($status)) {
          if($aid==-2){$atag=undef} # no real tag when using tag from last round
 			return($status,$atag,$info,0,$hadentry,$lname)
-		}
-		my $rel2=$relation{"\L$atag"};
-		if($rel2) { 
-			$rel2=~/^(\d+) (\w+) /s;
-         if($aid==-2){$atag=undef} # no real tag when using tag from last round
-			return ($1,$atag,$info,0,$hadentry,$lname);
 		}
 		if(!$rel) { return undef }
 		last;
