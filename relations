@@ -24,7 +24,6 @@ for my $p (qw'id name alliance relation comment submit') {
 	$options{$p}=param($p);
 }
 if(defined($options{submit}) && $options{submit}=~/delete/) { $options{delete}=1 }
-if($options{id}) { $options{name}=playerid2namem($options{id}); param("name",$options{name}) }
 
 if($options{comment}) {
    $options{comment} =~ s/[<>]//g;
@@ -34,7 +33,16 @@ if($options{alliance}) {
 }
 if($options{name}) {
 	$options{name} =~ s/[^a-zA-Z0-9.äöüÖÜÄß*û _:()!|{}\]\[-]+//g;
+	$options{id}=playername2idm($options{name}); param("id", $options{id});
 }
+if($options{id}) { $options{name}=playerid2namem($options{id}); param("name",$options{name}) }
+
+
+print start_form(-method=>'get', -name=>"form", -enctype=>"application/x-www-form-urlencoded"), textfield(-name=>'name', -class=>'text', -onchange=>"document.form.id.value=''"), " user name", br,
+"or",br,
+textfield(-name=>'id', -class=>'text', -onchange=>"document.form.name.value=''").AWfocus("form.name"), " user ID",br,
+ submit(-name=>"query", -class=>'smbutton'),reset(-class=>'smbutton'),
+ end_form;
 
 if(!$readonly && defined($options{relation})) {
    my $n=lc($options{name});
@@ -58,6 +66,7 @@ if(!$readonly && defined($options{relation})) {
 }
 
 if($options{name}) {# && $options{name} ne "unknown") {
+	print hr;
 	my $user=$options{name};
 #	$user =~ y/A-Z/a-z/;
 	my $new="edit existing entry";
@@ -110,7 +119,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	$atag=$atag?" ".alliancelink($atag):"";
    my $pldurl=getallidetailurl($id);
    if($pldurl) {$extralinks=a({-href=>$pldurl},img({-src=>"/images/aw/profile3.gif", -alt=>"alliance profile"})).$extralinks;}
-	print start_form(-name=>"form"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag.$lasttag." ", profilelink($id), $extralinks, 
+	print start_form(-name=>"form2"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag.$lasttag." ", profilelink($id), $extralinks, 
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
          a({class=>"othertool", -href=>"http://lefois.de/aw/tool/info.php?R_name=".$user}, "Lefois")." ".
          a({class=>"othertool", -href=>"http://www.lefois.de/aw/tool/battles.php?&days=all&R_pid=$id"},"Lefoisbattles")," ",
@@ -127,6 +136,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	 #.submit(-name=>"submit", -value=>"delete")
     #.AWfocus("form.relation")
 	;
+	print end_form;
 	if($id>2) {
 		my @pl=playerid2planetsm($id);
 		my $planets=@pl;
@@ -234,12 +244,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
          print "</code>";
       }
 	}
-} else {
-	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'name', -class=>'text'), " user name", br,
-   "or",br,
-   textfield(-name=>'id', -class=>'text').AWfocus("form.name"), " user ID",br,
-	 submit(-name=>"query", -class=>'smbutton'),reset(-class=>'smbutton');
-}
-print end_form, AWtail();
+} 
+print AWtail();
 #foreach(keys %ENV) {  print "$_ $ENV{$_}<br>";}
 
