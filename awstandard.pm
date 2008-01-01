@@ -170,6 +170,7 @@ sub parseawdate($) {my($d)=@_;
         my ($curmon,$year)=(gmtime())[4,5];
         my $mon=mon2id($val[3]);
         if($mon<$curmon-6){$year++}
+        if($mon>$curmon+6){$year--}
         return timegm($val[2],$val[1],$val[0],$val[4], $mon, $year);
 }
 
