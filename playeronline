@@ -7,8 +7,9 @@ use awstandard;
 use awinput;
 #awstandard_init();
 awinput_init();
+use constant DAYSECS => 3600*24;
 
-our $ticks=3;
+our $ticks=3; # chars per hour - must be positive integer
 our $granularity=24*$ticks;
 my $unk="?";
 my %cmap=($unk=>"gray", X=>"green", "-"=>"red");
@@ -17,7 +18,7 @@ our $firstlog=0;
 my $firstlogt;
 sub time2dt($) { my($time)=@_;
       my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);
-      $yday*$granularity+ int(($sec+$min*60+$hour*3600)*$granularity/86400)-$firstlog;
+		return int($time/DAYSECS*$granularity - $firstlog);
 }
 
 my %options;
