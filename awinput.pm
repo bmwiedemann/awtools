@@ -1125,6 +1125,17 @@ sub get_fleet($) {
    return $res;
 }
 
+sub fleet_launch_url($)
+{ my($f)=@_;
+	my %opts;
+	my $sidpid;
+	($sidpid, $opts{inf}, $opts{col}, $opts{des}, $opts{cru}, $opts{bat})=@$f[3,8..12];
+	$opts{nr}=sidpid2sidm($sidpid);
+   $opts{id}=sidpid2pidm($sidpid);
+	my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
+	return("http://www1.astrowars.com/0/Fleet/Launch.php/?$params");
+}
+
 our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
 # input: 1 row from fleet table
 # output: HTML for a short display of fleet with detailed info in title=
@@ -1150,7 +1161,11 @@ sub show_fleet($) { my($f)=@_;
    my $pid=sidpid2pidm($sidpid);
    my $xinfo="$sid#$pid".": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
    if($info) {$info=" ".$info}
-   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"${toolscgiurl}edit-fleet?fid=$fid\">edit</a> <a href=\"${toolscgiurl}fleetbattlecalc?fid=$fid\">bc</a> <a href=\"${toolscgiurl}whocanintercept?p=$sid%23$pid&amp;cvlimit=$cv\">catch</a> $eta $flstr ".playerid2link($owner).$info."</span>";
+	my $launch="";
+	if(1) {
+		$launch=" ".a({-href=>fleet_launch_url($f)}, "launch");
+	}
+   return "<span style=\"font-family:monospace $color\" title=\"$xinfo\"><a href=\"${toolscgiurl}edit-fleet?fid=$fid\">edit</a> <a href=\"${toolscgiurl}fleetbattlecalc?fid=$fid\">bc</a> <a href=\"${toolscgiurl}whocanintercept?p=$sid%23$pid&amp;cvlimit=$cv\">catch</a>$launch $eta $flstr ".playerid2link($owner).$info."</span>";
 }
 
 sub playerid2plans($)
