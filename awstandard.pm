@@ -2,6 +2,7 @@ package awstandard;
 
 use strict;
 require 5.002;
+use constant DAYSECS => 3600*24;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);

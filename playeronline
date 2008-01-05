@@ -6,8 +6,7 @@ use CGI ":standard";
 use awstandard;
 use awinput;
 #awstandard_init();
-awinput_init();
-use constant DAYSECS => 3600*24;
+awinput_init(1);
 
 our $ticks=3; # chars per hour - must be positive integer
 our $granularity=24*$ticks;
@@ -18,7 +17,7 @@ our $firstlog=0;
 my $firstlogt;
 sub time2dt($) { my($time)=@_;
       my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);
-		return int($time/DAYSECS*$granularity - $firstlog);
+		return int($time/awstandard::DAYSECS*$granularity - $firstlog);
 }
 
 my %options;

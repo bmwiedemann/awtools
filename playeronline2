@@ -7,7 +7,7 @@ use CGI ":standard";
 use awstandard;
 use awinput;
 #awstandard_init();
-awinput_init();
+awinput_init(1);
 
 our $ticks=4;
 our $granularity=24*$ticks;
@@ -18,7 +18,7 @@ our $firstlog=0;
 my $firstlogt;
 sub time2dt($) { my($time)=@_;
       my($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime($time);
-      $yday*$granularity+ int(($sec+$min*60+$hour*3600)*$granularity/86400)-$firstlog;
+      return int($time/awstandard::DAYSECS*$granularity - $firstlog);
 }
 
 my %options;
