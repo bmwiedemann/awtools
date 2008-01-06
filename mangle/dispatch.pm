@@ -89,10 +89,13 @@ sub mangle_dispatch(%) { my($options)=@_;
       my $module="";
       push(@module, url2pm($url));
       foreach my $m (@module) {
-         my $include="mangle/$m.pm";
+         my $include="$awstandard::codedir/mangle/$m.pm";
          next if(!-e $include);
          my $ret=do $include;
          next if $ret==2;
+			if($ret==30) {
+				return; # return $_ verbatim
+			}
          if($@) {$module="error in $m: $@";}
          else { $module="mangled $m";} # for the log
          # is handled now, so stop filtering
