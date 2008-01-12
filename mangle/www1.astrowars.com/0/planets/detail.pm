@@ -33,7 +33,7 @@ s%^([^<]+) (\d{1,2})(</td></tr>)%manglesys($1, $2).$3%me;
 my $dscost="";
 if(m%/0/Glossary//\?id=17> Destroyer.*\n<td colspan="2">\d+/(\d+)</td></tr>%) {
    $dscost="&amp;dscost=$1";
-   s%(<td><a href="/0/Planets/Spend_Points.php/\?p=\d+&i=\d+)("><b>Spend Points</b></a></td>)%$1$dscost$2%;
+   s%(<td><a href="/0/Planets/Spend_Points.php/\?p=\d+&)(i=\d+)("><b>Spend Points</b></a></td>)%$1amp;$2$dscost$3%;
 }
 
 
@@ -81,17 +81,29 @@ foreach my $n (0..$#buildings) {
 #      $debug.="$level $ppneeded<br>";
    }
    if($ppneeded>$pp && $ppplus && $prodbonus) {
-      my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%i%%)</style>",($ppneeded-$realpp)/$ppplus/$prodbonus, 100*$prodbonus);
+      my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%i%%)</span>",($ppneeded-$realpp)/$ppplus/$prodbonus, 100*$prodbonus);
       s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5&nbsp;$hours$6%;
       next;
    }
    next if(($ppneeded>1000 && $buil ne "Starbase") || $ppneeded>$pp);
-   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$5&amp;produktion=$val[$n]$dscost" style="background-color:blue">+1</a>$6%;
+
+	my $onclickjs=qq%
+	var d=document.getElementById('spenddiv');
+	d.style.display='inline';
+	var l=document.getElementById('spendlink$n');
+	l.href='#';
+	document.form.building$n.checked=true;
+	document.form.points.focus();
+	document.form.points.select();
+	%;
+
+   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$5&amp;produktion=$val[$n]$dscost" style="background-color:blue" onclick="
+	document.form.points.value='$5'; $onclickjs">+1</a>$6%;
 #   $debug.="<br>test: $buil $val[$n] $2 $4";
 }
 
 if($popplus && $popbonus) { # add hours to pop-growth
-   my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%i%%)</style>", $popneeded/$popplus/$popbonus, 100*$popbonus);
+   my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%i%%)</span>", $popneeded/$popplus/$popbonus, 100*$popbonus);
    s%(id=23>\+\d+</a></td><td>\s*\d+</td>.*\n\d+)(</td></tr>)%$1&nbsp;$hours$2%;
 }
 
@@ -111,6 +123,38 @@ if(1) {
       $&%m
    }
 }
+
+s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/planets_spend_points.js"></script>$&%;
+my $spend=qq!
+<div style="display:none" id="spenddiv">
+<table class="main_outer"><tr><td>
+<form action="/0/Planets/submit.php" name="form" method="post">
+<table class="main_inner" cellspacing="1">
+<tr align=center><td bgcolor="#202060">Where to spend <input type="text" name="points" size="3" id="ppvalue" class="text" value="" > <span id="ppmaxvalue"></span> <a class="awtools" href="#all" onClick="document.form.points.value=198;">all</a> <a class="awglossary" href="/0/Glossary//?id=21"> Production Point(s)</a>? </td></tr></table>
+<table border="0" cellspacing="1" cellpadding="1" bgcolor='#000000'>
+<tr align=center><td bgcolor='#404040' width="135">Hydroponic Farm</td><td><input type="radio" name="produktion" id="building0" value="farm"></td><td bgcolor='#404040' width="135">Transport</td><td><input type="radio" name="produktion" value="infantrieschiff">
+         </td></tr>
+<tr align=center><td bgcolor='#404040'>Robotic Factory</td><td><input type="radio" name="produktion" id="building1" value="fabrik"></td><td bgcolor='#404040'>Colony Ship</td><td><input type="radio" name="produktion" value="kolonieschiff">
+         </td></tr>
+<tr align=center><td bgcolor='#404040'>Galactic Cybernet</td><td><input type="radio" name="produktion" id="building2" value="kultur"></td><td bgcolor='#404040'>Destroyer</td><td><input type="radio" name="produktion" value="destroyer">
+         </td></tr>
+
+<tr align=center><td bgcolor='#404040'>Research Lab</td><td><input type="radio" name="produktion" id="building3" value="forschungslabor"></td>
+<td bgcolor='#404040'>Cruiser</td><td><input type="radio" name="produktion" value="cruiser">
+         </td></tr>
+<tr align=center><td bgcolor='#404040'>Starbase</td><td><input type="radio" name="produktion" id="building4" value="starbase"></td><td bgcolor='#404040'>Battleship</td><td><input type="radio" name="produktion" value="battleship">
+         </td><td><input type="submit" value="Spend PP" class="smbutton">
+<input type="hidden" name="i" value="$planet"></td></tr>
+</table>
+</form>
+<a name="spend"></a>
+</table>
+</div>
+</center>
+!;
+
+s{</body>}{$spend$&};
+
 $_.=$debug;
 
 1;
