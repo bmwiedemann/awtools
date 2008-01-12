@@ -113,7 +113,9 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
 
 # add button for bouncing a fleet
 my($sid,$pid)=($::options{url}=~/\bnr=(\d+).*\bid=(\d+)/);
-my $loop=qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; f.destination2.value=f.destination.value=$sid">loop fleet</a>%;
-s%(<td colspan=")3(" bgcolor='#602020'> <input type="submit".*</td>)%${1}1$2<td colspan="2" bgcolor="#206020">$loop</td>%;
+if($sid && $pid) {
+	my $loop=qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; f.destination2.value=f.destination.value=$sid">loop fleet</a>%;
+	s%(<td colspan=")3(" bgcolor='#602020'> <input type="submit".*</td>)%${1}1$2<td colspan="2" bgcolor="#206020">$loop</td>%;
+}
 
 1;
