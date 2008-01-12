@@ -1,7 +1,7 @@
 use strict;
 use awparser;
 
-if($::options{url}=~m/Trade\/(?:\?debug.*)?$/) {
+if($::options{url}=~m/Trade\/$/) {
 
    my @p=();
    my @arti=();

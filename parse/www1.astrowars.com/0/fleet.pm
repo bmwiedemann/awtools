@@ -3,7 +3,7 @@ use awparser;
 use awstandard;
 use awinput;
 
-if($::options{url}=~m/Fleet\/(?:\?debug.*)?$/) {
+if($::options{url}=~m/Fleet\/$/) {
    my @fleet;
    my @movingfleet;
    foreach my $line (m{<tr (.+?)</tr>}g) {
@@ -31,6 +31,7 @@ if($::options{url}=~m/Fleet\/(?:\?debug.*)?$/) {
    $d->{movingfleet}=\@movingfleet;
    $d->{fleet}=\@fleet;
 # TODO pending
+# TODO add marker when >20 fleet warning appears
 }
 
 2;
