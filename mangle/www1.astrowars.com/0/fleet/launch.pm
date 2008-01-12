@@ -56,7 +56,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
    if($race) {$refs=$$race[4];}
    if($sci) {if($$sci[0]>99){shift(@$sci)};$refe=$$sci[2]}
    my @c1=systemid2coord($srcsid);
-   if(defined($refs) && defined($refe) && $srcsid && defined(@c1)) {
+   if(defined($refs) && defined($refe) && $srcsid && (@c1)) {
       $refs=1+$refs*$awstandard::racebonus[4];
       s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/arrival.js"></script><script type="text/javascript" src="http://aw.lsmod.de/code/js/bmwajax.js"></script>$&%;
       
@@ -85,7 +85,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
             $o||=0;
             $own.=",$o";
          }
-         next if(!defined(@c2));
+         next if(!(@c2));
          my $dist=($c2[0]-$c1[0])**2 + ($c2[1]-$c1[1])**2;
          push(@distlist, "disttable[$sid]=[$dist$own];\n");
       }
@@ -110,5 +110,10 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
    s% name="destination2"%onchange="asyncfetchdist(document.forms[0].destination2.value)"$&%;
    s%</body>%<span class="bmwnotice">note: predicted arrival time will be wrong if your local clock is wrong (or target ownership changed).</span>$&%
 }
+
+# add button for bouncing a fleet
+my($sid,$pid)=($::options{url}=~/\bnr=(\d+).*\bid=(\d+)/);
+my $loop=qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; f.destination2.value=f.destination.value=$sid">loop fleet</a>%;
+s%(<td colspan=")3(" bgcolor='#602020'> <input type="submit".*</td>)%${1}1$2<td colspan="2" bgcolor="#206020">$loop</td>%;
 
 1;
