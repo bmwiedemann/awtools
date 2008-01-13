@@ -66,6 +66,9 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
       if($2=~m/^ \((\d+)/) {
          $d->{permarank}=int($1);
       } else { $d->{permarank}=0 }
+      if($line=~m{<font color="#AAAAAA">\[(\w+)\]</font>}) {
+         $d->{tag}=$1;
+      }
    } else {
 #      $d->{$n++}=$line;
    }
