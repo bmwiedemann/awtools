@@ -1,6 +1,7 @@
 use strict;
 use awparser;
 
+if($::options{url}=~m{Alliance/$}) {
 my @members=();
 foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}gs) {
 	if($line=~m/^"?#303030/) {
@@ -33,6 +34,7 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}gs) {
 }
 
 $d->{members}=\@members;
+}
 
 # TODO: bool:isleader
 
