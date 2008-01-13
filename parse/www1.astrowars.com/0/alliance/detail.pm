@@ -1,9 +1,21 @@
 use strict;
 use awparser;
+use awstandard;
 
+# fleets and planets
 my @planets=();
+my @movingfleet=();
 foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 	if(my @a=($line=~m{^#(\d+)><td(?: title="([^"]*)")?>})) {
+		if($a[0] eq "404040") {
+			my @d=split("</td><td[^>]*>",$');
+			my $sid=shift(@d);
+			next if $sid eq "SID";
+			my $pid=shift(@d);
+			my $eta=parseawdate(shift(@d));
+			push(@movingfleet, {sid=>$sid, pid=>$pid, eta=>$eta, ships=>[map {int($_)} @d]});
+			next;
+		}
 		my @d=split("</td><td>",$');
 		my $siege;
 		if($a[0] eq "303030") {
@@ -15,11 +27,17 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 			next;
 		}
 		my @extra=();
-		if($d[3] eq "N/A") { push(@extra, foreignplanet=>1) }
-		push(@planets, {name=>$a[1], siege=>$siege, data=>\@d, @extra});
-	}
+		my ($sid,$pid,$pop)=(shift(@d),shift(@d),shift(@d));
+		my @ships=splice(@d, 5, 5);
+		if($d[3] eq "N/A") { push(@extra, foreignplanet=>1); splice(@d,0,5); }
+		foreach my $a (@ships) {$a+=0}
+		foreach my $a (@d) {$a+=0}
+		
+		push(@planets, {sid=>int($sid), pid=>int($pid), "pop"=>int($pop), name=>$a[1], siege=>$siege, buildings=>\@d, ships=>\@ships, @extra});
+	} 
 }
-$d->{planets}=\@planets;
+$d->{planetdata}=\@planets;
+$d->{movingfleet}=\@movingfleet;
 
 # trades
 if(m{<tr bgcolor=#303030><td colspan=2>(.+?)<br></td></tr>}) {
@@ -36,6 +54,8 @@ if(m{<tr bgcolor=#303030><td colspan=2>(.+?)<br></td></tr>}) {
 if(m{<ul type=square><li>(.*?)</li></ul></td>}) {
 	my @a=split("</li><li>", $1);
 	foreach my $a (@a) {
+		if($a eq "Trader") { $d->{racetrader}=1 }
+		if($a eq "Start Up Lab") { $d->{racesul}=1 }
 		if($a=~m{^([-+]\d+)% (\w+) \(([-+]\d+)\)$}) {
 			$a=[$2, int($1), int($3)];
 			$d->{"race$2"}=[int($1), int($3)];
