@@ -18,6 +18,10 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 }
 $d->{members}=\@members;
 
+if(m{<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#000000' width="600"><tr><td><center>([^<]*)<br>}) {
+	$d->{name}=$1;
+}
+
 foreach my $m ("next", "previous") {
 	if(m{Alliance/List.php/\?start=(\d+)><b>$m</b></a>}) {
 		$d->{$m}=int($1);

@@ -1,18 +1,8 @@
 use strict;
 use awparser;
+use awinput;
 
-m{<tr align=center bgcolor="#202060"><td>#(\d+)</td><td><a href=/0/Glossary//\?id=7>lvl</a></td>};
-$d->{n}=int($1);
-my @a=m{id=23>\+(\d+)</a></td><td> (\d+)</td><td><img src="/images/dot.gif" height="10" width="([0-9.]+)"><img src="/images/leer.gif" height="10" width="([0-9.]+)"></td><td>\n(\d+)</td></tr>};
-{
-   my @b=splice(@a,2,2);
-   $a[1]+=$b[0]/340;
-   for my $a (@a) {$a+=0}
-}
-$d->{poplevel}=\@a;
-
-my @n;
-my $n=0;
+#my @n;
 foreach my $line (m{<tr align=center(.*?)</td></tr>}gs) {
    if($line=~m{([0-9.+]+)</td><td><img src="/images/dot.gif" height="10" width="([0-9.]+)"><img src="/images/leer.gif" height="10" width="([0-9.]+)"></td>}) {
       my $num=$1+$2/340;
@@ -29,7 +19,15 @@ foreach my $line (m{<tr align=center(.*?)</td></tr>}gs) {
       }
       $d->{lc($n2)}=[$num,$n3,@extra];
 #      push(@n, [$n2,$num,$1]);
-   }
+   } elsif($line=~m{^><td colspan="5">\s*(.*) (\d+)}) {
+		$d->{name}=$1;
+		$d->{pid}=$2+0;
+		$d->{sid}=systemname2id($1);
+	} elsif($line=~m{^ bgcolor="#202060"><td>#(\d+)}) {
+		$d->{n}=int($1);
+	}
+#	elsif($line=~m{Garrison</td><td>qty}) {
+#	} else { $d->{debug}=$line; }
 }
 #$d->{test}=\@n;
 
