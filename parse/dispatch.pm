@@ -2,10 +2,12 @@ package parse::dispatch;
 use strict;
 use awstandard;
 use awparser;
+use Time::HiRes qw(gettimeofday tv_interval);
 
 sub dispatch($)
 {
 	my($options)=@_;
+	my $t0 = [gettimeofday];
 	$d={"servertime"=>time()};
 	my $url=$options->{url};
 	my @module=url2pm($url);
@@ -22,6 +24,7 @@ sub dispatch($)
 		# is handled now, so stop filtering
 		last;
 	}
+	$d->{parsetime}=tv_interval($t0);
 	return $d;
 }
 

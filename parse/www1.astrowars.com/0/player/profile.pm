@@ -10,14 +10,19 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
          $x=~s{.*>([^>]+)</a>}{$1}s;
       }
       $value=~s/\n//g;
-#      if($key eq "Playerlevel") {}
       if($key eq "Plays from") {
          ($value)=($value=~m-/images/flags/(\w{1,4})\.png-);
-         $d->{country}=$value||"";
+			$value||="";
       }
+		elsif($key eq "Trade Revenue") {
+			$value=~s/%$//;
+		}
+      elsif($key eq "Playerlevel") { 
+			$value=~s/(\d+) - (\d+)%/$1+$2\/100/e;
+		}
       elsif($key eq "Origin") {
          $value=~m{(-?\d+)/(-?\d+)};
-         $d->{origin}=[int($1),int($2)];
+         $value=[int($1),int($2)];
       }
       elsif($key eq "Rank (Points Scored)") {
          $value=~m{#(\d+) \((\d+)\)};
@@ -28,7 +33,7 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
          if($value=~m{bgcolor='#(\d+)'>Status}) {
             my $colour=$1;
             my %status=("206020"=>0, "606020"=>1, "602020"=>2);
-            $d->{multi}=[$colour, $status{$colour}];
+            $value=[$colour, $status{$colour}];
          }
       }
       elsif($key eq "Idle") {
@@ -48,13 +53,14 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
          $d->{idleunit}=$idleunit;
       }
       else {
-         my $k=lc($key);
-         $k=~s/[^a-z]//g;
-         if($k) {
-            $d->{$k}=toint($value);
-         }
       }
-      push(@data, [$key, toint($value)]);
+		$value=tofloat($value);
+      push(@data, [$key, $value]);
+		my $k=lc($key);
+		if($k) {
+			$k=~s/[^a-z]//g;
+			$d->{$k}=$value;
+		}
    } elsif ($line=~m{Race/Detail.php/\?id=([^"]*)}) {
       my @race=split(",",$1);
       foreach my $a (@race) {$a+=0}
