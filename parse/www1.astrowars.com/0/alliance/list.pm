@@ -12,7 +12,7 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 				$currentsci=$n;
 			}
 		}
-		for my $n(0,2..4,6..9) {$a[$n]+=0}
+		for my $n(0,2..4,6,7,9) {$a[$n]+=0}
 		push(@members, {id=>$a[0], name=>$a[1], rank=>$a[2], points=>$a[3], pl=>$a[4], cul=>$a[6], trade=>$a[7], artifact=>$a[8], idle=>$a[9], idleunit=>$a[10], sciences=>\@sci, currentresearch=>$currentsci});
 	}
 }

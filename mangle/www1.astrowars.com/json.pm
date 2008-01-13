@@ -8,7 +8,10 @@ my $data=parse::dispatch::dispatch(\%::options);
 
 if(!$::options{debug}) {
    $_="";
+	$_.=encode_json($data);
 }
-$_.=encode_json($data);
+else {
+	$_.=JSON::XS->new->utf8->pretty->encode($data);
+}
 
 30; # means return our output $_ verbatim
