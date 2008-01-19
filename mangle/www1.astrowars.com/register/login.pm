@@ -29,6 +29,8 @@ if($session && $name) {
       $sth->execute($session, $pid, $name, $time, $time, $::options{ip},
             $pid, $name, $time, $::options{ip},
             );
+      $sth=$dbh->prepare("UPDATE `brownieplayer` SET prevlogin_at=lastlogin_at, `lastlogin_at`=? WHERE `pid`=?");
+      $sth->execute($time, $pid);
 #   }
 }
 #$_.=" test $sess $name";
