@@ -10,7 +10,7 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}gs) {
 			my($points,$x)=(shift(@a),shift(@a));
 			$points=~s/.*>(\d+)/$1/s;
 			if($x=~m{mode=post&u=(\d+)>([^<]+)</a>}) {
-				push(@members, [int($points), int($1), $2]);
+				push(@members, {points=>int($points), pid=>int($1), name=>$2});
 			}
 		}
 	} elsif($line=~m{^"#404040"><td>Name</td><td colspan="2">\s*<a href=(http://[^<]*)>([^<]*)</a></td>}) {
@@ -23,7 +23,7 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}gs) {
 	} elsif($line=~m{^"#404040"><td colspan=4>Members - (\d+)</td>}) {
 		$d->{members}=int($1);
 	} elsif($line=~m{^"#404040"><td>Leader</td><td colspan="2"><a href=/0/Player/Profile.php/\?id=(\d+)>([^<]+)</a></td>}) {
-		$d->{leader}=[int($1),$2];
+		$d->{leader}={pid=>int($1), name=>$2};
 	} elsif($line=~m{^"#404040"><td>Tag</td><td colspan="2"><a href=/rankings/alliances/\w+.php>(\w+)</a></td>}) {
 		$d->{tag}=$1;
 	} elsif($line=~m{^"#894900.*all incomings}) {
@@ -33,7 +33,7 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}gs) {
 	}
 }
 
-$d->{members}=\@members;
+$d->{member}=\@members;
 }
 
 # TODO: bool:isleader

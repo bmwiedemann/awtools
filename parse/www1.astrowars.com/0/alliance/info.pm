@@ -13,7 +13,7 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 #		$d->{debug}=$line;
 	}
 }
-$d->{members}=\@members;
+$d->{member}=\@members;
 
 if(m!<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#000000' width="600"><tr><td><center>([^<]{1,60}) - <small>(.*)!) {
 	$d->{name}=$1;
