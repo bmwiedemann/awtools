@@ -7,7 +7,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 our $d=$::data;
 @EXPORT = 
 qw($d
-&tobool &toint &unprettyprint
+&tobool &toint &tofloat &unprettyprint
 );
 
 sub tobool($)
@@ -20,6 +20,14 @@ sub toint($)
    my $x=shift;
    if($x eq "0") {return 0}
    if($x=~m/^[+-]?[1-9]\d*$/) {return int($x)}
+   return $x;
+}
+
+sub tofloat($)
+{
+   my $x=shift;
+   if($x eq "0") {return 0}
+   if($x=~m/^[+-]?[1-9.][0-9.]*$/) {return (0+$x)}
    return $x;
 }
 
