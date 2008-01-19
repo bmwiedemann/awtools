@@ -7,13 +7,16 @@ my @planets=();
 my @movingfleet=();
 foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 	if(my @a=($line=~m{^#(\d+)><td(?: title="([^"]*)")?>})) {
+		my @extra=();
 		if($a[0] eq "404040") {
 			my @d=split("</td><td[^>]*>",$');
 			my $sid=shift(@d);
 			next if $sid eq "SID";
 			my $pid=shift(@d);
 			my $eta=parseawdate(shift(@d));
-			push(@movingfleet, {sid=>$sid, pid=>$pid, eta=>$eta, ships=>[map {int($_)} @d]});
+			my @ships=map {int($_)} @d;
+			foreach my $n (0..4) { push(@extra, lc($awstandard::shipstr[$n]), $ships[$n])}
+			push(@movingfleet, {sid=>$sid, pid=>$pid, eta=>$eta, ships=>\@ships, @extra});
 			next;
 		}
 		my @d=split("</td><td>",$');
@@ -26,7 +29,6 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 #			$d->{debug}=$line;
 			next;
 		}
-		my @extra=();
 		my ($sid,$pid,$pop)=(shift(@d),shift(@d),shift(@d));
 		my @ships=splice(@d, 5, 5);
 		if($d[3] eq "N/A") { push(@extra, foreignplanet=>1); splice(@d,0,5); }
