@@ -22,7 +22,7 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
 		}
       elsif($key eq "Origin") {
          $value=~m{(-?\d+)/(-?\d+)};
-         $value=[int($1),int($2)];
+         $value={x=>int($1), y=>int($2)};
       }
       elsif($key eq "Rank (Points Scored)") {
          $value=~m{#(\d+) \((\d+)\)};
@@ -33,7 +33,7 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
          if($value=~m{bgcolor='#(\d+)'>Status}) {
             my $colour=$1;
             my %status=("206020"=>0, "606020"=>1, "602020"=>2);
-            $value=[$colour, $status{$colour}];
+            $value={color=>$colour, status=>$status{$colour}};
          }
       }
       elsif($key eq "Idle") {
@@ -65,7 +65,12 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
       my @race=split(",",$1);
       foreach my $a (@race) {$a+=0}
       # TODO percentages?
-      $d->{race}=\@race;
+		my %race=(flags=>$race[0]);
+		foreach my $n (1..7) {
+			$race{$awstandard::racestr[$n-1]}=$race[$n];
+		}
+      $d->{racevalue}=\@race;
+		$d->{race}=\%race;
    } elsif ($line=~m{>\s*([^<]+)( \(\d+[^)<]*\)</font>)?(<br><small>Premium Member</small>)?</b></center>}) {
       $d->{name}=$1;
       $d->{premium}=tobool($3);
