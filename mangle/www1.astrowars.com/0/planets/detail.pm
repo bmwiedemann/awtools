@@ -1,19 +1,27 @@
 use strict;
 use awstandard;
 use awinput;
+use parse::dispatch;
+my $data=parse::dispatch::dispatch(\%::options);
 
 my @buildings=("Hydroponic Farm", "Robotic Factory", "Galactic Cybernet", "Research Lab", "Starbase");
 my @val=qw(farm fabrik kultur forschungslabor starbase);
 my $debug="";
 
-$::options{url}=~/i=(\d+)/;
-my $planet=$1;
+my($planet)=($::options{url}=~/i=(\d+)/);
+if($planet != $data->{n}-1) {
+   $_.="not OK";
+   s/#404040/#802020/g;
+   s/(body.*"#000000">)/$&\n<div style="background-color: #300">/;
+}
+
+
 m%Production Points</a></td><td>\s*(\d+)</td>%;
-my $pp=$1;
+my $pp=$data->{productionpoints}->[0];
 my $sidpid;
-my ($popplus,$pop,$popneeded)= (m%id=23>\+(\d+)</a></td><td>\s*(\d+)</td>.*\n(\d+)</td></tr>%);
+my ($popplus,$pop,$popneeded)= @{$data->{population}}[2,0,1];
 #   $debug.=" $popplus $pop $popneeded ";
-my($ppplus)=(m%id=23>\+(\d+)</a>\n%);
+my($ppplus)=$data->{productionpoints}->[1];
 #   $debug.=$ppplus;
 
 sub manglesys($$) {my($sysname, $planet)=@_;
@@ -40,13 +48,13 @@ if(m%/0/Glossary//\?id=17> Destroyer.*\n<td colspan="2">\d+/(\d+)</td></tr>%) {
 my $realpp=$pp;
 # show production points as float
 if(1) {
-   if((my($pp,$p1,$p2)=(m%id=21>Production Points</a></td><td> (\d+)</td><td><img src="/images/dot.gif" height="10" width="([0-9.]+)"><img src="/images/leer.gif" height="10" width="([0-9.]+)"></td>%))) {
-   my $frac=$p1/($p1+$p2);
-   $realpp=$pp+$frac;
+#   if((my($pp,$p1,$p2)=(m%id=21>Production Points</a></td><td> (\d+)</td><td><img src="/images/dot.gif" height="10" width="([0-9.]+)"><img src="/images/leer.gif" height="10" width="([0-9.]+)"></td>%))) {
+#   my $frac=$p1/($p1+$p2);
+#   $realpp=$pp+$frac;
    $pp=sprintf("%.2f",$realpp);
    s%id=(21>Production Points</a></td><td>) (\d+)%$1 $pp%;
 #   $_.="test $pp $p1 $p2 $frac";
-   }
+#   }
 }
 
 
@@ -85,7 +93,7 @@ foreach my $n (0..$#buildings) {
       s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5&nbsp;$hours$6%;
       next;
    }
-   next if(($ppneeded>1000 && $buil ne "Starbase") || $ppneeded>$pp);
+   next if(($ppneeded>1500 && $buil ne "Starbase") || $ppneeded>$pp);
 
 	my $onclickjs=qq%
 	var d=document.getElementById('spenddiv');
@@ -96,6 +104,7 @@ foreach my $n (0..$#buildings) {
 	document.form.points.focus();
 	document.form.points.select();
 	%;
+   #$onclickjs="";
 
    s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$5&amp;produktion=$val[$n]$dscost" style="background-color:blue" onclick="
 	document.form.points.value='$5'; $onclickjs">+1</a>$6%;
