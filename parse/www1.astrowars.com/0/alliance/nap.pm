@@ -11,7 +11,7 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 		push(@alliancenaps, {tag=>$1, name=>$2, established=>parseawdate($3)} );
 	}
 }
-$d->{alliancenaps}=\@alliancenaps;
-$d->{playernaps}=\@playernaps;
+$d->{alliancenap}=\@alliancenaps;
+$d->{playernap}=\@playernaps;
 
 2;

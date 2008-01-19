@@ -25,7 +25,10 @@ if($::options{url}=~m/Fleet\/$/) {
          my $sid=systemname2id($system);
          for my $a(@a){$a+=0}
          my $pid=shift(@a);
-         push(@$target, {%fleetinfo, "system"=>$system, "sid"=>$sid, "pid"=>$pid, ships=>\@a});
+			my @ships=@a;
+			my @extra=();
+			foreach my $n (0..4) { push(@extra, lc($awstandard::shipstr[$n]), $ships[$n])}
+         push(@$target, {%fleetinfo, "system"=>$system, "sid"=>$sid, "pid"=>$pid, ship=>\@ships, @extra});
       }
    }
    $d->{movingfleet}=\@movingfleet;

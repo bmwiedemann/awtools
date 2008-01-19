@@ -15,10 +15,13 @@ foreach my $pline (m{<tr align=center bgcolor="#404040"(.+?)</tr>}g) {
 		for my $n(0,2..7) {$a[$n]+=0;}
       my @b=splice(@a,3,2);
       $a[2]+=$b[0]/100; # or /($b[0]+$b[1])
-		push(@p, \@a);
+		my @label=qw(id name population growth pp production);
+		my %a=();
+		for my $n(0..5) {$a{$label[$n]}=$a[$n]}
+		push(@p, \%a);
 	}
 }
-$d->{planets}=\@p;
+$d->{planet}=\@p;
 
 if(my @a=m{<td colspan=4>Growth ([+-]\d+)%.*Production ([+-]\d+)%</td>}) {
 	foreach my $a (@a) {$a+=0}
