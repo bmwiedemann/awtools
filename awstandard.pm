@@ -41,6 +41,8 @@ our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
 our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue");
 our @racestr=qw(growth science culture production speed attack defense);
+our @shipstr=qw(Transports Colony Destroyer Cruiser Battleship);
+our @buildingstr=qw(HF RF GC RL SB);
 our @racebonus=qw(0.07 0.08 0.04 0.04 0.17 0.12 0.16);
 our $magicstring="automagic:";
 our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HoR"=>15);
