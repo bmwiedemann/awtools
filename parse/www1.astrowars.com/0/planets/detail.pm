@@ -11,13 +11,15 @@ foreach my $line (m{<tr align=center(.*?)</td></tr>}gs) {
       $n2=~s/ +//g;
       my($n3)=($line=~m/([0-9\/]+)(?:<\/a>)?\s*$/);
       my @extra=();
+		my $label2="remain";
       # split ship remaining numbers
-      if($n3=~s{/(\d+)$}{}) {push(@extra,int($1));}
+      if($n3=~s{^(\d+)/}{}) {push(@extra,pp=>int($1));}
       $n3+=0;
       if($n2 eq "Population") {
-         m{id=23>\+(\d+)</a></td>} and push(@extra,int($1));
+         m{id=23>\+(\d+)</a></td>} and push(@extra,hourly=>int($1));
       }
-      $d->{lc($n2)}=[$num,$n3,@extra];
+		if($n2 eq "ProductionPoints") {$label2="hourly"}
+      $d->{lc($n2)}={num=>$num, $label2=>$n3, @extra};
 #      push(@n, [$n2,$num,$1]);
    } elsif($line=~m{^><td colspan="5">\s*(.*) (\d+)}) {
 		$d->{name}=$1;

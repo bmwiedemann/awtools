@@ -17,11 +17,11 @@ if($planet != $data->{n}-1) {
 
 
 m%Production Points</a></td><td>\s*(\d+)</td>%;
-my $pp=$data->{productionpoints}->[0];
+my $pp=$data->{productionpoints}->{num};
+my($ppplus)=$data->{productionpoints}->{hourly};
 my $sidpid;
-my ($popplus,$pop,$popneeded)= @{$data->{population}}[2,0,1];
+my ($popplus,$pop,$popneeded)= map{$data->{population}->{$_}} qw(hourly num remain);
 #   $debug.=" $popplus $pop $popneeded ";
-my($ppplus)=$data->{productionpoints}->[1];
 #   $debug.=$ppplus;
 
 sub manglesys($$) {my($sysname, $planet)=@_;
@@ -139,7 +139,7 @@ my $spend=qq!
 <table class="main_outer"><tr><td>
 <form action="/0/Planets/submit.php" name="form" method="post">
 <table class="main_inner" cellspacing="1">
-<tr align=center><td bgcolor="#202060">Where to spend <input type="text" name="points" size="3" id="ppvalue" class="text" value="" > <span id="ppmaxvalue"></span> <a class="awtools" href="#all" onClick="document.form.points.value=198;">all</a> <a class="awglossary" href="/0/Glossary//?id=21"> Production Point(s)</a>? </td></tr></table>
+<tr align=center><td bgcolor="#202060">Where to spend <input type="text" name="points" size="4" id="ppvalue" class="text" value="" > <span id="ppmaxvalue"></span> <a class="awtools" href="#all" onClick="document.form.points.value=!.int($pp).qq!;">all</a> <a class="awglossary" href="/0/Glossary//?id=21"> Production Point(s)</a>? </td></tr></table>
 <table border="0" cellspacing="1" cellpadding="1" bgcolor='#000000'>
 <tr align=center><td bgcolor='#404040' width="135">Hydroponic Farm</td><td><input type="radio" name="produktion" id="building0" value="farm"></td><td bgcolor='#404040' width="135">Transport</td><td><input type="radio" name="produktion" value="infantrieschiff">
          </td></tr>
