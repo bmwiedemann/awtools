@@ -18,7 +18,19 @@ if($::options{url}=~m/Fleet\/$/) {
          @a=($line=~m{><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small>([^<]*)\s(\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)});
          $target=\@movingfleet;
          $fleetinfo{eta}=parseawdate(shift(@a));
-      }
+      } elsif($line=~m{^bgcolor="606000" align="center"}) {
+			$target=\@movingfleet;
+			$fleetinfo{pending}=1;
+			$fleetinfo{eta}=0;
+         @a=($line=~m{^bgcolor="606000" align="center"><td><b>pending</b></td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small>([^<]*)\s(\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)});
+#bgcolor="606000" align="center"><td><b>pending</b></td><td><a href=/0/Map//?hl=1652><small>Beta Tania Australis 12</small></a></td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td>
+      } elsif($line=~m{^bgcolor="#202060" align="center"><td>Limit (\d+)/(\d+)</td>}) {
+			$d->{movingfleets}=$1;
+			$d->{maxmovingfleets}=$2;
+      } elsif($line=~m{^bgcolor="#202060" align="center"}) { # ignore
+      } else {
+			$d->{debug}=$line;
+		}
       if($target) {
          my $system=shift(@a);
          my $sid=systemname2id($system);
@@ -32,7 +44,6 @@ if($::options{url}=~m/Fleet\/$/) {
    }
    $d->{movingfleet}=\@movingfleet;
    $d->{fleet}=\@fleet;
-# TODO pending
 # TODO add marker when >20 fleet warning appears
 }
 
