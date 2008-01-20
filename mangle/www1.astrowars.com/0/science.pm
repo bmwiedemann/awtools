@@ -14,7 +14,7 @@ if($::options{name} && $ENV{REMOTE_USER}) {
       sub trans($) {my($sci)=@_;
          my $s=$transtable{$sci};
          return "" if !$s;
-         return "<a href=\"submit.php?science=f_$s\" class=\"awtools\">change&nbsp;to</a>&nbsp;";
+         return "<a href=\"submit.php?science=f_$s\">change&nbsp;to</a>&nbsp;";
       }
       s%(<tr align=center bgcolor='#\d+'><td)>(<a href=/0/Glossary[^>]*>)(\w+)%$1." align=left>".trans($3).$2.$3%ge;
 
