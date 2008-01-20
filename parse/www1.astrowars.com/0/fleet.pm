@@ -15,7 +15,6 @@ if($::options{url}=~m/Fleet\/$/) {
          @a=($line=~m{>(?:[^<]*(?:<[^s])*)*?<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td>});
          $target=\@fleet;
       } elsif($line=~/^bgcolor="404040" align=/) {
-         $d->{test}++;
          @a=($line=~m{><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small>([^<]*)\s(\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)});
          $target=\@movingfleet;
          $fleetinfo{eta}=parseawdate(shift(@a));

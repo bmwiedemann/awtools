@@ -11,7 +11,7 @@ if(m{^<html><head><title>Astro Wars</title>} && m{<font color="#FF0000" size="5"
    ($title,my @time)=($title=~/(.*) - (\d+):(\d+):(\d+)/);
    $title=~s/^\s+//;
    $d->{"title"}=$title;
-   $d->{"time"}=\@time;
+   $d->{"time"}=join(":",@time);
    $d->{"timesec"}=$time[0]*3600+$time[1]*60+$time[2];
 
    $d->{"trade"}=tobool(m{^<td>|</td><td><a href="/0/Trade/" class="white">Trade</a></td>});
