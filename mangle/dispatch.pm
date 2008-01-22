@@ -68,7 +68,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          else {$nclicks=1}
          if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          $info{clicks}=$nclicks;
-         $$options{authlink}="$origbmwlink/modperl/public/authaw?session=$session&amp;uri=/cgi-bin";
+         $$options{authlink}="$origbmwlink/public/authaw?session=$session&amp;uri=/cgi-bin";
          if($ENV{REMOTE_USER}) {
             $::bmwlink=$$options{authlink};
          }
@@ -269,7 +269,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       foreach my $s (@style){
          if(-r "$awstandard::cssdir/$s.css") {$style=$s;last;}
       }
-      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/$style.css">%;
+      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://$bmwserver/code/css/$style.css">%;
    }
    if($gameuri || $g) {
       # fix AR's broken HTML
