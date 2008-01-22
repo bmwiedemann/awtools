@@ -38,11 +38,12 @@ if(m!>Points: (\d+)</td><td>(\d+)! && $opid) {
    untie(%h);
    if($totalpop1 != $totalpop) {
       print STDERR "profile feed pop sum mismatch: '$totalpop1'!='$totalpop'\n";
+   } else {
+      $dbh->do("DELETE FROM cdlive WHERE pid = $opid"); # delete old entries
+      tie(%h,'Tie::DBI',$dbh,'cdlive','pid',{CLOBBER=>3});
+      $h{$opid}={time=>$now, points=>$points, pl=>$pl, totalpop=>$totalpop};
+      untie %h;
    }
-   $dbh->do("DELETE FROM cdlive WHERE pid = $opid"); # delete old entries
-   tie(%h,'Tie::DBI',$dbh,'cdlive','pid',{CLOBBER=>3});
-   $h{$opid}={time=>$now, points=>$points, pl=>$pl, totalpop=>$totalpop};
-   untie %h;
 }
    # autodetect and add trades:
    $opid+=0;

@@ -23,7 +23,7 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
          my $result=$sth->execute($time, $session);
          
          my $sth2=$dbh->prepare_cached("
-               INSERT INTO `brownieplayer` VALUES ( ?, ?, ?)
+               INSERT INTO `brownieplayer` VALUES ( ?, ?, ?, 0, 0)
                ON DUPLICATE KEY UPDATE `lastclick_at` = ?
                ;");
          $sth2->execute($$options{pid}, $time,$time,$time);
