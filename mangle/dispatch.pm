@@ -235,7 +235,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          $online="<span class=\"bottom_key\">allies online:</span> $online<br>"
       }
    }
-#   if($alli eq "TGD" || $alli eq "AF") {$notice="<b style=\"color:green\">note: RSA forum is down - backup forum is at <a href=\"http://s3.invisionfree.com/RSA_Outpost/index.php?act=idx\">http://s3.invisionfree.com/RSA_Outpost/</a>.</b><br>"}
+#   if($alli eq "TGD" || $alli eq "AF" || $alli eq "RATS") {$notice="<b style=\"color:green\">note: RSA forum is down - backup forum is at <a href=\"http://s3.invisionfree.com/RSA_Outpost/index.php?act=idx\">http://s3.invisionfree.com/RSA_Outpost/</a>.</b><br>"}
 
    # aw21 transition
    if($$options{proxy} eq "brownie-cgi") {
@@ -244,10 +244,13 @@ sub mangle_dispatch(%) { my($options)=@_;
    
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
    if($options->{pid}) {
-      my($u)=get_one_row("SELECT `lastupdate_at` FROM `brownieplayer` WHERE `pid`=?", [$options->{pid}]);
+      my($u,$loginat)=get_one_row("SELECT `lastupdate_at`,`prevlogin_at` FROM `brownieplayer` WHERE `pid`=?", [$options->{pid}]);
       if($u) {
          $u=$u-time+$awstandard::updatetime15;
          $info{nextupdate}=$u."s";
+      }
+      if($loginat) {
+         $info{prevlogin}=sprintf("%.1fh",($loginat-time)/3600);
       }
    }
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
