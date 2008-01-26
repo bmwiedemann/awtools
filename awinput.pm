@@ -720,34 +720,31 @@ sub gettradepartners($$) { my($maxta,$minad)=@_;
 }
 
 
-sub playerid2alli($)
+sub _playerid2alli($)
 { 
    return (get_one_row("SELECT alli FROM useralli WHERE pid=?",[$_[0]]))[0];
 }
 
-# this function is intended to work without init
-sub playername2alli($) {my ($user)=@_;
-   if(!$user) {return ""}
-#   if($user eq "greenbird") {return ""}
-   my %alliuser;
-#   awinput::opendb(O_RDONLY, "$awstandard::dbmdir/useralli.dbm", \%alliuser);
-#   my $alli=$alliuser{lc $user};
-#   untie(%alliuser);
-   my $pid=playername2idm($user);
-   my $alli=playerid2alli($pid);
+sub playerid2alli($) { my($pid)=@_;
+	if(!$pid) {return ""}
+   my $alli=_playerid2alli($pid);
    if(!$alli) {
 #      local $ENV{REMOTE_USER};
-      tie %alliances, "MLDBM", "$dbdir/alliances.mldbm", O_RDONLY, 0666;
-      tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
-#      tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
-#      if($user eq "greenbird") {$pid=68061}
+#      tie %alliances, "MLDBM", "$dbdir/alliances.mldbm", O_RDONLY, 0666;
+#      tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
       if($pid && $pid>2) {
-         $alli=lc(playerid2tag($pid));
+         $alli=lc(playerid2tagm($pid));
          if($awaccess::remap_alli{$alli}) { $alli=$awaccess::remap_alli{$alli} }
          if(!is_allowedalli($alli)) {$alli=""}
       }
    }
    return $alli;
+}
+
+# this function is intended to work without init
+sub playername2alli($) {my ($user)=@_;
+   if(!$user) {return ""}
+   return playerid2alli(playername2idm($user));
 }
 
 
