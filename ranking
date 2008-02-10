@@ -25,16 +25,17 @@ if($aid) {
 }
 
 my $prevname;
-foreach my $name(sort (keys %relation, @members)) {
+my $relation=awinput::getallrelations();
+foreach my $name(sort (keys %$relation, @members)) {
 	if(defined($prevname) && ($prevname eq $name)) {next}
 	$prevname=$name;
 	my @rel=getrelation($name);
 	if(!defined($rel[0])) {next}
 	my $id=playername2id($name);
 	next unless $id;
-	my $points=$player{$id}{points};
+	my $p=getplayer($id);
+	my $points=$p->{points};
 #	printf("%.3i(%.4i) $name($id)\n",$points,$player{$id}{rank});
-	my $p=$player{$id};
 #	if($rel[0]<=3) {
 		#my $aid=$$p{tag};
 		#my $atag=$aid && allianceid2tag($aid);

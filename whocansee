@@ -65,7 +65,7 @@ foreach my $row (@$data) {
    my $dist=sprintf("%.2f", sqrt(($x-$sysxy[0])**2 + ($y-$sysxy[1])**2));
    $rel||=4;
    my $etc=awinput::playerid2etc($epid);
-   my $p=$player{$epid};
+   my $p=getplayer($epid);
    my $planets=playerid2planetsm($epid);
    my $needplanets=$$p{culture}-$planets;
    push(@data2, [$epid, $x, $y, $ebio, $dist, $rel, $needplanets, $etc, $xe]);
