@@ -27,6 +27,8 @@ if($::options{url}=~m/Fleet\/$/) {
       } elsif($line=~m{^bgcolor="#202060" align="center"><td>Limit (\d+)/(\d+)</td>}) {
 			$d->{movingfleets}=$1;
 			$d->{maxmovingfleets}=$2;
+		} elsif($line=~m{^bgcolor="#404040" align="center"><td></td><td colspan="6"><small><b>Note:</b> You cannot see more than 20 fleets at the}) {
+			$d->{fleetlimit}=1;
       } elsif($line=~m{^bgcolor="#202060" align="center"}) { # ignore
       } else {
 			$d->{debug}=$line;
@@ -44,7 +46,6 @@ if($::options{url}=~m/Fleet\/$/) {
    }
    $d->{movingfleet}=\@movingfleet;
    $d->{fleet}=\@fleet;
-# TODO add marker when >20 fleet warning appears
 }
 
 2;
