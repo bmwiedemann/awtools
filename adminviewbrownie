@@ -20,7 +20,7 @@ sub lookup_ip($) {
    my $answer = $res->query($ip->reverse_ip(),'PTR');
    my $namer = $answer->{'answer'}[0];
    $res=$cache{$_[0]}=$namer->{'ptrdname'};
-   return $res;
+   return $res||"";
 }
 
 
