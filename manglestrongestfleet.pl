@@ -34,12 +34,7 @@ for(;(@a=m!<tr[^>]*><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>
 #	$fleets{$cv}=\@a[0..3];
 	my $plid=playername2id($name);
 	if(!$plid) { next }
-	my $atag="";
-	my $aid=getplayer($plid)->{alliance};
-	if($aid) {$atag=allianceid2tag($aid);}
-	#print "aid $aid $atag $plid\n";
-	#my @rel=getrelation($name);
-	#my $atag=$rel[1]||"";
+	my $atag=playerid2tagm($plid);
    $orig=~s!<td>$n</td><td>$fleet[2]</td><td>$fleet[3]</td><td>$fleet[4]</td>!$&<td>$cv</td>!g;
 	$orig=~s!\Q$name</a>!$name [$atag]</a>!;
 }
