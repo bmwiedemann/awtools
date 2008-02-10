@@ -8,7 +8,8 @@ use DBAccess;
 use awstandard;
 use awinput;
 awinput_init(1);
-   foreach my $name (keys %relation) {
+	my $relation=awinput::getallrelations();
+   foreach my $name (keys %$relation) {
       my @rel=getrelation($name);
       if($rel[0]>=8) {
          my $pid=playername2id($name);

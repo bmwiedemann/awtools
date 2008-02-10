@@ -6,7 +6,7 @@ require 5.002;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-our (%alliances,%starmap,%player,%playerid,%planets,%trade,%prices,%relation,
+our (%alliances,%starmap,%player,%playerid,%planets,%prices,%relation,
    $dbnamer);
 my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
@@ -18,7 +18,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
 &playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &gettradepartners &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
-%alliances %starmap %player %playerid %planets %trade %relation
+%alliances %starmap %player %playerid %planets
 );
 
 
@@ -50,7 +50,6 @@ sub awinput_init(;$) { my($nolock)=@_;
    tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
    tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
    tie %planets, "MLDBM", "$dbdir/planets.mldbm", O_RDONLY, 0666;
-   tie %trade, "MLDBM", "$dbdir/trade.mldbm", O_RDONLY, 0666;
    tie %prices, "MLDBM", "$dbdir/prices.mldbm", O_RDONLY, 0666;
    my $alli=$ENV{REMOTE_USER};
    if($alli) {
@@ -166,6 +165,11 @@ sub getallirelation($) {
 		}
 	}
 	return($status,$info);
+}
+
+sub getallrelations()
+{
+	return \%relation;
 }
 
 sub getrelation($;$) { my($name)=@_;

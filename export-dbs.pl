@@ -16,7 +16,8 @@ sub filter($) {
 awinput_init();
 # export relations DB
 open(STDOUT, ">", "$awstandard::allidir/$alli/relation.csv");
-while(my @a=each %relation) {
+my $relation=awinput::getallrelations();
+while(my @a=each %$relation) {
    filter($a[1]);
    print join("\t",@a)."\n";
 }
