@@ -6,8 +6,8 @@ require 5.002;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-our (%alliances,%starmap,%player,%playerid,%planets,%battles,%trade,%prices,%relation,%planetinfo,
-   $dbnamer,$dbnamep);
+our (%alliances,%starmap,%player,%playerid,%planets,%trade,%prices,%relation,
+   $dbnamer);
 my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
 
@@ -18,7 +18,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
 &playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &gettradepartners &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
-%alliances %starmap %player %playerid %planets %battles %trade %relation %planetinfo
+%alliances %starmap %player %playerid %planets %trade %relation
 );
 
 
@@ -50,7 +50,6 @@ sub awinput_init(;$) { my($nolock)=@_;
    tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
    tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
    tie %planets, "MLDBM", "$dbdir/planets.mldbm", O_RDONLY, 0666;
-   tie %battles, "MLDBM", "$dbdir/battles.mldbm", O_RDONLY, 0666;
    tie %trade, "MLDBM", "$dbdir/trade.mldbm", O_RDONLY, 0666;
    tie %prices, "MLDBM", "$dbdir/prices.mldbm", O_RDONLY, 0666;
    my $alli=$ENV{REMOTE_USER};
@@ -67,7 +66,6 @@ sub awinput_init(;$) { my($nolock)=@_;
 #      if($remap_planning{$alli}) {
 #         $alli=$remap_planning{$alli};
 #      }
-      $dbnamep="$awstandard::dbmdir/$alli-planets.dbm";
       untie %relation;
 
 #     if($ENV{REMOTE_USER} ne "guest") {
@@ -94,7 +92,6 @@ sub opendb($$%) {my($mode,$file,$db)=@_;
 # release locks allocated in awinput_finish
 sub awinput_finish() {
    untie(%relation);
-   untie(%planetinfo);
    alarm(0);
 }
 
@@ -423,15 +420,10 @@ sub getplanetinfo($$;$) { my($sid,$pid)=@_;
    my $pim=getplanetinfom($sid,$pid);
    if(!$pim || !defined($pim->[0])) {return ()}
    return ($pim->[3],$pim->[4],$pim->[8],$id);
-	my $pinfo=$planetinfo{$id};
-	if(!$pinfo){return ()}
-	$pinfo=~/^(\d) (\d+) (.*)/s;
-	return ($1,$2,$3,$id);
 }
 sub setplanetinfo($%) { my($id,$options)=@_;
 	if(!$id) {$id=$$options{sidpid}}
    if(!$id) {return}
-	#print "set '$id', '$options' $dbnamep ";
 	my $idm=sidpid22sidpid3m(sidpid32sidpid2($id));
 	my $dbh=get_dbh;
 	if(!$options) {
@@ -789,8 +781,6 @@ sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
    $awinput::fleetscreen=$screen;
    return unless $ENV{REMOTE_USER};
 #   awdiag("name:$::options{name} scr:$screen awscr:$awinput::fleetscreen");
-#	untie %planetinfo;
-#	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
    if($pid) {
       my $dbh=get_dbh;
       my $cond="";
@@ -815,7 +805,6 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
             my $d=AWisodate(time());
             if($time) { # moving fleet: planned to targeted
                if($s==2) {
-#                  $planetinfo{$sidpid}=~s/^2 $plid /3 $plid l:$d /;
                   $s=3;
                   $info="l:$d $info";
                }
@@ -823,7 +812,6 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
                my $newstat=($type==0?4:5); # or to taken if fleet is on own planet
                my $oldstat=($type==0?3:qr([34]));
                my $text=($type==0?"s":"took").":";
-#               $planetinfo{$sidpid}=~s/^$oldstat $plid /$newstat $plid $text$d /;
 					if($type==0) {
 						if($s==3) {
 							$s=4;
@@ -843,8 +831,6 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
    return 0;
 }
 sub dbfleetaddfinish() {
-#	untie %planetinfo;
-#	tie(%planetinfo, "DB_File::Lock", $dbnamep, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 
 sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
@@ -950,9 +936,6 @@ sub dblinkadd { my($sid,$url)=@_;
    my $dbh=get_dbh();
    my $sth=$dbh->prepare_cached("INSERT IGNORE INTO `planetinfos` VALUES(NULL,?,?,?,?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(), ?)");
    $sth->execute($ENV{REMOTE_USER}, $sidpid, 0,0, getauthpid(), $info);
-#   my $oldentry=$planetinfo{$sidpid};
-#   return if($oldentry);
-#   $planetinfo{$sidpid}=qq(0 0 $info);
 }
 
 sub playername2ir($) { playerid2ir(playername2idm($_[0])) }
