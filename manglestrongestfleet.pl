@@ -35,7 +35,7 @@ for(;(@a=m!<tr[^>]*><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>
 	my $plid=playername2id($name);
 	if(!$plid) { next }
 	my $atag="";
-	my $aid=$player{$plid}{alliance};
+	my $aid=getplayer($plid)->{alliance};
 	if($aid) {$atag=allianceid2tag($aid);}
 	#print "aid $aid $atag $plid\n";
 	#my @rel=getrelation($name);
