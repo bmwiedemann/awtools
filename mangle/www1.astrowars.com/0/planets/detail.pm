@@ -74,7 +74,7 @@ if($::options{name}) {
 #      $prodbonus+=$awstandard::racebonus[3]*$$race[3];
 #      $_.="@$race $popbonus $prodbonus";
 #   }
- } elsif((my $p=$player{$::options{pid}})) {
+ } elsif((my $p=getplayer($::options{pid}))) {
     $prodbonus+=0.01*$p->{trade};
     $popbonus+=0.01*$p->{trade};
  }

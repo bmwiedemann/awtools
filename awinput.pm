@@ -14,11 +14,11 @@ our $alarmtime=99;
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &getallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores
+&awinput_init &getrelation &getallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &getplayer &getalliance 
+&playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
 &playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &gettradepartners &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
-%alliances %starmap %player %playerid %planets
 );
 
 
@@ -369,10 +369,26 @@ sub playerid2home($) { my($id)=@_;
 sub playerid2country($) { my($id)=@_;
 	$player{$id}{from};
 }
+
+sub sidpid2planetm($)
+{ my($sidpid)=@_;
+	my $r=get_one_rowref("SELECT * FROM `planets` WHERE `sidpid`=?", [$sidpid]);
+	if(!$r) {return undef}
+	return {systemid=>sidpid2sidm($sidpid), planetid=>sidpid2pidm($sidpid), "pop"=>$r->[1], opop=>$r->[2], sb=>$r->[3], ownerid=>$r->[4], s=>$r->[5]};
+}
+sub getplanetm($$) {my($sid,$pid)=@_;
+	return sidpid2planetm(sidpid22sidpid3m($sid,$pid));
+}
 sub getplanet($$) { my($sid,$pid)=@_;
 	my $sys=$planets{$sid};
 	if(!$sys) {return undef}
 	$$sys[$pid-1];
+}
+sub getplayer($) { my($playerid)=@_;
+	return $player{$playerid};
+}
+sub getalliance($) { my($aid)=@_;
+	return $alliances{$aid};
 }
 
 # input: valid pid

@@ -87,8 +87,11 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	}
 	
 	my $extralinks="";
+	my $playerref;
+	if($id>2) {$playerref=getplayer($id)}
    {
-      if($id>2 && (my $p=$player{$id})) {
+      if($playerref) {
+		my $p=$playerref;
       my($epl,$eenergy,$ephys,$emath,$espeed,$eatt,$edef)=awinput::playerid2battlestats($id);
       $espeed=~s/\+//;
 
@@ -97,7 +100,8 @@ if($options{name}) {# && $options{name} ne "unknown") {
       my $awuser=getusernamecookie();
       my $oid=playername2id($awuser);
       if($oid && $oid>2) {
-         $opl=$player{$oid}{level};
+			my $otherplayer=getplayer($oid);
+         $opl=$otherplayer->{level};
          my ($race,$sci)=awinput::playerid2ir($oid);
          if($sci && $sci->[0]) { 
             if($sci->[0]>100) {shift @$sci}
@@ -141,7 +145,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	if($id>2) {
 		my @pl=playerid2planetsm($id);
 		my $planets=@pl;
-      my $pl=$player{$id};
+      my $pl=$playerref;
 		my $level=$$pl{level};
 		my ($pop,$scipoints)=get_one_row("SELECT `opop`,points-1*level FROM `player` WHERE `pid` = ?", [$id]);
 		my @planets;

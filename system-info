@@ -32,8 +32,9 @@ sub tlink(@) { my($a)=@_;
 sub spinfo($) { my($id)=@_; # short player info string
 	if($id==2) {return "unknown"}
 	if($id==0) {return "free planet"}
-	my $name=$player{$id}{name};
-	my $aid=$player{$id}{alliance};
+	my $playerref=getplayer($id);
+	my $name=$playerref->{name};
+	my $aid=$playerref->{alliance};
 	my @rel=getrelation($name);
 	my $color=getrelationcolor($rel[0]);
 	my $alliancestr="";

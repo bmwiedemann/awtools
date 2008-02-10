@@ -58,7 +58,7 @@ if(param()) {
       my ($race,$sci)=playerid2ir($pid);
       my @rel=getrelation($name);
       $rel[0]||=4;
-      my $pl=$player{$pid};
+      my $pl=getplayer($pid);
       my @pl=playerid2planetsm($pid);
       my $sid=$pl->{home_id};
       my %values=(player_id=>$pid, player_name=>$name, 

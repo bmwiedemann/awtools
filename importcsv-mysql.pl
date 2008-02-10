@@ -4,7 +4,7 @@ use strict;
 use DBAccess;
 if(!$dbh) {die "DB err: $!"}
 
-our (%alliances,%starmap,%player,%playerid,%planets,%alltrades,%battles,%prices,%baseprices);
+our (%alliances,%starmap,%player,%planets,%alltrades,%battles,%prices,%baseprices);
 our @opop;
 my $firstline;
 my (@elements);
@@ -67,11 +67,7 @@ sub player { #rank points id science culture level home_id logins from joined al
 	for(my $i=0; $i<=$#elements; ++$i) {
 		if($elements[$i] eq "id") {$id=$_[$i]}
 		else {$h{$elements[$i]}=$_[$i];}
-		if($elements[$i] eq "name") {$playerid{"\L$_[$i]"}=$id}
-#		if($elements[$i] eq "home_id") { push @{$origin[$_[$i]]}, $id; }
 	}
-#	$h{planets}=$playerplanets[$id];
-#	push(@{$alliancemembers[$h{alliance}]},$id);
    if(my $aid=$h{alliance}) {
       # this only works because player.csv is sorted by rank
       $h{arank}=++$arank[$aid];
