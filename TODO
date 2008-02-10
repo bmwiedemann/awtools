@@ -3,8 +3,19 @@
 #alltrades live update
 #public updated trade bonus table
 man/FAQ: it uses known IRs or worst case (att=+4, phys=SL) to calc xCV. you can see the original fleet numbers by pointing your mouse over the line.
+battle reports (fed from news screen - keep in DB with alli, pid, sidpid, time, info)
+#fix playeronline to use time / something directly
 #warn if launch-target is someone else's planet and there is no "plan" to that target
-big: parse every page into JSON-exported structure (and possibly use that for feeding DBs)
+#JS in planets/details -> display:none build part on bottom. must still work without JS
+port awsim to jstools3
+different CSS classes for different news items
+members themselves / alliance leader should be able to whitelist/blacklist authawforum usage
+#big: parse every page into JSON-exported structure (and possibly use that for feeding DBs)
+imessage token bucket rate limiting (2+1/min)? ignore function?
+respond to BIMs from within AW
+#add "your last login was at " DB entry in brownieplayer table
+improve fleet-updates to not change "current" entries unless needed (diff?)
+mysql replication
 
 #admin: lookup ip->hostname+username
 #admin: lookup name->ips
@@ -32,7 +43,7 @@ relations/system-info: recent battles
 reverse-engineer battle formulas (chance(att)) - use in whocanintercept
 playerprefs: phone, msn, email
 #whocansee: rewrite to work without whocansee.pl , add xE
-whocansee: in cases where both XR and EN have an intelreport... I think it would be best to just display the newer one
+whocansee: in cases where both XR and EN have an intelreport... I think it would be best to just display the newer one # done?
 -tool to display useralli = own (soon obsolete with mysql relations DB index)
 #XML-export of systems, players, fleets for integration into phpBB2 and others
 fleet estimator (using attacking CV, killed CV, signed TAs, estimated PP/h)
@@ -40,7 +51,6 @@ fleet estimator (using attacking CV, killed CV, signed TAs, estimated PP/h)
 auto-IM to team/alli about new incoming fleets
 fighterlist/whocanintercept: yCV with A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
 fighterlist: zCV = yCV + xCV(artifact)
-battle reports (fed from news screen - keep in DB with sidpid, time, info)
 #was done: xCV calculation: dont use outdated phys - instead worst-case - (4 days timeout)
 # [AF] SaggitariusA: ein anderes schönes tool wäre es mal, die PPs zu ermitteln, die man braucht, um auf planet #x eine SBy zu bauen (mit FS natürlich)
 #add recv message count to AWTools header: SELECT count(imid) FROM `imessage` WHERE `recvpid` = ? GROUP BY recvpid
@@ -120,3 +130,7 @@ changing the map look to look more "AW-like" - much like Mob's tools... I really
 [AF] Teddy_200: another thing too that would be nice is an alliance TA statistics page, with things like average number of TAs in an alliance, Average TR, prehaps date when the members got their TAs etc. Thins like that
 [AF] Teddy_200: at least if someone got a TA last update it would be marked somehow - that way you would know that player has just "lost" 20kA$...
 
+#first, could it be possible to add starbase CV to defending fleets ? :)
+(11:32:29 AM) [NAIN] Rasta31: 2nd, very easy stuff, make a list of all incommings parsed by brownie ordered by arrival time :)
+
+judochop: but something that it keeps the "planest" screen simple, the problem with looking at the other pages of incomming is that you can not see all the incomming and defences in one look, you have to scroll down or write down which is covered or not covered, 
