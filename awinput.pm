@@ -464,10 +464,10 @@ sub setplanetinfo($%) { my($id,$options)=@_;
 sub systemname2id($) { my($name)=@_;
    if($name=~m/^\((\d+)\)$/) { return $1 }
 	$name=~s/\s+/ /;
-	$starmap{"\L$name"};
+	$starmap{"\L$name"}+0;
 }
 sub systemcoord2id($$) { my($x,$y)=@_;
-	$starmap{"$x,$y"};
+	$starmap{"$x,$y"}+0;
 }
 sub systemid2name($) { my($id)=@_;
 	$starmap{$id}?$starmap{$id}{name}:undef;
@@ -1147,6 +1147,14 @@ sub show_fleet($) { my($f)=@_;
    if($cv==0 && $cls==0 && $trn==0) {return ""}
    my $color=!$iscurrent;
    my $tz=$timezone*3600;
+   my($sid,$pid)=sidpid32sidpid2m($sidpid);
+   if($status==1) {
+      my $p=getplanet($sid,$pid);
+      if($p) {
+         my $n=planet2sb($p);
+         $xcv.="+".int(0.5+((-10+10*(1.5**$n))*0.4));
+      }
+   }
    my $flstr="$cv/$xcv CV";
    if($trn){$flstr.=", $trn TRN"; if($eta){$color|=2;}}
    if($cls){$flstr.=", $cls CLS";}
@@ -1157,8 +1165,6 @@ sub show_fleet($) { my($f)=@_;
    if($eta) {$eta=AWisodatetime($eta+$tz)." GMT$tz2 ".awstandard::AWreltime($eta)} else {$eta="defending fleet.............."}
    if(length($eta)<$minlen1) {$eta.="&nbsp;" x ($minlen1-length($eta))}
    if(length($flstr)<$minlen) {$flstr.="&nbsp;" x ($minlen-length($flstr))}
-   my $sid=sidpid2sidm($sidpid);
-   my $pid=sidpid2pidm($sidpid);
    my $xinfo="$sid#$pid".": fleet=@$f[8..12] firstseen=".awstandard::AWreltime($firstseen)." lastseen=".awstandard::AWreltime($lastseen);
    if($info) {$info=" ".$info}
 	my $launch="";
