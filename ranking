@@ -25,8 +25,8 @@ if($aid) {
 }
 
 my $prevname;
-my $relation=awinput::getallrelations();
-foreach my $name(sort (keys %$relation, @members)) {
+my $relation=awinput::getallrelationkeys();
+foreach my $name(sort (@$relation, @members)) {
 	if(defined($prevname) && ($prevname eq $name)) {next}
 	$prevname=$name;
 	my @rel=getrelation($name);

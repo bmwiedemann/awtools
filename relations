@@ -226,11 +226,11 @@ if($options{name}) {# && $options{name} ne "unknown") {
          printf("xEnergy=%.2f ", arrival::effectiveenergy(1,2));
       }
       my @logins;
-		while($options{comment}=~/login:(\d+):(\d+):(\d+):([^ ]*)(.*)/s) {
-			$options{comment}=$5;
-         push(@logins, [$1,$2,$3,$4]);
-      }
-#      @logins=@{awlogins::get_logins($ENV{REMOTE_USER}, $id)};
+#		while($options{comment}=~/login:(\d+):(\d+):(\d+):([^ ]*)(.*)/s) {
+#			$options{comment}=$5;
+#        push(@logins, [$1,$2,$3,$4]);
+#      }
+      @logins=@{awlogins::get_logins($ENV{REMOTE_USER}, $id)};
       if($logins[0]) {
          print "<code>";
          my $firsti=awmax(-20,awmin((-$#logins-1), -1));

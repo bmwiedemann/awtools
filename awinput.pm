@@ -6,7 +6,7 @@ require 5.002;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-our (%alliances,%starmap,%player,%playerid,%planets,%relation,
+our (%alliances,%starmap,%player,%playerid,%planets,
    $dbnamer);
 my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
@@ -17,7 +17,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 &awinput_init &getrelation &getallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &getplayer &getalliance 
 &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
-&playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &gettradepartners &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
+&playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
 );
 
@@ -51,6 +51,7 @@ sub awinput_init(;$) { my($nolock)=@_;
    tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
    tie %planets, "MLDBM", "$dbdir/planets.mldbm", O_RDONLY, 0666;
    my $alli=$ENV{REMOTE_USER};
+	$dbnamer="";
    if($alli) {
       my $a=$alli;
       if($alli ne "guest") {
@@ -60,24 +61,24 @@ sub awinput_init(;$) { my($nolock)=@_;
 #      if($remap_relations{$alli}) {
 #         $a=$remap_relations{$alli};
 #      }
-      $dbnamer="$awstandard::dbmdir/$a-relation.dbm";
+      $dbnamer=$a; #"$awstandard::dbmdir/$a-relation.dbm";
 #      if($remap_planning{$alli}) {
 #         $alli=$remap_planning{$alli};
 #      }
-      untie %relation;
+#      untie %relation;
 
 #     if($ENV{REMOTE_USER} ne "guest") {
       if($nolock) {
-         tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
+#         tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
       } else {
          $SIG{"ALRM"}=sub{print STDERR "alarm $alarmtime; finish\n";&awinput_finish; require POSIX; POSIX::_exit(0);};
          alarm($alarmtime); # make sure locks are free'd
-         tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
+#         tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
       }
    } else {
       # make sure it isnt tied and stored
-      untie %relation;
-      %relation=();
+#      untie %relation;
+#      %relation=();
    }
 }
 
@@ -89,7 +90,7 @@ sub opendb($$%) {my($mode,$file,$db)=@_;
 
 # release locks allocated in awinput_finish
 sub awinput_finish() {
-   untie(%relation);
+#   untie(%relation);
    alarm(0);
 }
 
@@ -156,43 +157,44 @@ sub is_founder($)
 sub getallirelation($) {
 	my($atag)=@_;
 	my($status,$info)=get_one_row("SELECT `status`,`info` FROM `allirelations` WHERE `alli` = ? AND `tag` = ?", [$ENV{REMOTE_USER}, $atag]);
-	# TODO remove fallback to old DBM relation in GE10
-	if(!defined($status)) {
-		my $rel2=$relation{"\L$atag"};
-		if($rel2 && $rel2=~/^(\d+) \w+ /s) {
-			return($1,$');
-		}
-	}
 	return($status,$info);
 }
 
 sub getallrelations()
 {
-	return \%relation;
+	my $dbh=get_dbh();
+	my $sth=$dbh->prepare("SELECT * FROM `relations` WHERE `alli`=?");
+	my $res=$dbh->selectall_arrayref($sth, {}, $dbnamer);
+	return $res;
+}
+sub getallrelationkeys()
+{
+	my $r=getallrelations();
+	my @keys=();
+	foreach my $e (@$r) {
+		push(@keys, lc(playerid2name($e->[0])));
+	}
+	return \@keys;
 }
 
 sub getrelation($;$) { my($name)=@_;
 	my $lname="\L$name";
-	my $rel=$relation{$lname};
+	my $pid=playername2idm($name);
+	if(!$pid) { return }
+	my $rel=get_one_rowref("SELECT * FROM `relations` WHERE `pid`=? AND `alli`=?", [$pid, $dbnamer]);
 	my ($effrel,$ally,$info,$realrel,$hadentry);
 	$hadentry=0;
-	if($rel && $rel=~/^(\d+) (\w+) (.*)/s) {
-		($effrel,$ally,$info)=($1, $2, $3);
+	if($rel) {
+		($effrel,$ally,$info)=@{$rel}[2,3,6];
 		$hadentry=1
 	}
 	while(!$rel || !$effrel) {
-#		if(!$rel) { return undef; }
-		my $id=playername2idm($name);
-		if(!$id) {
-			if($hadentry){last}
-			return undef
-		}
-		my $aid=$player{$id}{alliance};
+		my $aid=$player{$pid}{alliance};
 #		print "aid $aid \n";
 		my $atag;
 		if(!$aid && $rel) {$atag=$ally;$aid=-1;}
       if(!$aid) {
-        if($startofround) { $atag=playerid2lasttag($id); if($atag){$aid=-2} }
+        if($startofround) { $atag=playerid2lasttag($pid); if($atag){$aid=-2} }
       }
 		elsif($aid>0) {$ally=$atag=$alliances{$aid}{tag};}
 		if(!$aid) { return undef }
@@ -213,8 +215,6 @@ sub playerid2relation($) { my($pid)=@_;
    return getrelation(playerid2namem($pid));
 }
 sub setrelation($%) { my($id,$options)=@_;
-	untie %relation;
-	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or die $!;
 	if(!$id) {$id=$$options{name}}
 	#print "set '$id', '$options' $dbnamer ";
    my $pid=playername2idm($id);
@@ -229,12 +229,6 @@ sub setrelation($%) { my($id,$options)=@_;
          $sth->execute($pid, $alli, $$options{status}, $$options{atag}, 0, time(), $$options{info});
       }
    }
-	if(!$options) {delete $relation{$id}; }
-	else {
-		$relation{$id}="$$options{status} $$options{atag} $$options{info}";
-	}
-	untie %relation;
-	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or die $!;
 }
 
 sub playerid2etc($) { my($id)=@_;
@@ -645,20 +639,6 @@ sub playername2production($)
 #   return if not defined $rel;
 #   return relation2production($rel,$name);
 }
-sub getallproductions_old()
-{
-   my @p=();
-   foreach my $name (keys %relation) {
-      my($rel)=$relation{$name};
-      if(!$rel) {next}
-      my($prod,undef,undef,$arti,undef,$ad,$pp,$bonus)=relation2production($rel);
-      if(!defined($prod)) {next}
-      my @sci=relation2science($rel);
-      if($sci[0]<time()-2*24*3600) {next}
-      push(@p, [$name,$prod,$ad,$pp,$bonus,$arti]);
-   }
-   return @p;
-}
 
 # differs from old getallproductions by 3 things: 
 # - pid is returned instead of name
@@ -703,32 +683,6 @@ sub playerid2trades($) {
    }
    return @t;
 }
-
-sub gettradepartners($$) { my($maxta,$minad)=@_;
-  my @result;
-  my $adprice=getartifactprice("pp");
-  foreach my $name (keys %relation) {
-    my($rel)=$relation{$name};
-    if(!$rel) {next}
-    my($prod,undef,undef,undef,undef,$ad,$pp,$bonus)=relation2production($rel);
-    if(!defined($prod)) {next}
-    my @sci=relation2science($rel);
-    if($sci[0]<time()-2*24*3600) {next}
-    $ad+=$pp*$adprice;
-    if($ad<$minad) {next}
-    my $trades=0;
-    if($rel=~/trade:([^ ]*)/) {
-       my $tas=$1;
-       my @a=split(/,/, $tas);
-       $trades=@a;
-    }
-    if($trades>$maxta) {next}
-#print("$name : ad: $ad \n<br />");
-    push(@result,[$name,$ad, $prod*$$bonus[0]*$adprice, $trades]);
-  }
-  return @result;
-}
-
 
 sub _playerid2alli($)
 { 
@@ -853,14 +807,12 @@ sub dbfleetaddfinish() {
 
 sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
    return if(!is_extended());
-	$name="\L$name";
-	untie %relation;
-	tie(%relation, "DB_File::Lock", $dbnamer, O_RDWR, 0644, $DB_HASH, 'write') or print "error accessing DB\n";
-	my $oldentry=$relation{$name};
-	my $newentry=addplayerir($oldentry, $sci,$race,$newlogin,$trade,$prod);
-	if($newentry) {
-		if(!$::options{debug}) {$relation{$name}=$newentry;}
-		else {print "<br />$name new:",$newentry;}
+#	my @rel=getrelation($name);
+#	my $oldentry="$rel[0] $rel[1] $rel[2]";# TODO $relation{$name};
+#	my $newentry=addplayerir($oldentry, $sci,$race,$newlogin,$trade,$prod);
+#	if($newentry) {
+#		if($::options{debug}) {print "<br />$name new:",$newentry;}
+	{
 		my $pid=playername2idm($name);
       require awlogins;
       awlogins::add_login($ENV{REMOTE_USER}, $pid, $newlogin);
@@ -907,8 +859,6 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
          my $r=$sth->execute($etc, $ENV{REMOTE_USER},$pid);
       }
    }
-	untie %relation;
-	tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0644, $DB_HASH, 'read') or print "error accessing DB\n";
 }
 
 sub dblinkadd { my($sid,$url)=@_;
