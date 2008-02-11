@@ -22,8 +22,6 @@ if(defined($options{relation})) {
 	$options{user} =~ y/A-Z/a-z/;
 	if($options{alliance}=~/^\s*$/) {$options{alliance}="unknown"}
 	$options{alliance} =~ y/a-z/A-Z/;
-	my %data;
-	tie(%data, "DB_File", $awinput::dbnamer) or print "error accessing DB\n";
 	$options{user}=~s/[\r\n\t ]+/ /g;
 	my $i=0;
 	foreach my $user(split(" ", $options{user})) {
@@ -36,9 +34,8 @@ if(defined($options{relation})) {
 		if($options{relation}<0 || $options{relation}>9 || $options{alliance} !~ /^[A-Z]*$/) { print "wrong input", AWtail; exit 0;} # modperl OK
 		my @rel=getrelation($user);
       $rel[2]||="";
-		$data{$user}="$options{relation} $options{alliance} $options{comment}\n$rel[2]";
+		setrelation($rel[5], {name=>$user, status=>$options{relation}, atag=>$options{alliance}, info=>$options{comment}});
 	}
-	untie(%data);
 	print span({-style=>'color: darkgreen'},"added $options{user}"),br;
 }
 
