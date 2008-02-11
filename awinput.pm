@@ -6,7 +6,7 @@ require 5.002;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-our (%alliances,%starmap,%player,%playerid,%planets,%prices,%relation,
+our (%alliances,%starmap,%player,%playerid,%planets,%relation,
    $dbnamer);
 my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
@@ -50,7 +50,6 @@ sub awinput_init(;$) { my($nolock)=@_;
    tie %player, "MLDBM", "$dbdir/player.mldbm", O_RDONLY, 0666;
    tie %playerid, "MLDBM", "$dbdir/playerid.mldbm", O_RDONLY, 0666;
    tie %planets, "MLDBM", "$dbdir/planets.mldbm", O_RDONLY, 0666;
-   tie %prices, "MLDBM", "$dbdir/prices.mldbm", O_RDONLY, 0666;
    my $alli=$ENV{REMOTE_USER};
    if($alli) {
       my $a=$alli;
@@ -687,8 +686,7 @@ sub getallproductionsm()
 sub getartifactprice($)
 {
    my($arti)=@_;
-   my $p=$awinput::prices{lc($arti)}||0;
-   return $p;
+	return ((get_one_row("SELECT `price` FROM `prices` WHERE `item`=?", [$arti]))[0]);
 }
 
 # input: pid
@@ -708,7 +706,7 @@ sub playerid2trades($) {
 
 sub gettradepartners($$) { my($maxta,$minad)=@_;
   my @result;
-  my $adprice=$prices{pp};
+  my $adprice=getartifactprice("pp");
   foreach my $name (keys %relation) {
     my($rel)=$relation{$name};
     if(!$rel) {next}
