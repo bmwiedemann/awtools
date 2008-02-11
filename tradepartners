@@ -23,7 +23,7 @@ if(!defined $options{sort}){$options{sort}="8.-2";}
 
 sub gettradepartners2($$) { my($maxta,$minad)=@_;
   my @result;
-  my $adprice=$awinput::prices{pp};
+  my $adprice=getartifactprice("pp");
   my $prod=awinput::getallproductionsm();
   foreach my $e (@$prod) {
     my ($pid,$prod,$ad,$pp,$bonus,$arti)=@$e;
