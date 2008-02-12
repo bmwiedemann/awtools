@@ -5,6 +5,7 @@ use CGI ":standard";
 
 use awstandard;
 use awinput;
+use awlogins;
 #awstandard_init();
 awinput_init(1);
 
@@ -28,14 +29,14 @@ if(param()) {
 	foreach my $p (qw(name)) {
 		$options{$p}=param($p);
 	}
-   my @rel=getrelation($options{name});
-   if(defined($rel[0]) && $rel[2]) {
-      my @logins=($rel[2]=~m/login:(\d+:\d+:\d+:\d+)/g);
+   if(my $id=playername2idm($options{name}))
+   {
+      my @logins=@{awlogins::get_logins($ENV{REMOTE_USER}, $id)};
       my @logs;
       my $lastlog=-1;
       my $lastlogn=-1;
-      foreach(@logins) {
-         my @l=split(":");
+      foreach (@logins) {
+         my @l=@$_;
          my $dt1=time2dt($l[1]-$l[3]);
          if(!$firstlog) {$firstlogt=$l[1]-$l[3];$firstlog=$dt1-$dt1%$granularity; $dt1-=$firstlog;}
          my $dt=time2dt($l[1]);
