@@ -79,7 +79,7 @@ sub mapimage($$$$;$$) {
          $img->filledRectangle($px*$scale,$py*$scale, ($px+1)*$scale-1, ($py+1)*$scale-1, $gridcolor1);
       }
       my $id=systemcoord2id($x,$y);
-      if(defined($id)) {
+      if($id) {
          for(my $i=1; $i<=12; $i++) {
             my $py2=$py+$i;
             my $planet=getplanet($id, $i); 

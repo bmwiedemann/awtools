@@ -36,7 +36,7 @@ sub drawtile($$$$$$&;$)
 	my($img,$x,$y,$px,$py,$scale,$func,$funcdata)=@_;
 	drawgrid($img,$x,$y,$px,$py,$scale);
 	my $id=systemcoord2id($x,$y);
-	if(defined($id)) {
+	if($id) {
 		$py+=$scale; # skip border
 		for(my $i=1; $i<=12; $i++,$py+=$scale) {
 			my @vals=&$func($x,$y,$id,$i,$funcdata);
