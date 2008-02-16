@@ -161,7 +161,7 @@ reloadapache:
 tgz:
 	rm -rf bmw-awtools
 	mkdir bmw-awtools
-	cp -a *.pl *.pm ${tools} prices.csv livemap preproc feed mangle ../brownie Makefile bmw-awtools
+	cp -a *.pl *.pm ${tools} prices.csv livemap preproc parse feed mangle ../brownie Makefile bmw-awtools
 	cp -a --parent html/code/css/{tools,*.css} html/code/js html/images/aw bmw-awtools
 	cd bmw-awtools &&\
 	chmod 755 html && mkdir -p cgi-bin/public log &&\

@@ -13,7 +13,9 @@ awstandard_init();
 our %blacklist=(
       hnu=>1,
       the=>1,
+      cccp=>1,
       );
+our %whitelist=();
 our %options;
 my $h=AWheader("User AW-forum authentication tool");
 if(param("u")) {
@@ -57,7 +59,7 @@ if(param("u")) {
             print $h."strange PID mismatch: $awpid != $pid";
          } else {
            my $atag=playerid2tagm($pid);
-           if($blacklist{lc($atag)}) {
+           if($blacklist{lc($atag)} || !$whitelist{lc($atag)}) {
             print $h."your alliance ($atag) is blocked from AW forum auth";
            } else {
             my $dbh=get_dbh;

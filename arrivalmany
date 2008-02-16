@@ -83,7 +83,7 @@ if(param()) {
    foreach my $planet (@{$o{planet}}) { $options{planet}=$planet;
     next if($planet<0 || $planet>11);
    foreach my $energy (@{$o{energy}}) { $options{energy}=$energy;
-    next if($energy<0 || $energy>60);
+    next if($energy<0 || $energy>80);
    foreach my $distance (@{$o{distance}}) { $options{distance}=$distance;
     next if($distance<0 || $distance>50000);
 
@@ -108,7 +108,7 @@ if(param()) {
 print h2("general notes"),
 'When going from Planet a in System A(x/y) to Planet b in System B(X/Y) then '.br.'Planet diff is the absolute of a-b  and  Dist sqr is (x-X)<sup>2</sup>+(y-Y)<sup>2</sup>'.
 #br.'Energy level accepts fractions like 10.5'.
-br.'Input values are enumerated with comma(,) and you can use dotdot(..) for ranges. They are capped as follows: <br/>planet: 0..11<br/>energy: 0..60<br/>speed: -4..+4<br/>distsqr: 0..50000 (but only calc a range of 100 at a time)'.br;
+br.'Input values are enumerated with comma(,) and you can use dotdot(..) for ranges. They are capped as follows: <br/>planet: 0..11<br/>energy: 0..80<br/>speed: -4..+4<br/>distsqr: 0..50000 (but only calc a range of 100 at a time)'.br;
 
 sub printform { 
 	my $s=5;

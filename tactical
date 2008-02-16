@@ -18,7 +18,7 @@ if($options{map}) {
 	my $f="$awstandard::allidir/$alli/tactical.png";
 	my ($size,$modified)=(stat($f))[7,9];
 	open(F, "<", $f) or die $!;
-	print header(-type=>'image/png', -last_modified=>awstandard::HTTPdate($modified), -expires=>"+6h", #-last_modified=>$modified,
+	print header(-type=>'image/png', -last_modified=>awstandard::HTTPdate($modified), -expires=>"+2h", #-last_modified=>$modified,
     -content_lenth=>$size);
    local $/;
    print <F>;

@@ -42,6 +42,8 @@ CREATE TABLE `brownieplayer` (
 `pid` INT PRIMARY KEY,
 `lastupdate_at` INT NOT NULL,
 `lastclick_at` INT NOT NULL
+`prevlogin_at` INT NOT NULL
+`lastlogin_at` INT NOT NULL
 );!);
 
 $dbh->do(qq!
@@ -135,6 +137,7 @@ CREATE TABLE `battles` (
 `system_id` INT,
 `time` INT NOT NULL,
 PRIMARY KEY ( `id` )
+INDEX ( `system_id`,`planet_id` ),
 );!);
 
 $dbh->do(qq!
@@ -257,7 +260,7 @@ PRIMARY KEY ( sidpid ));!);
 $dbh->do(qq!
 CREATE TABLE `planetinfos` (
 `id` INT ( 14 ) NOT NULL AUTO_INCREMENT,
-`alli` CHAR( 4 ) NOT NULL ,
+`alli` CHAR( 5 ) NOT NULL ,
 `sidpid` INT( 16 ) UNSIGNED NOT NULL ,
 `status` TINYINT( 2 ) UNSIGNED NOT NULL COMMENT '1-7 defined in awstandard.pm %planetstatusstring',
 `who` INT( 16 ) UNSIGNED NOT NULL ,
@@ -273,7 +276,7 @@ PRIMARY KEY ( id )
 $dbh->do(qq!
 CREATE TABLE `allirelations` (
 `tag` VARCHAR (8) NOT NULL ,
-`alli` CHAR( 4 ) NOT NULL ,
+`alli` CHAR( 5 ) NOT NULL ,
 `status` TINYINT UNSIGNED DEFAULT '4' NOT NULL COMMENT '0-9 defined in awstandard.pm %relationname',
 `info` TEXT NOT NULL ,
 PRIMARY KEY ( tag,alli )
@@ -281,7 +284,7 @@ PRIMARY KEY ( tag,alli )
 $dbh->do(qq!
 CREATE TABLE `relations` (
 `pid` INT NOT NULL ,
-`alli` CHAR( 4 ) NOT NULL ,
+`alli` CHAR( 5 ) NOT NULL ,
 `status` TINYINT UNSIGNED DEFAULT '4' NOT NULL COMMENT '0-9 defined in awstandard.pm %relationname',
 `atag` CHAR( 8 ) NOT NULL COMMENT 'AW tag override - empty str means use AW',
 `modified_by` INT( 16 ) NOT NULL ,
@@ -368,11 +371,11 @@ CREATE TABLE `fleets` (
 `xcv` INT( 6 ) NOT NULL ,
  iscurrent TINYINT(1) NOT NULL,
 `info` VARCHAR( 200 ) NULL ,
-INDEX ( alli ),
-INDEX (`status`),
+INDEX (`alli`),
+/*INDEX (`status`),*/
 INDEX (`owner`),
-INDEX ( sidpid ),
-INDEX ( eta ),
+INDEX (`sidpid` , `iscurrent`),
+INDEX (`eta`),
 PRIMARY KEY ( `fid` )
 );!);
 #$dbh->do(qq!

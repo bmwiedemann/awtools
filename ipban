@@ -17,7 +17,7 @@ my %ips;
 tie %ips,'Tie::DBI',$dbh,'ipban','ip',{CLOBBER=>2};
 my $pw=param("password");
 #print "hash: ".md5_hex('saLtv'.$pw);
-if($pw && md5_hex('saLtv'.$pw) eq 'b75b63e7e86d2480e0e5f921fa04d730' ) {
+if($pw && md5_hex('saLtv'.$pw) eq '2067c9f2c32946c1cb7bf599550c5c86' ) {
 	foreach my $p (qw(ip action reason)) {
 		$options{$p}=param($p);
       $options{$p}=~s/[<>]//g;
@@ -43,7 +43,7 @@ print start_form(-name=>"form"),textfield(-name=>'ip', -class=>'text')," IP",br,
    submit(-name=>"ban IP", -class=>'smbutton'),end_form.AWfocus("form.ip");
 print br.q'<div style="border: solid white 1px;">';
 foreach my $ip (keys %ips) {
-   my $l=a({-href=>"?ip=$ip&action=del"},"un-ban");
+   my $l=a({-href=>"?ip=$ip&action=del&password=$pw"},"un-ban");
    print $l." $ip added ".(scalar localtime $ips{$ip}->{timeadded})." reason: ".$ips{$ip}->{reason}.br;
 }
 untie %ips;

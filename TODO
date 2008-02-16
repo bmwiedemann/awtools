@@ -10,6 +10,7 @@ battle reports (fed from news screen - keep in DB with alli, pid, sidpid, time, 
 port awsim to jstools3
 different CSS classes for different news items
 members themselves / alliance leader should be able to whitelist/blacklist authawforum usage
+IP-range / telco whitelisting to prevent foreign espionage?
 #big: parse every page into JSON-exported structure (and possibly use that for feeding DBs)
 imessage token bucket rate limiting (2+1/min)? ignore function?
 respond to BIMs from within AW

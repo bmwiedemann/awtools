@@ -117,6 +117,6 @@ print div({-class=>"grouping"},start_form(-name=>"form").textfield(-name=>'p', -
 listbits();
 print 
    br."This tool allows to configure sharing of alliance-internal data with another alliance to allow for much improved coordination. The greyed out checkboxes show the access the other gives to you.",
-   br.span({-class=>"bmwnotice"}, "Note: self-sharing fully works now. You can give read access to fleets, plans, intel, internaldata(prod,PP,A\$,ETC) and online-status. relations and login data are shared when both sides enabled the checkbox.");
+   br.span({-class=>"bmwnotice"}, "Note: self-sharing fully works now. You can give read access to fleets, plans, intel, internaldata(prod,PP,A\$,ETC) and online-status. relations and login data are shared when both sides enabled the checkbox. Be careful with sharing relations - normally you only want that if you are doing joint diplomacy.");
 print AWtail();
 

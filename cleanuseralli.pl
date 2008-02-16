@@ -4,7 +4,6 @@ use strict;
 use DBAccess2;
 use awstandard;
 use awinput;
-use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 awinput_init(1);
 
 if(!$interbeta) {

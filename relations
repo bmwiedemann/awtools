@@ -131,7 +131,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 #            a({class=>"othertool", -href=>"http://azgharde.free.fr/tools/battles.php?pl=$user&da=all"},"azghardebattles"), " ",
 #            a({class=>"othertool", -href=>"http://odbvpn.ath.cx:89/pub/view_battles.php?player=$user&date=all"},"battles"),
             " ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;
-	print hidden(-name=>'name', $user);
+	print hidden(-name=>'name', -value=>$user);
 	print textfield(-name=>'alliance', -value=>$options{alliance}, -class=>'text'), " alliance membership (e.g. unknown, TZAR, ES)", br,
 	popup_menu(-name=>'relation', -values=>[0..9], -default=>$options{realrelation},
 		-labels=>\%awstandard::relationname), " relation", br,
