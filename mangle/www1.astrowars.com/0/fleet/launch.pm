@@ -57,7 +57,6 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
    if($sci) {if($$sci[0]>99){shift(@$sci)};$refe=$$sci[2]}
    my @c1=systemid2coord($srcsid);
    if(defined($refs) && defined($refe) && $srcsid && (@c1)) {
-      $refs=1+$refs*$awstandard::racebonus[4];
       s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/arrival.js"></script><script type="text/javascript" src="http://aw.lsmod.de/code/js/bmwajax.js"></script>$&%;
       
       if(m/name="destination2" size="3" class=text value="(\d+)"/) {
