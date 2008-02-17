@@ -1079,9 +1079,8 @@ sub fleet_launch_url($)
 	my $sidpid;
 	($sidpid, $opts{inf}, $opts{col}, $opts{des}, $opts{cru}, $opts{bat})=@$f[3,8..12];
 	$opts{nr}=sidpid2sidm($sidpid);
-   $opts{id}=sidpid2pidm($sidpid);
 	my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
-	return("http://www1.astrowars.com/0/Fleet/Launch.php/?$params");
+	return("http://www1.astrowars.com/0/Fleet/Launch.php/?$params&id=".sidpid2pidm($sidpid));
 }
 
 our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
