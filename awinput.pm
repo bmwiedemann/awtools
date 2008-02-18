@@ -457,10 +457,10 @@ sub setplanetinfo($%) { my($id,$options)=@_;
 sub systemname2id($) { my($name)=@_;
    if($name=~m/^\((\d+)\)$/) { return $1 }
 	$name=~s/\s+/ /;
-	$starmap{"\L$name"}+0;
+	return int($starmap{"\L$name"}||0);
 }
 sub systemcoord2id($$) { my($x,$y)=@_;
-	$starmap{"$x,$y"}+0;
+	return int($starmap{"$x,$y"}||0);
 }
 sub systemid2name($) { my($id)=@_;
 	$starmap{$id}?$starmap{$id}{name}:undef;
