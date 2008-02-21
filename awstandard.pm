@@ -19,6 +19,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 our $server="www1.astrowars.com";       # AW game host
 our $awforumserver="www.astrowars.com"; # AW forum host
 our $bmwserver="aw.lsmod.de";           # the domain name you use for the AWTools
+our $proxyip="192.168.236.1";
 our $toolscgiurl="";#"http://$bmwserver/cgi-bin/";
 our $basedir;
 our $dbmdir; 
@@ -43,7 +44,7 @@ our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Re
 our @racestr=qw(growth science culture production speed attack defense);
 our @shipstr=qw(Transports Colony Destroyer Cruiser Battleship);
 our @buildingstr=qw(HF RF GC RL SB);
-our @racebonus=qw(0.07 0.08 0.04 0.04 0.17 0.12 0.16);
+our @racebonus=qw(0.07 0.08 0.05 0.04 0.01 0.12 0.16);
 our $magicstring="automagic:";
 our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HoR"=>15);
 our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "darkturquoise", "LimeGreen", "green");
@@ -464,6 +465,13 @@ sub getauthname() {
 sub getauthpid()
 {
    return $ENV{HTTP_AWPID};
+}
+
+sub isproxy($)
+{
+	my($ip)=@_;
+	if($ip eq $awstandard::proxyip || $ip eq "192.168.235.1") {return 1}
+	return 0;
 }
 
 sub getparsed($)
