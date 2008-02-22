@@ -129,7 +129,7 @@ TA.candidate: TA.in TA.done TA.pl
 	./TA.pl > $@
 
 chpasswd:
-	REMOTE_USER=$a perl -e 'use http_auth; setdbpasswd($p);'
+	REMOTE_USER=$a perl -e 'use http_auth; setdbpasswd("$p");'
 	${htpasswd} -b ${htpasswdfile} $a $p
 
 unaccess:
