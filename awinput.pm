@@ -15,7 +15,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
 &awinput_init &getrelation &getallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &getplayer &getalliance 
-&playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores
+&playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores &settoolsaccess_rmask &settoolsaccess
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
 &playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
@@ -1202,6 +1202,22 @@ sub getlivealliscores($)
       ORDER BY `points` DESC");
    return $dbh->selectcol_arrayref($sth, {}, $aid, time()-12*3600);
 }
+
+sub settoolsaccess_rmask($$$) {
+        my ($alli,$tag,$rmask)=@_;
+	my $dbh=get_dbh();
+	my $sth=$dbh->prepare("UPDATE `toolsaccess` SET rmask=? WHERE tag=? AND othertag=?");
+	$sth->execute($rmask, $tag, $alli);
+}
+
+sub settoolsaccess($$$;$) {
+        my ($alli,$tag,$rbits,$wbits)=@_;
+	$wbits||=0;
+	my $dbh=get_dbh();
+	my $sth=$dbh->prepare("INSERT INTO `toolsaccess` VALUES (?,?,?,?,255) ON DUPLICATE KEY UPDATE rbits=?");
+	$sth->execute($alli,$tag,$rbits,$wbits, $rbits);
+}
+
 
 # input: alliance id
 # output: float score points value

@@ -23,15 +23,8 @@ foreach my $n (qw(fleets intelreport planetinfos logins plhistory relations)) {
    $sth->execute($newtag, $oldtag);
 }
 
-$dbh->do("DELETE FROM `toolsaccess` WHERE tag='$oldtag' AND othertag='$oldtag'");
-$dbh->do("INSERT INTO `toolsaccess` VALUES('$newtag','$newtag',255,255,255)");
-
-
-#foreach(qw(relation.dbm relation.dbm.lock planets.dbm planets.dbm.lock)) {
-foreach(qw(relation.dbm relation.dbm.lock)) {
-   rename("$awstandard::dbmdir/$oldtag-$_", "$awstandard::dbmdir/$newtag-$_");
-   print "mv $awstandard::dbmdir/$oldtag-$_ $awstandard::dbmdir/$newtag-$_\n";
-}
+$dbh->do("DELETE FROM `toolsaccess` WHERE tag='$oldtag' OR othertag='$oldtag'");
+settoolsaccess($newtag, $newtag, 255, 255);
 
 #rename...
 rename("$awstandard::allidir/$oldtag", "$awstandard::allidir/$newtag");

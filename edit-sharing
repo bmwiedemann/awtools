@@ -75,19 +75,16 @@ if($alli && param()) {
    if($options{p}){$options{p}=~tr/A-Z/a-z/;$options{p}=~s/[^a-z]//g;} # sanitize user input;
    if($options{p} && $options{p} eq lc($alli)) {exit(0)}
    my $dbh=get_dbh;
-   my $sth=$dbh->prepare("INSERT INTO `toolsaccess` VALUES (?,?,?,?,255) ON DUPLICATE KEY UPDATE rbits=?");
-   my $sth2=$dbh->prepare("UPDATE `toolsaccess` SET rmask=? WHERE tag=? AND othertag=?");
    my $action=param("action")||"";
    if($action eq "add") {
-      my $r=0;
-      $sth->execute($alli,$options{p},$r,0,$r);
+      settoolsaccess($alli,$options{p}, 0);
       print "added $options{p}",br;
    } elsif($action eq "edit") {
       my $r=0;
       foreach my $name (keys %bitmap) {
          $r|=$bitmap{$name}*(param($name)?1:0);
       }
-      $sth->execute($alli,$options{p},$r,0,$r);
+      settoolsaccess($alli,$options{p}, $r);
 
       # set masking out bits
       my $newmask=255;
@@ -98,7 +95,8 @@ if($alli && param()) {
          $newmask&=~$bitmap{$name};
 #         print " $name = $bit  $newmask ";
       }
-      $sth2->execute($newmask, $options{p}, $alli);
+      settoolsaccess_rmask($alli, $options{p}, $newmask);
+#      $sth2->execute($newmask, $options{p}, $alli);
       
       print "modified $options{p}",br;
    } elsif($action eq "del") {
