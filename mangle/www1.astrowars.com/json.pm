@@ -17,7 +17,7 @@ if($::options{callback}) {
 if(!$::options{debug}) {
 	$r->content_type("application/x-javascript");
    $_=$prefix;
-	$_.=encode_json($data);
+	$_.=JSON::XS->new->utf8->encode($data);
 	$_.=$postfix
 }
 else {
