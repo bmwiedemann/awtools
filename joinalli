@@ -9,6 +9,7 @@ use DBAccess2;
 use awstandard;
 use awinput;
 use awsql;
+use http_auth;
 #awstandard_init();
 awinput_init();
 
@@ -29,14 +30,13 @@ if($name && $pid && ($interbeta || (!$alli && !$awalli)) && param()) {
 	foreach my $p (qw(a p)) {
 		$options{$p}=param($p);
 	}
-   my $passwd=`cat $awstandard::basedir/.htpasswd`;
    $options{a}=~s/[^a-zA-Z0-9]//g; # sanitize user input # password is never printed and only looked up by crypt
    my $alli=lc($options{a});
+   my($user,$crypted,$group)=getdbpasswd($alli);
    if(!$alli) {
       dbset($name,$alli,$pid);
       print "dropped you from the user-alli mapping table".br;
-   } elsif($passwd=~m/^${alli}:(.*)/m && $alli ne "guest") {
-      my $crypted=$1;
+   } elsif($alli ne "guest") {
       if(crypt($options{p}, $crypted) eq $crypted) {
          dbset($name,$alli,$pid);
          print "$name, you now belong to alliance $options{a} (in regards to AWTools)",br;
