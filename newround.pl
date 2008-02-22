@@ -2,7 +2,7 @@
 use strict;
 use DBAccess;
 use awstandard;
-my $oldname="gold10";
+my $oldname="gold11";
 my $newname=$oldname;
 $newname=~s/(\d+)$/1+$1/e;
 my $newround=1;
@@ -14,7 +14,7 @@ if($newround) {
    foreach(qw"player alliances") {
       system("cp -a $_.csv $_.csv.$oldname");
    }
-   system("sudo cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
+   system("ssh root\@alpha cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
 }
 $dbh->do("UPDATE playerextra SET premium=NULL");
 $dbh->do("UPDATE planets SET ownerid=0");
