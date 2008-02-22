@@ -29,7 +29,7 @@ my @race;
 {
 	my $racere="";
 	foreach my $r (@awstandard::racestr) {
-		$racere.=qr"<li>[+-]\d+% $r \(([+-]\d)\)</li>";
+		$racere.=qr"<li>[+-]\d+[h%] $r \(([+-]\d)\)</li>";
 	}
 	if(/$racere/) {@race=($1,$2,$3,$4,$5,$6,$7);}
 }

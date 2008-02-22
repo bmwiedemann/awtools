@@ -48,7 +48,7 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 	{
 		my $racere="";
 		foreach my $r (@awstandard::racestr) {
-			$racere.=qr"<li>[+-]\d+% $r \(([+-]\d)\)</li>";
+			$racere.=qr"<li>[+-]\d+[%h] $r \(([+-]\d)\)</li>";
 		}
 		if(/$racere/) {@race=($1,$2,$3,$4,$5,$6,$7);print "race: @race<br>\n"}
 	}
