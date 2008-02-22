@@ -21,7 +21,8 @@ gif image/gif
 png image/png
 jpg image/jpg
 css text/css
-htm.? text/html
+htm text/html
+html text/html
 txt text/plain
 );
 
@@ -40,6 +41,11 @@ sub HTTPtoEpoch($) {
 sub awgetcache($)
 { my($path)=@_;
 #   my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks)=stat($path);
+	my $t;
+	if($path!~m/\.(.{1,4})$/ || !($t=$mimemap{$1})) { 
+		#print STDERR "no mime type for $path\n";
+		return 2;
+	}
 	my $content;
 	my $mtime;
    my $res=open(FCACHE, "<", $path);
@@ -48,6 +54,7 @@ sub awgetcache($)
 #		print STDERR "re-fetching $path\n";
 		my $request=$::options{request};
 		my $UA=$::options{ua};
+		# TODO drop if-modified-since to avoid 304 Not Modified response here ?
 		my $response = $UA->request($request);
       if($response->code != 200) {$::options{response}=$response; return 2}
 		$response->scan(sub {
@@ -60,7 +67,7 @@ sub awgetcache($)
       if(!$content) {return 2}
 		(my $dir=$path)=~s![^/]*$!!;
 		system("/bin/mkdir", "-p", $dir);
-		open(my $fd, ">", $path);
+		open(my $fd, ">", $path) or die $!;
 		syswrite($fd, $content);
 		close $fd;
 			
@@ -71,13 +78,6 @@ sub awgetcache($)
       close FCACHE;
 		$mtime=(stat($path))[9];
    }
-	my $t;
-	foreach my $k (keys(%mimemap)) {
-		if($path=~m/\.$k$/i) {
-			$t=$mimemap{$k};
-		}
-   }
-   if(!$t) { print STDERR "no mime type for $path\n"}
    return ($content,$mtime,$t);
 }
 
