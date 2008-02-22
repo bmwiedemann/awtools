@@ -1,11 +1,13 @@
+htpasswd=/usr/bin/htpasswd
+htpasswdfile=.htpasswd
 d=`date +%d-%m-%Y`
 mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-round=gold10
+round=gold11
 allies=$(shell ./get_allowed_alliances.pl)
-tools=index.html alliance{,2} allirelations arrival arrivalmany authaw authawforum awlinker awstatistics awtoolstatistics joinalli cdinfo distsqr ecocheck edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
+tools=index.html alliance{,2} allirelations arrival arrivalmany authaw authawforum awstatistics awtoolstatistics joinalli cdinfo distsqr ecocheck edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory ipban logout
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
 all: TA.candidate
@@ -66,7 +68,7 @@ banupdate: html/badproxylist.txt banbadproxies.pl
 	-perl banbadproxies.pl
 
 #runs 4 times a day
-updatexdaily: updateholes updatespy banupdate
+updatexdaily: updateholes updatespy
 updatemap: updatemaponly
 updatemapsonly: updatemaponly updatemap2only
 updatemaponly:
@@ -74,9 +76,7 @@ updatemaponly:
 	REMOTE_USER=$$a /usr/bin/nice -n +12 perl drawtactical.pl ; done
 updatemap2: cleandbs updatemapsonly
 updatemap2only:
-	#for a in $(allies) ; do \
-		REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \
-	done
+	#for a in $(allies) ; do \ REMOTE_USER=$$a /usr/bin/nice -n +12 perl tabmap.pl ; \ done
 cleanmap2:
 	find html/alli/*/l -name \*.png|xargs rm -f
 updateholes:
@@ -110,8 +110,7 @@ dumpdbs:
 cleandbs:
 	./cleanmysql.pl
 	./cleanuseralli.pl > /dev/null
-	for a in $(allies) ; do \
-	   REMOTE_USER=$$a ./cleanplanning.pl ; done
+	#for a in $(allies) ; do REMOTE_USER=$$a ./cleanplanning.pl ; done
 	cat empty.dbm > base/db2/sessioncache.dbm
 showua:
 	./showuseralli.pl
@@ -130,33 +129,35 @@ TA.candidate: TA.in TA.done TA.pl
 	./TA.pl > $@
 
 chpasswd:
-	/usr/sbin/htpasswd2 -b /home/aw/.htpasswd $a $p
+	REMOTE_USER=$a perl -e 'use http_auth; setdbpasswd($p);'
+	${htpasswd} -b ${htpasswdfile} $a $p
 
 unaccess:
 	mkdir -p old/obsolete
-	mv base/db2/$a-relation.dbm old/obsolete
+#	mv base/db2/$a-relation.dbm old/obsolete
 	./removealli.pl $a
-	vim +/^$a: base/.htpasswd
+	vim +/^$a: ${htpasswdfile}
 
 access:
-	-cp -ia empty.dbm base/db2/$a-relation.dbm
+	#-cp -ia empty.dbm base/db2/$a-relation.dbm
 #	-cp -ia empty.dbm base/db2/$a-planets.dbm
-	touch base/db2/$a-relation.dbm.lock
+	#touch base/db2/$a-relation.dbm.lock
 #	./dbm-add.pl base/db2/$a-relation.dbm af "7 af alliance relation"
 #	./dbm-add.pl base/db2/$a-relation.dbm rats "7 rats alliance relation"
-	./dbm-add.pl base/db2/$a-relation.dbm $a "9 $a own alliance relation"
-	-./runsql.pl "INSERT INTO toolsaccess VALUES ('$a','$a',255,255,255)"
+	#./dbm-add.pl base/db2/$a-relation.dbm $a "9 $a own alliance relation"
+	-addalli.pl
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}
-	/usr/sbin/htpasswd2 base/.htpasswd $a
+	${htpasswd} ${htpasswdfile} $a
 	#vi /srv/www/cgi-bin/aw/.htaccess
-	-chmod 660 base/db2/$a*.dbm*
-	sudo chown wwwrun.bernhard base/db2/*.dbm*
+	#-chmod 660 base/db2/$a*.dbm*
+	#sudo chown wwwrun.bernhard base/db2/*.dbm*
 	echo -n " $a" >> allowed_alliances # keep for human lookup only
 	make reloadapache updatemap updatemap2 allies=$a
 
 reloadapache:
-	sudo /usr/local/bin/reloadapache
+	./reloadhttpd
+	#sudo /usr/local/bin/reloadapache
 
 tgz:
 	rm -rf bmw-awtools
