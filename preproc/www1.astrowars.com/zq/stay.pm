@@ -38,7 +38,7 @@ if($q->param("time") && $sessionid) {
          my %us; # usersession
          tie %us,'Tie::DBI',$dbh,'usersession','sessionid',{CLOBBER=>2};
          my @site=qw"Fleet/ News/";
-         foreach my $n (qw(85381 90943 115233)) {
+         foreach my $n (qw(39364 227097)) {
             push(@site, "Player/Profile.php/?id=$n");
          }
          my $lasturi="http://www1.astrowars.com/0/News/";
