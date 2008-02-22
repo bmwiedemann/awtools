@@ -5,6 +5,7 @@ my $sth=$dbh->prepare_cached("SELECT `forumstyle` FROM `playerprefs` WHERE `pid`
 my $res=$dbh->selectall_arrayref($sth, {}, $::options{pid});
 if($res && $res->[0] && (my $s=$res->[0]->[0])) {
 # replace forum theme
+   $s=~s/ +$//;
    s{(["(]templates)/subBlack/subBlack} {$1/$s/$s}gi;
    s{(["(]templates)/subBlack/} {$1/$s/}gi;
 }
