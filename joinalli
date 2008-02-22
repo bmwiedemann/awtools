@@ -32,12 +32,11 @@ if($name && $pid && ($interbeta || (!$alli && !$awalli)) && param()) {
 	}
    $options{a}=~s/[^a-zA-Z0-9]//g; # sanitize user input # password is never printed and only looked up by crypt
    my $alli=lc($options{a});
-   my($user,$crypted,$group)=getdbpasswd($alli);
    if(!$alli) {
       dbset($name,$alli,$pid);
       print "dropped you from the user-alli mapping table".br;
    } elsif($alli ne "guest") {
-      if(crypt($options{p}, $crypted) eq $crypted) {
+      if(checkdbpasswd($alli, $options{p})) {
          dbset($name,$alli,$pid);
          print "$name, you now belong to alliance $options{a} (in regards to AWTools)",br;
       } else {

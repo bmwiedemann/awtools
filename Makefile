@@ -130,7 +130,7 @@ TA.candidate: TA.in TA.done TA.pl
 
 chpasswd:
 	REMOTE_USER=$a perl -e 'use http_auth; setdbpasswd("$p");'
-	${htpasswd} -b ${htpasswdfile} $a $p
+	${htpasswd} -m -b ${htpasswdfile} $a $p
 
 unaccess:
 	mkdir -p old/obsolete
