@@ -9,9 +9,8 @@ if($auth) {
    print header(-cookie=>cookie(-name=>'PHPSESSID', -value=>"", -expires=>'+0h'));
    print "Your cookie has been removed. If you are still not fully logged out, <a href=\"logout\">reload this page</a> and cancel the authentication."
 } else {
-   print header(-type=>"text/html", -status=>"401 Authorization Required", WWW_Authenticate=> 'Basic realm="greenbird\'s AW scripts"'),
-   "You should now be logged out.",br,
-   "you may ".a({-href=>"index.html"},"login here"),br,
-   "If this did not help, try Tools=>Password-Manager=>Log-Out or closing all browser windows.";
-   ;
+   print header(-type=>"text/html", -status=>"401 Authorization Required", WWW_Authenticate=> 'Basic realm="greenbird\'s AW scripts"');
+#   "You should now be logged out.",br,
+#   "you may ".a({-href=>"index.html"},"login here"),br,
+#   "If this did not help, try Tools=>Password-Manager=>Log-Out or closing all browser windows.";
 }
