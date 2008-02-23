@@ -10,7 +10,7 @@ use awinput;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
-qw(dumptable);
+qw(&dumptable &dumptable2 &dumpwholetable);
 
 sub textfilter($) {
    $_[0]=~s/\r//g;
@@ -18,7 +18,7 @@ sub textfilter($) {
    $_[0]=~s/\t/\\t/g;
 }  
 
-sub dumptable1($$@)
+sub dumptable2($$@)
 { my($tname,$query, $vars)=@_;
    my $tabs=$dbh->selectall_arrayref("SHOW COLUMNS FROM `$tname`");
    my $sth=$dbh->prepare($query);
@@ -47,7 +47,13 @@ sub dumptable1($$@)
 sub dumptable($$$)
 { my($tname,$alli,$flag)=@_;
    my ($allimatch,$amvars)=awinput::get_alli_match2($alli,$flag);
-   dumptable1($tname, "SELECT $tname.* FROM `$tname`,`toolsaccess` WHERE $allimatch", $amvars);
+   dumptable2($tname, "SELECT $tname.* FROM `$tname`,`toolsaccess` WHERE $allimatch", $amvars);
+}
+
+sub dumpwholetable($)
+{
+	my($tname)=@_;
+	dumptable2($tname, "SELECT * FROM `$tname`");
 }
 
 1;

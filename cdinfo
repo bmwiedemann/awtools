@@ -6,6 +6,7 @@ use DBAccess2;
 use awstandard;
 use awinput;
 use awsql;
+use DBDump;
 awstandard_init(); # for tool theming
 #awinput_init();
 
@@ -16,49 +17,25 @@ if(param()) {
 	}
    if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
    my $p=$options{p};
+   my $alli=$ENV{REMOTE_USER};
    print header("text/plain");
    if($p==1) {
    } elsif($p==2) {
-      my $dbh=get_dbh;
-      my $res=$dbh->selectall_arrayref("
-            SELECT *
-            FROM `cdcv` 
-         ");
-      foreach(@$res) {
-         print join("\t", @$_),"\n";
-      }
+      dumpwholetable("cdcv");
    } elsif($p==3) {
-      my $dbh=get_dbh;
-      my $res=$dbh->selectall_arrayref("
-            SELECT *
-            FROM `cdlive` 
-         ");
-      foreach(@$res) {
-         print join("\t", @$_),"\n";
-      }
+      dumpwholetable("cdlive");
+   } elsif($p==26) {
+      dumptable("relations", $alli, 8);
+   } elsif($p==27) {
+      dumptable("allirelations", $alli, 8);
    } elsif($p==29) {
-      my $dbh=get_dbh;
-      my ($allimatch,$amvars)=get_alli_match2($ENV{REMOTE_USER}, 1);
-      my $sth=$dbh->prepare("
-            SELECT `fleets`.*
-            FROM `fleets`, `toolsaccess`
-            WHERE $allimatch
-         ");
-      my $res=$dbh->selectall_arrayref($sth,{},@$amvars);
-      foreach(@$res) {
-         print join("\t", @$_),"\n";
-      }
-
+      dumptable("fleets", $alli, 1);
    } elsif($p==30) {
-      my $dbh=get_dbh;
-      my $tab="battlecalc";
-      my $fields=get_table_fields($tab);
-      print (join("\t",@$fields),"\n");
-      my $res=$dbh->selectall_arrayref("
-            SELECT * FROM `$tab`
-         ");
-      foreach(@$res) {
-         print join("\t", @$_),"\n";
+      dumpwholetable("battlecalc");
+   } elsif($p==200) {
+      my $sidpid=sidpid22sidpid3m(param("sid"),0);
+      if($sidpid>12) {
+	      dumptable2("planets", "SELECT * FROM `planets` WHERE sidpid>=? AND sidpid<=?", [$sidpid, $sidpid+12]);
       }
    }
 } else {
