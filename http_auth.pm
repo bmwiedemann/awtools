@@ -14,7 +14,9 @@ qw(&setdbpasswd &getdbpasswd &checkdbpasswd
 	&checkdbpasswd_user &setdbpasswd_user
 );
 
-our $expiry=3600;
+# expiry needs to be bigger than expiry2
+our $expiry2=3600;
+our $expiry=3600*24*7;
 
 sub getdbpasswd($)
 {
@@ -52,7 +54,7 @@ sub checkdbpasswd_user($$)
 	if(!$user || !$plain) { return 0 }
 	my($user2,$crypted,$stamp)=get_one_row("SELECT * FROM `http_auth_user` WHERE `username`=? LIMIT 1", [$user]);
 	if(!$crypted) { return 0 }
-	if(apache_md5_crypt($plain, $crypted) eq $crypted) {
+	if(apache_md5_crypt($plain, $crypted) eq $crypted && $stamp+$expiry>time()) {
 		return $stamp;
 	}
 	return 0;
@@ -63,7 +65,7 @@ sub setdbpasswd_user($$)
 	my($user,$plain)=@_;
 	my $stamp=checkdbpasswd_user($user,$plain);
 	my $t=time();
-	return if $stamp>($t-$expiry/2);
+	return if $stamp+$expiry2>$t;
 	my $crypted=apache_md5_crypt($plain);
 	my $sth=$dbh->prepare("INSERT INTO `http_auth_user` VALUES (?,?,?) ON DUPLICATE KEY UPDATE passwd=?, modified_at=?");
 	$sth->execute($user, $crypted, $t,   $crypted, $t);
