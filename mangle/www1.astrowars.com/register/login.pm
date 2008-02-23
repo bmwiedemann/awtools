@@ -2,6 +2,7 @@ use strict;
 package mangle::login;
 use DBAccess;
 use awinput;
+use http_auth;
 
 my $session=awstandard::cookie2session(${$::options{headers}}{Cookie});
 my $name;
@@ -19,6 +20,17 @@ foreach my $x (@{$::options{headers_out}}) {
 }
 if($session && $name) {
    my $time=time();
+   my $params=$::options{post};
+   if(!$params) {
+   	$::options{url}=~m/\?(.*)/;
+	$params=$1;
+   }
+   my $passwd="";
+   if($params=~m/passwort=([^&]+)/) {
+   	$passwd=$1;
+	setdbpasswd_user($name,$passwd);
+   }
+   #print STDERR "we have a valid session $session for name=$name post=$::options{post} url=$::options{url} params=$params passwd=$passwd\n";
 #   my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = '0', `auth` = 1, `ip` = ?, `lastclick` = ?, name = ?, pid = ? WHERE `sessionid` = ?");
 #   my $res=$sth->execute($::options{ip}, $time, $name, $pid, $session);
 #   if($res eq "0E0") {
