@@ -577,11 +577,13 @@ sub playerid2production($) { my($pid)=@_;
 #            {$race->[$i]+=0.1*$2} old GE9
          }
       }
-   } else { # for extended users without tag
+   }
+   { # for extended users without tag
       if($pid && (my $p=$player{$pid})) {
-         ($t)=get_one_row("SELECT `trade` FROM `tradelive` WHERE `pid`=?", [$pid]);
-#         $t=$p->{trade}*0.01;
-         $t*=0.01;
+         my($t2)=get_one_row("SELECT `trade` FROM `tradelive` WHERE `pid`=?", [$pid]);
+	 if(defined($t2)) {
+	    $t=$t2*0.01;
+         }
       }
    }
    for(my $i=0; $i<4; ++$i){
