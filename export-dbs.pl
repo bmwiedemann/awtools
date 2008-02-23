@@ -2,7 +2,8 @@
 use strict;
 use awstandard;
 use awinput;
-use DBAccess2;
+use DBAccess;
+use DBDump;
 
 my $alli=$ENV{REMOTE_USER};
 exit 0 unless $alli;
@@ -13,7 +14,7 @@ sub filter($) {
    $_[0]=~s/\t/\\t/g;
 }
 
-awinput_init();
+awinput_init(1);
 # export relations DB
 open(STDOUT, ">", "$awstandard::allidir/$alli/relation.csv");
 my $relation=awinput::getallrelations();
@@ -23,45 +24,18 @@ foreach my $a (@$relation) {
 }
 
 my $dbh=get_dbh;
-sub dumptable($$)
-{ my($tname,$flag)=@_;
-   my $tabs=$dbh->selectall_arrayref("SHOW COLUMNS FROM `$tname`");
-   my ($allimatch,$amvars)=awinput::get_alli_match2($alli,$flag);
-   my $sth=$dbh->prepare("SELECT $tname.* FROM `$tname`,`toolsaccess` WHERE $allimatch");
-   my $r=$dbh->selectall_arrayref($sth,{},@$amvars);
-
-   my @head=();
-   foreach my $t (@$tabs) {
-      push(@head, $t->[0]);
-   }
-   print join("\t",@head),"\n";
-#   print "id\talli\tsidpid\tstatus\twho\tmodified_by\tmodified_at\tcreated_at\tinfo\n";
-   foreach my $row(@$r) {
-      for(my $n=$#{$tabs}; $n>=0; --$n) {
-         my $t=$tabs->[$n];
-         if($t->[1] eq "text" || $t->[1]=~/^varchar/) {
-            filter($row->[$n]); # info field
-         }
-         if(!defined($row->[$n])) { $row->[$n]||=""; }
-#         if($t->[1]=~m/int/) { $row->[$n]||=0; }
-      }
-#      $row->[5]||=0;
-      print join("\t",@$row),"\n";
-   }
-}
 
 open(STDOUT, ">", "$awstandard::allidir/$alli/fleets.csv");
-dumptable("fleets", 1);
+dumptable("fleets", $alli, 1);
 open(STDOUT, ">", "$awstandard::allidir/$alli/planetsplanning.csv");
-dumptable("planetinfos", 2);
+dumptable("planetinfos", $alli, 2);
 open(STDOUT, ">", "$awstandard::allidir/$alli/intelreport.csv");
-dumptable("intelreport", 4);
+dumptable("intelreport", $alli, 4);
 open(STDOUT, ">", "$awstandard::allidir/$alli/internalintel.csv");
-dumptable("internalintel", 32);
+dumptable("internalintel", $alli, 32);
+open(STDOUT, ">", "$awstandard::allidir/$alli/allirelations.csv");
+dumptable("allirelations", $alli, 8);
+open(STDOUT, ">", "$awstandard::allidir/$alli/relations.csv");
+dumptable("relations", $alli, 8);
 
-
-#while(my @a=each %planetinfo) {
-#   filter($a[1]);
-#   print join("\t",@a)."\n";
-#}
 
