@@ -152,7 +152,7 @@ access:
 	#-chmod 660 base/db2/$a*.dbm*
 	#sudo chown wwwrun.bernhard base/db2/*.dbm*
 	echo -n " $a" >> allowed_alliances # keep for human lookup only
-	make reloadapache updatemap updatemap2 allies=$a
+	make reloadapache updatemapsonly allies=$a
 
 reloadapache:
 	./reloadhttpd
