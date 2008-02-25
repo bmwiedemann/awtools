@@ -145,7 +145,7 @@ access:
 #	./dbm-add.pl base/db2/$a-relation.dbm af "7 af alliance relation"
 #	./dbm-add.pl base/db2/$a-relation.dbm rats "7 rats alliance relation"
 	#./dbm-add.pl base/db2/$a-relation.dbm $a "9 $a own alliance relation"
-	-./addalli.pl
+	-./addalli.pl $a
 #	rm -rf large-$a ;	mkdir -p large-$a
 	rm -rf html/alli/$a/l/ ; mkdir -p html/alli/$a/{l,history}
 	#vi /srv/www/cgi-bin/aw/.htaccess
