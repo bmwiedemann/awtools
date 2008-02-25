@@ -11,7 +11,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
 qw(&setdbpasswd &getdbpasswd &checkdbpasswd
-	&checkdbpasswd_user &setdbpasswd_user
+	&setdbpasswd_user &getdbpasswd_user &checkdbpasswd_user 
 );
 
 # expiry needs to be bigger than expiry2
@@ -47,12 +47,16 @@ sub setdbpasswd($;$)
 
 # same as above for user passwords
 
+sub getdbpasswd_user($)
+{
+	return get_one_row("SELECT * FROM `http_auth_user` WHERE `username`=? LIMIT 1", [$_[0]]);
+}
 # returns timestamp of last modification upon success
 sub checkdbpasswd_user($$)
 {
 	my($user, $plain)=@_;
 	if(!$user || !$plain) { return 0 }
-	my($user2,$crypted,$stamp)=get_one_row("SELECT * FROM `http_auth_user` WHERE `username`=? LIMIT 1", [$user]);
+	my($user2,$crypted,$stamp)=getdbpasswd_user($user);
 	if(!$crypted) { return 0 }
 	if(apache_md5_crypt($plain, $crypted) eq $crypted && $stamp+$expiry>time()) {
 		return $stamp;
