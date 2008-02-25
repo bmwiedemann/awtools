@@ -3,7 +3,7 @@ require Exporter;
 use vars qw(@ISA @EXPORT);
 
 @ISA = qw(Exporter);
-@EXPORT = qw(&get_dbh &get_one_row &get_one_rowref &get_table_fields);
+@EXPORT = qw(&get_dbh &get_one_row &get_one_rowref &selectall_arrayref &get_table_fields);
 
 # return DB handle
 # useful when you only need the mysql DB for some stuff
@@ -22,6 +22,12 @@ sub get_one_rowref($;@)
 {
    require DBAccess;
    &DBAccess::get_one_rowref; # passes @_ into it
+}
+
+sub selectall_arrayref($;@)
+{
+   require DBAccess;
+   &DBAccess::selectall_arrayref; # passes @_ into it
 }
 
 sub get_table_fields($)

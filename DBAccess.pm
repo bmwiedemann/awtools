@@ -6,7 +6,7 @@ require Exporter;
 use vars qw(@ISA @EXPORT);
 
 @ISA = qw(Exporter);
-@EXPORT = qw($dbh &get_one_row &get_one_rowref &get_dbh);
+@EXPORT = qw($dbh &get_one_row &get_one_rowref &get_dbh &selectall_arrayref);
 
 our $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
 if(!$dbh) {die "DB err: $!"}
@@ -32,6 +32,14 @@ sub get_one_rowref($;@) {
    my $row  = $sth->fetchrow_arrayref;
    $sth->finish;
    return $row;
+}
+
+sub selectall_arrayref($;@)
+{
+	my($sql,$vars)=@_;
+	$vars||=[];
+	my $sth=$dbh->prepare_cached($sql);
+	return $dbh->selectall_arrayref($sth,{}, @$vars);
 }
 
 sub get_dbh()
