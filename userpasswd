@@ -6,6 +6,7 @@ use CGI ":standard";
 
 use awstandard;
 use awinput;
+use http_auth;
 awstandard_init();
 #awinput_init();
 
@@ -15,22 +16,28 @@ my $pid=getauthpid();
 print AWheader("Change $user\'s AWtools password");
 if(!$pid) {
 	print "you need <a href=\"/manual/auth\">per-user authentication</a> to use this tool.";
-} elsif(param()) {
-	foreach my $p (qw(p)) {
-		$options{$p}=param($p);
-	}
-   my $p=$options{p};
-   if($p=~m/^[a-zA-Z0-9,.:\/=%+_-]{4,48}$/) {
-      use http_auth;
-      setdbpasswd_user($pid, $p);
-		print "updated.";
-   } else {
-      print "password not changed. should be at least 4 chars, excluding some special chars"
-   }
 } else {
-	print "",
-      start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," new password (4-8 characters)",br,
-		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+	my @pass=getdbpasswd_user($pid);
+	my $pwhash=$pass[1];
+	if(param()) {
+		foreach my $p (qw(p)) {
+			$options{$p}=param($p);
+		}
+		my $p=$options{p};
+		if((!$pwhash || (param("oldpw") eq $pwhash)) && $p=~m/^[a-zA-Z0-9,.:\/=%+_-]{4,48}$/) {
+			setdbpasswd_user($pid, $p);
+			print "updated.";
+		} else {
+			print "password not changed. should be at least 4 chars, excluding some special chars"
+		}
+	} else {
+		param('oldpw', $pwhash);
+		print "",
+			start_form(-name=>"form"),
+			hidden(-name=>'oldpw'),
+			textfield(-name=>'p', -class=>'text')," new password (4-8 characters)",br,
+			submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+	}
 }
 print AWtail();
 
