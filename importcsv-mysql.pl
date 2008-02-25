@@ -4,6 +4,10 @@ use strict;
 use DBAccess;
 if(!$dbh) {die "DB err: $!"}
 
+my @mods=qw(planets player alliances starmap alltrades battles prices);
+my $mods=shift;
+if($mods) { @mods=split(/ /, $mods); }
+
 our (%alliances,%starmap,%player,%planets,%alltrades,%battles,%prices,%baseprices);
 our @opop;
 my $firstline;
@@ -118,7 +122,7 @@ sub alltrades
 
 print "reading CSV files\n";
 #for my $f (@::files) {
-for my $f (qw(planets player alliances starmap alltrades battles prices)) {
+for my $f (@mods) {
 	my $file="$f.csv";
 	my $head=1;
 	$firstline=1;
@@ -144,6 +148,20 @@ for my $f (qw(planets player alliances starmap alltrades battles prices)) {
 print "pushing into MySQL DB\n";
 use Tie::DBI;
 if(1){
+{
+	print "\tprices\n";
+	my $sth=$dbh->prepare("REPLACE INTO `prices` VALUES (?,?)");
+	delete($prices{date});
+	delete($baseprices{date});
+	for my $p (keys %prices) {
+		$sth->execute($p,$prices{$p});
+	}
+	for my $p (keys %baseprices) {
+		$sth->execute("b$p",$baseprices{$p});
+	}
+	if($mods && $mods eq "prices") {exit 0}
+}
+
 print "\tplanets\n";
 my %h;
 tie %h,'Tie::DBI',$dbh,'planets','sidpid',{CLOBBER=>3};
@@ -232,17 +250,6 @@ foreach my $row (@$res) {
    $sth->execute(($n++), $pid);
 }
 
-
-print "\tprices\n";
-$sth=$dbh->prepare("REPLACE INTO `prices` VALUES (?,?)");
-delete($prices{date});
-delete($baseprices{date});
-for my $p (keys %prices) {
-   $sth->execute($p,$prices{$p});
-}
-for my $p (keys %baseprices) {
-   $sth->execute("b$p",$baseprices{$p});
-}
 
 print "done\n";
 1;
