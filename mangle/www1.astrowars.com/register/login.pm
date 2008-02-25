@@ -20,7 +20,8 @@ foreach my $x (@{$::options{headers_out}}) {
 }
 if($session && $name && $pid) {
    my $time=time();
-	if(0) {
+	my $prefs=awinput::getuserprefs($pid);
+	if($prefs->[6]) {
 		my $params=$::options{post};
 		if(!$params) {
 			$::options{url}=~m/\?(.*)/;
