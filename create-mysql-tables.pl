@@ -256,10 +256,14 @@ PRIMARY KEY ( pid ));!);
 
 $dbh->do(qq!
 CREATE TABLE playerprefs (
-pid MEDIUMINT UNSIGNED NOT NULL ,
+pid MEDIUMINT UNSIGNED NOT NULL,
 tz  MEDIUMINT,
 customhtml TEXT,
-storeir    BOOL,
+forumstyle VARCHAR(20) NOT NULL,
+awtoolsstyle VARCHAR(20) NOT NULL,
+storeir    BOOL NOT NULL,
+storepw    BOOL NOT NULL,
+forumauth  BOOL NOT NULL,
 PRIMARY KEY ( pid ));!);
 
 $dbh->do(qq!
