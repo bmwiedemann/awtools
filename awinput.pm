@@ -667,7 +667,8 @@ sub getallproductionsm()
 # output: number (e.g. 3851.28 A$)
 sub getartifactprice($)
 {
-   my($arti)=@_;
+	my($arti)=@_;
+	if(!$arti) {return 0}
 	return ((get_one_row("SELECT `price` FROM `prices` WHERE `item`=?", [$arti]))[0]);
 }
 
