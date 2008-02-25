@@ -16,7 +16,7 @@ qw(&setdbpasswd &getdbpasswd &checkdbpasswd
 
 # expiry needs to be bigger than expiry2
 our $expiry2=3600;
-our $expiry=3600*24*7;
+our $expiry=3600*24*50;
 
 sub getdbpasswd($)
 {
