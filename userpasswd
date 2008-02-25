@@ -1,0 +1,36 @@
+#!/usr/bin/perl -w
+# safe 070204
+use strict;
+use CGI ":standard";
+
+
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+our %options;
+my $user=getauthname();
+my $pid=getauthpid();
+print AWheader("Change $user\'s AWtools password");
+if(!$pid) {
+	print "you need <a href=\"/manual/auth\">per-user authentication</a> to use this tool.";
+} elsif(param()) {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+	}
+   my $p=$options{p};
+   if($p=~m/^[a-zA-Z0-9,.:\/=%+_-]{4,48}$/) {
+      use http_auth;
+      setdbpasswd_user($pid, $p);
+		print "updated.";
+   } else {
+      print "password not changed. should be at least 4 chars, excluding some special chars"
+   }
+} else {
+	print "",
+      start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," new password (4-8 characters)",br,
+		submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
+}
+print AWtail();
+
