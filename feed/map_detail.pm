@@ -2,35 +2,34 @@ use strict;
 use MLDBM qw(DB_File Storable);
 use Fcntl;
 use DBAccess;
-our %planets; # imported from awinput
+use awstandard;
+use awinput;
+# TODO: cleanup to not use awinput::planets directly
 
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 sub filter() {
-   return if(!m!Planets at <b>([^<]*)</b> \((-?\d+)/(-?\d+)\)! || !$::options{url});
+	my $data=getparsed(\%::options);
+   return if(!$data->{name} || !$::options{url});
    return if($ENV{REMOTE_USER} eq "xr"); # TODO : drop later?
-   my ($sysname,$x,$y)=($1,$2,$3);
+   my ($sysname,$x,$y)=($data->{name},$data->{x},$data->{y});
    my $sid=systemcoord2id($x,$y); #systemname2id($sysname);
    if ($::options{url}=~m/\?nr=(\d+)/) {$sid=$1}
-   my $system=$planets{$sid};
-   return if ! $system;
-   my @system=@$system;
+   my @system=systemid2planets($sid);
+#   return if ! @system;
    print qq!update on <a href="system-info?id=$sid">$sysname</a> ($x,$y)<br>\n!;
    m/Population.*?Starbase.*?Owner(.*)/s;
    $_=$1;
 
-   untie %planets;
-   tie %planets, "MLDBM", "db/planets.mldbm", O_RDWR|O_CREAT, 0666 or print "can not write DB: $!";
+   untie %awinput::planets;
+   tie %awinput::planets, "MLDBM", "db/planets.mldbm", O_RDWR|O_CREAT, 0666 or print "can not write DB: $!";
 
-   my @a;
-   for(;(@a=m!<tr bgcolor=".(\d{6})"[^>]*><td[^>]*>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(<a href=[^>]+>|)([^<]+)(?:</a>)?</td></tr>(.*)!); $_=$a[6]) {
-      my ($bgcolor,$pid,$pop,$sb,$link,$owner)=@a;
-      my $siege=($bgcolor eq "602020")?1:0;
+	my $planets=$data->{planet};
+	foreach my $pla (@$planets) {
+      my ($siege,$pid,$pop,$sb,$playerid,$owner)=($pla->{siege}, $pla->{id}, $pla->{population}, $pla->{starbase}, $pla->{pid}, $pla->{name});
       if($pop==0) {$pop++}
       my $details="$pid $pop $sb $siege $owner";
-      my $playerid;
-      if($link=~/id=(\d+)/) {$details.="($1)"; $playerid=$1}
       my $p=$system[$pid-1]; #getplanet($sid,$pid);
       next if(!$p);
       $details.=" old: ".planet2pop($p)." ".planet2sb($p)." ".planet2siege($p);
@@ -46,9 +45,9 @@ sub filter() {
       $sth->execute($siege, $sb, $pop, $playerid, $sidpid);
    }
    if(!$debug) {
-      $planets{$sid}=\@system;
+      $awinput::planets{$sid}=\@system;
    }
-   untie %planets; # flush write buffers and avoid unwanted later modifications
+   untie %awinput::planets; # flush write buffers and avoid unwanted later modifications
 }
 
 filter();
