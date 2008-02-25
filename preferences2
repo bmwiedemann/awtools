@@ -36,7 +36,7 @@ if(!$authpid) {
    } else {
       my $prefs=awinput::getuserprefs($authpid);
       if($prefs) {
-         my($pid,$tz,$customhtml,$storeir,$forumstyle)=@$prefs;
+         my($pid,$tz,$customhtml,$forumstyle, $awtoolsstyle, $storeir, $storepw, $forumauth)=@$prefs;
          param("p",$tz);
          param("awfstyle",$forumstyle);
          param("customhtml",$customhtml);
