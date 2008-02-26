@@ -31,6 +31,7 @@ init:
 #	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
 updateprices:
 	wget -x -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
+	perl importcsv-mysql.pl prices
 	perl importcsv.pl prices
 	chmod 660 newdb/*
 	mv newdb/prices.mldbm db/
@@ -112,6 +113,9 @@ cleandbs:
 	./cleanuseralli.pl > /dev/null
 	#for a in $(allies) ; do REMOTE_USER=$$a ./cleanplanning.pl ; done
 	cat empty.dbm > base/db2/sessioncache.dbm
+optimize:
+	perl runsql.pl 'OPTIMIZE TABLE `alliaccess` , `alliances` , `allirelations` , `alltrades` , `battlecalc` , `battles` , `brownieplayer` , `cdcv` , `cdlive` , `config` , `fleets` , `http_auth` , `http_auth_user` , `imessage` , `intelreport` , `internalintel` , `ipban` , `logins` , `planetinfos` , `planets` , `player` , `playerextra` , `playerprefs` , `plhistory` , `prices` , `relations` , `starmap` , `toolsaccess` , `tradelive` , `trades` , `useralli` , `usersession`'
+
 showua:
 	./showuseralli.pl
 lookup7:
