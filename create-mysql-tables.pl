@@ -85,7 +85,7 @@ CREATE TABLE `config` (
 $dbh->do(qq!
 CREATE TABLE `alliaccess` (
 `pid` MEDIUMINT PRIMARY KEY,
-`aid` MEDIUMINT NOT NULL
+`alliance` MEDIUMINT NOT NULL
 );!);
 $dbh->do(qq!
 CREATE TABLE `toolsaccess` (

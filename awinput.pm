@@ -8,7 +8,7 @@ require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 our (%alliances,%starmap,%player,%playerid,%planets,
    $dbnamer);
-my $startofround=0; # ((gmtime())[7]%91) <20
+my $startofround=1; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
@@ -140,7 +140,7 @@ sub is_founder($)
 {
    my ($pid)=@_;
    if(!$pid) {return 0}
-   my($delegate)=get_one_row("SELECT alliaccess.pid FROM `alliaccess`,player WHERE alliaccess.aid=alliance AND alliaccess.pid=player.pid AND player.pid=?",[$pid]);
+   my($delegate)=get_one_row("SELECT alliaccess.pid FROM `alliaccess`,player WHERE alliaccess.alliance=player.alliance AND alliaccess.pid=player.pid AND player.pid=?",[$pid]);
    if($delegate) {return 1}
    my($founder)=get_one_row("SELECT founder FROM alliances, player WHERE aid=alliance AND pid=?",[$pid]);
    return $pid == $founder;
