@@ -41,14 +41,14 @@ AW::Alliance->table('alliances');
 AW::Alliance->columns(All => qw/aid 	tag 	founder 	daysleft 	members 	points 	permanent 	name 	url/);
 AW::Alliance->has_a(founder=> 'AW::Player');
 AW::Alliance->has_many(players=> 'AW::Player');
+AW::Alliance->has_many(delegates=> 'AW::Alliaccess');
 
 
-Package AW::Alliaccess;
+package AW::Alliaccess;
 use base 'AW::DBI';
 AW::Alliaccess->table('alliaccess');
-AW::Alliaccess->columns(All => qw'pid aid');
+AW::Alliaccess->columns(All => qw'pid alliance');
 AW::Alliaccess->has_a(pid => 'AW::Player');
-AW::Alliaccess->has_a(aid => 'AW::Alliace');
-
+AW::Alliaccess->has_a(alliance => 'AW::Alliance');
 
 
