@@ -7,7 +7,7 @@ awinput_init(1);
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
-foreach(qw(logout antispy antispy2 arrival arrivalmany authaw authawforum awstatistics cdinfo distsqr ecocheck edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences preferences2 ranking sim tactical tactical-live tactical-live2 topallis topwars tradepartners uploadcss userpasswd whocansee whocanintercept /jstools.html /jstools2.html)) {
+foreach(qw(logout alliaccess antispy antispy2 arrival arrivalmany authaw authawforum awstatistics cdinfo distsqr ecocheck edit-sharing eta feedupdate fighterlist holes imessage joinalli permanentranking planet-info playerbattles3 playeronline playeronline2 preferences preferences2 ranking sim tactical tactical-live tactical-live2 topallis topwars tradepartners uploadcss userpasswd whocansee whocanintercept /jstools.html /jstools2.html)) {
 	print a({-href=>$_},$_)," &nbsp; ";
 }
 
@@ -33,6 +33,7 @@ p;
 if(is_founder(getauthpid())||is_admin()) {
  print h2("founder links"),
  a({href=>"passwd"}, "Change AWtools password"),br,
+ a({href=>"alliaccess"}, "Allow others to act same as the founder"),br,
  a({href=>"edit-sharing"}, "Set AWtools' data sharing with other alliances"),br;
 }
 if(is_admin()) {

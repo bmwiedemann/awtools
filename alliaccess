@@ -1,0 +1,80 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+use awclassdbi;
+#awstandard_init();
+awinput_init(1);
+
+our %options;
+print AWheader("AW alli access management");
+my $authpid=getauthpid();
+my $alli=$ENV{REMOTE_USER};
+my $admin=is_admin();
+if($admin && param("alli")) {$alli=param("alli")}
+my $aid=alliancetag2id($alli);
+#print "$aid $authpid\n<br>";
+if(!$aid) {
+	print "error: $alli alliance ID not found\n";
+	exit 0;
+}
+
+sub list($)
+{
+	my($aid)=@_;
+	my $a=AW::Alliance->retrieve($aid);
+	my $dele=$a->delegates;
+	print hr,"List of delegations: ",br;
+	while (my $e = $dele->next) {
+		my $pid=$e->pid;
+		my $n=playerid2namem($pid);
+		my $a="";
+		if(is_admin() && param("alli")) {$a="&alli=".param("alli")}
+		print a({-href=>"alliaccess?p=$n&action=del$a"},"del")," ",display_pid($pid),br;
+	}
+}
+
+if(!is_founder($authpid) && !$admin) {
+	print "sorry, this tool is only for players with founder permissions\n";
+	list($aid);
+} else {
+	print start_form(-name=>"form", -action=>"alliaccess"),
+		hidden(-name=>'action', -value=>'add'),
+		textfield(-name=>'p', -class=>'text'), " player name",br,
+		($admin?textfield(-name=>'alli', -class=>'test')." alli".br:()),
+		submit(-name=>"query", -class=>'smbutton', -label=>'add'),end_form.AWfocus("form.p");
+	print br,"This tool allows the founder to delegate his privileges to other members of his alliance (those with a real tag). Mostly for the edit-sharing tool at the moment.";
+	if(param()) {
+		foreach my $p (qw(p action)) {
+			$options{$p}=param($p);
+		}
+	#      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
+#		if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
+		my $pid=playername2idm($options{p});
+		if(!$pid) {
+			print "player not found\n";
+		} else {
+			if($options{action} eq "add") {
+				my $aa = AW::Alliaccess->find_or_create({pid=>$pid});
+		#		print ref($aa),$aa,"\n"; exit 0;
+				if($aa->alliance >0) {
+					print "entry does already exist".br;
+				} else {
+					print "added $options{p}".br;
+					$aa->alliance($aid);
+					$aa->update;
+				}
+			} elsif($options{action} eq "del") {
+				my $aa=AW::Alliaccess->retrieve($pid);
+				if($aa) {
+					$aa->delete;
+				}
+			}
+		}
+	}
+	list($aid);
+}
+print AWtail();
+
