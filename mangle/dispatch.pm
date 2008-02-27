@@ -233,7 +233,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       $online=join(", ", @who2);
 		my $untagged=$dbh->selectcol_arrayref("SELECT name  FROM `useralli`,playerextra WHERE `alli`=? AND useralli.pid=playerextra.pid", {}, $alli);
 		if($untagged && @$untagged) {
-			$online.="<br>untagged $alli players: ".join(", ", @$untagged);
+			$online.="<br><span class=\"bmwinfo\">untagged $alli players: ".join(", ", @$untagged)."</span>";
 		}
       if($online){
          $online="<span class=\"bottom_key\">allies online:</span> $online<br>"
