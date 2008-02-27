@@ -231,6 +231,10 @@ sub mangle_dispatch(%) { my($options)=@_;
       }
       $$options{sqlelapsed}=tv_interval ( $t1 );
       $online=join(", ", @who2);
+		my $untagged=$dbh->selectcol_arrayref("SELECT name  FROM `useralli`,playerextra WHERE `alli`=? AND useralli.pid=playerextra.pid", {}, $alli);
+		if($untagged && @$untagged) {
+			$online.="<br>untagged $alli players: ".join(", ", @$untagged);
+		}
       if($online){
          $online="<span class=\"bottom_key\">allies online:</span> $online<br>"
       }
