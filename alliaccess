@@ -40,16 +40,17 @@ if(!is_founder($authpid) && !$admin) {
 	print "sorry, this tool is only for players with founder permissions\n";
 	list($aid);
 } else {
+	foreach my $p (qw(p action)) {
+		$options{$p}=param($p);
+	}
+	param("action", "add");
 	print start_form(-name=>"form", -action=>"alliaccess"),
-		hidden(-name=>'action', -value=>'add'),
+		hidden(-name=>'action'),
 		textfield(-name=>'p', -class=>'text'), " player name",br,
 		($admin?textfield(-name=>'alli', -class=>'test')." alli".br:()),
 		submit(-name=>"query", -class=>'smbutton', -label=>'add'),end_form.AWfocus("form.p");
 	print br,"This tool allows the founder to delegate his privileges to other members of his alliance (those with a real tag). Mostly for the edit-sharing tool at the moment.";
 	if(param()) {
-		foreach my $p (qw(p action)) {
-			$options{$p}=param($p);
-		}
 	#      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
 #		if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
 		my $pid=playername2idm($options{p});
@@ -68,7 +69,7 @@ if(!is_founder($authpid) && !$admin) {
 				}
 			} elsif($options{action} eq "del") {
 				my $aa=AW::Alliaccess->retrieve($pid);
-				if($aa) {
+				if($aa && $aa->alliance == $aid) {
 					$aa->delete;
 				}
 			}
