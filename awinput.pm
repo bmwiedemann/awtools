@@ -156,7 +156,7 @@ sub is_founder($)
 # output: (status,info) , undef if not found
 sub getallirelation($) {
 	my($atag)=@_;
-	my($status,$info)=get_one_row("SELECT `status`,`info` FROM `allirelations` WHERE `alli` = ? AND `tag` = ?", [$ENV{REMOTE_USER}, $atag]);
+	my($status,$info)=get_one_row("SELECT `status`,`info` FROM `allirelations` WHERE `alli` = ? AND `tag` = ?", [$dbnamer, $atag]);
 	return($status,$info);
 }
 
