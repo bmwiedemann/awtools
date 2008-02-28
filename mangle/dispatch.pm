@@ -120,7 +120,8 @@ sub mangle_dispatch(%) { my($options)=@_;
                   $l/system-info">system
                   $l/relations">player
                   $l/alliance">alliance
-                  $l/fleets">fleets$e$&%m;
+                  $l/fleets">fleets
+                  $l/preferences2">preferences2$e$&%m;
 #               $_.="test OK";
 #            § or $_.= $@;
          } else {
