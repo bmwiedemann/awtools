@@ -68,16 +68,17 @@ sub awstandard_init() {
    $toolscgiurl="";
    if((my $pid=getauthpid())) {
       my $dbh=get_dbh;
-      my $sth=$dbh->prepare_cached("SELECT `tz`,`customhtml` FROM `playerprefs` WHERE `pid` = ?");
+      my $sth=$dbh->prepare_cached("SELECT `tz`,`customhtml`,`awtoolsstyle` FROM `playerprefs` WHERE `pid` = ?");
       my $res=$dbh->selectall_arrayref($sth, {}, $pid);
       if($res && $res->[0]) {
-         my($tz,$ch)=@{$res->[0]};
+         my($tz,$ch,$awtstyle)=@{$res->[0]};
          if(defined($tz)) {
             $timezone=$tz;
          }
          if(defined($ch)) {
             $customhtml.=$ch;
          }
+			if($awtstyle) {$style=$awtstyle}
       }
    }
    if(!defined($timezone)) {$timezone=0}
