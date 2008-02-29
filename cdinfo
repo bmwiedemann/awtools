@@ -24,6 +24,12 @@ if(param()) {
       dumpwholetable("cdcv");
    } elsif($p==3) {
       dumpwholetable("cdlive");
+   } elsif($p==20) {
+		dumptable("intelreport", $alli, 4);
+   } elsif($p==21) {
+		dumptable("internalintel", $alli, 32);
+   } elsif($p==24) {
+      dumptable("planetinfos", $alli, 2);
    } elsif($p==26) {
       dumptable("relations", $alli, 8);
    } elsif($p==27) {
