@@ -12,7 +12,7 @@ for my $p (qw'fid') {
   $options{$p}=~s/[^0-9]//g; # sanitize user input;
 }
 if(defined($options{fid})) {
-   awinput_init();
+   awinput_init(1);
    my $res=awinput::get_fleet($options{fid});
    if(!$res || !$$res[0]) {
       print AWheader("error")."fleet $options{fid} not found";
@@ -32,11 +32,11 @@ if(defined($options{fid})) {
          $params.="&p$f=".eval("\$o$f");
       }
       my $url="http://$awstandard::awforumserver/about/battlecalculator/?destroyer=$eds&cruiser=$ecs&battleship=$ebs&des=$deffleet[0]&cru=$deffleet[1]&bat=$deffleet[2]&sta=0&submit2=calculate+battle&go=1$params";
-      print (redirect($url),a({href=>$url},"link"));
+      print (redirect($url));
    }
 } else {
    print AWheader("fleet to battlecalc"),
       start_form(-name=>"form", -method=>"get"),textfield(-name=>'fid', -class=>'text'), " fleet id",br,
       submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.fid");
+	print AWtail;
 }
-print AWtail;
