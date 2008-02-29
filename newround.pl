@@ -20,7 +20,7 @@ $dbh->do("UPDATE playerextra SET premium=NULL");
 $dbh->do("UPDATE planets SET ownerid=0");
 $dbh->do("UPDATE intelreport SET racecurrent=0");
 $dbh->do("UPDATE intelreport SET biology=NULL, economy=NULL, energy=NULL, mathematics=NULL, physics=NULL, social=NULL");
-foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhistory planetinfos player useralli internalintel logins)) {
+foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhistory planetinfos player useralli internalintel logins tradelive)) {
    $dbh->do("TRUNCATE TABLE `$name`");
 }
 
