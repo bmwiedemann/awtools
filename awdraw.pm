@@ -51,7 +51,7 @@ sub mapimage($$$$;$$) {
 
 # Create the main image
    my $truecolor=($imagesizex<30);
-   my $img = new GD::Image($imagesizex*$scale, $imagesizey*$scale, $truecolor);
+   my $img = new GD::Image($imagesizex*$scale, $imagesizey*$scale);
    mapcommon::mapcoloralloc($img);
 
    sub gridtest($) { $_[0]%10<=1 ? $mapcommon::lightgridcolor:$mapcommon::darkgridcolor }
