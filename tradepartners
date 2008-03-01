@@ -30,7 +30,7 @@ sub gettradepartners2($$) { my($maxta,$minad)=@_;
     my $name=playerid2namem($pid);
     $ad+=$pp*$adprice;
     if($ad<$minad) {next}
-    my $adplus=$ad+getartifactprice($arti);
+    my $adplus=$ad+(getartifactprice($arti)||0);
     my $trades=awinput::playerid2trades($pid);
     if($trades>$maxta) {next}
     push(@result,[$name,$pid,$ad, $adplus, $prod*$bonus*$adprice, $trades]);
