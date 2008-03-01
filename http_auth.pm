@@ -27,8 +27,8 @@ sub checkdbpasswd($$)
 {
 	my($user, $plain)=@_;
 	if(!$user || !$plain) { return 0 }
-	my($user2,$crypted,$group)=getdbpasswd($user);
-	if(!$crypted) { return 0 }
+	my($user2,$crypted,$group,$modat,undef,$allowpw)=getdbpasswd($user);
+	if(!$crypted || !$allowpw) { return 0 }
 	if(apache_md5_crypt($plain, $crypted) eq $crypted || crypt($plain, $crypted) eq $crypted) {
 		return 1;
 	}
@@ -41,8 +41,8 @@ sub setdbpasswd($;$)
 	$group||=1;
 	my $alli=$ENV{REMOTE_USER};
 	my $crypted=apache_md5_crypt($plain);
-	my $sth=$dbh->prepare("INSERT INTO `http_auth` VALUES (?,?,?,?,?) ON DUPLICATE KEY UPDATE passwd=?, modified_at=?");
-	$sth->execute($alli, $crypted, $group, time(), "x", $crypted, time());
+	my $sth=$dbh->prepare("INSERT INTO `http_auth` VALUES (?,?,?,?,'x',0) ON DUPLICATE KEY UPDATE passwd=?, modified_at=?");
+	$sth->execute($alli, $crypted, $group, time(), $crypted, time());
 }
 
 # same as above for user passwords

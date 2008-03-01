@@ -103,7 +103,9 @@ CREATE TABLE `http_auth` (
 `username` CHAR(9) PRIMARY KEY,
 `passwd` CHAR(40) NOT NULL,
 `groups` CHAR(25) NOT NULL,
-`modified_at` INT NOT NULL
+`modified_at` INT NOT NULL,
+`passwdj` CHAR(40) NOT NULL,
+`allowpw` BOOL
 );!);
 
 $dbh->do(qq!
