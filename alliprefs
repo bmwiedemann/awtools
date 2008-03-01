@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+use http_auth;
+use DBAccess2;
+#awstandard_init();
+awinput_init(1);
+
+our %options;
+print AWheader("AW alli preferences");
+my $authpid=getauthpid();
+my $alli=$ENV{REMOTE_USER};
+my $admin=is_admin();
+if($admin && param("alli")) {$alli=param("alli")}
+my $aid=alliancetag2id($alli);
+#print "$aid $authpid\n<br>";
+if(!$aid) {
+	print "error: $alli alliance ID not found\n";
+	exit 0;
+}
+
+sub list($)
+{
+	my($alli)=@_;
+}
+
+if(!is_founder($authpid) && !$admin) {
+	print "sorry, this tool is only for players with founder permissions\n";
+	list($alli);
+} else {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+	}
+	if(!(param())) {
+		my @pw=getdbpasswd($alli);
+		param("allowpw",$pw[5]);
+	}
+	print start_form(-name=>"form"),
+		checkbox(-name=>"allowpw", -label=>"Allow logins to AWTools with alliance password", -value=>1),br,
+		submit(-name=>"Update", -class=>'smbutton'),end_form.AWfocus("form.p");
+	if(param()) {
+		# set it
+		my $allowpw=param("allowpw");
+		http_auth::setdbpasswdallow($allowpw);
+	}
+	list($alli);
+}
+print AWtail();
+

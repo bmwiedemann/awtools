@@ -45,6 +45,15 @@ sub setdbpasswd($;$)
 	$sth->execute($alli, $crypted, $group, time(), $crypted, time());
 }
 
+sub setdbpasswdallow($)
+{
+	my($allowpw)=@_;
+	$allowpw=$allowpw?1:0; # sanitize user input
+	my $alli=$ENV{REMOTE_USER};
+	my $sth=$dbh->prepare("UPDATE `http_auth` SET allowpw=? WHERE `username`=?");
+	$sth->execute($allowpw, $alli);
+}
+
 # same as above for user passwords
 
 sub getdbpasswd_user($)
