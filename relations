@@ -178,8 +178,8 @@ if($options{name}) {# && $options{name} ne "unknown") {
       my $fleets=awinput::playerid2fleets($id, "ORDER BY `sidpid` ASC, `eta` ASC, `lastseen` ASC");
       print "fleets:<ul>\n";
       foreach my $f (@$fleets) {
-         my($sidpidm,$cv)=@{$f}[3,13];
-         next if not $cv;
+         my($sidpidm,$cv, $trn, $cls)=@{$f}[3,13,8,9];
+         next if (not $cv and not $trn and not $cls);
          my ($sid,$pid)=sidpid32sidpid2m($sidpidm);
          print li(sprintf("<code><a href=\"system-info?id=$sid\">%4i#%02i</a></code> ",$sid,$pid). show_fleet($f));
       }
