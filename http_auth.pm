@@ -41,7 +41,7 @@ sub setdbpasswd($;$)
 	$group||=1;
 	my $alli=$ENV{REMOTE_USER};
 	my $crypted=apache_md5_crypt($plain);
-	my $sth=$dbh->prepare("INSERT INTO `http_auth` VALUES (?,?,?,?,'x',0) ON DUPLICATE KEY UPDATE passwd=?, modified_at=?");
+	my $sth=$dbh->prepare("INSERT INTO `http_auth` VALUES (?,?,?,?,'x',1) ON DUPLICATE KEY UPDATE passwd=?, modified_at=?");
 	$sth->execute($alli, $crypted, $group, time(), $crypted, time());
 }
 
