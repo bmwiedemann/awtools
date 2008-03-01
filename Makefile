@@ -135,6 +135,7 @@ TA.candidate: TA.in TA.done TA.pl
 chpasswd:
 	REMOTE_USER=$a perl -e 'use http_auth; setdbpasswd("$p");'
 	${htpasswd} -m -b ${htpasswdfile} $a $p
+	make reloadapache
 
 unaccess:
 	mkdir -p old/obsolete
@@ -156,7 +157,7 @@ access:
 	#-chmod 660 base/db2/$a*.dbm*
 	#sudo chown wwwrun.bernhard base/db2/*.dbm*
 	echo -n " $a" >> allowed_alliances # keep for human lookup only
-	make reloadapache updatemapsonly allies=$a
+	make updatemapsonly allies=$a
 
 reloadapache:
 	./reloadhttpd
