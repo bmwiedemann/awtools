@@ -158,7 +158,7 @@ sub AWfocus($) { my($elem)=@_;
 
 sub wikilink($)
 { my($name)=@_;
-	return a({-href=>"http://wiki.zq1.de/mediawiki/index.php/$name"}, $name);
+	return a({-href=>"http://wiki.zq1.de/wiki/$name"}, $name);
 }
 
 
