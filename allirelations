@@ -5,8 +5,8 @@ use CGI ":standard";
 use awstandard;
 use awinput;
 use DBAccess;
-awstandard_init();
-#awinput_init();
+#awstandard_init();
+awinput_init();
 
 our %options;
 print AWheader("AW alliance relations tool");
@@ -29,8 +29,7 @@ if(param()) {
       }
    } else {
       # save new values
-      my $sth=$dbh->prepare("REPLACE INTO allirelations VALUES (?,?,?,?)");
-      $sth->execute($options{p},$ENV{REMOTE_USER},$options{relation},$options{comment});
+		setallirelation(\%options);
    }
 
    print start_form(-name=>"form2"),hidden("p"),

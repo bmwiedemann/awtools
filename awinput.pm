@@ -14,7 +14,7 @@ our $alarmtime=99;
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = qw(
-&awinput_init &getrelation &getallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &getplayer &getalliance 
+&awinput_init &getrelation &getallirelation &setallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &getplayer &getalliance 
 &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores &settoolsaccess_rmask &settoolsaccess
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
 &playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
@@ -223,12 +223,19 @@ sub setrelation($%) { my($id,$options)=@_;
       my $alli=$ENV{REMOTE_USER};
       if(!$options) {
          my $sth=$dbh->prepare("DELETE FROM `relations` WHERE `pid`=? AND `alli`=?");
-         $sth->execute($pid, $alli);
+         $sth->execute($pid, $dbnamer||$alli);
       } else {
          my $sth=$dbh->prepare("REPLACE INTO `relations` VALUES (?,?,?,?,?,?,?)");
          $sth->execute($pid, $alli, $$options{status}, $$options{atag}, 0, time(), $$options{info});
       }
    }
+}
+sub setallirelation(%)
+{
+	my($options)=@_;
+	my $dbh=get_dbh();
+	my $sth=$dbh->prepare("REPLACE INTO allirelations VALUES (?,?,?,?)");
+	$sth->execute(lc($options->{p}),$dbnamer||$ENV{REMOTE_USER},$options->{relation},$options->{comment});
 }
 
 sub playerid2etc($) { my($id)=@_;
