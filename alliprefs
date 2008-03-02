@@ -40,7 +40,8 @@ if(!is_founder($authpid) && !$admin) {
 	}
 	print start_form(-name=>"form"),
 		checkbox(-name=>"allowpw", -label=>"Allow logins to AWTools with alliance password", -value=>1),br,
-		submit(-name=>"Update", -class=>'smbutton'),end_form.AWfocus("form.p");
+		submit(-name=>"Update", -class=>'smbutton'),end_form.AWfocus("form.p"),
+		br,"for more info see ",wikilink("alliprefs Tool");
 	if(param()) {
 		# set it
 		my $allowpw=param("allowpw");
