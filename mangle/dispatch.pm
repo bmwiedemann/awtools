@@ -114,14 +114,13 @@ sub mangle_dispatch(%) { my($options)=@_;
                my $s=qq'<td class="white">$::bmwlink';
                my $l="$e$sep$s";
                s%^</tr></table>%</tr><tr class="bmwblankrow"><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b></td>
-                  $s/arrival">arrival
+                  $s/preferences2">preferences2
                   $l/tactical">tacmap
                   $l/tactical-live2">tlarge
                   $l/system-info">system
                   $l/relations">player
                   $l/alliance">alliance
-                  $l/fleets">fleets
-                  $l/preferences2">preferences2$e$&%m;
+                  $l/fleets">fleets$e$&%m;
 #               $_.="test OK";
 #            § or $_.= $@;
          } else {
