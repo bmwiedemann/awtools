@@ -220,10 +220,10 @@ sub setrelation($%) { my($id,$options)=@_;
    my $pid=playername2idm($id);
    if($pid) {  # mysql relations insert
       my $dbh=get_dbh;
-      my $alli=$ENV{REMOTE_USER};
+      my $alli=$dbnamer||$ENV{REMOTE_USER};
       if(!$options) {
          my $sth=$dbh->prepare("DELETE FROM `relations` WHERE `pid`=? AND `alli`=?");
-         $sth->execute($pid, $dbnamer||$alli);
+         $sth->execute($pid, $alli);
       } else {
          my $sth=$dbh->prepare("REPLACE INTO `relations` VALUES (?,?,?,?,?,?,?)");
          $sth->execute($pid, $alli, $$options{status}, $$options{atag}, 0, time(), $$options{info});
