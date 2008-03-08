@@ -23,8 +23,6 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 
 
 use MLDBM qw(DB_File Storable);
-#use DBAccess;
-use DB_File::Lock;
 use CGI ":standard";
 use Fcntl qw(:flock O_RDWR O_CREAT O_RDONLY);
 use awaccess;
@@ -82,11 +80,6 @@ sub awinput_init(;$) { my($nolock)=@_;
    }
 }
 
-
-sub opendb($$%) {my($mode,$file,$db)=@_;
-   tie(%$db, "DB_File::Lock", $file, $mode, 0, $DB_HASH, ($mode==O_RDONLY)?'read':'write');
-#   or print $head,"\nerror accessing DB\n";
-}
 
 # release locks allocated in awinput_finish
 sub awinput_finish() {

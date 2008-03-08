@@ -11,7 +11,7 @@ awstandard_init();
 #awinput_init();
 
 our %options;
-my $user=getauthname();
+my $user=getauthname()||"user";
 my $pid=getauthpid();
 print AWheader("Change $user\'s AWtools password");
 if(!$pid) {
