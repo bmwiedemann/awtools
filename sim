@@ -25,12 +25,12 @@ if(@params && param("turns")<=14999) {
 	print "</pre>\n";
 } else {
 	my $s=5;
-   my $t=9500;
+   my $t=8700;
 	my @default=($t,$t/4,6);
 #	my @default=(400,40,3);
 	print start_form(-method=>'get', -name=>"form"), 
    i("simulation options"),br,
-	textfield(-name=>'turns', -value=>$default[0], -size=>$s, -class=>'text'), " how many turns (of 15 min) to simulate (old rounds were ~7300 long)", br,
+	textfield(-name=>'turns', -value=>$default[0], -size=>$s, -class=>'text'), " how many turns (of 15 min) to simulate (old rounds were ~7300 long. GE10 was ~9500 long)", br,
 	textfield(-name=>'print', -value=>$default[1], -size=>$s, -class=>'text'), " print only each n turns", br,
 	textfield(-name=>'initialp', -value=>72, -size=>$s, -class=>'text'), " starting time in hours (initial starting points depend on this (default: 72h=3d=144PP))", br,
 #textfield(-name=>'tactic', -value=>$default[2], -size=>$s, -class=>'text'), " use tactic (1..6)", 

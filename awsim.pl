@@ -218,8 +218,10 @@ sub finish(){
   my $sci=0;
   my $pkt=0;#int($player{cul});
   foreach my $p (@planet) {
-     next if($$p{pop}<10.5);
-    $pkt+=$$p{pop}-0.5-10;
+  	 my $pop=$$p{pop};
+     next if($pop<10.5);
+    $pkt+=$pop-0.5-10;
+	 if($pop>20) {$pkt+=$pop-20}
     #$pkt+=int($$p{pop});
   }
   while(1){
