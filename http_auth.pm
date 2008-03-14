@@ -63,15 +63,17 @@ sub getdbpasswd_user($)
 	return get_one_row("SELECT * FROM `http_auth_user` WHERE `username`=? LIMIT 1", [$_[0]]);
 }
 # returns timestamp of last modification upon success
-sub checkdbpasswd_user($$)
+sub checkdbpasswd_user($$;$)
 {
 	my($user, $plain)=@_;
-	if(!$user || !$plain) { return 0 }
+	if(!$user || !$plain) { $_[2]="no user/PW given"; return 0 }
 	my($user2,$crypted,$stamp)=getdbpasswd_user($user);
-	if(!$crypted) { return 0 }
-	if(apache_md5_crypt($plain, $crypted) eq $crypted && $stamp+$expiry>time()) {
-		return $stamp;
-	}
+	if(!$crypted) { $_[2]="no password set"; return 0 }
+	if(apache_md5_crypt($plain, $crypted) eq $crypted) {
+		if($stamp+$expiry>time()) {
+			return $stamp;
+		} else { $_[2]="expired" }
+	} else { $_[2]="incorrect password" }
 	return 0;
 }
 
