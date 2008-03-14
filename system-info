@@ -189,6 +189,10 @@ if(param("legend")) {
 		my @planets=systemid2planets($system);
 		foreach my $h (@planets) {
 			my $planetid=planet2pid($h);
+			if(!$planetid) {
+				tprint "<li> - missing from <a href=\"http://www.astrowars.com/forums/viewtopic.php?t=27341\">AW sign-in concurrency bug</a></li>\n";
+				next;
+			}
          my $target="";
          if($h && $planetid && $options{target} && $options{target}==$planetid) {
             $target=' class="bmwtarget"';
