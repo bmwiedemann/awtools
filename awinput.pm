@@ -8,7 +8,7 @@ require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 our (%alliances,%starmap,%player,%playerid,%planets,
    $dbnamer);
-my $startofround=1; # ((gmtime())[7]%91) <20
+my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;

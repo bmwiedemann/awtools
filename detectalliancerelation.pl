@@ -5,7 +5,7 @@ use awinput;
 use DBAccess2;
 awinput_init(1);
 
-if(scalar keys %::alliances<10) {exit 0}
+if(scalar keys %awinput::alliances<10) {exit 0}
 my %relation;
 my %nsystems;
 my %conq;
@@ -67,8 +67,6 @@ for my $day (0..7) {
 }
 #print STDERR "scanning systems...\n";
 
-{my $dummy=\%::alliances;} #avoid warning
-
 for my $sid (1..6000) {
  my %allis=();
  my $level=systemid2level($sid);
@@ -81,7 +79,7 @@ for my $sid (1..6000) {
 	if($pop<$minpop) {$minpop=$pop}
 	my $aid=playerid2alliance($o);
 	if(!$aid) {next}
-	if($::alliances{$aid}{points}<270 && allianceid2members($aid)<8) {next}
+	if($awinput::alliances{$aid}{points}<270 && allianceid2members($aid)<8) {next}
 	$allis{$aid}++;
 	my $sidpid="$sid#$plid";
 	my $n=0;
