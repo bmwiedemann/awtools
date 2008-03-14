@@ -10,6 +10,11 @@ foreach my $n (qw(fleets relations logins planetinfos intelreport plhistory)) {
       FROM `$n`
       WHERE `alli` = '$a'");
 }
+foreach my $n (qw(toolsaccess)) {
+   $dbh->do("DELETE
+      FROM `$n`
+      WHERE `tag` = '$a' OR `othertag` = '$a'");
+}
 
 system("rm -r html/alli/$a");
 
