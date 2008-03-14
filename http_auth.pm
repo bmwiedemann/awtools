@@ -23,15 +23,17 @@ sub getdbpasswd($)
 	return get_one_row("SELECT * FROM `http_auth` WHERE `username`=? LIMIT 1", [$_[0]]);
 }
 
-sub checkdbpasswd($$)
+sub checkdbpasswd($$;$)
 {
 	my($user, $plain)=@_;
-	if(!$user || !$plain) { return 0 }
+	if(!$user || !$plain) { $_[2]="no user/PW given"; return 0 }
 	my($user2,$crypted,$group,$modat,undef,$allowpw)=getdbpasswd($user);
-	if(!$crypted || !$allowpw) { return 0 }
+	if(!$crypted) { $_[2]="no password set"; return 0 }
+	if(!$allowpw) { $_[2]="alliance passwords disabled"; return 0 }
 	if(apache_md5_crypt($plain, $crypted) eq $crypted || crypt($plain, $crypted) eq $crypted) {
 		return 1;
 	}
+	$_[2]="incorrect password";
 	return 0;
 }
 
