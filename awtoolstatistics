@@ -20,15 +20,15 @@ my $users=$dbh->selectall_arrayref(
    );
 
 my $allis=$dbh->selectall_arrayref(
-      "SELECT tag, count( tag )
+      "SELECT tag, count( tag ), members
       FROM (
-         SELECT DISTINCT player.name, tag
+         SELECT DISTINCT player.name, tag, members
          FROM `usersession` , `player` , `alliances`
          WHERE `aid` = `alliance`
          AND usersession.pid = player.pid
          ) AS e
       GROUP BY `tag`
-      ORDER BY `count( tag )` DESC
+      ORDER BY `count( tag )` DESC, members ASC, `tag`
       "
    );
 #      LIMIT 0 , 30
@@ -53,13 +53,13 @@ print "<h2>alliance usage</h2>";
 my $n=0;
 foreach my $row (@{$allis}[0..49]) {
    next if not $row;
-   my($name,$num)=@$row;
+   my($name,$num, $memb)=@$row;
    my $color="";
    if(is_allowedalli($name) || $remap_alli{lc($name)}) {
       $color="color:green";
    }
    my $m=allianceid2members(alliancetag2id($name));
-   printf("%02i <b style=\"$color\">%-4s</b> %2i/%-2i\n", ++$n, $name, $num, $m);
+   printf("%02i <b style=\"$color\">%-4s</b> %2i/%-2i/%i\n", ++$n, $name, $num, $m, $memb);
 }
 
 print "<h2>fleets</h2>";
