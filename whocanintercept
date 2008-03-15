@@ -67,6 +67,14 @@ if(param() && param("p")) {
 #         print "$x2,$y2 $dist $owner $eta $now $ett ";
 #         print awinput::show_fleet($row).br;
       }
+		if(param("csv")) {
+			print "\n\nCSV data:\n";
+			foreach(@data) {
+				print join("\t",@$_),"\n";
+			}
+			awinput::awinput_finish();
+			exit(0);
+		}
       print sort_table([qw(who where when(h) howmuchCV xCV bioneed)],
             [\&display_pid, \&display_sid, \&display_round2, 
              \&display_string, \&display_string, \&display_string],
