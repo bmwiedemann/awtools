@@ -38,6 +38,7 @@ our $style;
 our $timezone;
 our $updatetime15=16*60;
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+our %month=qw(Jan 1 Feb 2 Mar 3 Apr 4 May 5 Jun 6 Jul 7 Aug 8 Sep 9 Oct 10 Nov 11 Dec 12);
 our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
 our %relationname=(0=>"from alliance", 1=>"total war", 2=>"foe", 3=>"tense", 4=>"unknown(neutral)", 5=>"implicit neutral", 6=>"NAP", 7=>"friend", 8=>"ally", 9=>"member");
 our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"sieged by", 5=>"taken by", 6=>"lost to", 7=>"defended by");
@@ -163,9 +164,10 @@ sub wikilink($)
 
 
 sub mon2id($) {my($m)=@_;
-        for(my $i=0; $i<12; $i++) {
-                if($m eq $month[$i]) {return $i}
-        }
+#        for(my $i=0; $i<12; $i++) {
+#                if($m eq $month[$i]) {return $i}
+#        }
+        return $month{$m}-1;
 }
 
 # input: AW style time string
