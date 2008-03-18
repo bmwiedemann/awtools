@@ -8,6 +8,7 @@ our $d=$::data;
 @EXPORT = 
 qw($d
 &tobool &toint &tofloat &unprettyprint
+&parselastupdate
 );
 
 sub tobool($)
@@ -40,3 +41,13 @@ sub unprettyprint($)
    return $value+0;
 }
 
+
+sub parselastupdate($)
+{
+	my($textref)=@_;
+	if($$textref =~m/Last Update (\d\d:\d\d:\d\d) GMT (\w{3} \d+)/) {
+		$d->{lastupdate}="$1 $2";
+		# re-use existing year/month inference algorithms
+		$d->{lastupdatetime}=awstandard::parseawdate("$1 - $2");
+	}
+}
