@@ -1,15 +1,26 @@
+#DBAccess(2): myselectall_arrayref($query, [$var1, $var2]);
+#display somewhere SELECT useralli.*,name  FROM `useralli`,playerextra WHERE `alli`=? AND useralli.pid=playerextra.pid
+#alliaccess manipulation CGI
+#mysql prices noon uppdate
+
+#have checkdbpasswd return info on why it failed (blocked, non-existing user, wrong hash, expired) and log it (and possibly output it to user?)
+cool: improve playerbattles3 tool to include intermediate guessrace and att/defence formula for better results. use recursion
+?parse best* pages, store in DB and display elsewhere?
+make AW backlinks depend on user-prefs (www[1].astrowars.com vs [www.]aw21.zq1.de)
+medium-big: Anyway, a tool that allows the alliance's founder to see who access his alliance's brownie account (IP and user associated), and to block some IP/user, would be great.
 #auto daily alliancerelations.png
 #eco check tool
 #alltrades live update
 #public updated trade bonus table
 man/FAQ: it uses known IRs or worst case (att=+4, phys=SL) to calc xCV. you can see the original fleet numbers by pointing your mouse over the line.
++documentation Wiki (with Orphebus)
 battle reports (fed from news screen - keep in DB with alli, pid, sidpid, time, info)
 #fix playeronline to use time / something directly
 #warn if launch-target is someone else's planet and there is no "plan" to that target
 #JS in planets/details -> display:none build part on bottom. must still work without JS
 port awsim to jstools3
 different CSS classes for different news items
-members themselves / alliance leader should be able to whitelist/blacklist authawforum usage
+#members themselves / alliance leader should be able to whitelist/blacklist authawforum usage
 IP-range / telco whitelisting to prevent foreign espionage?
 #big: parse every page into JSON-exported structure (and possibly use that for feeding DBs)
 imessage token bucket rate limiting (2+1/min)? ignore function?
@@ -41,7 +52,7 @@ internal planet: buildings, PP, fractional pop
 ?findjumpy tool to look for free/unknown planets and friendly planets for attacks
 #interbeta: alliances.tag, *.alli -> CHAR(4)
 relations/system-info: recent battles
-reverse-engineer battle formulas (chance(att)) - use in whocanintercept
+reverse-engineer battle formulas (chance(att)) - use in whocanintercept - add a "calc this battle" link next to it
 playerprefs: phone, msn, email
 #whocansee: rewrite to work without whocansee.pl , add xE
 whocansee: in cases where both XR and EN have an intelreport... I think it would be best to just display the newer one # done?

@@ -4,6 +4,7 @@ use strict;
 use DBAccess;
 
 my $a=shift;
+if(!$a) {exit 1}
 
 foreach my $n (qw(fleets relations logins planetinfos intelreport plhistory)) {
    $dbh->do("DELETE

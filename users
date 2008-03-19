@@ -1,6 +1,6 @@
 GE11 IS: Naughty_Trollet
-GE10 AF: klappstuhl
-#GE8 TGD: winterwolf
+#GE10 AF: klappstuhl
+?GE8 TGD: winterwolf
 GE11 RATS: BigE
 GE11 SW: jca
 GE11 SSS: Waldorf
@@ -15,81 +15,93 @@ GE11 UFsR: MaLaGasy
 GE11 SOUP: mysz
 GE11 LAA: cheesedown
 GE11 SP: alcorack
-GE11 FSB: bonyv
+GE11 FSB: bonyv = ?
 GE11 SpIn: salamander
 GE11 SK: Izeldon
 GE11 SEUX: vaneagle
-GE11 ?OCB: Miconico
-GE11 ?RTT:
-GE11 ?LORD: 
-GE11 ?NEMO: Runner ("Scott")
+GE11 AuA: cpkoma
+GE11 OCB: Miconico
+GE11 RTT: akirabzh
+GE11 LORD: VincentVega (ok?)
+GE11 NEMO: Runner ("Scott")
+GE11 BAAL: Cheiron / GigantusX
+GE11 SITH: hasnak
+GE11 CoRE: TJ2805
+GE11 DAMN: darthtang
+GE11 EN: Jowy
+GE11 WHF: Philgorn (verbaluzi (Chans))
+# 3d cancelation
+GE11 EIRE: R0dEire
+GE11 PM: dinAlt
+GE11 UnBC: Jigglypuff (Trolic (juglemon))
+
+?GE11: LBA
+?GE10 RIP: ? GigantusX
 
 
 
-
-2008-02-23
-?GE11 +TROL: speter/Mythwin
-GE11 +?LOCO: downsouth
+2008-02-29
+GE11 +TROL: speter (Xavier Josep Vi*als Blasco(jvinyals@yahoo.com))
+GE11 +LOCO: downsouth (stillsouth@hotmail.com)
 GE11 +THE: Solutodka=sylvain faltrept (orphebus=MrCellophane=QueenOfSheba= Miguel Garcia de la Fuente <orphebus@orphebus.com>)
 GE11 +FBSP: vaport  "Sean C Byers" <vaportonaw@yahoo.com>
 GE11 +FLO: awhelen (Schallenberg(gltommy@aol.com))
-GE11 +LOSE: FrereJacques (Miguel Garcia orphebus@orphebus.org)
-GE11 +?topay?NAIN: Rasta31
+GE11 +LOSE: FrereJacques = Miguel Garcia (orphebus@orphebus.org)
+GE11 +KIN: skate6407 = Richard Perry(richardperry219@yahoo.com)
+GE11 +DOM: tigerteam (Susanne und Uwe Weck(office@uweweck.de))
+GE11 +EOS: Dramoir = Leon Boff(dramoir@avalon-ink.com)
+GE11 +NAIN: Rasta31 = Kévin RIEU (ffmandu13@hotmail.com) plus regular NAP
+
 
 ---
 
 
-GE10 +UFO: (old:pikansjos) rollyp (rolf_oest@hotmail.com)
-GE10 +FARt: Yawgmoth (alberto.ciampini@virgilio.it, "Vincenzo Mottola" <enzo_mottola@yahoo.it>)
-GE10 +GBB colix javier.cadena@upc.edu
-GE10 +TROL Mythwin(mygubbins@gmail.com)/Harmony (speter=Xavier Josep Viñals Blasco <jvinyals@yahoo.com>  (old:Avempace)) 
-GE10 +CCCP Rasta31 (ffmandu13@hotmail.com)
-GE10 SSS: Telly & CountCount (Petra Dufek)
-GE10 FOG: dealtadawn
+#GE10 +UFO: (old:pikansjos) rollyp (rolf_oest@hotmail.com)
+#GE10 +FARt: Yawgmoth (alberto.ciampini@virgilio.it, "Vincenzo Mottola" <enzo_mottola@yahoo.it>)
+#GE10 +GBB colix javier.cadena@upc.edu
+#GE10 +TROL Mythwin(mygubbins@gmail.com)/Harmony (speter=Xavier Josep Viñals Blasco <jvinyals@yahoo.com>  (old:Avempace)) 
+#GE10 +CCCP Rasta31 (ffmandu13@hotmail.com)
+#GE10 SSS: Telly & CountCount (Petra Dufek)
+#GE10 FOG: dealtadawn
 
-GE10 LAA: cheesedown
+#GE10 LAA: cheesedown
 #GE10 RYA: farsalos
-GE10 RIP: ? GigantusX
-GE10 DOM: tigerteam
-GE10 SITH: hasnak (NAP with RATS?)
-GE10 ABP: sausage
-GE10 LOAD: Sorteslyngel
+#GE10 ABP: sausage
 
 
 #GE10 FURY: monster (renamed PUNX)
-GE10 WAV: cpkoma (undercover)
-GE10 EN: Haensu (Jowy & sh0rty (& emile13))
-GE10 WHF: verbaluzi (Chans)
-GE10 HOS: JamzHetfield
-GE10 SK: Izeldon
-GE10 CoRE: TJ2805
-GE10 SpIn: GreenKnight
+#GE10 WAV: cpkoma (undercover)
+#GE10 SoB: crickan
+#GE10 SK: Izeldon
+#GE10 SpIn: GreenKnight
 GE10 xCOP: eggignadl (with COP)
-GE10 SoB: crickan
-GE10 WAR: phoos/DaMuttz
-GE10 AFK: NaRu1/1flaw
-GE10 HoS: JamzHetfield
-GE10 TGC: trouble
+#GE10 WAR: phoos/DaMuttz
+#GE10 AFK: NaRu1/1flaw
+#GE10 LOAD: Sorteslyngel
+#GE10 HoS: JamzHetfield
+#GE10 TGC: trouble
 
 
 
-GE9 +NAIN: ThanksForXP(Rasta31)
+#GE9 +NAIN: ThanksForXP(Rasta31)
 GE9 +HNU: yosoyyoytuno (rulf) - RAUL GARCIA GARCIA <rgarciag@gmail.com>
-GE9 AuA: cpkoma
-GE9 +FBSP: vaport  "Sean C Byers" <vaportonaw@yahoo.com>
+#GE9 AuA: cpkoma
+#GE9 +FBSP: vaport  "Sean C Byers" <vaportonaw@yahoo.com>
 #GE9 +FFU: ? ffuffu9 julien.latour@gmail.com
-GE9 ROTA: Simena
-GE9 UnBC: Trolic (juglemon)
-GE9 WAR: phoos
-GE9 PYS: mysz aka ?
-GE9 KP: GigantusX
-GE9 MEX: Huehueteotl=Kronic, gucumatz=jlpm87
+#GE9 ROTA: Simena
+?GE9 UnBC: Trolic (juglemon)
+#GE9 WAR: phoos
+#GE9 PYS: mysz aka ?
+#GE9 KP: GigantusX
+#GE9 MEX: Huehueteotl=Kronic, gucumatz=jlpm87
 #GE9 WORM: judochop
 GE9 DI: plinko
-GE9 Kon/QDT: Mythwin
-GE9 COP: Ugignadl
+#GE9 Kon/QDT: Mythwin
+#GE9 COP: Ugignadl
 
-GE8 +CCCP Rasta31
+---
+
+#GE8 +CCCP Rasta31
 GE8 +VOX+??: (Capricorne=Remi Nguyen)
 GE9 +CRS: LadyGoonie&ManuMilitari (=DANTIN Guenael)
 GE8 OCB: kommanda
