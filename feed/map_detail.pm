@@ -27,7 +27,7 @@ sub filter() {
 
 	my $planets=$data->{planet};
 	foreach my $pla (@$planets) {
-      my ($siege,$pid,$pop,$sb,$playerid,$owner)=($pla->{siege}, $pla->{id}, $pla->{population}, $pla->{starbase}, $pla->{pid}, $pla->{name});
+      my ($siege,$pid,$pop,$sb,$playerid,$owner)=($pla->{sieged}, $pla->{id}, $pla->{population}, $pla->{starbase}, $pla->{pid}, $pla->{name});
       if($pop==0) {$pop++}
       my $details="$pid $pop $sb $siege $owner";
       my $p=$system[$pid-1]; #getplanet($sid,$pid);
