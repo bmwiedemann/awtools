@@ -162,8 +162,17 @@ if($options{name}) {# && $options{name} ne "unknown") {
          my @t=awinput::playerid2trades($id);
          $trades=join(", ", map {playerid2link($_)} @t);
       }
-      my $homelink=systemid2link($$pl{home_id});
-		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".(1*$level)."+$poppts+".($scipoints-$poppts).") trade=$$pl{trade}% logins=$$pl{logins} home=$homelink from=$$pl{from} joined=".(gmtime($$pl{joined}))." trades=$trades ";
+		my $homeid=$$pl{home_id};
+		my ($x,$y)=systemid2coord($homeid);
+		my $bio=25;
+		my(undef,$sci)=playerid2ir($id);
+		{
+			if($sci && $sci->[0]) { $bio=$sci->[1]; }
+		}
+		$bio=1+($bio&0xfffe);
+		my $maplink=a({href=>"tactical-live2?xs=$x&ys=$y&xe=$bio&ye=$bio"},"map");
+      my $homelink=systemid2link($homeid);
+		print br,"pl=$level sl=$$pl{science} cl=$$pl{culture} points=$$pl{points} (".(1*$level)."+$poppts+".($scipoints-$poppts).") trade=$$pl{trade}% logins=$$pl{logins} home=$homelink $maplink from=$$pl{from} joined=".(gmtime($$pl{joined}))." trades=$trades ";
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
