@@ -90,7 +90,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
       }
       my $tz=$timezone;
       my $starttime=sprintf("%i.%.6i ;", Time::HiRes::gettimeofday());
-      s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="35" disabled></form>
+      s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="55" disabled></form>
       <script type="text/javascript">
          <!--
          @distlist;
