@@ -164,10 +164,10 @@ if($options{name}) {# && $options{name} ne "unknown") {
       }
 		my $homeid=$$pl{home_id};
 		my ($x,$y)=systemid2coord($homeid);
-		my $bio=25;
+		my $bio=$$pl{science};
 		my(undef,$sci)=playerid2ir($id);
 		{
-			if($sci && $sci->[0]) { $bio=$sci->[1]; }
+			if($sci && $sci->[0] && $sci->[0]>time()-3600*24*7) { $bio=$sci->[1]; }
 		}
 		$bio=1+($bio&0xfffe);
 		my $maplink=a({href=>"tactical-live2?xs=$x&ys=$y&xe=$bio&ye=$bio"},"map");
