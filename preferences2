@@ -53,7 +53,7 @@ if(!$authpid) {
       print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," TimeZone",br,
          popup_menu(-name=>'awfstyle', -values=>[qw(subBlack subSilver)])," AW forum style",br,
          popup_menu(-name=>'awtstyle', -values=>["",qw(blue aw plain)])," AWTools style",br,
-			checkbox(-name=>'storepw', -value=>1), ' auto-update player\'s <a href="userpasswd">tools-password</a> from AW',br,
+			checkbox(-name=>'storepw', -value=>1), ' auto-update player\'s <a href="userpasswd">AWTools-password</a> from AW',br,
 			checkbox(-name=>'forumauth', -value=>1), ' allow log in with <a href="authawforum">AW-forum user+pass</a>',br,
 			(is_extended()?():(checkbox(-name=>'storeir', -label=>'Store IR for basic brownie user (for use in planets and travel-time prediction)', -value=>1),br)),
 			
