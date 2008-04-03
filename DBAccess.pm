@@ -8,7 +8,9 @@ use vars qw(@ISA @EXPORT);
 @ISA = qw(Exporter);
 @EXPORT = qw($dbh &get_one_row &get_one_rowref &get_dbh &selectall_arrayref);
 
-our $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
+our $dbh;
+$dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
+if(!$dbh) { $DBConf::connectionInfo=~s/192.168.236.1/192.168.235.1/; $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd); }
 if(!$dbh) {die "DB err: $!"}
 
 sub get_one_row($;@) {
