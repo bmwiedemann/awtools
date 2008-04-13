@@ -66,6 +66,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          $nclicks=$$aref[0][0];
          if(defined($nclicks)) {$nclicks++}
          else {$nclicks=1}
+			$::options{nclicks}=$nclicks;
          if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          $info{clicks}=$nclicks;
          $$options{authlink}="$origbmwlink/public/authaw?session=$session&amp;uri=/cgi-bin";
