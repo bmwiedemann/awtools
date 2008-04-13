@@ -82,19 +82,22 @@ if($options{id}) {
 	my $id=$options{id};
 	if($id!~m/(\d+)#(\d+)/) {print "invalid system/planet id\n",AWtail; exit 0; } # modperl OK
 	my ($sid,$pid)=($1,$2);
-	my @pinfo=getplanetinfo($sid,$pid);
 	print qq!<a href="?legend=1">legend</a>!,br;
 	my $new="edit existing entry";
 	my $link="";
-	if(!@pinfo) {
+	my $pim=getplanetinfom($sid,$pid);
+	my @pinfo;
+	if(!$pim) {
 		$options{status}=1;
 		$options{who}=2;
 		$options{comment}="";
 		$new=span({-style=>'color: red'},"add new entry");
 	} else {
+		@pinfo=($pim->[3],$pim->[4],$pim->[8]);
 		($options{status},$options{who},$options{comment})=@pinfo;
 		my $name=playerid2name($options{who});
 		$link=qq! - <a href="relations?name=$name">info on $name</a>!;
+		print "last modified by: ",playerid2link($pim->[5]), " , last modified at: ",scalar gmtime $pim->[6],br;
 	}
 
 	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getstatuscolor($options{status})},systemid2name($sid)."($id)")." ", systemlink($sid), br,
