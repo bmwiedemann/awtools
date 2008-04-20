@@ -413,7 +413,7 @@ sub playerid2link($) { my($id)=@_;
 
 sub playerid2link2($) {   
    my $l=playerid2link($_[0]);
-   $l=~s!${toolscgiurl}relations!http://$server/0/Player/Profile.php/!;
+   $l=~s!${toolscgiurl}relations!http://$awserver/0/Player/Profile.php/!;
    return $l;
 }
 
@@ -1189,7 +1189,7 @@ sub getallidetailurl($) { my($pid)=@_;
 
    } else {return}
    $arank--;
-   return "http://$server/0/Alliance/Detail.php/?id=$arank";
+   return "http://$awserver/0/Alliance/Detail.php/?id=$arank";
 }
 
 # input: alliance id

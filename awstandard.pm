@@ -11,13 +11,14 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @EXPORT = 
 qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &wikilink
 &mon2id &parseawdate &getrelationclass &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &file_content &url2pm &awmax &awmin &getauthpid &getparsed
-      $magicstring $style $server $bmwserver $toolscgiurl $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir @racebonus %artifact);
+      $magicstring $style $server $awserver $bmwserver $toolscgiurl $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir @racebonus %artifact);
 
 use CGI ":standard";
 use Time::Local;
 use Time::HiRes qw(gettimeofday tv_interval);
 
 our $server="www1.astrowars.com";       # AW game host
+our $awserver="www1.astrowars.com";     # proxied AW game host
 our $awforumserver="www.astrowars.com"; # AW forum host
 our $bmwserver="aw.lsmod.de";           # the domain name you use for the AWTools
 our $proxyip="192.168.236.1";
@@ -82,6 +83,9 @@ sub awstandard_init() {
          }
 			if($awtstyle) {$style=$awtstyle}
       }
+		$awserver="aw21.zq1.de";
+      my ($proxy)=get_one_row("SELECT `proxy` FROM `usersession` WHERE `pid` = ? ORDER BY `lastclick` DESC LIMIT 1", [$pid]);
+		if($proxy) { $awserver=$proxy; }
    }
    if(!defined($timezone)) {$timezone=0}
    $start_time=[gettimeofday()];
@@ -210,10 +214,10 @@ sub planetlink($) {my ($id)=@_;
         return qq!<a href="planet-info?id=$escaped">$id</a>!;
 }
 sub profilelink($) { my($id)=@_;
-        qq!<a class="aw" href="http://$server/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a class="aw" href="http://$server/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
+        qq!<a class="aw" href="http://$awserver/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a class="aw" href="http://$awserver/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
 }
 sub alliancedetailslink($) { my($id)=@_;
-        qq!<a class="aw" href="http://$server/0/Alliance/Detail.php/?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
+        qq!<a class="aw" href="http://$awserver/0/Alliance/Detail.php/?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
 }
 sub systemlink($) { my($id)=@_;
         qq!<a href="system-info?id=$id">info for system $id</a>\n!;

@@ -37,7 +37,7 @@ if($session && $name && $pid) {
 #   my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = '0', `auth` = 1, `ip` = ?, `lastclick` = ?, name = ?, pid = ? WHERE `sessionid` = ?");
 #   my $res=$sth->execute($::options{ip}, $time, $name, $pid, $session);
 #   if($res eq "0E0") {
-		my $proxybase="";
+		my $proxybase=$::options{req}->headers_in()->get("Host");
       my $sth=$dbh->prepare_cached("
          INSERT INTO `usersession` VALUES ( ?, ?, ?, 0, ?, ?, ?, 1, ?)
          ON DUPLICATE KEY UPDATE `nclick` = 0, `auth` = 1, pid = ?, name = ?, `lastclick` = ?, `ip` = ?, `proxy` = ?
