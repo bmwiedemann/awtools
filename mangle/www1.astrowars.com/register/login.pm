@@ -37,12 +37,13 @@ if($session && $name && $pid) {
 #   my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = '0', `auth` = 1, `ip` = ?, `lastclick` = ?, name = ?, pid = ? WHERE `sessionid` = ?");
 #   my $res=$sth->execute($::options{ip}, $time, $name, $pid, $session);
 #   if($res eq "0E0") {
+		my $proxybase="";
       my $sth=$dbh->prepare_cached("
-         INSERT INTO `usersession` VALUES ( ?, ?, ?, 0, ?, ?, ?, 1)
-         ON DUPLICATE KEY UPDATE `nclick` = 0, `auth` = 1, pid = ?, name = ?, `lastclick` = ?, `ip` = ?
+         INSERT INTO `usersession` VALUES ( ?, ?, ?, 0, ?, ?, ?, 1, ?)
+         ON DUPLICATE KEY UPDATE `nclick` = 0, `auth` = 1, pid = ?, name = ?, `lastclick` = ?, `ip` = ?, `proxy` = ?
          ;");
-      $sth->execute($session, $pid, $name, $time, $time, $::options{ip},
-            $pid, $name, $time, $::options{ip},
+      $sth->execute($session, $pid, $name, $time, $time, $::options{ip}, $proxybase,
+            $pid, $name, $time, $::options{ip}, $proxybase
             );
       $sth=$dbh->prepare("UPDATE `brownieplayer` SET prevlogin_at=lastlogin_at, `lastlogin_at`=? WHERE `pid`=?");
       $sth->execute($time, $pid);
