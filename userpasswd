@@ -39,5 +39,6 @@ if(!$pid) {
 			submit(-name=>"query", -class=>'smbutton'),end_form.AWfocus("form.p");
 	}
 }
-print AWtail();
+print br,span({-class=>"bmwnotice"},"Note: user passwords will expire after ".int($http_auth::expiry/(3600*24))." days for security reasons."),
+AWtail();
 
