@@ -18,8 +18,12 @@ if(!$oldtag || !$newtag) {
 }
 
 my $dbh=get_dbh;
-foreach my $n (qw(fleets intelreport planetinfos logins plhistory relations)) {
+foreach my $n (qw(fleets intelreport internalintel planetinfos logins plhistory relations allirelations)) {
    my $sth=$dbh->prepare("UPDATE `$n` SET `alli` = ? WHERE `alli` = ?");
+   $sth->execute($newtag, $oldtag);
+}
+foreach my $n (qw(http_auth)) {
+   my $sth=$dbh->prepare("UPDATE `$n` SET `username` = ? WHERE `username` = ?");
    $sth->execute($newtag, $oldtag);
 }
 
@@ -30,6 +34,7 @@ settoolsaccess($newtag, $newtag, 255, 255);
 rename("$awstandard::allidir/$oldtag", "$awstandard::allidir/$newtag");
 print "mv $awstandard::allidir/$oldtag $awstandard::allidir/$newtag\n";
 
-system("vim '+\%s/^${oldtag}:/${newtag}:/' $basedir/.htpasswd");
+#system("vim '+\%s/^${oldtag}:/${newtag}:/' $basedir/.htpasswd");
+system("vim '+\%s/^${oldtag}:/${newtag}:/' ./.htpasswd");
 # possibly manual intervention needed for awaccess
 

@@ -20,12 +20,13 @@ my $reldate="071220";
 my $arel="gold10/alliancerelation-$reldate";
 print 
  a({href=>"http://aw.lsmod.de/manual.html#brownie"}, "brownie")." and ".a({href=>"http://aw21.zq1.de/"}, "no-install-brownie"),br,
+ a({href=>"/abbrev.txt"}, "AW abbreviations"),br,
  a({href=>"http://$bmwserver/strongestfleet-1.html"},"strongest fleets"),"+history",br,
  a({href=>"http://$bmwserver/$arel.png"},"alliance relations")."
  (".a({href=>"http://$bmwserver/$arel.svg"},"svg").", ".a({href=>"http://$bmwserver/round/alliancerelation.png"},"currentpng").", ".a({href=>"http://$bmwserver/round/alliancerelation.svg"},"currentsvg").")",br,
  a({href=>"http://$bmwserver/customize_race.html"},"greenbird's race helper")," ",a({class=>"aw", href=>"http://aw21.zq1.de/register/customize_race.php"},"AW race"),br,
 # a({href=>"/beta10/alliancerelation"},"alliance relation data")." &gt; ".a({href=>"topwars"},"top wars").", ".a({href=>"topallis"},"top allis"),
- p,a({href=>"/manual.html"},"manual").", ".a({-href=>"http://wiki.zq1.de/mediawiki/"},"AWTools-docu-wiki").", ".a({href=>"/manual-devel.html"},"developers-manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog"), " / ", a({href=>"http://aw.lsmod.de/TODO"},"ToDo-List"),br,
+ p,a({href=>"/manual.html"},"manual").", ".a({-href=>"http://wiki.zq1.de/"},"AWTools-docu-wiki").", ".a({href=>"/manual-devel.html"},"developers-manual")." and ".a({href=>"/ChangeLog.txt"},"ChangeLog"), " / ", a({href=>"http://aw.lsmod.de/TODO"},"ToDo-List"),br,
 "color codes ". a({href=>"system-info?legend=1"}, "for relations"), 
 " and ".a({href=>"planet-info?legend=1"}, "for planet/plannings"),
 p;
@@ -53,13 +54,13 @@ if(is_admin()) {
  a({class=>"othertool", href=>"http://filix.exx.pl/aw/"}, "Filix"), " ",
  a({class=>"othertool", href=>"http://www.gipi.biz/2007-2/"}, "Gipi"), " ",
  a({class=>"othertool", href=>"http://www.astrowars-tools.com/"}, "Rasta31"), " ",
+ a({class=>"othertool", href=>"http://aw.neron92.info/"}, "neron92"), " ",
  #a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
  "outdated: ",
  a({class=>"othertool", href=>"http://astrostats.reseaulocal.fr/"}, "Astrostats"), " ",
  a({class=>"othertool", href=>"http://azgharde.free.fr/tools/index.php"},"azgharde")," ",
  a({class=>"othertool", href=>"http://lefois.de/aw/tool/index.php"}, "Lefois"), " ",
  a({class=>"othertool", href=>"http://www.aab-software.org/modules/awgmap/"}, "Nemisis"), " ",
- a({class=>"othertool", href=>"http://aw.neron92.info/"}, "neron92"), " ",
  br,
 "featured links: ",
 a({class=>"othertool", href=>"http://vultures.int.pl/NC/"}, "Northern Cross")," ",

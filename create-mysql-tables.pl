@@ -204,6 +204,7 @@ firstclick INT NOT NULL ,
 lastclick INT NOT NULL ,
 ip VARCHAR ( 15 ) NOT NULL,
 auth TINYINT ( 1 ) NOT NULL,
+proxy VARCHAR ( 60 ) NOT NULL,
 PRIMARY KEY ( sessionid ),
 KEY ( name ),
 KEY ( lastclick )

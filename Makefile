@@ -10,7 +10,8 @@ allies=$(shell ./get_allowed_alliances.pl)
 tools=index.html alliaccess alliance{,2} alliprefs allirelations arrival arrivalmany authaw authawforum awstatistics awtoolstatistics joinalli cdinfo distsqr ecocheck edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory userpasswd ipban logout
 #allies=
 #winterwolf arnaken manindamix tabouuu Rasta31 bonyv Rolle
-all: TA.candidate
+all:
+	echo "err. see Makefile for targets"
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
 links:
@@ -136,6 +137,8 @@ chpasswd:
 	REMOTE_USER=$a perl -e 'use http_auth; setdbpasswd("$p");'
 	${htpasswd} -m -b ${htpasswdfile} $a $p
 	make reloadapache
+chuserpasswd:
+	perl -e 'use http_auth; setdbpasswd_user("$u", "$p");'
 
 unaccess:
 	mkdir -p old/obsolete
@@ -170,7 +173,7 @@ tgz:
 	cp -a --parent html/code/css/{tools,*.css} html/code/js html/images/aw bmw-awtools
 	cd bmw-awtools &&\
 	chmod 755 html && mkdir -p cgi-bin/public log &&\
-	cp -a /home/aw/startup.pl ../dist-extra/* ../dist-extra/.ht* . &&\
+	cp -a ../dist-extra/* ../dist-extra/.ht* . &&\
 	perl -i -pe 'if($$n){$$n--;$$_=""} if(m/greenbird 1/){$$n=2};' mangle/dispatch.pm &&\
 	perl -i -pe 's/dbpasswd = .*/dbpasswd = "xxx";/; s/bmwuser/awuser/; ' DBConf.pm &&\
 	find -name CVS -o -name ".*.swp" | xargs rm -rf &&\
