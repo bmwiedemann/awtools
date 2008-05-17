@@ -21,6 +21,6 @@ $dbh->do("DELETE FROM cdcv WHERE pid = 0 OR time < $time"); # delete outdated en
 $dbh->do("DELETE FROM cdlive WHERE time < $time");
 
 
-foreach my $t (qw(fleets usersession battles imessage cdcv cdlive intelreport planetinfos playerprefs useralli toolsaccess logins)) {
+foreach my $t (qw(fleets usersession battles imessage cdcv cdlive intelreport planetinfos playerprefs useralli toolsaccess logins relations starmap planets player alliances)) {
    $dbh->do("OPTIMIZE TABLE `$t`");
 }
