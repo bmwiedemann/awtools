@@ -10,7 +10,10 @@ sub traveltime { my ($options)=@_;
    my $basetime=$c+sqrt(sqrt($$options{distance})+$$options{planet}*$p)*$a;
    my $time=$basetime *$e**$$options{energy};
    if($$options{own}) {$time/=2}
-   else { $time+= 5-$options->{racespeed} }
+   else {
+		my $ttmalus=5-$options->{racespeed};
+		$time+= $$options{distance}?$ttmalus:$ttmalus/4;
+	}
    return $time;
 }
 
