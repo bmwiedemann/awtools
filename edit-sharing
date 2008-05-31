@@ -9,7 +9,7 @@ awstandard_init();
 #awinput_init();
 
 our $alli=$ENV{REMOTE_USER};
-our %bitmap=(fleets=>1, plans=>2, intel=>4, relations=>8, "online"=>16, "internaldata"=>32);
+our %bitmap=(fleets=>1, plans=>2, intel=>4, relations=>8, "online"=>16, "internaldata"=>32, incomings=>64);
 our $readonly=0;
 
 sub listrow($$$$;$$)

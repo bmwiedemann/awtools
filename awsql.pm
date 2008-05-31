@@ -34,13 +34,21 @@ sub set_useralli($$)
 }
 
 # output: array with SQL string and placeholder vars
+sub get_alli_match2($$;$);
 sub get_alli_match2($$;$)
 { my($alli,$bits,$what)=@_;
    if(!$alli || $alli eq "guest") {return (0,[])}
    $what||="alli";
-   return ("( $what = toolsaccess.tag AND
+	my @extravars=();
+	my $extrasql="";
+	if($bits==1) { # for 
+		my($mat,$vars)=get_alli_match2($alli,64,$what);
+		$extrasql="OR (( fleets.status & 3 = 2 ) AND $mat)";
+		@extravars=@$vars;
+	}
+   return ("(( $what = toolsaccess.tag AND
          othertag = ? AND
-         rbits & rmask & ? != 0 )", [$alli,$bits]);
+         rbits & rmask & ? != 0 )$extrasql)", [$alli,$bits, @extravars]);
 }
 
 
