@@ -43,7 +43,7 @@ sub drawtile($$$$$$&;$)
 			my $px1=$px+$scale;
 			foreach my $v (@vals) {
 				my ($width,$partcolor)=@$v;
-				my $c=$colorindex{$partcolor};
+				my $c=$colorindex{$partcolor||0};
 				if(!defined($c)){$c=$partcolor};
 				$img->filledRectangle($px1,$py, $px1+$width*$scale-1,$py+$scale-1, $c);
 				$px1+=$width*$scale;

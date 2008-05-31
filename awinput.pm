@@ -846,9 +846,9 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
          my @sci;
 			if($sci) {@sci=@{$sci}[0..5]}
          my $sth=$dbh->prepare("UPDATE `intelreport` 
-            SET racecurrent=1, biology=?, economy=?, energy=?, mathematics=?, physics=?, social=? 
+            SET racecurrent=1, biology=?, economy=?, energy=?, mathematics=?, physics=?, social=?, modified_at=?
             WHERE `alli`=? AND `pid`=?");
-         my $r=$sth->execute(@sci, $ENV{REMOTE_USER},$pid);
+         my $r=$sth->execute(@sci, $time, $ENV{REMOTE_USER},$pid);
       }
       if($pid && $prod) {
          my $sth=$dbh->prepare("INSERT INTO `internalintel`
