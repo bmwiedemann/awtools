@@ -44,7 +44,7 @@ if(param()) {
 
       my %status;
       if($row->[2]&2) {
-         %status=(2=>"unhandled incoming", 3=>"move", 6=>"handled incoming", 10=>"seen+unhandled incoming");
+         %status=(2=>"unhandled incoming", 3=>"move", 6=>"handled incoming", 10=>"seen, but not handled incoming");
       } else {
          %status=(0=>"sieging", 1=>"defending");
       }
