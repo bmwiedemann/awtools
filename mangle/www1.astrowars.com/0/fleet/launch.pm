@@ -131,7 +131,7 @@ if($sid && $pid) {
 		my $sysname=systemid2name($sid);
 		my $setstr=setdest($sid,$pid,"to $sid#$pid");
 #		$pstr.="$setstr @$plan<br/>\n";
-		$pstr.="<tr><td bgcolor='$scolor'>$statusstr: $sysname#$pid</td><td bgcolor='#404040' style='padding-left: 5px' colspan=2>$setstr</td></tr>";
+		$pstr.="<tr><td bgcolor='$scolor'>$statusstr: <a href=\"/0/Map/Detail.php/?nr=$sid\">$sysname#$pid</a></td><td bgcolor='#404040' style='padding-left: 5px' colspan=2>$setstr</td></tr>";
 	}
 	s{<!-- loopmark --></tr>}{$&$pstr};
 #	s{</body>}{<br>$pstr $&};
