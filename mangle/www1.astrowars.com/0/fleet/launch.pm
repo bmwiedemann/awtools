@@ -112,9 +112,26 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
 
 # add button for bouncing a fleet
 my($sid,$pid)=($::options{url}=~/\bnr=(\d+).*\bid=(\d+)/);
+sub setdest($$$)
+{ my($sid,$pid,$text)=@_;
+	return qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; f.destination2.value=f.destination.value=$sid">$text</a>%
+}
 if($sid && $pid) {
-	my $loop=qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; f.destination2.value=f.destination.value=$sid">loop fleet</a>%;
-	s%(<td colspan=")3(" bgcolor='#602020'> <input type="submit".*</td>)%${1}1$2<td colspan="2" bgcolor="#206020">$loop</td>%;
+	my $loop=setdest($sid,$pid,"loop fleet");
+	s%(<td colspan=")3(" bgcolor='#602020'> <input type="submit".*</td>)%${1}1$2<td colspan="2" bgcolor="#206020">$loop</td><!-- loopmark -->%;
+
+	my $plans=playerid2plans($::options{pid});
+	my $pstr="";
+	foreach my $plan (@$plans) {
+		my($sidpid,$status,$who,$info)=@{$plan}[2..4,8];
+		my($sid,$pid)=sidpid32sidpid2m($sidpid);
+		my $scolor=getstatuscolor($status);
+		my $setstr=setdest($sid,$pid,"to $sid#$pid");
+#		$pstr.="$setstr @$plan<br/>\n";
+		$pstr.="<tr><td bgcolor='$scolor'></td><td bgcolor='#404040' style='padding-left: 5px' colspan=2>$setstr</td></tr>";
+	}
+	s{<!-- loopmark --></tr>}{$&$pstr};
+#	s{</body>}{<br>$pstr $&};
 }
 
 1;
