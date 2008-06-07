@@ -126,9 +126,12 @@ if($sid && $pid) {
 		my($sidpid,$status,$who,$info)=@{$plan}[2..4,8];
 		my($sid,$pid)=sidpid32sidpid2m($sidpid);
 		my $scolor=getstatuscolor($status);
+		my $statusstr=$planetstatusstring{$status};
+		$statusstr=~s/ by//;
+		my $sysname=systemid2name($sid);
 		my $setstr=setdest($sid,$pid,"to $sid#$pid");
 #		$pstr.="$setstr @$plan<br/>\n";
-		$pstr.="<tr><td bgcolor='$scolor'></td><td bgcolor='#404040' style='padding-left: 5px' colspan=2>$setstr</td></tr>";
+		$pstr.="<tr><td bgcolor='$scolor'>$statusstr: $sysname#$pid</td><td bgcolor='#404040' style='padding-left: 5px' colspan=2>$setstr</td></tr>";
 	}
 	s{<!-- loopmark --></tr>}{$&$pstr};
 #	s{</body>}{<br>$pstr $&};
