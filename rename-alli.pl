@@ -35,6 +35,6 @@ rename("$awstandard::allidir/$oldtag", "$awstandard::allidir/$newtag");
 print "mv $awstandard::allidir/$oldtag $awstandard::allidir/$newtag\n";
 
 #system("vim '+\%s/^${oldtag}:/${newtag}:/' $basedir/.htpasswd");
-system("vim '+\%s/^${oldtag}:/${newtag}:/' ./.htpasswd");
+#system("vim '+\%s/^${oldtag}:/${newtag}:/' ./.htpasswd");
 # possibly manual intervention needed for awaccess
 
