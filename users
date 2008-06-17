@@ -1,24 +1,51 @@
-GE11 IS: Naughty_Trollet
+GE12 IS: Naughty_Trollet
 #GE10 AF: klappstuhl
 ?GE8 TGD: winterwolf
-GE11 RATS: BigE
-GE11 SW: jca
+GE12 RATS: BigE
+GE12 SW: jca
+
+GE12 ASGA: thokrat
+GE12 NAIN: kachou (Rasta31 = Kévin RIEU (ffmandu13@hotmail.com) plus regular NAP)
+?GE12 FOG: dealtadawn
+GE12 FBSP: vaport  "Sean C Byers" <vaportonaw@yahoo.com>
+GE12 CoRE: TJ2805
+GE12 SEUX: vaneagle
+GE12 NUTS: darfel
+GE12 OCB: Recallcat (miconico)
+GE12 EN: Jowy
+GE12 TGT: monster
+GE12 PM: dinAlt
+GE12 SJ: Naff (regular NAP)
+GE12 GLUC: Silvernights
+
+GE12 +Fart: gltommy (Schallenberg(gltommy@aol.com))
+GE12 +UFO: Rasta
+GE12 +FIR: (Capricorne=Remi Nguyen)
+GE12 +SBR: XMRacer=Robert Rathbone(RnL0997@netscape.net)
+GE12 +Mill: Ford=Guido Einsporn(g-einsporn@web.de)
+GE12 +NOD: S0O0DA=Florent MARTINIERE(kyle_jjg@hotmail.com)
+GE12 +DOM: tigerteam=Susanne und Uwe Weck(office@uweweck.de)
+GE12 +LOCO: downsouth=ds pc repair (stillsouth@hotmail.com)
+
+declined tools NAPS:
+GE12 TUGA: darfel
+GE12 LAA: MaraTatouye
+GE12 UnBC: Concrete (Jigglypuff (Trolic (juglemon)))
+
+
 GE11 SSS: Waldorf
 GE11 XR: CHIG/AstroHocke (McMalone Arnaken)
 GE11 PUNX: monster
 GE11 ESF: killerbiene
-GE11 TUGA: darfel
 GE11 WAR: phoos
 GE11 BBA: ST0RMTR00PER(starcatcher)
 GE11 VIB: Otteson
 GE11 UFsR: MaLaGasy
 GE11 SOUP: mysz
-GE11 LAA: cheesedown
 GE11 SP: alcorack
 GE11 FSB: bonyv = ?
 GE11 SpIn: salamander
 GE11 SK: Izeldon
-GE11 SEUX: vaneagle
 GE11 AuA: cpkoma
 GE11 OCB: Miconico
 GE11 RTT: akirabzh
@@ -26,16 +53,14 @@ GE11 LORD: VincentVega (ok?)
 GE11 NEMO: Runner ("Scott")
 GE11 BAAL: Cheiron / GigantusX
 GE11 SITH: hasnak
-GE11 CoRE: TJ2805
 GE11 DAMN: darthtang
-GE11 EN: Jowy
 GE11 WHF: Philgorn (verbaluzi (Chans))
 # 3d cancelation
 GE11 EIRE: R0dEire
 GE11 PM: dinAlt
-GE11 UnBC: Jigglypuff (Trolic (juglemon))
-
-?GE11: LBA
+GE11 LBA: Kronic
+GE11 COP: pyser (Ugignadl)
+?GE11 TRZ: HelmetWearer
 ?GE10 RIP: ? GigantusX
 
 
@@ -44,13 +69,13 @@ GE11 UnBC: Jigglypuff (Trolic (juglemon))
 GE11 +TROL: speter (Xavier Josep Vi*als Blasco(jvinyals@yahoo.com))
 GE11 +LOCO: downsouth (stillsouth@hotmail.com)
 GE11 +THE: Solutodka=sylvain faltrept (orphebus=MrCellophane=QueenOfSheba= Miguel Garcia de la Fuente <orphebus@orphebus.com>)
-GE11 +FBSP: vaport  "Sean C Byers" <vaportonaw@yahoo.com>
 GE11 +FLO: awhelen (Schallenberg(gltommy@aol.com))
 GE11 +LOSE: FrereJacques = Miguel Garcia (orphebus@orphebus.org)
 GE11 +KIN: skate6407 = Richard Perry(richardperry219@yahoo.com)
 GE11 +DOM: tigerteam (Susanne und Uwe Weck(office@uweweck.de))
 GE11 +EOS: Dramoir = Leon Boff(dramoir@avalon-ink.com)
-GE11 +NAIN: Rasta31 = Kévin RIEU (ffmandu13@hotmail.com) plus regular NAP
+GE11 +SBQR: unthinkable pseudo alli Msrgaret Van Iderstine = (mvaniderstine@pei.sympatico.ca)
+GE11 +ENID: Ford = Guido Einsporn(g-einsporn@web.de)
 
 
 ---
@@ -62,7 +87,6 @@ GE11 +NAIN: Rasta31 = Kévin RIEU (ffmandu13@hotmail.com) plus regular NAP
 #GE10 +TROL Mythwin(mygubbins@gmail.com)/Harmony (speter=Xavier Josep Viñals Blasco <jvinyals@yahoo.com>  (old:Avempace)) 
 #GE10 +CCCP Rasta31 (ffmandu13@hotmail.com)
 #GE10 SSS: Telly & CountCount (Petra Dufek)
-#GE10 FOG: dealtadawn
 
 #GE10 LAA: cheesedown
 #GE10 RYA: farsalos
@@ -97,7 +121,6 @@ GE9 +HNU: yosoyyoytuno (rulf) - RAUL GARCIA GARCIA <rgarciag@gmail.com>
 #GE9 WORM: judochop
 GE9 DI: plinko
 #GE9 Kon/QDT: Mythwin
-#GE9 COP: Ugignadl
 
 ---
 
