@@ -69,7 +69,7 @@ if($options{status} && $options{status}>=1 && $options{status}<=9) {
          s/\byesterday\b/in -1 d/i;
          s/\bin ([-+]?\d+) (days|d)\b/AWisodate(time()+3600*24*$1)/ge;
          s/\bin (\d+) (hours|h)\b/AWisodatetime(time()+3600*$1)/ge;
-         s/$weekdayre(?!=)/$1."=".weekday2date($1)/ge;
+         s/$weekdayre(?!=)\b/$1."=".weekday2date($1)/ge;
          param('comment', $_);
       }
 		$plinfo={"sidpid"=>sidpid22sidpid3($sid,$pid), "status"=>$options{status}, "who"=>$options{who}, "info"=>$options{comment}};
