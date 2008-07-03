@@ -94,6 +94,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
       <script type="text/javascript">
          <!--
          @distlist;
+         browniedomain="$ENV{HTTP_HOST}";
          aid=$aid;
          sx=$c1[0];
          sy=$c1[1];
@@ -114,7 +115,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
 my($sid,$pid)=($::options{url}=~/\bnr=(\d+).*\bid=(\d+)/);
 sub setdest($$$)
 { my($sid,$pid,$text)=@_;
-	return qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; f.destination2.value=f.destination.value=$sid">$text</a>%
+	return qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; f.destination2.value=f.destination.value=$sid; asyncfetchdist($sid);">$text</a>%
 }
 if($sid && $pid) {
 	my $loop=setdest($sid,$pid,"loop fleet");
