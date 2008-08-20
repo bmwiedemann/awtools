@@ -15,7 +15,7 @@ for my $p (qw'history onlyinc') {
    $options{$p}=param($p);
 }
 if($options{history}) {$wantcurrent=""}
-if($options{onlyinc}) {$wantcurrent.=" AND status = 2 ";}
+if($options{onlyinc}) {$wantcurrent.=" AND (status & 7) = 2 ";}
 
 print AWheader($title);
 print p(a({-href=>"?history=".(!$options{history})},"toggle history")." ".a({-href=>"?onlyinc=".(!$options{onlyinc})},"toggle incomings"));
