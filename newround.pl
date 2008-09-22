@@ -2,7 +2,7 @@
 use strict;
 use DBAccess;
 use awstandard;
-my $oldname="gold11";
+my $oldname="gold13";
 my $newname=$oldname;
 $newname=~s/(\d+)$/1+$1/e;
 my $newround=1;
@@ -16,6 +16,7 @@ if($newround) {
    }
    system("ssh root\@alpha cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
 }
+system("./updatelasttag.pl");
 $dbh->do("UPDATE playerextra SET premium=NULL");
 $dbh->do("UPDATE planets SET ownerid=0");
 $dbh->do("UPDATE intelreport SET racecurrent=0");

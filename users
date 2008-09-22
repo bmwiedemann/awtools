@@ -1,19 +1,44 @@
-GE12 IS: Naughty_Trollet
+GE13 ?CRS: Miconico ( LadyGoonie&ManuMilitari (=DANTIN Guenael))
+GE13 RIMS: SirFlea
+GE13 PUNX: monster
+GE13 CoRE: TJ2805
+GE13 EN: sh0rty (Jowy)
+GE13 TUGA: FreeXerxes (darfel)
+GE13 FFA+NOD+TWIX: Eaque
+GE13 FOG: NebUlaris (dealtadawn)
+GE13 BBA: ST0RMTR00PER(starcatcher)
+GE13 NIAI+SEUX: vaneagle
+GE13 IS: Naughty_Trollet
+GE13 SW: jca
+GE13 LBA: Kronic
+GE13 DAMN: darthtang
+
+?GE13 LotF: crickan
+
+
+GE13 ++LOCO: JoeyHack=Joseph Hathaway joehat@comcast.net (downsouth=ds pc repair (stillsouth@hotmail.com))
+GE13 +FIR: (Capricorne=Remi Nguyen)
+GE13 +Fart: gltommy (Schallenberg(gltommy@aol.com))
+GE13 +UFO: Rasta
+GE13 +DOM: tigerteam=Susanne und Uwe Weck(office@uweweck.de)
+GE13 +EOS: Araikas=Kenneth Boff(kjb@avalon-ink.com) (Dramoir = Leon Boff(dramoir@avalon-ink.com))
+GE13 +TROL: speter (Xavier Josep Vin~als Blasco(jvinyals@yahoo.com))
+
+
+?queried: miconico, concrete
+
+
 #GE10 AF: klappstuhl
 ?GE8 TGD: winterwolf
-GE12 RATS: BigE
-GE12 SW: jca
+#GE12 RATS: BigE
 
 GE12 ASGA: thokrat
 GE12 NAIN: kachou (Rasta31 = Kévin RIEU (ffmandu13@hotmail.com) plus regular NAP)
-?GE12 FOG: dealtadawn
 GE12 FBSP: vaport  "Sean C Byers" <vaportonaw@yahoo.com>
-GE12 CoRE: TJ2805
-GE12 SEUX: vaneagle
+#GE12 SEUX: vaneagle
 GE12 NUTS: darfel
 GE12 OCB: Recallcat (miconico)
-GE12 EN: Jowy
-GE12 TGT: monster
+#GE12 TGT: monster
 GE12 PM: dinAlt
 GE12 SJ: Naff (regular NAP)
 GE12 GLUC: Silvernights
@@ -22,29 +47,21 @@ GE12 SITH: hasnak
 GE12 UFsR: MaLaGasy
 
 
-GE12 +Fart: gltommy (Schallenberg(gltommy@aol.com))
-GE12 +UFO: Rasta
-GE12 +FIR: (Capricorne=Remi Nguyen)
 GE12 +SBR: XMRacer=Robert Rathbone(RnL0997@netscape.net)
 GE12 +Mill: Ford=Guido Einsporn(g-einsporn@web.de)
 GE12 +NOD: S0O0DA=Florent MARTINIERE(kyle_jjg@hotmail.com)
-GE12 +DOM: tigerteam=Susanne und Uwe Weck(office@uweweck.de)
-GE12 +LOCO: downsouth=ds pc repair (stillsouth@hotmail.com)
-GE12 +EOS: Dramoir = Leon Boff(dramoir@avalon-ink.com)
+#GE12 +LOCO: downsouth=ds pc repair (stillsouth@hotmail.com)
 GE12+13? +QI: 20080724 BornAgain = Peter Balcon(MyMail@pbalcon.e7even.com)
 
 declined tools NAPS:
-GE12 TUGA: darfel
 GE12 LAA: MaraTatouye
 GE12 UnBC: Concrete (Jigglypuff (Trolic (juglemon)))
 
 
 GE11 SSS: Waldorf
 GE11 XR: CHIG/AstroHocke (McMalone Arnaken)
-GE11 PUNX: monster
 GE11 ESF: killerbiene
 GE11 WAR: phoos
-GE11 BBA: ST0RMTR00PER(starcatcher)
 GE11 VIB: Otteson
 GE11 UFsR: MaLaGasy
 GE11 SOUP: mysz
@@ -53,18 +70,16 @@ GE11 FSB: bonyv = ?
 GE11 SpIn: salamander
 GE11 SK: Izeldon
 GE11 AuA: cpkoma
-GE11 OCB: Miconico
+#GE11 OCB: Miconico
 GE11 RTT: akirabzh
 GE11 LORD: VincentVega (ok?)
 GE11 NEMO: Runner ("Scott")
 GE11 BAAL: Cheiron / GigantusX
 GE11 SITH: hasnak
-GE11 DAMN: darthtang
 GE11 WHF: Philgorn (verbaluzi (Chans))
 # 3d cancelation
 GE11 EIRE: R0dEire
-GE11 PM: dinAlt
-GE11 LBA: Kronic
+#GE11 PM: dinAlt
 GE11 COP: pyser (Ugignadl)
 ?GE11 TRZ: HelmetWearer
 ?GE10 RIP: ? GigantusX
@@ -72,7 +87,6 @@ GE11 COP: pyser (Ugignadl)
 
 
 2008-02-29
-GE11 +TROL: speter (Xavier Josep Vi*als Blasco(jvinyals@yahoo.com))
 GE11 +LOCO: downsouth (stillsouth@hotmail.com)
 GE11 +THE: Solutodka=sylvain faltrept (orphebus=MrCellophane=QueenOfSheba= Miguel Garcia de la Fuente <orphebus@orphebus.com>)
 GE11 +FLO: awhelen (Schallenberg(gltommy@aol.com))
@@ -132,7 +146,6 @@ GE9 DI: plinko
 
 #GE8 +CCCP Rasta31
 GE8 +VOX+??: (Capricorne=Remi Nguyen)
-GE9 +CRS: LadyGoonie&ManuMilitari (=DANTIN Guenael)
 GE8 OCB: kommanda
 GE8 LXG: AllanQmain
 GE8 Spin: Firefly2

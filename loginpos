@@ -8,7 +8,8 @@ use awinput;
 awstandard_init();
 #awinput_init();
 
-print AWheader("AW inofficial login position tool");
+print AWheader("AW inofficial login position tool"),
+ "This tool uses the forum's \"The newest registered user is\"-info to find out:",br,br;
 
 my $uri1='http://www.astrowars.com/forums/';
   $_=get("$uri1");

@@ -31,6 +31,7 @@ our %remap_relations=(
 #      seux=>"niai",
       );
 our %remap_alli=(
+#		punx=>"tgt",
 #      lbb=>"lba",
 #      ice=>"fir",
 #      sjma=>"sj",
