@@ -116,6 +116,14 @@ if($popplus && $popbonus) { # add hours to pop-growth
    s%(id=23>\+\d+</a></td><td>\s*\d+</td>.*\n\d+)(</td></tr>)%$1&nbsp;$hours$2%;
 }
 
+# add SB auto-growth
+my $sb=$data->{starbase}->{num};
+if($sb) {
+	my $hours=sprintf("<span style=\"color:green\">in&nbsp;%.1fh</span>", $data->{starbase}->{remain}/($sb*0.2));
+	my $buil="Starbase";
+	s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)%$1$2$3$4$5&nbsp;$hours%;
+}
+
 # add incomings to this planet below
 if(1) {
    my $fleets=awinput::sidpid2fleets($sidpid, "AND `iscurrent` = 1 ");
