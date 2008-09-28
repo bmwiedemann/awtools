@@ -3,20 +3,30 @@ use strict;
 #$ENV{REMOTE_USER}="af";
 exit 0 if $ENV{REMOTE_USER} eq "guest";
 
+my $alli=$ENV{REMOTE_USER};
 my @members;
-use DBAccess;
+use DBAccess2;
 use awstandard;
 use awinput;
 awinput_init(1);
-	my $relation=awinput::getallrelationkeys();
-   foreach my $name (@$relation) {
-      my @rel=getrelation($name);
-      if($rel[0]>=8) {
-         my $pid=playername2id($name);
-         my ($r,$s)=playerid2ir($pid);
-         next if not $pid or not $s or not $s->[0];
-         push(@members,[$name,$pid, $s->[1]]);
-      }
+	my $dbh=get_dbh();
+	my $sth=$dbh->prepare("
+	 SELECT pid
+	 FROM `relations`
+	 WHERE `alli` = ?
+	 AND STATUS >=8
+	 UNION DISTINCT
+	 SELECT pid
+	 FROM player, alliances
+	 WHERE alliance = aid
+	 AND tag = ?
+	");
+	my $relation=$dbh->selectcol_arrayref($sth, {}, $alli,$alli);
+   foreach my $pid (@$relation) {
+		my $name=playerid2name($pid);
+		my ($r,$s)=playerid2ir($pid);
+		next if not $pid or not $s or not $s->[0];
+		push(@members,[$name,$pid, $s->[1]]);
    }
 
 #print @members,"\n";exit 0;
@@ -58,7 +68,7 @@ if(!defined($maxxy[0]) || $minsci>=100) {
 }
 #print "@minxy , @maxxy";
 $minsci+=$scidiff;
-my $sth=$::dbh->prepare(
+my $sth=$dbh->prepare(
       qq(
 SELECT  x,y,player.name,pid,science
 FROM  `player`,`starmap` 
@@ -66,7 +76,7 @@ WHERE science >= ?
 AND `home_id` = starmap.`sid` AND starmap.x >= ? AND starmap.y >= ? AND starmap.x <= ? AND starmap.y <= ?
    ));
 $|=1;
-my $allplayers=$::dbh->selectall_arrayref($sth, undef, $minsci, $minxy[0], $minxy[1], $maxxy[0], $maxxy[1]); 
+my $allplayers=$dbh->selectall_arrayref($sth, undef, $minsci, $minxy[0], $minxy[1], $maxxy[0], $maxxy[1]); 
 
 #while(<>) { print eval; }
 
