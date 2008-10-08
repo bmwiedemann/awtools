@@ -1,3 +1,6 @@
+use DBAccess2;
+
+
 if(m!<td>Sum</td><td>\d+</td><td>\d+</td><td>\d+</td><td>\d+</td><td>\d+</td><td>(\d+)</td></tr>! && $1>=150) {
    s%\n</tr>\n</table>\n<br>%<td>|</td>
 <td><a href="/0/Planets/Spend_All_Points.php"><b>Spend All Points</b></a></td>$&%;
@@ -21,8 +24,26 @@ sub replace_buildings_colour
    return $ret;
 }
 
-#if($::options{name} eq "greenbird") {
    s&(<td><a href="?Detail.php/\?i=\d+"?>[^<]* \d+</a></td>)<td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>&$1.replace_buildings_colour($2,$3,$4,$5,$6,$7)."</tr>"&ge;
+#if($::options{name} eq "greenbird") {
+	my $dbh=get_dbh();
+	my $planets=$dbh->selectall_arrayref(
+"SELECT `name`, sidpid DIV 13, sidpid MOD 13, `starbase` FROM `planets`,`starmap` WHERE (sidpid DIV 13)=`sid` AND `ownerid` = ?", {}, $::options{pid});
+	my %nhash=();
+	my $shash=();
+	foreach my $p (@$planets) {
+		my($name, $sid, $pid, $sb)=@$p;
+		$nhash{"$name $pid"}=$sb;
+		$shash{"($sid) $pid"}=$sb;
+		#$_.="@$p\n<br>";
+	}
+	s{(<a href=Detail\.php/\?i=\d+>)([^<>]+ \d+)(</a></td>.*?)(</tr>)}
+	 {$1$2$3<td>$nhash{$2}</td>$4}g;
+	s{(<a href=Detail\.php/\?i=\d+>)(\(\d+\) \d+)(</a></td>.*?)(</tr>)}
+	 {$1$2$3<td>$shash{$2}</td>$4}g;
+	s{Production Points</a></td>}
+	 {$&<td><a class="awglossary" href="/0/Glossary/?id=16">SB</a></td>};
 #}
+
 
 1;
