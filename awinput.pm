@@ -830,8 +830,8 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 				@race=@{$race}[0..6];
 				my $sum=0;
 				foreach my $r (@race){$sum+=$r}
-				$race[7]=$sum<=-7;
-            if($race[7]){$sum-=7}
+				$race[7]=$sum<=-6;
+            if($race[7]){$sum-=6}
 				$race[8]=$sum&1;
 			}
 			my @update=map {"$_=?"} (@awstandard::racestr, "trader", "startuplab");
@@ -878,6 +878,7 @@ sub dblinkadd { my($sid,$url)=@_;
    elsif($url=~m!http://www.aw-oceans11.de/smf/index.php\?topic=([0-9.]+)!) { $type="OXI" } # SMF
    elsif($url=~m!http://www.apgaming.com/index.php\?[a-zA-Z0-9&=_]topic=([0-9.]+)!) { $type="APG" } # SMF mod?
 #   elsif($url=~m!http://lesnains\.darkbb\.com/viewtopic\.forum\?[pt]=(\d+)!) { $type="NAIN" } # phpBB outdated
+   elsif($url=~m!http://tzar\.info/modules\.php\?name=Forums&file=viewtopic&[pt]=(\d+)!i) { $type="TZAR" } # phpNuke phpBB mod
    elsif($url=~m!http://lesnains\.darkbb\.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="NAIN" } # some custom phpBB mod?
    elsif($url=~m!http://spin.forumzen.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="SpIn" } # some custom phpBB mod?
    elsif($url=~m!http://en\.forumactif\.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="EN" } # some custom phpBB mod?
@@ -1003,8 +1004,8 @@ sub get_team_pids($;$)
    my ($allimatch,$amvars)=("alliances.`tag` = ? AND alliances.tag=toolsaccess.tag AND alliances.tag=othertag", [$alli]);
    my($allimatch2,$amvars2)=("`alli` = ? AND alli=toolsaccess.tag AND alli=othertag", [$alli]);
    if($team) {
-      ($allimatch,$amvars)=get_alli_match2($alli,1,'alliances.tag');
-      ($allimatch2,$amvars2)=get_alli_match2($alli, 1);
+      ($allimatch,$amvars)=get_alli_match2($alli,16,'alliances.tag');
+      ($allimatch2,$amvars2)=get_alli_match2($alli, 16);
    } else {
    }
    my $dbh=get_dbh;

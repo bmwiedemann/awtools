@@ -1,0 +1,49 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+use DBAccess;
+#awstandard_init();
+awinput_init(1);
+
+our %options;
+print AWheader("AW alli data cleanup");
+my $authpid=getauthpid();
+my $alli=$ENV{REMOTE_USER};
+my $admin=is_admin();
+if($admin && param("alli")) {$alli=param("alli")}
+my $aid=alliancetag2id($alli);
+#print "$aid $authpid\n<br>";
+if(!$aid) {
+	print "error: $alli alliance ID not found\n";
+	exit 0;
+}
+
+print "Be careful with this tool. It allows you to clean your alliance's relations database and there is no easy way to get it all back</br>";
+
+if(!is_founder($authpid) && !$admin) {
+	print "sorry, this tool is only for players with founder permissions\n";
+} else {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+	}
+	print start_form(-name=>"form", -action=>"allicleanup"),
+	#	hidden(-name=>'action'),
+		popup_menu(-name=>'p', -class=>'text', -values=>['relations','allirelations']), "what to clean",br,
+		($admin?textfield(-name=>'alli', -class=>'test')." alli".br:()),
+		submit(-name=>"query", -class=>'smbutton', -label=>'I am sure: clean!'),end_form.AWfocus("form.p");
+	if(param()) {
+		my $t=$options{p};
+		if($t eq "relations" || $t eq "allirelations") {
+			my $sth=$dbh->prepare("DELETE FROM $t WHERE `alli`=?");
+			$sth->execute($alli);
+			print "cleaned!";
+		}
+	#      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
+#		if($options{p}){$options{p}=~s/[^0-9]//g;} # sanitize user input;
+	}
+}
+print AWtail();
+

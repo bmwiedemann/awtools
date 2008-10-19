@@ -57,7 +57,7 @@ sub auth_ok($) { my($auth)=@_;
    return if(!$auth);
 	my @auth=split("#",$auth);
 	if(mkhash($auth[0]) ne $auth[1]) {return 0}
-	if($options{expires} && $options{expires}<time) {
+	if($options{expires} && ($options{expires}<time || $options{expires}==1218071909)) {
 		print "valid link has expired\n";
 		return 0;
 	}
@@ -166,7 +166,7 @@ if(param("legend")) {
 		}
 		my $syslevel=systemid2level($system);
 		my $output="$bs$sysname ($x/$y)$be${eol}Id=$system level=$syslevel ";
-      my @nstarmaplink=("http://neron92.free.fr/AW_Tools/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
+      my @nstarmaplink=("http://aw.neron92.info/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
       my @lstarmaplink=("http://www.astrowars-tools.com/tools/map.php?x=$x&y=$y&sys_id=$system&bio=24","rastastarmap");
       my @lbattleslink=("http://www.gipi.biz/2007-2/index.php?id=$system&case=system", "gipi");
 #      my @abattleslink=("http://azgharde.free.fr/tools/details.php?nr=$system", "azghardebattles");
