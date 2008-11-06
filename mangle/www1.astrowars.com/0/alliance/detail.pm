@@ -2,7 +2,7 @@ use strict;
 use awinput;
 
 # add system ID tool links
-s%(<tr align=center bgcolor=#\d+><td[^>]*>)(\d+)(</td><td)%$1$::bmwlink/system-info?id=$2">$2</a>$3%g;
+s%(<tr align=center bgcolor=#\d+><td[^>]*>)(\d+)(</td><td>)(\d+)%$1$::bmwlink/system-info?id=$2&target=$4">$2</a>$3$4%g;
 
 # add next and prev buttons
 if($::options{url}=~/id=(\d+)/) {

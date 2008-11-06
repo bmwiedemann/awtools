@@ -12,6 +12,8 @@ if(param("session")) {
 		$options{$p}=param($p);
 	}
    if($options{session}) {
+		my $uri2=$ENV{QUERY_STRING};
+		if($uri2=~m/uri=(.*)/) {$options{uri}=$1} # allow for normal & chars
       $options{uri}||="/cgi-bin/index.html";
       $options{uri}=~s/%/&/g;
       print redirect(-connection=>"Keep-Alive", -uri=>$options{uri}, -cookie=>[#cookie(-name=>'sessionid', -value=>$options{session}, -expires=>'+2d'), 
