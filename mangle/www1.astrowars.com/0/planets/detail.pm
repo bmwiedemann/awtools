@@ -30,7 +30,7 @@ sub manglesys($$) {my($sysname, $planet)=@_;
    if($sid) {
       $sidpid=sidpid22sidpid3m($sid, $planet);
       my ($x,$y)=systemid2coord($sid);
-      return "<a href=\"/0/Map/Detail.php/?nr=$sid\">$sysname #$planet ($x,$y) id=$sid</a>";
+      return "<a href=\"/0/Map/Detail.php/?nr=$sid&highlight=$planet\">$sysname #$planet ($x,$y) id=$sid</a>";
    }
    return $result;
 }

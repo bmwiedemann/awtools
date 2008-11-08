@@ -1,10 +1,14 @@
 if($::options{url}=~/nr=(\d+)/) {
    my $id=$1;
-   my $link=$::bmwlink.awstandard::awsyslink($id);
+	my($pid)=($::options{url}=~/&highlight=(\d+)/);
+   my $link=$::bmwlink.awstandard::awsyslink($id,1,$pid);
    my $frame=$link;
    $frame=~s/.*(http:)/$1/;
    $link=~s/(simple=)\d/$1/; # enable full view for links
    s%(Planets at)%$1 ${link}id=$id</a>%;
+	# highlight planet
+	s{(<tr bgcolor="#\d+" align=center)(><td>$pid</td><td>)}{$1 style="font-weight: bold; font-size: 1.3em;"$2};
+
    if(s%<TABLE.*\z%Map / Detail</b></td>%) {
       $_.=qq'<iframe width="95%" height="700" src="$frame</iframe></body></html>';
    }
