@@ -12,14 +12,17 @@ my $awuser=getusernamecookie();
 my $refsys=cookie('refsys');
 
 our %options;
-if($refsys && param()) {
+if(($refsys||param("ssid")) && param()) {
    $refsys=~s/[^0-9#]//g; # sanitize user input
-	foreach my $p (qw(sid pid)) {
+	foreach my $p (qw(sid pid ssid spid energy)) {
 		$options{$p}=param($p);
-      $options{$p}=~s/[^0-9]//g; # sanitize user input
+      if(defined($options{$p})) {
+			$options{$p}=~s/[^0-9]//g; # sanitize user input
+		}
 	}
    my($refe,$refs)=(0,0);
    my($refsid,$refpid)=split(/[^0-9]/,$refsys);
+	if(defined($options{ssid})) {($refsid,$refpid)=($options{ssid},$options{spid})}
    $refpid||=0;
    my($refx,$refy)=systemid2coord($refsid);
    my($x,$y)=systemid2coord($options{sid});
@@ -33,6 +36,7 @@ if($refsys && param()) {
       if($race) {$refs=$$race[4];$refs=~s/\+//;}
       if($sci) {if($$sci[0]>99){shift(@$sci)};$refe=$$sci[2]}
    }
+	if(defined($options{energy}) && $options{energy} ne "") {$refe=$options{energy}}
    my $pdiff=abs($refpid-$options{pid});
    #print header(), "eta for: $refsid#$refpid -> $options{sid}#$options{pid}";
    print redirect("/cgi-bin/arrival?distance=$refdist&amp;planet=$pdiff&amp;energy=$refe&amp;racespeed=$refs");
