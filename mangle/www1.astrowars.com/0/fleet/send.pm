@@ -21,6 +21,11 @@ if(!$param) {
 
 if($param) {
    my $cgi=new CGI($param);
+   my $destsid=$cgi->param("destination2");
+   if(!$destsid) { $destsid=$cgi->param("destination"); }
+   my $destpid=$cgi->param("planet");
+   my $srcsid=$cgi->param("nr");
+   my $srcpid=$cgi->param("id");
 # add echo of fleet
    my @fleet;
    my $warning;
@@ -66,6 +71,8 @@ if($param) {
          $extrainfo2.="<tr><td$align>Local Arrival time</td><td>$tl</td></tr>";
       }
       $extrainfo2.="<tr><td$align>Arrival time$delim</td><td> <!--inserthere-->".AWisodatetime($altime)." $suf </td></tr>$flighttime";
+		my $etalink=qq{$::bmwlink/eta?energy=$energy&amp;sid=$destsid&amp;pid=$destpid&amp;ssid=$srcsid&amp;spid=$srcpid">ETAcalc</a>};
+		s/Calculated arrival time: .* - \d+:\d+:\d+/$& - $etalink/;
    }
 
    my $script="";
@@ -99,11 +106,6 @@ if(1) {
 
 
 # add echo of destination
-   my $destsid=$cgi->param("destination2");
-   if(!$destsid) { $destsid=$cgi->param("destination"); }
-   my $destpid=$cgi->param("planet");
-   my $srcsid=$cgi->param("nr");
-   my $srcpid=$cgi->param("id");
    my $destname=display_sid2($destsid);
    my $srcname=display_sid2($srcsid);
    
