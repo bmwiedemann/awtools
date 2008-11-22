@@ -27,15 +27,17 @@ print AWheader("fighter listing [\U$alli]");
 
 my $dbh=get_dbh;
 my $sth=$dbh->prepare("SELECT pid, SUM( cv ) , SUM( xcv ), MAX( cv ), opop
-      FROM `alliances` , player, fleets
+      FROM `alliances` , player, fleets, toolsaccess
       WHERE alliance = aid
       AND owner = pid
-      AND tag = ?
-      AND alli = ?
+      AND alliances.tag = toolsaccess.tag
+      AND othertag=?
+      AND rbits & rmask & 1 != 0
+      AND alli = alliances.tag
       AND iscurrent =1
       GROUP BY pid");
 # alternative: SELECT pid,MAX(cv),SUM(cv),SUM(xcv) FROM (SELECT aid FROM `alliances` WHERE tag = 'af') AS a LEFT JOIN player ON alliance=aid LEFT JOIN fleets ON owner=pid WHERE iscurrent=1 AND alli='af' GROUP BY pid
-my $fleets=$dbh->selectall_arrayref($sth, {}, $alli, $alli);
+my $fleets=$dbh->selectall_arrayref($sth, {}, $alli);
 
 my @data;
 foreach my $row (@$fleets) {
