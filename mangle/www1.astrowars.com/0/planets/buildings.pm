@@ -37,7 +37,7 @@ sub replace_buildings_colour
 		$shash{"($sid) $pid"}=$sb;
 		#$_.="@$p\n<br>";
 	}
-	s{(<a href=Detail\.php/\?i=\d+>)([^<>]+ \d+)(</a></td>.*?)(</tr>)}
+	s{(<a href=Detail\.php/\?i=\d+>)(\w[^<>]+ \d+)(</a></td>.*?)(</tr>)}
 	 {$1$2$3<td>$nhash{$2}</td>$4}g;
 	s{(<a href=Detail\.php/\?i=\d+>)(\(\d+\) \d+)(</a></td>.*?)(</tr>)}
 	 {$1$2$3<td>$shash{$2}</td>$4}g;
