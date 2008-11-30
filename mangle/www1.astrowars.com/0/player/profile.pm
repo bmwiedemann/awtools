@@ -12,7 +12,7 @@ s%(<b>Player / Profile</b></td>\s*<td>)([^<]*)%$1$::bmwlink/relations?name=$2">A
 
 my $name=$2;
 # test for available intel
-my $pid=playername2id($name);
+my $pid=playername2idm($name);
 my ($rac,$sci)=awinput::playerid2ir($pid);
 my ($racestr,$scistr)=ir2string($rac,$sci);
 
@@ -33,19 +33,16 @@ if($rac && defined($rac->[0])) {
 }
 
 # add idle time (even for premium members)
-my @rel=getrelation($name);
-if(defined($rel[0])) {
-   (my $l)=(m!>Logins</td><td>(\d+)</td></tr>!g);
-   if($rel[2]=~m/login:($l:\d+:\d+:\d+)/) {
-      my @l=split(":",$1);
-      my $idle=sprintf("%im", (time()-$l[1])/60);
-      s!(>Idle</td><td>[^<]*)!$1 = $idle!;
-   }
+use awlogins;
+my $logins=awlogins::get_logins($ENV{REMOTE_USER},$pid, "ORDER BY `time` DESC LIMIT 1");
+if($logins && defined($logins->[0])) {
+	my @l=@{$logins->[0]};
+	my $idle=sprintf("%im", (time()-$l[1])/60);
+	s!(>Idle</td><td>[^<]*)!$1 = $idle!;
 }
 
 use awsql;
 my $prem=m!<small>Premium Member</small>! || 0;
-my $pid=playername2idm($name);
 update_premium($pid, $prem);
 
 1;

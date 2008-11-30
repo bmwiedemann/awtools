@@ -71,12 +71,13 @@ sub add_login($$@) {
    return 1;
 }
 
-sub get_logins($$)
-{ my($alli,$pid)=@_;
+sub get_logins($$;$)
+{ my($alli,$pid,$extrasql)=@_;
+   $extrasql||="";
    my $dbh=get_dbh;
    my ($allimatch, $amvars)=get_alli_match2($alli,4);
    my $sth=$dbh->prepare("SELECT `n`, `time`, `idle`, `fuzz`
-         FROM `logins`,`toolsaccess` WHERE $allimatch AND `pid` = ?");
+         FROM `logins`,`toolsaccess` WHERE $allimatch AND `pid` = ? $extrasql");
    return $dbh->selectall_arrayref($sth,{}, @$amvars, $pid);
 }
 
