@@ -15,6 +15,11 @@ if($planet != $data->{n}-1) {
    s/(body.*"#000000">)/$&\n<div style="background-color: #300">/;
 }
 
+# add access keys
+s{>Previous</a></td>}{ accesskey="p" $&};
+s{>Next</a></td>}{ accesskey="n" $&};
+# end
+
 
 m%Production Points</a></td><td>\s*(\d+)</td>%;
 my $pp=$data->{productionpoints}->{num};

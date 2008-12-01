@@ -26,8 +26,8 @@ if($::options{url}=~/id=(\d+)/) {
          my $x=$1;
          if($id) { $x="<a href=\"/0/Player/Profile.php/?id=$id\">$1</a>"; }
          $x.$2%e;
-      if($previd>=0) { $prevstring.=qq'<a href="$url$previd">prev</a>'; }
-      if($nextid<@$members || $s) { $prevstring.=qq' <a href="$url$nextid">next</a>'; }
+      if($previd>=0) { $prevstring.=qq'<a href="$url$previd" accesskey="p">prev</a>'; }
+      if($nextid<@$members || $s) { $prevstring.=qq' <a href="$url$nextid" accesskey="n">next</a>'; }
       my $n=0;
       my $form="";
       if(@$members) {
