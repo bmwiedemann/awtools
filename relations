@@ -157,6 +157,8 @@ if($options{name}) {# && $options{name} ne "unknown") {
          my $ppop=planet2opop($pp);
          next if $ppop<10;
 			$poppts+=$ppop-10;
+         next if $ppop<20;
+			$poppts+=$ppop-20;
 		}
       my $trades="";
       {
