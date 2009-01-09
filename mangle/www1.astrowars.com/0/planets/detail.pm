@@ -94,7 +94,7 @@ foreach my $n (0..$#buildings) {
 #      $debug.="$level $ppneeded<br>";
    }
    if($ppneeded>$pp && $ppplus && $prodbonus) {
-      my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%i%%)</span>",($ppneeded-$realpp)/$ppplus/$prodbonus, 100*$prodbonus);
+      my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%0.f%%)</span>",($ppneeded-$realpp)/$ppplus/$prodbonus, 100*$prodbonus);
       s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5&nbsp;$hours$6%;
       next;
    }
