@@ -1,6 +1,9 @@
+#fighterlist internaldata sharing instead of alli=aid/tag
 #use planet-planning sid#pid as preset dests in Fleet/Launch
+#planet/details display time to next auto-sb level
+#planet/buildings display current SB levels from planets DB
 display show hh:mm instead of hours as float (in reltime)
-planets table add modified_at, display in system-info
+starmap/planets table add modified_at, display in system-info
 #DBAccess(2): myselectall_arrayref($query, [$var1, $var2]);
 #display somewhere SELECT useralli.*,name  FROM `useralli`,playerextra WHERE `alli`=? AND useralli.pid=playerextra.pid
 #alliaccess manipulation CGI
