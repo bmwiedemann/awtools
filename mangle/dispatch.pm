@@ -48,6 +48,9 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $alli="\U$ENV{REMOTE_USER}";
    
    # greenbird special
+	if($g) {
+		$info{url}=$::options{req}->headers_in()->get("Host");
+	}
    if(m/onLoad="document.login.secure.focus\(\);">/) {
       if($g) {
          if(do "mangle/special/secure.pm") {
@@ -232,9 +235,18 @@ sub mangle_dispatch(%) { my($options)=@_;
       }
       $$options{sqlelapsed}=tv_interval ( $t1 );
       $online=join(", ", @who2);
-		my $untagged=$dbh->selectcol_arrayref("SELECT name  FROM `useralli`,playerextra WHERE `alli`=? AND useralli.pid=playerextra.pid", {}, $alli);
+		my $untagged=$dbh->selectall_arrayref("SELECT playerextra.name,level  FROM `useralli`,playerextra LEFT JOIN `player` ON player.pid=playerextra.pid WHERE `alli`=? AND useralli.pid=playerextra.pid", {}, $alli);
 		if($untagged && @$untagged) {
-			$online.="<br><span class=\"bmwinfo\">untagged $alli players: ".join(", ", @$untagged)."</span>";
+		   my $x="";
+			my @list=();
+			foreach my $p (@$untagged) {
+				$x="$p->[0]";
+				if($p->[1]) {
+					$x.=" (PL $p->[1])";
+				}
+				push(@list,$x);
+			}
+			$online.="<br><span class=\"bmwinfo\">untagged $alli players: ".join(", ", @list)."</span>";
 		}
       if($online){
          $online="<span class=\"bottom_key\">allies online:</span> $online<br>"
