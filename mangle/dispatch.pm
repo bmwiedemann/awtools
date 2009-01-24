@@ -235,7 +235,8 @@ sub mangle_dispatch(%) { my($options)=@_;
       }
       $$options{sqlelapsed}=tv_interval ( $t1 );
       $online=join(", ", @who2);
-		my $untagged=$dbh->selectall_arrayref("SELECT playerextra.name,level  FROM `useralli`,playerextra LEFT JOIN `player` ON player.pid=playerextra.pid WHERE `alli`=? AND useralli.pid=playerextra.pid", {}, $alli);
+		my $untagged=$dbh->selectall_arrayref("SELECT playerextra.name,level  FROM `useralli`,playerextra LEFT JOIN `player` ON player.pid=playerextra.pid WHERE `alli`=? AND useralli.pid=playerextra.pid 
+		ORDER BY `level`,playerextra.name", {}, $alli);
 		if($untagged && @$untagged) {
 		   my $x="";
 			my @list=();
