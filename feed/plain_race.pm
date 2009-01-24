@@ -38,6 +38,10 @@ my $sciencere="";
 my @science;
 my @race;
 foreach my $r (@awstandard::racestr) {
+	if($r eq "speed") {
+		$racere.=qr"\*?\s*\+\d+h\s+$r\s+\(([+-]?\d)\)\s*"s;
+		next;
+	}
 	$racere.=qr"\*?\s*[+-]?\d+%\s+$r\s+\(([+-]?\d)\)\s*"s;
 }
 foreach my $sci (@awstandard::sciencestr) {
