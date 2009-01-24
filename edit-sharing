@@ -20,10 +20,10 @@ sub listrow($$$$;$$)
    $rbits+=0;
    foreach my $name (sort keys(%bitmap)) {
       my $n=$bitmap{$name};
-		my $check1=($rrbits & $mask & $n)!=0;
+		my $check1=$rrbits & $n;
 		my $check2=$rbits & $n;
       $checkboxes.=
-         checkbox(-name=>"mask$name", -label=>"", -title=>"$otag ".($check1?"shares":"does not share")." $name with you", -checked=>$check1, (($rrbits & $n)?():(-disabled=>1) )).
+         checkbox(-name=>"mask$name", -label=>"", -title=>"$otag ".($check1?"shares":"does not share")." $name with you".((($check1&$mask)==0)?" but you deactivated it":""), -checked=>(($check1&$mask)!=0), ($check1?():(-disabled=>1) )).
          checkbox(-name=>$name, -title=>"you ".($check2?"share":"do not share")." $name with $otag", -checked=>$check2!=0)." &nbsp;&nbsp; ";
    }
    print div({-class=>"grouping"},($del?a({-href=>"?action=del&p=$otag"},"del"):"")." $a $otag $rbits $rrbits $mask".
