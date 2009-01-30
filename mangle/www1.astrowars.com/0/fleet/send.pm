@@ -150,6 +150,9 @@ if(1) {
    $link=~s/.*(http:)/$1/;
    s%</body>%<span class="bmwnotice">note: predicted arrival time will be wrong if you use the back button of your browser.</span><br>$&%;
    if($destsid) {
+		if(m{<br> <b>Ship\(s\) successfully launched.</b>}) {
+			s{</body>}{<iframe width="95%" height="300" src="/0/Fleet/"></iframe>$&};
+		}
       s%</body>%<iframe width="95\%" height="700" src="$link"></iframe><br>$&%;
    }
 
