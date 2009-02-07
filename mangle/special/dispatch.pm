@@ -18,6 +18,7 @@ sub mangle() {
    # add icon
    my $icon="awfavicon.ico";
    if($::options{url}=~m!^http://forum.rebelstudentalliance!) {$icon="rsafavicon.ico"}
+	if($::options{url}=~m!^http://de.wikipedia!){return}
    s%</head>%<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/$icon">\n<link rel="shortcut icon" href="http://aw.lsmod.de/$icon">\n</head>%;
 }
 
