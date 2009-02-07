@@ -13,6 +13,7 @@ if($::options{url}=~m/Fleet\/$/) {
       my $target;
       if($line=~/^align=center/) {
          @a=($line=~m{>(?:[^<]*(?:<[^s])*)*?<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td>});
+         $fleetinfo{sieging}=$sieging;
          $target=\@fleet;
       } elsif($line=~/^bgcolor="404040" align=/) {
          @a=($line=~m{><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small>([^<]*)\s(\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)});
