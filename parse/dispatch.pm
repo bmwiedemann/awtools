@@ -7,6 +7,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 sub dispatch($)
 {
 	my($options)=@_;
+	if($options->{data}){return $options->{data}}
 	my $t0 = [gettimeofday];
 	$d={"servertime"=>time()};
 	my $url=$options->{url};
@@ -25,6 +26,7 @@ sub dispatch($)
 		last;
 	}
 	$d->{parsetime}=tv_interval($t0);
+	$options->{data}=$d; # cache for later re-use
 	return $d;
 }
 
