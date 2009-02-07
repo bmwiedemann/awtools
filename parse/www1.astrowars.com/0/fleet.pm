@@ -7,13 +7,12 @@ if($::options{url}=~m/Fleet\/$/) {
    my @fleet;
    my @movingfleet;
    foreach my $line (m{<tr (.+?)</tr>}g) {
-      my $sieging=tobool($line!~/bgcolor="#404040/);
       my @a;
       my %fleetinfo=();
       my $target;
       if($line=~/^align=center/) {
          @a=($line=~m{>(?:[^<]*(?:<[^s])*)*?<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td>});
-         $fleetinfo{sieging}=$sieging;
+         $fleetinfo{sieging}=tobool($line!~/bgcolor="#404040/);
          $target=\@fleet;
       } elsif($line=~/^bgcolor="404040" align=/) {
          @a=($line=~m{><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small>([^<]*)\s(\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)});
