@@ -361,7 +361,8 @@ sub guesstimezone($) {my($title)=@_;
    return undef unless $title=~m/(\d\d):(\d\d):(\d\d)/;
    my $localt=$1*3600+$2*60+$3;
    my $diff=$localt-($utc%86400);
-   return ($diff+86400/2)%86400-86400/2;
+   my $tzs=($diff+86400/2)%86400-86400/2;
+   return($tzs-(($tzs+900)%(1800)-900)); # round to half hours
 }
 
 sub AWreltime($) { my($t)=@_;

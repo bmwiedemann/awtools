@@ -16,8 +16,8 @@ if(m{^<html><head><title>Astro Wars</title>} && m{<font color="#FF0000" size="5"
 
    $d->{"trade"}=tobool(m{^<td>|</td><td><a href="/0/Trade/" class="white">Trade</a></td>});
    $d->{"alliance"}=tobool(m{^<td>|</td><td><a href="/0/Alliance/" class="white">Alliance</a></td>});
-
-# TODO add timezone detector
+# add timezone detector
+	$d->{"timezone"}=awstandard::guesstimezone($d->{"time"});
 
 }
 

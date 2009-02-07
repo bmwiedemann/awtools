@@ -15,7 +15,8 @@ $_='<?xml version="1.0" encoding="iso-8859-1"?>
 <link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/awfavicon.ico" />
 <link rel="shortcut icon" href="http://aw.lsmod.de/awfavicon.ico" />
 </head><body>
-<table border="0" cellspacing="1" cellpadding="2">
+<center>
+<table border="0" cellspacing="1" cellpadding="2" class="main_inner">
 <tr bgcolor="#202060" align="center"><td><small>Estimated Arrival</small></td><td><small>Destination</small> </td><td><a class="awglossary" href="/0/Glossary//?id=25"><small>Transport</small></a></td><td><a class="awglossary" href="/0/Glossary//?id=24"><small>Colony Ship</small></a></td><td><a class="awglossary" href="/0/Glossary//?id=17"><small>Destroyer</small></a></td><td><a class="awglossary" href="/0/Glossary//?id=18"><small>Cruiser</small></a></td><td><a class="awglossary" href="/0/Glossary//?id=19"><small>Battleship</small></a></td></tr>
 ';
 
@@ -26,10 +27,13 @@ sub syshtml($$$)
 }
 
 my $u=$::options{url};
+my $tzoffset=$data->{timezone}||0;
 my $offset=0;
+my $now=time();
 foreach my $f (@{$data->{movingfleet}}) {
 	my($sid,$pid,$sysname,$eta,$ship)=($f->{sid},$f->{pid},$f->{system},$f->{eta}, $f->{ship});
-	$_.= "<tr class=\"trgray4\"><td>".join("</td><td>",scalar gmtime($eta+$offset), syshtml($sid,$pid,$sysname),@$ship)."</td></tr>\n";
+	$_.= "<tr class=\"trgray4\"><td>".join("</td><td>",
+		sprintf("%.2fh",($eta-$tzoffset-$now)/3600)." ".scalar gmtime($eta+$offset), syshtml($sid,$pid,$sysname),@$ship)."</td></tr>\n";
 }
 $_.=qq'<tr class="trblue226"><td>Limit $data->{movingfleets}/$data->{maxmovingfleets}</td><td><small>Location</small></td><td colspan="5"></td></tr>';
 foreach my $f (@{$data->{fleet}}) {
@@ -39,6 +43,6 @@ foreach my $f (@{$data->{fleet}}) {
 }
 #$_.= "OK $u <br>";
 
-$_.= "</table></body></html>";
+$_.= "</table></center></body></html>";
 
 30;
