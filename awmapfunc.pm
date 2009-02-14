@@ -19,8 +19,49 @@ our @drawfuncs=(
       \&awfleetstatusfunc,
       \&awfleetownerrelationfunc,
       \&awpopulationfunc,
+      \&awallifunc,
       );
 my $s=12;
+
+
+use constant maxhue=>6*0xff;
+sub hsv2rgb(@)
+{
+	my $hsv=shift;
+	my($hue,$saturation,$value)=@$hsv;
+	$hue=($hue%maxhue+maxhue)%maxhue; # make sure it is in 0..maxhue
+	my ($h1,$h2)=(int($hue/0xff), $hue%0xff);
+	my @rgb=(0,0,0);
+	my $n=$h1>>1;
+	$rgb[$n]=0xff;
+	if($h1&1) {
+		$rgb[($n+1)%3]=$h2;
+	} else {
+		$rgb[($n+2)%3]=0xff-$h2;
+	}
+	foreach my $c (@rgb) {
+		$c=255+(($c-255)*$saturation)/255;
+		$c=($c*$value)/255;
+	}
+	return @rgb;
+}
+
+
+our $colorsalt="";
+sub colorhash($)
+{
+	if(!$_[0]) {return 0}
+	require Digest::MD5;
+	my $digest = Digest::MD5::md5($_[0].$colorsalt);
+	my @a=unpack("C*", $digest);
+	my @hsv=@a[0..2];
+	for my $i (1..2) {
+		$hsv[$i]=$hsv[$i]/2+128;
+	}
+	$hsv[0]*=6;
+	my @rgb=hsv2rgb(\@hsv);
+	return (($rgb[0]<<16) + ($rgb[1]<<8) + $rgb[2]);
+}
 
 # all mapping functions:
 # input: x,y coords
@@ -119,6 +160,24 @@ sub awpopulationfunc
       else {
          my $l=$pop*255/maxpop;
          $c=((255-$l)<<16)|($l<<8);
+      }
+   }
+	addleft(\@v, 4, $c);
+	return @v;
+}
+
+sub awallifunc
+{ my($x,$y,$sid,$pid,$data)=@_;
+	my @v=awfilterchain($x,$y,$sid,$pid,$data);
+	my $planet=getplanet($sid, $pid);
+	my $c=0xff;
+   if(!$planet) {$c="dimgray"}
+   else {
+		my $o=$$planet{ownerid};
+      if($o==0) {$c="white"}
+      else {
+			my $atag=playerid2tagm($o);
+         $c=colorhash($atag);
       }
    }
 	addleft(\@v, 4, $c);
