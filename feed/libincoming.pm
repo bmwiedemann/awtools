@@ -16,6 +16,9 @@ sub parseincomings($) {local $_=$_[0];
          $shipn++;
       }
       my $time=parseawdate($awdatetime);
+      if($time-$::options{tz}<time) {
+         print "skipping past incoming";
+      } else {
       $sid="$systemid#$planetid";
       print "incoming: ".planetlink($sid)." @fleet\n";
       print "<br>added $systemid#$planetid $epid $ename $time";
@@ -26,6 +29,7 @@ sub parseincomings($) {local $_=$_[0];
 #        my $r=$rel[0]||1;
             print " important incoming of '$ename'";
          }
+      }
       }
       print "<br />";
    }
