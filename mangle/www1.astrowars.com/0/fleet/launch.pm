@@ -32,7 +32,7 @@ sub piddropdown($) {
    my $ret='<select name="planet"><option></option>';
    for my $i (1..12) {
       my $sel=$_[0]==$i?" selected":"";
-      $ret.=qq%<option$sel>$i</option>%;
+      $ret.=qq%<option$sel value="$i">$i</option>%;
    }
    $ret.='</select>';
    return $ret;
@@ -90,7 +90,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
       }
       my $tz=$timezone;
       my $starttime=sprintf("%i.%.6i ;", Time::HiRes::gettimeofday());
-      s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="55" disabled></form>
+      s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="60" disabled></form>
       <script type="text/javascript">
          <!--
          @distlist;
@@ -115,7 +115,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
 my($sid,$pid)=($::options{url}=~/\bnr=(\d+).*\bid=(\d+)/);
 sub setdest($$$)
 { my($sid,$pid,$text)=@_;
-	return qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; f.destination2.value=f.destination.value=$sid; asyncfetchdist($sid);">$text</a>%
+	return qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; if(f.destination2) f.destination2.value=$sid; f.destination.value=$sid; asyncfetchdist($sid);">$text</a>%
 }
 if($sid && $pid) {
 	my $loop=setdest($sid,$pid,"loop fleet");
