@@ -57,7 +57,7 @@ if(defined($options{xs}) && $options{scale}>0 && $options{scale}<=5 && $xsize>0 
 	start_html(-title=>$title , -style=>"/code/css/tools/tactical.css"), 
 	#AWheader2($title),
 	start_form('get', "coord"),
-   image_button(-src=>"?map=1&xs=$options{xs}&ys=$options{ys}&xe=$options{xe}&ye=$options{ye}&scale=$options{scale}&type=$o"),
+   image_button(-src=>"?map=1&xs=$options{xs}&ys=$options{ys}&xe=$options{xe}&ye=$options{ye}&scale=1&type=$o", -width=>$totx*$options{scale}, -height=>$toty*$options{scale}),
 #	qq!<input type="image" src="?map=1&amp;xs=$options{xs}&amp;ys=$options{ys}&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;scale=$options{scale}" />!,
 	hidden("xs"),
 	hidden("ys"),
