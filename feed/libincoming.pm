@@ -16,7 +16,7 @@ sub parseincomings($) {local $_=$_[0];
          $shipn++;
       }
       my $time=parseawdate($awdatetime);
-      if($time-$::options{tz}<time) {
+      if($time-3600*$::options{tz}<time-3600*6) {
          print "skipping past incoming";
       } else {
       $sid="$systemid#$planetid";
