@@ -226,8 +226,10 @@ sub profilelink($) { my($id)=@_;
 sub alliancedetailslink($) { my($id)=@_;
         qq!<a class="aw" href="http://$awserver/0/Alliance/Detail.php/?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
 }
-sub systemlink($) { my($id)=@_;
-        qq!<a href="system-info?id=$id">info for system $id</a>\n!;
+sub systemlink($;$) { my($id,$pid)=@_;
+	my $extra="";
+	if($pid){$extra="&amp;target=$pid"}
+        qq!<a href="system-info?id=$id$extra">info for system $id</a>\n!;
 }
 
 sub alliancelink($) { my($atag)=@_;

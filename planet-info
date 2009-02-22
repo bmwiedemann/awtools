@@ -100,7 +100,7 @@ if($options{id}) {
 		print "last modified by: ",playerid2link($pim->[5]), " , last modified at: ",scalar gmtime $pim->[6],br;
 	}
 
-	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getstatuscolor($options{status})},systemid2name($sid)."($id)")." ", systemlink($sid), br,
+	print start_form(-name=>"form"), "$new: ". span({-style=>'color: '.getstatuscolor($options{status})},systemid2name($sid)."($id)")." ", systemlink($sid,$pid), br,
 		popup_menu(-name=>'status', -values=>[1..7], -default=>$options{status},
 		-labels=>\%planetstatusstring), " status", br,
 		textfield(-name=>'who', -value=>$options{who}, -class=>'text'), " user-id or user-name of the one who does the above $link", br,
