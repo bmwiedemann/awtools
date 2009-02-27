@@ -6,6 +6,9 @@ use Time::HiRes;
 # activate arrival calc checkbox
 s/<input type="checkbox" name="calc" value="1"/$& checked/;
 
+# energy 0 is possible - so activate it
+s/<option>1<option>2/<option>0$&/;
+
 
 # convert radio list into drop-down list
 my @list=();
