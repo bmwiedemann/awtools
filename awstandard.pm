@@ -497,6 +497,21 @@ sub isproxy($)
 	return 0;
 }
 
+sub map_forward_ip($)
+{
+	my $ip=shift;
+	# directly map six in four ipv6 addrs
+	$ip=~s/^2002:([0-9a-f]{2})([0-9a-f]{2}):([0-9a-f]{2})([0-9a-f]{2}):[0-9a-f:]+$/join(".", map {hex($_)} ($1,$2,$3,$4))/e; 
+	if($ip=~m/^[23][0-9a-f]{3}:[0-9a-f:]+$/) {
+		# map other IPv6 to 127.x.x.x
+		require Digest::MD5;
+		my $digest=Digest::MD5::md5($ip); # guarantees even distribution
+		my @a=unpack("C*", $digest);
+		$ip="127.".join(".",@a[0..2]);
+	}
+	return $ip
+}
+
 sub getparsed($)
 {
    my $options=shift;
