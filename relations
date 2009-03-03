@@ -193,7 +193,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
          my($sidpidm,$cv, $trn, $cls)=@{$f}[3,13,8,9];
          next if (not $cv and not $trn and not $cls);
          my ($sid,$pid)=sidpid32sidpid2m($sidpidm);
-         print li(sprintf("<code><a href=\"system-info?id=$sid\">%4i#%02i</a></code> ",$sid,$pid). show_fleet($f));
+         print li(sprintf("<code><a href=\"system-info?id=$sid&amp;target=$pid\">%4i#%02i</a></code> ",$sid,$pid). show_fleet($f));
       }
       print "</ul>\n";
       my $plans=playerid2plans($id);

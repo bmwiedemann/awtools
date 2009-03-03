@@ -173,7 +173,9 @@ if(param("legend")) {
       my @rbattleslink=("http://test.astrowars-tools.com/awtools/battles.php?sid=$system", "Rastabattles");
       my @rhistorylink=("http://test.astrowars-tools.com/awtools/info.php?history=1&sid=$system","Rastahistory");
       my @lhistorylink=("http://filix.exx.pl/aw/star.php?id=$system", "filix");
-      my @mapdetailslink=("http://$awserver/0/Map/Detail.php/?nr=$system","Map/Details");
+		my $extrasys="";
+		if($options{target}) {$extrasys="&highlight=$options{target}"}
+      my @mapdetailslink=("http://$awserver/0/Map/Detail.php/?nr=$system$extrasys","Map/Details");
       if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";
