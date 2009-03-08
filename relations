@@ -181,10 +181,11 @@ if($options{name}) {# && $options{name} ne "unknown") {
 		print br,$user," owns $planets planets<ul>";
 		foreach my $pp (@planets) {
 			my $sid=planet2sid($pp);
+			my $pid=planet2pid($pp);
          my $s=planet2siege($pp);
 			my ($x,$y)=systemid2coord($sid);
-			my $link=a({-href=>"system-info?id=$sid"},systemid2name($sid));
-			print li({-style=>"font-family: monospace;".($s?" background-color: red;":"")},sprintf(qq!(%2i,%2i) #%2i : pop=%2i SB=%2i $link\n!, $x, $y, planet2pid($pp), planet2pop($pp), planet2sb($pp)));
+			my $link=a({-href=>"system-info?id=$sid&target=$pid"},systemid2name($sid));
+			print li({-style=>"font-family: monospace;".($s?" background-color: red;":"")},sprintf(qq!(%2i,%2i) #%2i : pop=%2i SB=%2i $link\n!, $x, $y, $pid, planet2pop($pp), planet2sb($pp)));
 		}
 		print "</ul>\n";
       my $fleets=awinput::playerid2fleets($id, "ORDER BY `sidpid` ASC, `eta` ASC, `lastseen` ASC");
