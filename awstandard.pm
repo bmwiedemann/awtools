@@ -132,6 +132,9 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 		}
 		$links.="|&nbsp;".a(\%h,$item)." ";
 	}
+	if($ENV{HTTP_AWPID}) {
+		$links.="|&nbsp;".a({-href=>"relations?id=$ENV{HTTP_AWPID}"}, "self");
+	}
 	$links.=$customhtml||"";
 	if(!$style) {$style='blue'}
    my $flag = autoEscape(0);
