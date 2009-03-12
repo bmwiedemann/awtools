@@ -17,6 +17,14 @@ for my $p (qw'alliance sort omit') {
 $options{omit}=~s/[^ 0-9]//g; # sanitize user input
 $options{alliance}=~s/[^A-Za-z]//g; # sanitize user input
 
+our $now=time();
+sub display_relmin($)
+{
+	my($idle)=@_;
+
+	if(!$idle) { return "-" }
+	sprintf("%im",($now-$idle)/60);
+}
 
 print AWheader("\U$options{alliance}\E alliance info [\U$ENV{REMOTE_USER}]", 
       '<link rel="stylesheet" type="text/css" href="/code/css/alliance.css" />'
@@ -35,7 +43,7 @@ if($options{alliance}) {
    my @displayfuncs=
          (\&display_string, \&display_pid, \&display_sid, 
            \&display_string, \&display_string, \&display_string, \&display_string, \&display_needplanets, \&display_string, \&display_string, \&display_string, \&display_string, 
-           \&AWisodatetime, \&display_string, \&display_etc, \&display_string);
+           \&AWisodatetime, \&display_string, \&display_etc, \&display_string, \&display_relmin);
    foreach(split / /, $options{omit}) {
       $displayfuncs[$_-1]=undef;
    }
@@ -118,15 +126,15 @@ if($options{alliance}) {
       my $res=$dbh->selectall_arrayref($sth, {}, $ENV{REMOTE_USER}, $pid);
       $incomings=${$$res[0]}[0];
       push(@members2, [$links, $pid, $$p{home_id}, $$p{level}, $$p{science}, $$p{culture}, $$p{trade},
-            $needplanets, "$$p{points}(#$$p{rank})", $n+1, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc, $incomings]);
+            $needplanets, "$$p{points}(#$$p{rank})", $n+1, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc, $incomings, awinput::getlastlog($pid)]);
 		$n++;
 	}
    print " ".a({-href=>"relations-bulk?user=".join("%0a",@membernames)."&alliance=$options{alliance}"},"edit relations for all members");
-	print sort_table([qw"links name home pl sl cl tr", '<span title="number of planets needed">need</span>', qw"pts(rank) arank log from joined intel ETC inco"],
+	print sort_table([qw"links name home pl sl cl tr", '<span title="number of planets needed">need</span>', qw"pts(rank) arank log from joined intel ETC inco idle"],
          \@displayfuncs,
          [undef, \&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, 
            \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_string,
-           \&sort_num, \&sort_string, \&sort_num, \&sort_num],
+           \&sort_num, \&sort_string, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@members2 );
 
 

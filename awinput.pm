@@ -1229,4 +1229,23 @@ sub settoolsaccess($$$;$) {
 # output: float score points value
 #sub getlivealliscore($) see alliance tool
 
+# input: player id
+# output: UNIX timestamp of last login or undef if no current data is available
+sub getlastlog($)
+{
+	my($pid)=@_;
+	require awlogins;
+	my $logins=awlogins::get_logins($ENV{REMOTE_USER}, $pid, "ORDER BY `n` DESC LIMIT 1");
+
+	foreach my $log (@$logins) {
+		my ($n,$time, $idle, $fuzz)=@$log;
+		my $playerref=getplayer($pid);
+		my $dblog=$playerref->{logins};
+		if($n<$dblog) { return undef; } # stale/outdated data
+#		print "@$log $dblog<br>\n";
+		return $time;
+	}
+	return undef;
+}
+
 1;
