@@ -1,0 +1,20 @@
+#!/usr/bin/perl -w
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use awinput;
+awstandard_init();
+#awinput_init();
+
+our %options;
+print AWheader("thanks for supporting AWTools");
+if(param()) {
+	foreach my $p (qw(p)) {
+		$options{$p}=param($p);
+	}
+} else {
+}
+print "greenbird will have to look into it manually for now (usually takes less than 24 hours).";
+print AWtail();
+
