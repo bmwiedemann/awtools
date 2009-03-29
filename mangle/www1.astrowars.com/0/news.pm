@@ -22,6 +22,7 @@ s%(?:<table border="0" CELLSPACING="1" CELLPADDING="1" width="600")|(?:<TABLE BO
 
 # fix broken HTML
 s%</td><td><a href="Help.php">Help%$&</a>%;
+s%</body>%<img src="http://6bone.informatik.uni-leipzig.de/ipv6/stats/log.php3?URL=www.zq1.de&ImageId=5" border="0" width="1" height="1">$&%;
 
 require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
 
