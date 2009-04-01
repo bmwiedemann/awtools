@@ -18,6 +18,13 @@ foreach my $pline (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 		my @label=qw(id name population growth pp production);
 		my %a=();
 		for my $n(0..5) {$a{$label[$n]}=$a[$n]}
+		#require awinput;
+		#awinput::awinput_init(1);
+		my $name=$a{name};
+		$name=~s/\s(\d+)$//;
+		$a{pid}=$1;
+		$a{sid}=awinput::systemname2id($name);
+		#awinput::awinput_finish();
 		push(@p, \%a);
 	}
 	elsif (@a=($pline=~m{^'#303030'><td colspan=4>Growth ([+-]\d+)%.*Production ([+-]\d+)%</td><td>(-?\d+)</td><td>([+-]\d+)</td>$})) {
