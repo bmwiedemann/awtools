@@ -9,7 +9,7 @@ sub mangle($)
 { local $_=$_[0];
 #return $_;
    eval {use strict;
-
+	use Image::Magick;
 #      $_.="test OK";
 	# fetch security-check image to read text
    my $req=$::options{request};
@@ -19,17 +19,14 @@ sub mangle($)
    my $response = $ua->request($imgreq);
    my $content = $response->content;
 
-	# write image to temp file
-   use File::Temp qw(tempfile tempdir);
-   my $dir = tempdir( CLEANUP => 1 );
-   my ($fh, $filename) = tempfile( DIR => $dir );
-	print $fh $content;
-	close($fh);
+	my $img=Image::Magick->new();
+	$img->Set(magick=>"PNG");
+	$img->BlobToImage($content);
 
 	# read image
 #	chdir "/home/aw/base/awread";
 	require "$awstandard::basedir/base/awread/awread.pm";
-	my $string=awread::read_awimg($filename);
+	my $string=awread::process_awimg($img);
 #	$_.="found $string";
    if($string=~m/^[0-9a-f]{5}$/) {
       s!<img src="/0/secure.php"[^>]*>!Security Measure!i; # drop original image link
