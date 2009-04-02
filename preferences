@@ -20,7 +20,7 @@ $style=$options{style}||$cookies{style};
 $awstandard::customhtml=$options{customhtml}||$cookies{customhtml};
 
 if(!defined($options{tz})) {param("tz",0)}
-if(defined($options{user})) {
+if(defined($options{user}) && $ENV{REQUEST_METHOD} eq "POST") {
    $options{refsys}||="";
    my @cookies;
 	push(@cookies, cookie(-name=>'user', -value=>$options{user}, -expires=>'+90d'));
@@ -31,7 +31,7 @@ if(defined($options{user})) {
 	print header(-cookie=>\@cookies).AWheader2("logged in as $options{user} ($options{refsys})");
 } else { print AWheader("cookie-preferences"); }
 
-print start_form(-method=>'get', -name=>"form"), textfield(-name=>'user', -class=>'text'), " user name", br.AWfocus("form.user"),
+print start_form(-method=>'post', -name=>"form"), textfield(-name=>'user', -class=>'text'), " user name", br.AWfocus("form.user"),
 textfield(-name=>'refsys', -class=>'text'), " sys#planet (used for ETA calculation - e.g. 1#1 for Rana 1)", br,
 popup_menu(-name=>'style', -values=>[qw(green blue aw plain)], -default=>"blue"), " color theme for AWtools", br,
 popup_menu(-name=>'tz', -values=>[-11..12]), " timezone for AWtools", br,

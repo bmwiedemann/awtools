@@ -15,7 +15,7 @@ my $authpid=getauthpid();
 if(!$authpid) {
    print "Sorry, you can only use this tool when ".a({-href=>"authawforum?uri=/cgi-bin/preferences2"},"properly authenticated");
 } else {
-   if(param()) {
+   if(param() && $ENV{REQUEST_METHOD} eq "POST") {
       foreach my $p (qw(p awfstyle awtstyle customhtml)) {
          $options{$p}=param($p);
 #      if(defined($options{$p})){$options{$p}=~s/[^a-zA-Z0-9]//g;} # sanitize user input;
