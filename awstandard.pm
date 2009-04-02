@@ -46,7 +46,8 @@ our %planetstatusstring=(1=>"unknown", 2=>"planned by", 3=>"targeted by", 4=>"si
 our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Revenue");
 our @racestr=qw(growth science culture production speed attack defense);
 our @shipstr=qw(Transports Colony Destroyer Cruiser Battleship);
-our @buildingstr=qw(HF RF GC RL SB);
+our @buildingstr=qw(HF RF GC RL SB TRN CLS DS CS BS);
+our @buildingval=qw(farm fabrik kultur forschungslabor starbase infantrieschiff kolonieschiff destroyer cruiser battleship);
 our @racebonus=qw(0.07 0.08 0.05 0.04 0.01 0.12 0.16);
 our $magicstring="automagic:";
 our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HoR"=>15);
@@ -56,7 +57,7 @@ our @statuscolor=qw(black black blue cyan red green orange green);
 our $start_time;
 our $customhtml;
 
-use awaccess; # needs 1 var
+require awaccess; # needs 1 var
 use DBAccess2;
 
 sub awstandard_init() {
