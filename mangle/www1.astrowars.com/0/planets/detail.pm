@@ -5,7 +5,6 @@ use parse::dispatch;
 my $data=parse::dispatch::dispatch(\%::options);
 
 my @buildings=("Hydroponic Farm", "Robotic Factory", "Galactic Cybernet", "Research Lab", "Starbase");
-my @val=qw(farm fabrik kultur forschungslabor starbase);
 my $debug="";
 
 my($planet)=($::options{url}=~/i=(\d+)/);
@@ -111,7 +110,8 @@ foreach my $n (0..$#buildings) {
 	%;
    #$onclickjs="";
 
-   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" href="/0/Planets/Spend_Points.php/?p=$pp&amp;i=$planet&amp;points=$5&amp;produktion=$val[$n]$dscost" style="background-color:blue" onclick="
+	my $intpp=int($pp);
+   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" href="/0/Planets/Spend_Points.php/?p=$intpp&amp;i=$planet&amp;points=$5&amp;produktion=$awstandard::buildingval[$n]$dscost" style="background-color:blue" onclick="
 	document.form.points.value='$5'; $onclickjs">+1</a>$6%;
 #   $debug.="<br>test: $buil $val[$n] $2 $4";
 }
