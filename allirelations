@@ -17,6 +17,7 @@ if(param()) {
 		$options{$p}=param($p);
 	}
    if($options{p}){$options{p}=~s/[^a-zA-Z]//g;} # sanitize user input;
+   if($options{comment}){$options{comment}=~s/[<>]//g}
    
    if(!$options{relation}) {
       # query existing values
