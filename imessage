@@ -64,6 +64,9 @@ if(!$authpid) {
 	}
    if(!$options{sort}){$options{sort}="2";} # default sort by time
    if(!$options{action} || $options{action}=~m/[^a-z_-]/){$options{action}="list";}
+	if($options{action}=~m/^send/ && defined($options{msg}) && $ENV{REQUEST_METHOD} ne "POST") { # partially safeguard against CSRF
+		delete($options{msg});
+	}
    if($options{alli}) {$options{alli}=~s/[^a-z]//g}
    if($options{recv} && $options{recv}=~m/[^0-9]/) { $options{recv}=playername2idm($options{recv}); } # counts as sanitizing
    my $subtools="";
