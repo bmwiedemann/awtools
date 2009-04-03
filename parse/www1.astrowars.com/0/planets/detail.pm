@@ -27,10 +27,19 @@ foreach my $line (m{<tr align=center(.*?)</td></tr>}gs) {
 		$d->{sid}=systemname2id($1);
 	} elsif($line=~m{^ bgcolor="#202060"><td>#(\d+)}) {
 		$d->{n}=int($1);
+	} elsif($line=~m{^><td colspan="5" bgcolor="#602020"><a href="?/0/Player/Profile.php/\?id=(\d+)"?>Hostile forces in the orbit of}) {
+		$d->{sieging}=$1;
+		# ->{destroyer}->{num} etc has to be interpreted as foreign fleet
+#	} elsif($line=~m{ bgcolor="#202060"><td>Hostile Fleet}) {
+#	} elsif($line=~m{Garrison</td><td>qty}) {
+#	} else { $d->{debug}=$line; 
 	}
-#	elsif($line=~m{Garrison</td><td>qty}) {
-#	} else { $d->{debug}=$line; }
 }
 #$d->{test}=\@n;
+
+for my $v ("Next") {
+	$d->{lc($v)}=tobool(m/">$v<\/a><\/td>/);
+}
+$d->{previous}=tobool($d->{n}>1);
 
 2;
