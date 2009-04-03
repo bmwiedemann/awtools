@@ -8,7 +8,7 @@ foreach my $line (m{<tr align=center bgcolor=(.+?)</tr>}gs) {
 		$d->{currentscience}=$1;
 	}
 	if(my @a=($line=~m{([^>]+)</a> </td><td>(\d+)</td><td><img src="/images/dot.gif" height="10" width="(\d+)"><img src="/images/leer.gif" height="10" width="(\d+)"></td><td>(?:<form><input type="text" value=")?(\d+)(?:" size="8" name="r" class=text style="text-align:center;">)?</td><td>(?:<INPUT type="text" value=")?([0-9:]+(?: days)?)})) {
-      my $sl=$a[1]+($a[2]/250);
+      my $sl=$a[1]+($a[2]/260);
 		$d->{lc($a[0])}={level=>$sl, remain=>int($a[4]), "t"=>$a[5]};
 	}
 	elsif($line=~m{^"#202060"}) {
