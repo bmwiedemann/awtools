@@ -13,13 +13,16 @@ sub lookup_ip($) {
    use Net::IP;
    use Net::DNS;
    if(my $res=$cache{$_[0]}) {return $res}
-   my $ip = new Net::IP($_[0],4);
+   my $ip = new Net::IP($_[0]);
+	my $res;
+	if($ip) {
 #   print $ip->reverse_ip()."\n";
 #   print "Resolving ...\n";
-   my $res = Net::DNS::Resolver->new;
-   my $answer = $res->query($ip->reverse_ip(),'PTR');
-   my $namer = $answer->{'answer'}[0];
-   $res=$cache{$_[0]}=$namer->{'ptrdname'};
+   	$res = Net::DNS::Resolver->new;
+		my $answer = $res->query($ip->reverse_ip(),'PTR');
+		my $namer = $answer->{'answer'}[0];
+		$res=$cache{$_[0]}=$namer->{'ptrdname'};
+	}
    return $res||"";
 }
 
