@@ -1,5 +1,16 @@
 use DBAccess2;
+#use strict;
 
+use awstandard;
+my $data=getparsed(\%::options);
+
+my $sum=0;
+foreach my $p (@{$data->{planet}}) {
+	my $p=$p->{population}-20;
+	next if($p<=0);
+	$sum+=$p;
+}
+s{(Points: )(\d+)(</td>)}{$1.($2+$sum).$3}e;
 
 if(m!<td>Sum</td><td>\d+</td><td>\d+</td><td>\d+</td><td>\d+</td><td>\d+</td><td>(\d+)</td></tr>! && $1>=150) {
    s%\n</tr>\n</table>\n<br>%<td>|</td>
