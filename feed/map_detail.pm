@@ -35,7 +35,7 @@ sub filter() {
       $details.=" old: ".planet2pop($p)." ".planet2sb($p)." ".planet2siege($p);
       $$p{s}=$siege;
       print "$details<br>\n";
-      next if not $playerid;
+      next if not defined $playerid; # skip missing planets
       $$p{ownerid}=$playerid;
       $$p{pop}=$pop;
       $$p{sb}=$sb;
