@@ -16,7 +16,7 @@ qw(vkeyboard);
 sub vkeyboard($@)
 {
    my($tname, $a)=@_;
-   my $out=q!<span class="vkhidden" onMouseOver="this.className='vkunhidden'">vk !;
+   my $out=q!<span class="vkhidden" onMouseOver="this.className='vkunhidden'" onClick="this.className='vkunhidden'">vk !;
 # onMouseOut="this.className='vkhidden'">vk !;
    foreach my $c (@$a) {
       $out.=qq!<input type="button" class="vkbutton" value="$c" onclick="document.$tname.value+= '$c';">!;
