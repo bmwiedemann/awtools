@@ -17,7 +17,8 @@ if($d->{sieging} && m!Transport</a></td><td>(\d+).* Colony Ship</a></td><td>(\d+
 my %h=(pp=>$d->{productionpoints}->{num}, "pop"=>$d->{population}->{num},
 	hf=>$d->{hydroponicfarm}->{num}, rf=>$d->{roboticfactory}->{num}, 
 	gc=>$d->{galacticcybernet}->{num}, rl=>$d->{researchlab}->{num}, 
-	sb=>$d->{starbase}->{num} );
+	sb=>$d->{starbase}->{num},
+	ownerid=>$::options{pid});
 
 update_building($d->{sid},$d->{pid},1,\%h);
 
