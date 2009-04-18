@@ -38,13 +38,14 @@ sub update_building($$$%)
 	}
 
 	unshift(@v, $p->{ownerid});
+	unshift(@v, $alli);
 	if(!defined($oldv[0])) {
 		my $sth2=$dbh->prepare_cached("INSERT INTO `internalplanet` VALUES (?,?,?,?,?,?,?,?,?,?)");
-   	$sth2->execute($alli,$sidpid, @v) or 
+   	$sth2->execute($sidpid, @v) or 
 		print "err: ",$sth2->errstr,"<br/>";
 	} else {
-		my $sth2=$dbh->prepare_cached("UPDATE `internalplanet` SET ownerid=?, pop=?, pp=?, b1=?, b2=?, b3=?, b4=?, b5=? WHERE alli=? AND sidpid=?");
-   	$sth2->execute(@v, $alli,$sidpid) or 
+		my $sth2=$dbh->prepare_cached("UPDATE `internalplanet` SET alli=?, ownerid=?, pop=?, pp=?, b1=?, b2=?, b3=?, b4=?, b5=? WHERE sidpid=?");
+   	$sth2->execute(@v, $sidpid) or 
 		print "err: ",$sth2->errstr,"<br/>";
 	}
 }
