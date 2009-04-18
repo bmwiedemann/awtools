@@ -126,9 +126,9 @@ if($options{name}) {# && $options{name} ne "unknown") {
    if($pldurl) {$extralinks=a({-href=>$pldurl},img({-src=>"/images/aw/profile3.gif", -alt=>"alliance profile"})).$extralinks;}
 	print start_form(-name=>"form2"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag.$lasttag." ", profilelink($id), $extralinks, 
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
-         a({class=>"othertool", -href=>"http://test.astrowars-tools.com/awtools/info.php?pName=".$user}, "Rasta")." ".
+         a({class=>"othertool", -href=>"http://www.astrowars-tools.com/info.php?pName=".$user}, "Rasta")." ".
          a({class=>"othertool", -href=>"http://filix.exx.pl/aw/profile.php?id=$id"},"filix")," ",
-         a({class=>"othertool", -href=>"http://test.astrowars-tools.com/awtools/battles.php?pName=$user"},"Rastabattles")," ",
+         a({class=>"othertool", -href=>"http://www.astrowars-tools.com/battles.php?pName=$user"},"Rastabattles")," ",
 #            a({class=>"othertool", -href=>"http://azgharde.free.fr/tools/battles.php?pl=$user&da=all"},"azghardebattles"), " ",
 #            a({class=>"othertool", -href=>"http://odbvpn.ath.cx:89/pub/view_battles.php?player=$user&date=all"},"battles"),
             " ",a({-href=>"playeronline?name=$user"},"view idle/online"),br;

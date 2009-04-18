@@ -167,11 +167,11 @@ if(param("legend")) {
 		my $syslevel=systemid2level($system);
 		my $output="$bs$sysname ($x/$y)$be${eol}Id=$system level=$syslevel ";
       my @nstarmaplink=("http://aw.neron92.info/showmap.php?id=$system&range=25&showcoord=1&showid=1&s_infos=1&f_infos=1","neronstarmap");
-      my @lstarmaplink=("http://test.astrowars-tools.com/awtools/map.php?x=$x&y=$y&sid=$system&bio=24","rastastarmap");
+      my @lstarmaplink=("http://www.astrowars-tools.com/map.php?x=$x&y=$y&sid=$system&bio=24","Rastastarmap");
       my @lbattleslink=("http://www.gipi.biz/2007-2/index.php?id=$system&case=system", "gipi");
 #      my @abattleslink=("http://azgharde.free.fr/tools/details.php?nr=$system", "azghardebattles");
-      my @rbattleslink=("http://test.astrowars-tools.com/awtools/battles.php?sid=$system", "Rastabattles");
-      my @rhistorylink=("http://test.astrowars-tools.com/awtools/info.php?history=1&sid=$system","Rastahistory");
+      my @rbattleslink=("http://www.astrowars-tools.com/battles.php?sid=$system", "Rastabattles");
+      my @rhistorylink=("http://www.astrowars-tools.com/info.php?history=1&sid=$system","Rastahistory");
       my @lhistorylink=("http://filix.exx.pl/aw/star.php?id=$system", "filix");
 		my $extrasys="";
 		if($options{target}) {$extrasys="&highlight=$options{target}"}
