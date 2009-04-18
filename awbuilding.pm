@@ -11,7 +11,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
 qw(&update_building);
-our $f=1000;
 
 sub update_building($$$%)
 {
@@ -24,9 +23,6 @@ sub update_building($$$%)
 	my $sth=$dbh->prepare_cached("SELECT * FROM `internalplanet` WHERE alli=? AND sidpid=?");
 	my @oldv=$dbh->selectrow_array($sth, {}, $alli,$sidpid);
 	my @v=($p->{pop}, $p->{pp}, $p->{hf}, $p->{rf}, $p->{gc}, $p->{rl}, $p->{sb});
-	foreach my $v (@v) {
-		$v*=$f;
-	}
 	print "feed old:@oldv new:@v<br/>";
 	my @newv=@oldv;
 	if($isfloat || !defined($oldv[0])) {
@@ -34,7 +30,7 @@ sub update_building($$$%)
 	} else {
 		for my $i (0..6) {
 			my $v=$v[$i]; 
-			if($oldv[$i]<$v || $v<$f*int($oldv[$i]/$f)) {
+			if($oldv[$i]<$v || $v<int($oldv[$i])) {
 				# force changes even with rounded input
 				$newv[$i]=$v;
 			}
