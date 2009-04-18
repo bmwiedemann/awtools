@@ -10,7 +10,15 @@ use awinput;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
-qw(&update_building);
+qw(&getbuilding &update_building &update_building_pp);
+
+sub getbuilding($@)
+{
+	my($cond,$vars)=@_;
+	my $dbh=get_dbh;
+	my $sth=$dbh->prepare_cached("SELECT * FROM `internalplanet` $cond");
+	return $dbh->selectall_arrayref($sth, {}, @$vars);
+}
 
 sub update_building($$$%)
 {
@@ -30,16 +38,21 @@ sub update_building($$$%)
 	} else {
 		for my $i (0..6) {
 			my $v=$v[$i]; 
-			if($oldv[$i]<$v || $v<int($oldv[$i])) {
+			if(defined($v) && ($oldv[$i]<$v || $v<int($oldv[$i]))) {
 				# force changes even with rounded input
 				$newv[$i]=$v;
 			}
 		}
 	}
+	# TODO optimize: could return here if @newv==@oldv
 
 	unshift(@v, $p->{ownerid});
 	unshift(@v, $alli);
-	my($u)=get_one_row("SELECT `lastupdate_at` FROM `brownieplayer` WHERE `pid`=?", [$p->{ownerid}]);
+	my $u=$p->{updatetime};
+	if(!defined($u)) {
+		($u)=get_one_row("SELECT `lastupdate_at` FROM `brownieplayer` WHERE `pid`=?", [$p->{ownerid}]);
+	}
+
 	unshift(@v, $u||time());
 
 	if(!defined($oldv[0])) {
@@ -51,6 +64,14 @@ sub update_building($$$%)
    	$sth2->execute(@v, $sidpid) or 
 		print "err: ",$sth2->errstr,"<br/>";
 	}
+}
+
+sub update_building_pp($%)
+{
+	my($sidpid,$h)=@_;
+   my $dbh=get_dbh;
+	my $sth2=$dbh->prepare_cached("UPDATE `internalplanet` SET time=?, pp=? WHERE sidpid=?");
+	$sth2->execute($h->{"time"}, $h->{pp}, $sidpid);
 }
 
 1;
