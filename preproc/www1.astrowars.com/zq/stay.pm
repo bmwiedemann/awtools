@@ -1,5 +1,4 @@
 use strict;
-BEGIN {$ENV{HTTP_COOKIE}=$::options{headers}->{Cookie};} # allow parsing cookies from CGI module
 use warnings;
 use CGI;
 use Tie::DBI;
@@ -13,12 +12,13 @@ my $request=$::options{request};
 my $h=$::options{headers};
 (my $urlparam)=($::options{url}=~/\?(.*)/);
 my $param=$::options{post}||$urlparam;
+$ENV{HTTP_COOKIE}=$::options{headers}->{Cookie}; # allow parsing cookies from CGI module
 my $q = new CGI($param);
-my $m="";
 my $sessionid=$q->cookie("PHPSESSID");
-if($q->param("time") && $sessionid) {
-   my $times=$q->param("time");
-   $m="p=$param t=$times\n";
+my $times=$q->param("time");
+my $m="sessionid=$sessionid p=$param time=$times";
+if($times && $sessionid) {
+   $m.=" t=$times\n";
    my %newh;
    my $re=$::options{request};
    foreach my $k (qw(Via X-Forwarded-For Accept Accept-Language Accept-Encoding Accept-Charset Cookie User-Agent)) {
@@ -38,7 +38,7 @@ if($q->param("time") && $sessionid) {
          my %us; # usersession
          tie %us,'Tie::DBI',$dbh,'usersession','sessionid',{CLOBBER=>2};
          my @site=qw"Fleet/ News/";
-         foreach my $n (qw(39364 227097)) {
+         foreach my $n (qw(154597 153149)) {
             push(@site, "Player/Profile.php/?id=$n");
          }
          my $lasturi="http://www1.astrowars.com/0/News/";
@@ -83,7 +83,7 @@ if($q->param("time") && $sessionid) {
    }
 }
 
-$r->print( $q->start_html(-title=>"AW stay"),$m,$q->br,$q->start_form(-name=>"form"),$q->textfield(-name=>'time', -class=>'text'),$q->br,
-      $q->submit(-name=>"query", -class=>'smbutton'),$q->br);
+$r->print( $q->start_html(-title=>"AW stay"),$m,$q->br,$q->start_form(-name=>"form", -method=>"get", -enctype=>"multipart/form-data"),$q->textfield(-name=>'time', -class=>'text')," minutes",$q->br,
+      $q->submit(-name=>"query", -class=>'smbutton'),$q->end_form,$q->br);
 
 1;
