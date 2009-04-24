@@ -28,17 +28,19 @@ sub update_building($$$%)
 	my $alli=$ENV{REMOTE_USER};
 	if(!$alli || $alli eq "guest") {return}
    my $dbh=get_dbh;
-	my $sth=$dbh->prepare_cached("SELECT * FROM `internalplanet` WHERE alli=? AND sidpid=?");
-	my @oldv=$dbh->selectrow_array($sth, {}, $alli,$sidpid);
+	my $sth=$dbh->prepare_cached("SELECT * FROM `internalplanet` WHERE sidpid=?");
+	my @oldv=$dbh->selectrow_array($sth, {}, $sidpid);
 	my @v=($p->{pop}, $p->{pp}, $p->{hf}, $p->{rf}, $p->{gc}, $p->{rl}, $p->{sb});
-	print "feed old:@oldv new:@v<br/>";
+	#print "feed old:@oldv new:@v<br/>";
+	my $offs=4;
 	my @newv=@oldv;
 	if($isfloat || !defined($oldv[0])) {
 		@newv=@v;
 	} else {
 		for my $i (0..6) {
 			my $v=$v[$i]; 
-			if(defined($v) && ($oldv[$i]<$v || $v<int($oldv[$i]))) {
+			my $o=$oldv[$i+$offs];
+			if(defined($v) && ($o<$v || $v<int($o))) {
 				# force changes even with rounded input
 				$newv[$i]=$v;
 			}
