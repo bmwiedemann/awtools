@@ -23,7 +23,7 @@ sub getbuilding($@)
 sub update_building($$$%)
 {
    my($sid, $pid,$isfloat,$p)=@_;
-   return if not $sid || not $pid;
+   return if not $sid || not $pid || ! defined($p->{pop});
 	my $sidpid=sidpid22sidpid3m($sid,$pid);
 	my $alli=$ENV{REMOTE_USER};
 	if(!$alli || $alli eq "guest") {return}
