@@ -2,7 +2,7 @@ use strict;
 use awinput;
 
 # link Bio25 systems
-s%(<tr[^>]*><td>(?:<b>pending</b>)?(?:<a href=Launch.php/\?nr=[^>]*><b>Launch</b></a>)?[^<]*</td><td><small>)\((\d+)\)(\s+\d+</small></td>)%$1$::bmwlink/system-info?id=$2">($2)</a>$3%g;
+s%(<tr[^>]*><td>(?:<b>pending</b>)?(?:<a href=Launch.php/\?nr=[^>]*><b>Launch</b></a>)?[^<]*</td><td><small>)\((\d+)\)(\s+)(\d+)(</small></td>)%$1$::bmwlink/system-info?id=$2&target=$4">($2)</a>$3$4$5%g;
 
 
 
