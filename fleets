@@ -30,6 +30,7 @@ my $res=$dbh->selectall_arrayref($sth, {}, @$amvars);
 
 my @sidpids=sort {$$b[1]<=>$$a[1]} @$res;
 my %cvsum;
+my %xcvsum;
 
 foreach my $row1 (@sidpids) {
    my($sidpid,$sumcv,$trn,$cls)=@$row1;
@@ -54,14 +55,15 @@ foreach my $row1 (@sidpids) {
    print "$str\n".br;
    foreach my $row2 (@$res) {
 		my($owner,$cv, $xcv)=@$row2[4,13,14];
-		$cvsum{$owner}+=$xcv;
+		$cvsum{$owner}+=$cv;
+		$xcvsum{$owner}+=$xcv;
       print awinput::show_fleet($row2).br;
    }
    print br;
 }
-print "<table><tr><th>Player</th><th>XCV</th></tr>";
-foreach my $owner (sort {$cvsum{$b}<=>$cvsum{$a}} keys (%cvsum)) {
-	print ("<tr>".td(playerid2link($owner)).td($cvsum{$owner})."</tr>");
+print "<table><tr><th>Player</th><th>CV</th><th>XCV</th></tr>";
+foreach my $owner (sort {$xcvsum{$b}<=>$xcvsum{$a}} keys (%cvsum)) {
+	print ("<tr>".td(playerid2link($owner)).td($cvsum{$owner}).td($xcvsum{$owner})."</tr>");
 }
 print "</table>";
 print AWtail();
