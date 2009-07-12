@@ -8,6 +8,10 @@ s/<input type="checkbox" name="calc" value="1"/$& checked/;
 
 # energy 0 is possible - so activate it
 s/<option>1<option>2/<option>0$&/;
+# add values to energy so that JS works with IE8
+sub substene($) {my $x=shift; $x=~s/(<option(?: selected)?)>(\d+)/$1 value="$2">$2/g; $x}
+s{(<select name="energy">\n)\d+([^/]+)(</select></td></tr>)}
+ {$1.substene($2).$3}e;
 
 
 # convert radio list into drop-down list
