@@ -28,21 +28,26 @@ sub filter() {
 	my $planets=$data->{planet};
 	foreach my $pla (@$planets) {
       my ($siege,$pid,$pop,$sb,$playerid,$owner)=($pla->{sieged}, $pla->{id}, $pla->{population}, $pla->{starbase}, $pla->{pid}, $pla->{name});
+		next if not defined $playerid; # skip missing planets
       if($pop==0) {$pop++}
       my $details="$pid $pop $sb $siege $owner";
       my $p=$system[$pid-1]; #getplanet($sid,$pid);
-      next if(!$p);
-      $details.=" old: ".planet2pop($p)." ".planet2sb($p)." ".planet2siege($p);
-      $$p{s}=$siege;
-      print "$details<br>\n";
-      next if not defined $playerid; # skip missing planets
-      $$p{ownerid}=$playerid;
-      $$p{pop}=$pop;
-      $$p{sb}=$sb;
+		if(!$p) {
+			$details.=" new entry $pid ";
+			$system[$pid-1]=$p={opop=>,$pop, planetid=>$pid, systemid=>$sid};
+		} else {
+			$details.=" old: ".planet2pop($p)." ".planet2sb($p)." ".planet2siege($p);
+			print "$details<br>\n";
+		}
+		$$p{s}=$siege;
+		$$p{ownerid}=$playerid;
+		$$p{pop}=$pop;
+		$$p{sb}=$sb;
 # additionally update in mysql DB:
       my $sidpid=sidpid22sidpid3m($sid,$pid);
-      my $sth=$dbh->prepare("UPDATE `planets` SET siege=?, starbase=?, population=?, ownerid=? WHERE sidpid = ?");
-      $sth->execute($siege, $sb, $pop, $playerid, $sidpid);
+		my $sth=$dbh->prepare("INSERT INTO `planets` VALUES (?,?,?,?,?,?) ON DUPLICATE KEY UPDATE population=?, starbase=?, ownerid=?, siege=?");
+      $sth->execute($sidpid, $pop, $pop, $sb, $playerid, $siege,
+			$pop, $sb, $playerid, $siege);
    }
    if(!$debug) {
       $awinput::planets{$sid}=\@system;
