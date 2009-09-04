@@ -497,7 +497,7 @@ sub getauthpid()
 sub isproxy($)
 {
 	my($ip)=@_;
-	if($ip eq $awstandard::proxyip || $ip=~m/192\.168\.23[56]\.\d+/ || $ip eq "10.8.0.5" || $ip eq "85.25.150.94") {return 1}
+	if($ip eq $awstandard::proxyip || $ip=~m/192\.168\.23[456]\.\d+/ || $ip eq "10.8.0.5" || $ip eq "85.25.150.94") {return 1}
 	return 0;
 }
 
