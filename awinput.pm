@@ -10,6 +10,7 @@ our (%alliances,%starmap,%player,%playerid,%planets,
    $dbnamer);
 my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
+our $tradercost=5;
 
 $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
@@ -830,8 +831,8 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 				@race=@{$race}[0..6];
 				my $sum=0;
 				foreach my $r (@race){$sum+=$r}
-				$race[7]=$sum<=-6;
-            if($race[7]){$sum-=6}
+				$race[7]=$sum<=-$tradercost;
+            if($race[7]){$sum-=$tradercost}
 				$race[8]=$sum&1;
 			}
 			my @update=map {"$_=?"} (@awstandard::racestr, "trader", "startuplab");
@@ -867,6 +868,7 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 sub dblinkadd { my($sid,$url)=@_;
    my $type;
    if($url=~m!http://forum\.rebelstudentalliance\.co\.uk/index\.php\?showtopic=(\d+)!) { $type="RSA" } # IPB
+   if($url=~m!http://home\.rebelstudentalliance\.co\.uk/forum/index\.php/topic,(\d+\.\d+)\.html!) { $type="RSA" } # IPB
    elsif($url=~m!http://flebb\.servebeer\.com/sknights/index\.php\?showtopic=(\d+)!) { $type="SK" } # IPB
    elsif($url=~m!http://z10.invisionfree.com/Trolls/index.php\?showtopic=(\d+)!) { $type="TROL" } # IPB
    elsif($url=~m!http://s6.invisionfree.com/LOVE/index.php\?showtopic=(\d+)!) { $type="LOVE" } # IPB
