@@ -42,9 +42,10 @@ my $distmargin=1;
 foreach my $e (@members) {
    my($name,$pid,$bio)=@$e;
    $member{$pid}=1;
-   push(@memberids,$pid);
    my $sid=playerid2home($pid);
    my ($x,$y)=systemid2coord($sid);
+	next unless defined($x);
+   push(@memberids,$pid);
    push(@coords,[$x,$y]);
    my $sl=$::player{$pid}{science};
    if(!$bio){$bio=4}#$sl}
