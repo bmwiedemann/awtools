@@ -42,7 +42,7 @@ if(param()) {
 #      if(defined($options{$p})){$options{$p}=~s/[^0-9]//g;} # sanitize user input;
 	}
    if($options{p}){$options{p}=~s/[<>]//g;} # sanitize user input;
-   if($options{ip}){$options{ip}=~s/[^0-9.]//g;}
+   if($options{ip}){$options{ip}=~s/[^0-9.a-fA-F:]//g;}
    
    my $pid=playername2idm($options{p});
    my $dbh=get_dbh;
