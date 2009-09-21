@@ -9,9 +9,9 @@ my $debug="";
 
 my($planet)=($::options{url}=~/i=(\d+)/);
 if($planet != $data->{n}-1) {
-   $_.="not OK";
    s/#404040/#802020/g;
    s/(body.*"#000000">)/$&\n<div style="background-color: #300">/;
+	s%</body>%<br/><span class=bmwwarning>warning: You should not spend PP on this page as they would go to planet 7 (that is an old AW bug). Refresh and then spend your PPs.</span><br/>$&%;
 }
 
 # add access keys
