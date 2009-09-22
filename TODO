@@ -1,9 +1,20 @@
+feed new planets into tools (important at start of round)
+store SU payback price in DB "date hf rf gc rl" # parse/www1.astrowars.com/0/planets/spend_points.pm done ; use brownieplayer.lastupdate_at? or immediate update
+#fleets: display CV
+[RATS] TinyToon: btw, just an idea for brownie....it is possible to add a popup window to tactic live map? i mean when you move mouse at system to seee what is inside w/o cliking at it?
+starmap/planets table add modified_at, display in system-info
+#fix same PHPSESSID on other account -> wrong alli value
+#check IPv6 usage: NAGROM , 1ntraflesh , lswift , rebeca , greenbird
+#map IPv6 forward addrs via 2002:ipv4 or to 127.x.x.x otherwise
+#SOAP/XML-RPC: getsessionid, build, launch, offertrade, getdata
+airecommend.pm: give reasons for recommendation to humans
+#gather internalplanet data + simulate eco every 15 mins (cron)
+secure all non-info (set/POST) admin and founder tools against http://cwe.mitre.org/top25/#CWE-352
+?display show hh:mm instead of hours as float (in reltime)
 #fighterlist internaldata sharing instead of alli=aid/tag
 #use planet-planning sid#pid as preset dests in Fleet/Launch
 #planet/details display time to next auto-sb level
 #planet/buildings display current SB levels from planets DB
-display show hh:mm instead of hours as float (in reltime)
-starmap/planets table add modified_at, display in system-info
 #DBAccess(2): myselectall_arrayref($query, [$var1, $var2]);
 #display somewhere SELECT useralli.*,name  FROM `useralli`,playerextra WHERE `alli`=? AND useralli.pid=playerextra.pid
 #alliaccess manipulation CGI
@@ -154,3 +165,21 @@ changing the map look to look more "AW-like" - much like Mob's tools... I really
 (11:32:29 AM) [NAIN] Rasta31: 2nd, very easy stuff, make a list of all incommings parsed by brownie ordered by arrival time :)
 
 judochop: but something that it keeps the "planest" screen simple, the problem with looking at the other pages of incomming is that you can not see all the incomming and defences in one look, you have to scroll down or write down which is covered or not covered, 
+
+
+----
+Sorry to bother you, but I just first saw your Javascript formulas (http://aw.lsmod.de/jstools.html) today.
+
+I had some questions/suggestions :
+- first, about your index page in general, there are 40 links listed. Maybe would it be easier if they were listed in some categories ? (like a category about "maps" in general, with the tac' maps, the systems overviews, etc.)
+Anyway, that's up to you.
+- about the tools themselves :
+* the SB-FS-calc is very nice : could you maybe add an entry for "already existing SB" ? For example, if you already have SB15 on your 4th planet and want to raise it to 19, you'll have to make at least 2 calculations.
+* about the PL calculators now : same here, we can calculate how much XP you need to get PLx from PL0, but not how much XP you need to get PLx from PLy. Same problem for the "inverse player level" and the daily updates calculator.
+* about the TT calculator : calculating the distance square is always difficult, I know that you have a tool for that also, but :
+- either add a link in your jstools as well,
+- or you could change it in the way Rasta's tool used to do --> you just enter your sid or coordinates, and the calculator finds the distance square all by itself.
+
+Regards,
+monico.
+
