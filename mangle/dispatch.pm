@@ -48,7 +48,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $alli="\U$ENV{REMOTE_USER}";
    
    # greenbird special
-	if($g) {
+	if($g && $::options{req}) {
 		$info{url}=$::options{req}->headers_in()->get("Host");
 	}
    if(m/onLoad="document.login.secure.focus\(\);">/) {
