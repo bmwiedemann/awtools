@@ -9,6 +9,7 @@ if($::options{url}=~/nr=(\d+)/) {
 	# highlight planet
 	s{(<tr bgcolor="#\d+" align=center)(><td>$pid</td><td>)}{$1 style="font-weight: bold; font-size: 1.3em;"$2};
 
+	$frame.="[Your user agent does not support frames or is currently configured not to display frames.]";
    if(s%<TABLE.*\z%Map / Detail</b></td>%) {
       $_.=qq'<iframe width="95%" height="700" src="$frame</iframe></body></html>';
    }
