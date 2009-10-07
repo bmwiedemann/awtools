@@ -52,6 +52,9 @@ my $name=$::options{name};
 if(@race=/$racere/) {
 	print qq! <a href="relations?name=$::options{name}">name=$::options{name}</a> race: @race<br>\n!;
 }
+if(!@race && (@race=/([-+][0-4])([-+][0-4])([-+][0-4])([-+][0-4])([-+][0-4])([-+][0-4])([-+][0-4])\.\+\d\d\d \d+d/)) {
+	print "found AWTools style race @race</br>";
+}
 if(@science=/$sciencere/) {
 	print "science: @science<br>\n";
 }
