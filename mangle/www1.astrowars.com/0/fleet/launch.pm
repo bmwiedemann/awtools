@@ -145,4 +145,17 @@ if($sid && $pid) {
 #	s{</body>}{<br>$pstr $&};
 }
 
+# send-all adjustments
+sub replacesendall($)
+{
+	my $x=shift;
+	my $y=$x;
+	$x=~s{>all}{>all with transports};
+	$y=~s{>all}{>all without transports};
+	$y=~s{(inf.value)=\d+}{$1=0};
+	return "$y | $x"
+}
+
+$ENV{QUERY_STRING}!~m/inf=0/ && s{(<a href="#all".*>all</a>)}{replacesendall($1)}e;
+
 1;
