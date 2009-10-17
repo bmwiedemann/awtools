@@ -56,6 +56,7 @@ sub simitestclient($)
 	my $sock=IO::Socket::INET->new(PeerAddr=>"alpha.zq1.de:6987", Timeout=>2) or return (); # die "error opening socket: $!";
 	print $sock $str,"\n";
 	my @res;
+   local $_;
 	while(<$sock>) {
 		chop;
 		last if($_ eq "");
@@ -96,7 +97,7 @@ sub split_words($)
 
 sub stripwiki($)
 {
-	$_=shift;
+	local $_=shift;
 	s{<ref [^><\]]+>}{ }g;
    s{http://[^ "><\]]+}{}g;
    s/'''?//g; # drop bold/italic
@@ -109,10 +110,10 @@ sub stripwiki($)
 # use encoding "utf8";
 sub checktext($)
 {
-	$_=stripwiki(shift);
-   my $a=split_words($_);
+	my $x=stripwiki(shift);
+   my $a=split_words($x);
 #	print;
-	binmode STDOUT, ":utf8";
+#	binmode STDOUT, ":utf8";
 	my @out;
    foreach my $w (@$a) {
       next if not $w;
