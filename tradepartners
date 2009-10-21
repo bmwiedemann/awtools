@@ -51,7 +51,7 @@ foreach my $entry (@tap) {
    my $time=(20000-$ad)/$prod;
    my $timeplus=(20000-$adplus)/$prod;
    my ($race)=playerid2ir($pid);
-   if($race && @$race && $race->[-3]) {$time=0; $timeplus=0} # TODO retest
+   if($race && @$race && $race->[-3]) {$time=-999.9; $timeplus=-999.9} # traders dont need to save - this sorts them on top of the table
    my ($playerbonus)=$dbh->selectrow_array($sth, {}, $pid);
 #   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
    push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus]);
