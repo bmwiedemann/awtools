@@ -1,11 +1,10 @@
 htpasswd=/usr/bin/htpasswd
-htpasswdfile=.htpasswd
 d=`date +%d-%m-%Y`
 mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-round=gold13
+round=gold17
 allies=$(shell ./get_allowed_alliances.pl)
 tools=index.html alliaccess alliance{,2} allicleanup alliprefs allirelations arrival arrivalmany authaw authawforum awstatistics awtoolstatistics joinalli cdinfo distsqr ecocheck edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory thanks userpasswd ipban logout
 #allies=
@@ -63,6 +62,7 @@ updatedaily:
 	ln -f html/${round}/alliancerelation-${mydate} html/${round}/alliancerelation && \
 	(perl alliancerelation2dot.pl html/round/alliancerelation-${mydate} | neato -Tsvg > html/${round}/alliancerelation-${mydate}.svg &&\
 	ln -f html/${round}/alliancerelation-${mydate}.svg html/${round}/alliancerelation.svg &&\
+	test -s html/round/alliancerelation.svg &&\
 	convert -density 70 html/round/alliancerelation.svg html/round/alliancerelation.png )&
 
 banupdate: html/badproxylist.txt banbadproxies.pl
@@ -100,7 +100,7 @@ drawall:
 	for f in www1.astrowars.com/export/history/starmap* ; do ./drawmap.pl $$f ; done
 
 dumpdbs:
-	-cp -a base/db2 /no_backup/bernhard/aw/backup/db-${mydate}
+	#-cp -a base/db2 /no_backup/bernhard/aw/backup/db-${mydate}
 #	mkdir -p html/alli/$$a/history
 #	-for a in $(allies) ; do \
 #		cp -a html/alli/$$a/{fleets.csv,history/fleets-${mydate}.csv} ; \
@@ -135,8 +135,9 @@ TA.candidate: TA.in TA.done TA.pl
 
 chpasswd:
 	REMOTE_USER=$a perl -e 'use http_auth; setdbpasswd("$p");'
-	#${htpasswd} -m -b ${htpasswdfile} $a $p
 	make reloadapache
+
+# note u=user-id
 chuserpasswd:
 	perl -e 'use http_auth; setdbpasswd_user("$u", "$p");'
 
@@ -144,7 +145,6 @@ unaccess:
 	mkdir -p old/obsolete
 #	mv base/db2/$a-relation.dbm old/obsolete
 	./removealli.pl $a
-	vim +/^$a: ${htpasswdfile}
 
 access:
 	#-cp -ia empty.dbm base/db2/$a-relation.dbm
