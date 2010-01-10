@@ -47,7 +47,7 @@ sub hsv2rgb(@)
 }
 
 
-our $colorsalt="";
+our $colorsalt="#y";
 sub colorhash($)
 {
 	if(!$_[0]) {return 0}

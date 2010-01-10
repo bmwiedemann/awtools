@@ -92,7 +92,7 @@ if(!$done) {
     awmapcgi::awmapcoordinput(),
 	 hidden("map",2),
 	 popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4])." scaling factor".br,
-    popup_menu(-name=>'type',-values=>[sort keys %$maptypes],-labels=>$maptypes, -default=>"0,1,2"), " type of map",br,
+    popup_menu(-name=>'type',-values=>[sort keys %$maptypes],-labels=>$maptypes, -default=>"0,6,1,2"), " type of map",br,
 #    hidden(-name=>"type", -value=>"1,2,3"),
 	 submit(-name=>"draw", -class=>'smbutton'), " (up to $max squares)";
 	 end_form, end_html;
