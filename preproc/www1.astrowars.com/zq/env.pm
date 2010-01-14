@@ -5,12 +5,12 @@ print "\n--Options--\n";
 foreach my $k (keys %::options) {
    print "$k=$::options{$k}\n";
 }
-print "\n--Headers--\n";
+print "\n--Headers from browser--\n";
 my $h=$::options{headers};
 foreach my $k (keys %$h) {
    print "$k = $h->{$k}\n";
 }
-print "\n--Headers2--\n";
+print "\n--Headers to AW--\n";
 my $re=$::options{request};
 my @h=$re->header_field_names();
 foreach my $h (@h) {
