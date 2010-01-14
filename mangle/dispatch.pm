@@ -62,11 +62,11 @@ sub mangle_dispatch(%) { my($options)=@_;
 
    
 # add main AWTool link
-      if((my $session=awstandard::cookie2session(${$$options{headers}}{Cookie}))) {
+      if((my $session=$$options{session})) {
          my $nclicks="";
-         my $sth2=$dbh->prepare_cached("SELECT `nclick` FROM `usersession` WHERE `sessionid` = ?");
-         my $aref=$dbh->selectall_arrayref($sth2, {}, $session);
-         $nclicks=$$aref[0][0];
+         #my $sth2=$dbh->prepare_cached("SELECT `nclick` FROM `usersession` WHERE `sessionid` = ?");
+         #my $aref=$dbh->selectall_arrayref($sth2, {}, $session);
+         $nclicks=$$options{nclick};#$$aref[0][0];
          if(defined($nclicks)) {$nclicks++}
          else {$nclicks=1}
 			$::options{nclicks}=$nclicks;
@@ -130,6 +130,7 @@ sub mangle_dispatch(%) { my($options)=@_;
          } else {
             s%Fleet</a></td>%$&<td>|</td><td>$::bmwlink/index.html">AWTools</a></td>%;
          }
+			s{(<table)(><tr><td><table bgcolor="#\d+" style="cursor: pointer;"cellspacing="0" )}{$1 class="bottomad"$2};
       }
 
 #   do "mangle/special/dispatch.pm"; 

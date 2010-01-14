@@ -13,8 +13,6 @@ use Time::HiRes qw(gettimeofday tv_interval); # for profiling
 #my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
 
 # input options hash reference
-# input $_ with HTML code of a complete page
-# output $_ with HTML of preprocd page
 sub preproc_dispatch(%) { my($options)=@_;
    my $url=$$options{url};
 #   $g=$specialname{$$options{name}};
@@ -34,12 +32,18 @@ sub preproc_dispatch(%) { my($options)=@_;
       local $/;
       my $perlinc=<$f>;
       close $f;
+		$_=undef;
       my $ret=eval $perlinc;
       next if $ret==2;
       if($@) {$module="error in $m: $@";}
 #      $module.=" preprocd $m"; 
       $brownie::process::browniedone=200;
 #      print "\n$module\n";
+		if(defined($_)) {
+			my $r=$$options{req};
+			$::options{mime} and $r->content_type($::options{mime});
+			$r->print($_);
+		}
       # is handled now, so stop filtering
       last;
    }
