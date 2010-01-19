@@ -4,6 +4,7 @@ use CGI ":standard";
 use awstandard;
 use awinput;
 awinput_init(1);
+my $forumaddr=getawwwwserver();
 print AWheader('greenbird\'s AWtools index');
 
 #foreach(qw(login arrival sim tactical tactical-large relations alliance system-info planet-info fleets feedupdate)) {
@@ -16,8 +17,8 @@ print p;
 print a({href=>"/alli/$ENV{REMOTE_USER}/"},"\U$ENV{REMOTE_USER}\E data dir"),br;
 #print a({href=>"/$ENV{REMOTE_USER}-holes.html"},"\U$ENV{REMOTE_USER}\E holes"),br;
 #print qq!<a href="/~bernhard/aw/awcalc/$ENV{REMOTE_USER}-relations.txt">\U$ENV{REMOTE_USER}\E alliance relations</a>!,br;
-my $reldate="071220";
-my $arel="gold10/alliancerelation-$reldate";
+my $reldate="100103";
+my $arel="gold17/alliancerelation-$reldate";
 print 
  a({href=>"http://aw.lsmod.de/manual.html#brownie"}, "brownie")." and ".a({href=>"http://aw21.zq1.de/"}, "no-install-brownie"),br,
  a({href=>"/abbrev.txt"}, "AW abbreviations"),br,
@@ -46,11 +47,11 @@ if(is_admin()) {
 	}
 }
  print h2("extra links"),
- a({class=>"aw", href=>"http://www1.astrowars.com/0/News/"},"AW"),br,
- a({class=>"aw", href=>"http://www1.astrowars.com/rankings/"},"AW rankings"),br,
- a({class=>"aw", href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br,
- a({class=>"aw", href=>"http://www.astrowars.com/about/battlecalculator"},"AW battle calculator")," ", a({class=>"aw", href=>"http://www1.astrowars.com/0/Trade/prices.txt"},"AW trade prices"),br,
- a({class=>"awglossary", href=>"http://www.astrowars.com/portal/Main_Page"},"AW help"),br,
+ a({class=>"aw", href=>"http://$awserver/0/News/"},"AW"),br,
+ a({class=>"aw", href=>"http://$awserver/rankings/"},"AW rankings"),br,
+ a({class=>"aw", href=>"http://$forumaddr/forums/privmsg.php"},"AW inbox"),br,
+ a({class=>"aw", href=>"http://$forumaddr/about/battlecalculator"},"AW battle calculator")," ", a({class=>"aw", href=>"http://$awserver/0/Trade/prices.txt"},"AW trade prices"),br,
+ a({class=>"awglossary", href=>"http://$forumaddr/portal/Main_Page"},"AW help"),br,
  "other tools: ".
  a({class=>"othertool", href=>"http://filix.exx.pl/aw/"}, "Filix"), " ",
  a({class=>"othertool", href=>"http://www.gipi.biz/2007-2/"}, "Gipi"), " ",

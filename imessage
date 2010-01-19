@@ -81,7 +81,8 @@ if(!$authpid) {
       $subtools.=a({-href=>"?action=$t"}, $t)." ";
    }
    print $subtools,br;
-   print a({-href=>"http://www.astrowars.com/forums/privmsg.php"},"AW inbox"),br;
+	my $forumaddr=getawwwwserver();
+   print a({-href=>"http://$forumaddr/forums/privmsg.php"},"AW inbox"),br;
    if($admin && ($options{action} eq "sendotheralli" || $options{action} eq "sendotherteam")) {
       if($options{msg}){
          my $to=awinput::get_team_pids($options{action} eq "sendotherteam", $options{alli});
