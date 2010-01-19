@@ -31,7 +31,8 @@ if(defined($options{fid})) {
          $params.="&f$f=".eval("\$e$f");
          $params.="&p$f=".eval("\$o$f");
       }
-      my $url="http://$awstandard::awforumserver/about/battlecalculator/?destroyer=$eds&cruiser=$ecs&battleship=$ebs&des=$deffleet[0]&cru=$deffleet[1]&bat=$deffleet[2]&sta=0&submit2=calculate+battle&go=1$params";
+      my $forumaddr=getawwwwserver();
+      my $url="http://$forumaddr/about/battlecalculator/?destroyer=$eds&cruiser=$ecs&battleship=$ebs&des=$deffleet[0]&cru=$deffleet[1]&bat=$deffleet[2]&sta=0&submit2=calculate+battle&go=1$params";
       print (redirect($url));
    }
 } else {
