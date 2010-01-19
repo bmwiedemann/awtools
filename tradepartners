@@ -54,12 +54,14 @@ foreach my $entry (@tap) {
    if($race && @$race && $race->[-3]) {$time=-999.9; $timeplus=-999.9} # traders dont need to save - this sorts them on top of the table
    my ($playerbonus)=$dbh->selectrow_array($sth, {}, $pid);
 #   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
-   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus]);
+	my $cl="-1";
+	if(my $player=getplayer($pid)){$cl=$player->{culture}};
+   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus,$cl]);
 }
 
-print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti pop10)], 
-         [\&display_pid, \&display_relation, \&display_round0, \&display_round0, \&display_string, \&display_round1, \&display_round0, \&display_round1, \&display_string],
-         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti pop10 culture)], 
+         [\&display_pid, \&display_relation, \&display_round0, \&display_round0, \&display_string, \&display_round1, \&display_round0, \&display_round1, \&display_string, \&display_string],
+         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
          sort_param_to_keys($options{sort}), \@tap2 );
 
 print AWtail();
