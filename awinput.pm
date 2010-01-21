@@ -70,8 +70,8 @@ sub awinput_init(;$) { my($nolock)=@_;
       if($nolock) {
 #         tie(%relation, "DB_File", $dbnamer, O_RDONLY, 0, $DB_HASH);
       } else {
-         $SIG{"ALRM"}=sub{print STDERR "alarm $alarmtime; finish\n";&awinput_finish; require POSIX; POSIX::_exit(0);};
-         alarm($alarmtime); # make sure locks are free'd
+         #$SIG{"ALRM"}=sub{select STDERR; $|=1; print STDERR "alarm $alarmtime; finish\n";&awinput_finish; require POSIX; POSIX::_exit(0);};
+         #alarm($alarmtime); # make sure locks are free'd
 #         tie(%relation, "DB_File::Lock", $dbnamer, O_RDONLY, 0, $DB_HASH, 'read');# or print $head,"\nerror accessing DB\n";
       }
    } else {
@@ -884,10 +884,13 @@ sub dblinkadd { my($sid,$url)=@_;
    elsif($url=~m!http://lesnains\.darkbb\.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="NAIN" } # some custom phpBB mod?
    elsif($url=~m!http://spin.forumzen.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="SpIn" } # some custom phpBB mod?
    elsif($url=~m!http://en\.forumactif\.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="EN" } # some custom phpBB mod?
-   elsif($url=~m!http://alien.forum2jeux.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="AN" } # some custom phpBB mod?
-   elsif($url=~m!http://mtg-aw.forumzen.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="MtG" } # some custom phpBB mod?
+   elsif($url=~m!http://alien\.forum2jeux\.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="AN" } # some custom phpBB mod?
+   elsif($url=~m!http://mtg-aw\.forumzen\.com/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="MtG" } # some custom phpBB mod?
+   elsif($url=~m!http://quartiergeneral\.superforum\.fr/[a-z0-9/-]+/[0-9a-z-]+-[pt](\d+)\.htm!i) { $type="CRS" } # some custom phpBB mod?
+   elsif($url=~m!http://cpgfh\.esc58\.com/+niai/viewtopic\.php.*!) { $type="NIAI" } # phpBB
    elsif($url=~m!http://quicheinside\.free\.fr/viewtopic\.php\?[pt]=(\d+)!) { $type="QI" } # phpBB
    elsif($url=~m!http://(?:www\.)vbbyjc\.com/phpBB2/viewtopic\.php\?[pt]=(\d+)!) { $type="SW" } # phpBB
+   elsif($url=~m!http://www\.atfreeforum\.com/pikansjos/viewtopic\.php\?[pt]=(\d+)!) { $type="UFO" } # phpBB
    elsif($url=~m!http://sw\.wirleo\.com/viewtopic\.php\?[pt]=(\d+)!) { $type="SW" } # phpBB
    elsif($url=~m!http://allianceffa.free.fr/ZeForum/viewtopic\.php\?[pt]=(\d+)!) { $type="FFA" } # phpBB
    elsif($url=~m!http://www.ionstorm-alliance.com/forum/viewtopic\.php\?[pt]=(\d+)!) { $type="IS" } # phpBB
@@ -1087,7 +1090,7 @@ sub fleet_launch_url($)
 	($sidpid, $opts{inf}, $opts{col}, $opts{des}, $opts{cru}, $opts{bat})=@$f[3,8..12];
 	$opts{nr}=sidpid2sidm($sidpid);
 	my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
-	return("http://www1.astrowars.com/0/Fleet/Launch.php/?$params&id=".sidpid2pidm($sidpid));
+	return("http://$awserver/0/Fleet/Launch.php/?$params&id=".sidpid2pidm($sidpid));
 }
 
 our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
@@ -1161,11 +1164,12 @@ sub display_sid($) { my($sid)=@_;
    my ($x,$y)=systemid2coord($sid);
    a({-href=>"system-info?id=$sid"},"$sid($x,$y)");
 }
-sub display_sid2($) { my($sid)=@_;
+sub display_sid2($;$) { my($sid,$pid)=@_;
    my $name=systemid2name($sid);
    return "" if ! $name;
    my ($x,$y)=systemid2coord($sid);
-   return a({-href=>"http://$bmwserver/cgi-bin/system-info?id=$sid"},"$name ($x,$y)");
+	my $extra=($pid?"&target=$pid":"");
+   return a({-href=>"http://$bmwserver/cgi-bin/system-info?id=$sid$extra"},"$name ($x,$y)");
 }
 
 sub sort_pid($$) {lc(playerid2name($_[0])) cmp lc(playerid2name($_[1]))}
