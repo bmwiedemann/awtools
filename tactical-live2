@@ -29,10 +29,11 @@ foreach my $p (qw(xs xe ys ye)) {
 if(!defined($options{type}) || $options{type}!~m/^[0-9,]+$/) {$options{type}="0,1,2"}
 my $imgsize=bmwround($options{scale}*13);
 
+awinput_init(1);
+print header(-connection=>"Keep-Alive", -keep_alive=>"timeout=15, max=99", -expires=>awstandard::HTTPdate(time()+24*3600));
 if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>100 || $options{ye}>100))
 {
-   awinput_init(1);
-   print AWheader($title, qq(<style type="text/css"><!-- img {border:0;} --></style>));
+	print AWheader2($title, qq(<style type="text/css"><!-- img {border:0;} --></style>));
 	my $xe=round($options{xs}+$options{xe}/2);
 	my $ye=round($options{ys}+$options{ye}/2);
 	my $xs=$xe-$options{xe};
@@ -64,8 +65,7 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 	print "</table>";
    awinput::awinput_finish();
 } else {
-   awinput_init(1);
-	print header(), AWheader2($title);
+	print AWheader2($title);
 	print start_form(-method=>'get', -name=>"form"), 
     awmapcgi::awmapcoordinput(),
     popup_menu(-name=>'scale',-values=>[1,1.5,2,2.5,3,4], -default=>2)," scaling factor",br,
