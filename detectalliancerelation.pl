@@ -79,7 +79,7 @@ for my $sid (1..6000) {
 	if($pop<$minpop) {$minpop=$pop}
 	my $aid=playerid2alliance($o);
 	if(!$aid) {next}
-	if($awinput::alliances{$aid}{points}<270 && allianceid2members($aid)<8) {next}
+	if($awinput::alliances{$aid}{points}<10 && allianceid2members($aid)<5) {next}
 	$allis{$aid}++;
 	my $sidpid="$sid#$plid";
 	my $n=0;
