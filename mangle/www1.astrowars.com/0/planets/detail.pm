@@ -45,7 +45,7 @@ s%^([^<]+) (\d{1,2})(</td></tr>)%manglesys($1, $2).$3%me;
 my $dscost="";
 if(m%/0/Glossary//\?id=17> Destroyer.*\n<td colspan="2">\d+/(\d+)</td></tr>%) {
    $dscost="&amp;dscost=$1";
-   s%(<td><a href="/0/Planets/Spend_Points.php/\?p=\d+&)(i=\d+)("><b>Spend Points</b></a></td>)%$1amp;$2$dscost$3%;
+   s%(<td><a href="/0/Planets/Spend_Points.php/\?p=\d+&)(i=\d+)("><b>Spend Points</b></a></td>)%$1amp;$2$dscost" accesskey="s$3%;
 }
 
 
@@ -84,6 +84,7 @@ if($::options{name}) {
  }
 }
 
+my $sbautogrowth=int($data->{starbase}->{num})*0.2;
 # add +1 build links when there is enough PP
 foreach my $n (0..$#buildings) {
    my $buil=$buildings[$n];
@@ -92,8 +93,12 @@ foreach my $n (0..$#buildings) {
    if($mangle::dispatch::g) {
 #      $debug.="$level $ppneeded<br>";
    }
-   if($ppneeded>$pp && $ppplus && $prodbonus) {
-      my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%0.f%%)</span>",($ppneeded-$realpp)/$ppplus/$prodbonus, 100*$prodbonus);
+   if($ppneeded>$pp && $ppplus && $prodbonus) { # add remaining hours
+		my $ppplusbonus=$ppplus*$prodbonus;
+		if($n==4) { # SB-autogrowth
+			$ppplusbonus+=$sbautogrowth;
+		}
+      my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%0.f%%)</span>",($ppneeded-$realpp)/$ppplusbonus, 100*$prodbonus);
       s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5&nbsp;$hours$6%;
       next;
    }
@@ -122,9 +127,8 @@ if($popplus && $popbonus) { # add hours to pop-growth
 }
 
 # add SB auto-growth
-my $sb=$data->{starbase}->{num};
-if($sb) {
-	my $hours=sprintf("<span style=\"color:green\">in&nbsp;%.1fh</span>", $data->{starbase}->{remain}/($sb*0.2));
+if($sbautogrowth) {
+	my $hours=sprintf("<span style=\"color:green\">in&nbsp;%.1fh</span>", $data->{starbase}->{remain}/$sbautogrowth);
 	my $buil="Starbase";
 	s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)%$1$2$3$4$5&nbsp;$hours%;
 }
