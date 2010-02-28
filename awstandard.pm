@@ -10,7 +10,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
 qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &wikilink getawwwwserver
-&mon2id &parseawdate &getrelationclass &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &file_content &url2pm &awmax &awmin &getauthpid &getparsed
+&mon2id &parseawdate &getrelationclass &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &url_encode &file_content &url2pm &awmax &awmin &getauthpid &getparsed
       $magicstring $style $server $awserver $bmwserver $toolscgiurl $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir @racebonus %artifact);
 
 use CGI ":standard";
@@ -21,6 +21,7 @@ our $server="www1.astrowars.com";       # AW game host
 our $awserver="www1.astrowars.com";     # proxied AW game host
 our $awforumserver="www.astrowars.com"; # AW forum host
 our $bmwserver="aw.lsmod.de";           # the domain name you use for the AWTools
+our $bmwproxyaddr="aw21.zq1.de";
 our $proxyip="192.168.236.1";
 our $toolscgiurl="";#"http://$bmwserver/cgi-bin/";
 our $basedir;
@@ -84,7 +85,7 @@ sub awstandard_init() {
          }
 			if($awtstyle) {$style=$awtstyle}
       }
-		$awserver="aw21.zq1.de";
+		$awserver=$bmwproxyaddr;
       my ($proxy)=get_one_row("SELECT `proxy` FROM `usersession` WHERE `pid` = ? ORDER BY `lastclick` DESC LIMIT 1", [$pid]);
 		if($proxy) { $awserver=$proxy; }
    }
@@ -436,6 +437,12 @@ sub html_encode($) {
    return if not $_[0];
    $_[0]=~s/[<>"]/$htmlcode{$&}/g;
 }
+sub url_encode($) {
+   return if not $_[0];
+   my $x=shift;
+   $x=~s/[^a-zA-Z0-9.-]/sprintf("%%%02x",ord($&))/ge;
+   return $x;
+}
 
 sub file_content($) {my($fn)=@_;
    open(FCONTENT, "<", $fn) or return undef;
@@ -497,7 +504,7 @@ sub getauthpid()
 sub isproxy($)
 {
 	my($ip)=@_;
-	if($ip eq $awstandard::proxyip || $ip=~m/192\.168\.23[456]\.\d+/ || $ip eq "10.8.0.5" || $ip eq "85.25.150.94") {return 1}
+	if($ip eq $awstandard::proxyip || $ip=~m/192\.168\.23[456]\.\d+/ || $ip=~m(10\.8\.0\.)) {return 1}
 	return 0;
 }
 
