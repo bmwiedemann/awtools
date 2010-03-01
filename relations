@@ -10,6 +10,7 @@ use awinput;
 use awlogins;
 use arrival;
 use awhtmlout;
+use awbuilding;
 use DBAccess2;
 awinput_init();
 
@@ -179,13 +180,40 @@ if($options{name}) {# && $options{name} ne "unknown") {
 #		require "guess.pm";
 #		printf (br."race fighter%.4f ranker%.4f\n",guessrace([getpubdata($id)]));
 		print br,$user," owns $planets planets<ul>";
+		my $internalplanets=getbuilding_player($id);
+		my %internalplanet;
+		foreach my $ip (@$internalplanets) { # hash result array
+			my $sidpid=shift(@$ip);
+			$internalplanet{$sidpid}=$ip;
+		}
+		my($iptotalpp, $iptotalpop, $iptotalpoppoints);
 		foreach my $pp (@planets) {
 			my $sid=planet2sid($pp);
 			my $pid=planet2pid($pp);
+			my $sidpid=sidpid22sidpid3m($sid,$pid);
+			my $ip=$internalplanet{$sidpid};
+			my $ipextra="";
+			if($ip) {
+				my (undef,undef,undef,$ippop,$ippp,$hf,$rf,$gc,$rl,$sb,$updated_at)=@$ip;
+	#			print "debug: @$ip<br/>\n";
+				$ipextra=sprintf(' <span style="color:green">pop=%.2f pp=%i hf=%i rf=%i gc=%i rl=%i</span>', $ippop, $ippp, $hf, $rf, $gc, $rl);
+				$iptotalpp+=$ippp;
+				$iptotalpop+=$ippop;
+				if($ippop>10) {
+					$ippop=int($ippop);
+					$iptotalpoppoints+=$ippop-10;
+					if($ippop>20) {
+						$iptotalpoppoints+=$ippop-20;
+					}
+				}
+			}
          my $s=planet2siege($pp);
 			my ($x,$y)=systemid2coord($sid);
 			my $link=a({-href=>"system-info?id=$sid&target=$pid"},systemid2name($sid));
-			print li({-style=>"font-family: monospace;".($s?" background-color: red;":"")},sprintf(qq!(%2i,%2i) #%2i : pop=%2i SB=%2i $link\n!, $x, $y, $pid, planet2pop($pp), planet2sb($pp)));
+			print li({-style=>"font-family: monospace;".($s?" background-color: red;":"")},sprintf(qq!(%2i,%2i) #%2i : pop=%2i%s SB=%2i $link\n!, $x, $y, $pid, planet2pop($pp), $ipextra, planet2sb($pp)));
+		}
+		if($iptotalpp && $iptotalpop) {
+			print li(sprintf("predicted: totalpop=%.2f, points=%i+%i+%i=%i totalpp=%i", $iptotalpop, $level, $iptotalpoppoints, $scipoints-$poppts, $level+$iptotalpoppoints+$scipoints-$poppts, $iptotalpp));
 		}
 		print "</ul>\n";
       my $fleets=awinput::playerid2fleets($id, "ORDER BY `sidpid` ASC, `eta` ASC, `lastseen` ASC");
