@@ -186,7 +186,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 			my $sidpid=shift(@$ip);
 			$internalplanet{$sidpid}=$ip;
 		}
-		my($iptotalpp, $iptotalpop, $iptotalpoppoints);
+		my($iptotalpp, $iptotalpop, $iiptotalpoppoints, $iptotalpoppoints);
 		foreach my $pp (@planets) {
 			my $sid=planet2sid($pp);
 			my $pid=planet2pid($pp);
@@ -200,10 +200,12 @@ if($options{name}) {# && $options{name} ne "unknown") {
 				$iptotalpp+=$ippp;
 				$iptotalpop+=$ippop;
 				if($ippop>10) {
-					$ippop=int($ippop);
+					my $iippop=int($ippop);
 					$iptotalpoppoints+=$ippop-10;
+					$iiptotalpoppoints+=$iippop-10;
 					if($ippop>20) {
 						$iptotalpoppoints+=$ippop-20;
+						$iiptotalpoppoints+=$iippop-20;
 					}
 				}
 			}
@@ -213,7 +215,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 			print li({-style=>"font-family: monospace;".($s?" background-color: red;":"")},sprintf(qq!(%2i,%2i) #%2i : pop=%2i%s SB=%2i $link\n!, $x, $y, $pid, planet2pop($pp), $ipextra, planet2sb($pp)));
 		}
 		if($iptotalpp && $iptotalpop) {
-			print li(sprintf("predicted: totalpop=%.2f, points=%i+%i+%i=%i totalpp=%i", $iptotalpop, $level, $iptotalpoppoints, $scipoints-$poppts, $level+$iptotalpoppoints+$scipoints-$poppts, $iptotalpp));
+			print li(sprintf("predicted: totalpop=%.2f, points=%i+%i+%i=%i+%.2f totalpp=%i", $iptotalpop, $level, $iiptotalpoppoints, $scipoints-$poppts, $level+$iiptotalpoppoints+$scipoints-$poppts, $iptotalpoppoints-$iiptotalpoppoints, $iptotalpp));
 		}
 		print "</ul>\n";
       my $fleets=awinput::playerid2fleets($id, "ORDER BY `sidpid` ASC, `eta` ASC, `lastseen` ASC");
