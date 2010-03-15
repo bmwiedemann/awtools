@@ -18,7 +18,7 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 &awinput_init &getrelation &getallirelation &setallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &getplayer &getalliance 
 &playerid2lasttag &playerid2pseudotag &playerid2link &playerid2link2 &getplanetinfom &getplanetinfo &setplanetinfo &systemname2id &systemcoord2id &systemid2name &systemid2level &systemid2coord &systemid2link &systemid2planets &allianceid2tag &allianceid2members &alliancetag2id &playerid2alliance &playerid2alliancem &playerid2planets &playerid2planetsm &playerid2tag &playerid2tagm &planet2sb &planet2pop &planet2opop &planet2owner &planet2siege &planet2pid &planet2sid &getatag &getallidetailurl &playerid2plans &showplan &getlivealliscores &settoolsaccess_rmask &settoolsaccess
 &sidpid2planet &getplanet2 &sidpid22sidpid3 &sidpid32sidpid2 &sidpid22sidpid3m &sidpid32sidpid2m 
-&playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround
+&playerid2ir &playerid2iir &playerid2etc &playerid2production &relation2production &getartifactprice &getallproductions &show_fleet &dbfleetaddinit &dbfleetadd &dbfleetaddfinish &dbplayeriradd &dblinkadd &getauthname &getusernamecookie &getuseridcookie &is_admin &is_extended &is_founder &is_startofround &predict_points
 &display_pid &display_relation &display_atag &display_sid &display_sid2 &sort_pid
 );
 
@@ -590,6 +590,7 @@ sub playerid2production($) { my($pid)=@_;
    for(my $i=0; $i<4; ++$i){
       $bonus[$i]=$race->[$bonusmap[$i]]*(1+$t);
    }
+	if($player{$pid}{points}>=500) {$bonus[3]=0.01} # countdown -99% rule
 	push(@prod, \@bonus);
 #	for(my $i=0; $i<3; ++$i){ $prod[$i]+=$bonus[$i]; }
 	return \@prod;
@@ -1250,6 +1251,66 @@ sub getlastlog($)
 		if($n<$dblog) { return undef; } # stale/outdated data
 #		print "@$log $dblog<br>\n";
 		return $time;
+	}
+	return undef;
+}
+
+# input: player ID
+# output: [floatpoppoints, poppoints, scipoints, plpoints, totalpp]
+sub predict_points($)
+{
+	require awbuilding;
+	my $id=shift;
+	my $pl;
+	if($id>2) {$pl=getplayer($id)}
+	return undef unless $pl;
+	my @pl=playerid2planetsm($id);
+	my ($level,$pop,$scipoints)=get_one_row("SELECT level,`opop`,points-$plpointsfactor*level FROM `player` WHERE `pid` = ?", [$id]);
+	my @planets;
+	my $poppts=0;
+# get pop points from CSV
+	foreach my $p (@pl) {
+		my $pp=getplanet2($p);
+		push(@planets, $pp);
+		my $ppop=planet2opop($pp);
+		next if $ppop<10;
+		$poppts+=$ppop-10;
+		next if $ppop<20;
+		$poppts+=$ppop-20;
+	}
+
+# get brownie data
+	my $internalplanets=awbuilding::getbuilding_player($id);
+	my %internalplanet;
+	foreach my $ip (@$internalplanets) { # hash result array
+		my $sidpid=shift(@$ip);
+		$internalplanet{$sidpid}=$ip;
+	}
+	my($iptotalpp, $iptotalpop, $iiptotalpoppoints, $iptotalpoppoints);
+	foreach my $pp (@planets) {
+		my $sid=planet2sid($pp);
+		my $pid=planet2pid($pp);
+		my $sidpid=sidpid22sidpid3m($sid,$pid);
+		my $ip=$internalplanet{$sidpid};
+		my $ipextra="";
+		if($ip) {
+			my (undef,undef,undef,$ippop,$ippp)=@$ip;
+			$iptotalpp+=$ippp;
+			$iptotalpop+=$ippop;
+			if($ippop>10) {
+				my $iippop=int($ippop);
+				$iptotalpoppoints+=$ippop-10;
+				$iiptotalpoppoints+=$iippop-10;
+				if($ippop>20) {
+					$iptotalpoppoints+=$ippop-20;
+					$iiptotalpoppoints+=$iippop-20;
+				}
+			}
+		}
+	}
+# TODO: simulate extra science points
+	if($iptotalpp && $iptotalpop) {
+		return [$iptotalpoppoints, $iiptotalpoppoints, $scipoints-$poppts, $plpointsfactor*$level];
 	}
 	return undef;
 }
