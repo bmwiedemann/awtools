@@ -39,7 +39,21 @@ sub manglesys($$) {my($sysname, $planet)=@_;
    return $result;
 }
 
-s%^([^<]+) (\d{1,2})(</td></tr>)%manglesys($1, $2).$3%me;
+my $recommend="";
+
+if(1 || $::options{name} eq "pikansjos" || $::options{name} eq "Marstranger" || $::options{name} eq "greenbird") {
+	require awrecommend;
+	my $rec=awrecommend::planet_building_recommend($data);
+	if($rec && $rec->{building}) {
+		my $rectext=awrecommend::get_recommendation_text($rec);
+		my $recurl=awrecommend::get_recommendation_build_url($data,$rec);
+		$recurl=~s/&/&amp;/;
+		$rectext=~s/PP/$&<br>/;
+		$recommend=qq'<tr class="bmwdarkmessagebox"><td colspan="5"><a href="$recurl">Do it</a>: $rectext</td></tr>';
+	}
+}
+
+s%^([^<]+) (\d{1,2})(</td></tr>)%manglesys($1, $2).$3.$recommend%me;
 
 # find and pass cost of destroyer
 my $dscost="";
