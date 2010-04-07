@@ -2,7 +2,7 @@
 use strict;
 use DBAccess;
 use awstandard;
-my $oldname="gold13";
+my $oldname=readlink "html/round";#"gold18";
 my $newname=$oldname;
 $newname=~s/(\d+)$/1+$1/e;
 my $newround=1;
@@ -14,14 +14,15 @@ if($newround) {
    foreach(qw"player alliances") {
       system("cp -a $_.csv $_.csv.$oldname");
    }
-   system("ssh root\@alpha cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
+#   system("ssh root\@delta cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
+#	if($?>>8) {die "backup failed";}
 }
 system("./updatelasttag.pl");
 $dbh->do("UPDATE playerextra SET premium=NULL");
 $dbh->do("UPDATE planets SET ownerid=0");
 $dbh->do("UPDATE intelreport SET racecurrent=0");
 $dbh->do("UPDATE intelreport SET biology=NULL, economy=NULL, energy=NULL, mathematics=NULL, physics=NULL, social=NULL");
-foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhistory planetinfos player useralli internalintel logins tradelive)) {
+foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhistory planetinfos player useralli internalintel internalplanet logins tradelive)) {
    $dbh->do("TRUNCATE TABLE `$name`");
 }
 
@@ -39,5 +40,7 @@ awstandard::set_file_content("player.csv", "rank\tpoints\tid\tscience\tculture\t
 awstandard::set_file_content("battles.csv", "id\tcv_def\tcv_att\tatt_id\tdef_id\twin_id\tplanet_id\tsystem_id\ttime\n");
 awstandard::set_file_content("systemexportsecret", rand(1000000000000000)."\n");
 
-system("make importcsv");
+system(qw"/usr/bin/perl -i -pe", '@a=split("\t"); if($notfirst){$a[2]=$a[3]=$a[4]=$a[5]=0} $_=join("\t",@a)."\n"; $notfirst=1', "planets.csv");
 
+system("make importcsv");
+print "do not forget to start new log\n";
