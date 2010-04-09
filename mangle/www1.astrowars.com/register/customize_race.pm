@@ -74,7 +74,16 @@ s{<!-- Begin}{$&\nvar races = $racejson;\nvar racestr = ["growth", "science", "c
 
 s{<FORM name="race" method="post">}{}; # move below racetype form
 
-s{<br>Race link}{<br>\n<br><form name="racetypeform"><select name="racetype" id="racetype">
-$raceselect</select> <input type="button" class="smbutton" value="preview race" onclick="use_race_template(races[document.getElementById('racetype').value])"></form><form name="race" method="post">$&};
+s{<br>Race link}{<br>\n<br><div align="center"><form name="racetypeform" action=""><select name="racetype" id="racetype">
+$raceselect</select> <input type="button" class="smbutton" value="preview race" onclick="use_race_template(races[document.getElementById('racetype').value])"></form></div><form name="race" method="post" action="">$&};
+
+
+
+# HTML standard conformity
+s{<html>\s*<head>}{<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+$&
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">};
+
+s{LANGUAGE="JavaScript"}{language="JavaScript" type="text/javascript"}gi;
 
 1;
