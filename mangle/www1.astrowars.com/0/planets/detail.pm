@@ -17,6 +17,8 @@ if($planet != $data->{n}-1) {
 # add access keys
 s{>Previous</a></td>}{ accesskey="p" $&};
 s{>Next</a></td>}{ accesskey="n" $&};
+s{>Buildings</a></td>}{ accesskey="b" $&};
+s{>Overview</a></td>}{ accesskey="o" $&};
 # end
 
 
@@ -130,7 +132,8 @@ foreach my $n (0..$#buildings) {
    #$onclickjs="";
 
 	my $intpp=int($pp);
-   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" href="/0/Planets/Spend_Points.php/?p=$intpp&amp;i=$planet&amp;points=$5&amp;produktion=$awstandard::buildingval[$n]$dscost" style="background-color:blue" onclick="
+	my $np1=$n+1;
+   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" accesskey=$np1 href="/0/Planets/Spend_Points.php/?p=$intpp&amp;i=$planet&amp;points=$5&amp;produktion=$awstandard::buildingval[$n]$dscost" style="background-color:blue" onclick="
 	document.form.points.value='$5'; $onclickjs">+1</a>$6%;
 #   $debug.="<br>test: $buil $val[$n] $2 $4";
 }
