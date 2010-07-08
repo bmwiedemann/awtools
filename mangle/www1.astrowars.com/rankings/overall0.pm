@@ -14,7 +14,7 @@ if($allicd && $allicd->[0]) {
 	foreach my $e (@{$data->{entry}}) {
 		my $dl=$e->{daysleft};
 		if($dl==-1){$dl=1000}
-		while((my $alli=$allicd->[$nalli]) && $alli->[3] < $dl) {
+		while((my $alli=$allicd->[$nalli]) && $allicd->[$nalli]->[3] < $dl) {
 			++$nalli;
 			# insert $alli above $e
 #			my @e=%$e; $_.="@$alli -- @e";
