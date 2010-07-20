@@ -10,8 +10,8 @@ $VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
 @ISA = qw(Exporter);
 @EXPORT = 
 qw(&awstandard_init &bmwround &bmwmod &awdiag &AWheader3 &AWheader2 &AWheader &AWtail &AWfocus &wikilink getawwwwserver
-&mon2id &parseawdate &getrelationclass &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &url_encode &file_content &url2pm &awmax &awmin &getauthpid &getparsed
-      $magicstring $style $server $awserver $bmwserver $toolscgiurl $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir @racebonus %artifact);
+&mon2id &parseawdate &getrelationclass &getrelationcolor &getstatuscolor &planetlink &profilelink &alliancedetailslink &systemlink &alliancelink &addplayerir &fleet2cv &addfleet &relation2race &relation2science &gmdate &AWtime &AWisodate &AWisodatetime &AWreltime &sb2cv &title2pm &safe_encode &html_encode &url_encode &file_content &url2pm &awmax &awmin &getauthpid &getparsed &build_url
+      $plpointsfactor $magicstring $style $server $awserver $bmwserver $toolscgiurl $timezone %planetstatusstring %relationname $interbeta $basedir $dbdir @racebonus %artifact);
 
 use CGI ":standard";
 use Time::Local;
@@ -39,6 +39,7 @@ our $interbeta=0;
 our $style;
 our $timezone;
 our $updatetime15=16*60;
+our $plpointsfactor=1;
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 our %month=qw(Jan 1 Feb 2 Mar 3 Apr 4 May 5 Jun 6 Jul 7 Aug 8 Sep 9 Oct 10 Nov 11 Dec 12);
 our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
@@ -117,6 +118,8 @@ sub awdiag($) { my ($str)=@_;
    close(LOG);
 }
 
+our %headerlinkmap=(imessage=>"BIM");
+
 sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
@@ -125,14 +128,15 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/code/css/tools/common.css" />!);
 #   push(@$heads, "<title>$title</title>");
 	$owncgi=~s!/cgi-bin/(?:modperl/)?!!;
-	foreach my $item (qw(index.html tactical-live tactical-live2 relations allirelations alliance system-info fleets)) {
+	foreach my $item (qw(index.html tactical-live tactical-live2 relations allirelations alliance system-info fleets imessage)) {
 		my %h=(href=>$item);
+		my $linktext=$headerlinkmap{$item}||$item;
 		if($item eq $owncgi) {
 			$h{class}='headeractive';
-			$links.="|".span({-class=>"headeractive"},"&nbsp;".a(\%h,$item)." ");
+			$links.="|".span({-class=>"headeractive"},"&nbsp;".a(\%h,$linktext)." ");
 			next;
 		}
-		$links.="|&nbsp;".a(\%h,$item)." ";
+		$links.="|&nbsp;".a(\%h,$linktext)." ";
 	}
 	if($ENV{HTTP_AWPID}) {
 		$links.="|&nbsp;".a({-href=>"relations?id=$ENV{HTTP_AWPID}"}, "self");
@@ -438,7 +442,7 @@ sub html_encode($) {
    $_[0]=~s/[<>"]/$htmlcode{$&}/g;
 }
 sub url_encode($) {
-   return if not $_[0];
+   return if not defined $_[0];
    my $x=shift;
    $x=~s/[^a-zA-Z0-9.-]/sprintf("%%%02x",ord($&))/ge;
    return $x;
@@ -521,6 +525,17 @@ sub map_forward_ip($)
 		$ip="127.".join(".",@a[0..2]);
 	}
 	return $ip
+}
+
+sub build_url(%)
+{ my($f)=@_;
+   my %opts;
+   foreach my $k (qw(i points)) {
+      $opts{$k}=$f->{$k};
+   }
+   $opts{produktion}=$awstandard::buildingval[$f->{type}];
+   my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
+   return("http://$awserver/0/Planets/submit.php?$params");
 }
 
 sub getparsed($)
