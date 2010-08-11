@@ -1,9 +1,6 @@
 use strict;
 use awinput;
 
-# add system ID tool links
-s%(<tr align=center bgcolor=#\d+><td[^>]*>)(\d+)(</td><td>)(\d+)%$1$::bmwlink/system-info?id=$2&target=$4">$2</a>$3$4%g;
-
 # add next and prev buttons
 if($::options{url}=~/id=(\d+)/) {
    my $id=$1;
@@ -76,5 +73,35 @@ if(0) {
    }
 #   $_.="<br>t:$trade a:$arti b:@bonus<br>";
 }
+
+
+use awbuilding;
+# add data from internalplanet collection
+sub popsubst($$$)
+{
+	my($sid,$pid,$pop)=@_;
+	my $v=getbuilding_sidpid($sid,$pid);
+	if($v && $v->[0]) {
+		my $pop2=$v->[0]->[4];
+		my $pp=$v->[0]->[5];
+		if($pop2) {
+			my $extra="";
+			if($pop != int($pop2)) {$extra=$pop." | "}
+			$pop=sprintf("%s%.2f",$extra,$pop2);
+		}
+		if($pp) {
+			return "$pop pp:".int($pp);
+		}
+	}
+	return $pop;
+}
+
+if(1){#$mangle::dispatch::g) {
+	s%(<tr align=center bgcolor=#\d+><td[^>]*>)(\d+)(</td><td>)(\d+)(</td><td>)(\d+)%$1.$2.$3.$4.$5.popsubst($2,$4,$6)%ge;
+}
+
+# add system ID tool links
+s%(<tr align=center bgcolor=#\d+><td[^>]*>)(\d+)(</td><td>)(\d+)%$1$::bmwlink/system-info?id=$2&target=$4">$2</a>$3$4%g;
+
 
 1;
