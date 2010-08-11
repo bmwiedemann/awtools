@@ -128,6 +128,7 @@ if($sid && $pid) {
 	my $loop=setdest($sid,$pid,"loop fleet");
 	s%(<td colspan=")3(" bgcolor='#602020'> <input type="submit".*</td>)%${1}1$2<td colspan="2" bgcolor="#206020">$loop</td><!-- loopmark -->%;
 
+# add planed planets as targets
 	my $plans=playerid2plans($::options{pid});
 	my $pstr="";
 	foreach my $plan (@$plans) {
@@ -138,8 +139,9 @@ if($sid && $pid) {
 		$statusstr=~s/ by//;
 		my $sysname=systemid2name($sid);
 		my $setstr=setdest($sid,$pid,"to $sid#$pid");
+		$info=~s/\n/<br>/g;
 #		$pstr.="$setstr @$plan<br/>\n";
-		$pstr.="<tr><td bgcolor='$scolor'>$statusstr: <a href=\"/0/Map/Detail.php/?nr=$sid&highlight=$pid\">$sysname#$pid</a></td><td bgcolor='#404040' style='padding-left: 5px' colspan=2>$setstr</td></tr>";
+		$pstr.="<tr><td bgcolor='$scolor'>$statusstr: <a href=\"/0/Map/Detail.php/?nr=$sid&highlight=$pid\">$sysname#$pid</a></td><td bgcolor='#404040' style='padding-left: 5px' colspan=2>$setstr</td><td></td><td>$info</td></tr>";
 	}
 	s{<!-- loopmark --></tr>}{$&$pstr};
 #	s{</body>}{<br>$pstr $&};
