@@ -106,8 +106,8 @@ if(1) {
 
 
 # add echo of destination
-   my $destname=display_sid2($destsid);
-   my $srcname=display_sid2($srcsid);
+   my $destname=display_sid2($destsid,$destpid);
+   my $srcname=display_sid2($srcsid,$srcpid);
    
 # add awauth
    for my $l ($destname, $srcname) {
