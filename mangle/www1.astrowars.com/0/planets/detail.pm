@@ -51,7 +51,7 @@ if(1 || $::options{name} eq "pikansjos" || $::options{name} eq "Marstranger" || 
 		my $recurl=awrecommend::get_recommendation_build_url($data,$rec);
 		$recurl=~s/&/&amp;/;
 		$rectext=~s/PP/$&<br>/;
-		$recommend=qq'<tr class="bmwdarkmessagebox"><td colspan="5"><a href="$recurl">Do it</a>: $rectext</td></tr>';
+		$recommend=qq'<tr class="bmwdarkmessagebox"><td colspan="5"><a href="$recurl" accesskey="d">Do it</a>: $rectext</td></tr>';
 	}
 }
 
