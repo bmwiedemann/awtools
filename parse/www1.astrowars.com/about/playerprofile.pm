@@ -41,9 +41,7 @@ foreach my $line (m{<tr.(.+?)</td></tr>}gs) {
 		if($post=~m{ \((\d+)(?:th|rd|nd|st)\)</font></b>$}) {
 			$d->{permanentrank}=$1;
 		}
-		if($post=~m{<small>Premium Member</small>}) {
-			$d->{premium}=1;
-		}
+		$d->{premium}=($post=~m{<small>Premium Member</small>})||0;
 	} elsif($line=~m{^<td colspan="2"><a href=http://www\.astrowars\.com/forums/privmsg\.php\?mode=post&u=(\d+)>Send Private Message</a>$}) {
 		$d->{pid}=int($1);
 	} elsif($line=~m{^align="center" bgcolor="#181818"} || $line=~m{^bgcolor="#402525"} || $line=~m{^<td>\s*<b>About<br>}) {

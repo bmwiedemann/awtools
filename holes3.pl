@@ -8,9 +8,12 @@ awinput_init(1);
 
 sub holesort { $$a[3]<=>$$b[3] || $$b[1]<=>$$a[2]}
 
-my $aid=alliancetag2id($ENV{REMOTE_USER});
+my $alli=$ENV{REMOTE_USER};
+my $aid=alliancetag2id($alli);
+#die "error: tag $alli not found" if(!$aid);
 exit 0 if(!$aid);
 my @members=allianceid2members($aid);
+#die "error: $alli has zero members" if(!@members || !$members[0]);
 exit 0 if(!@members || !$members[0]);
 
 #print "@members";

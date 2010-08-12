@@ -590,7 +590,7 @@ sub playerid2production($) { my($pid)=@_;
    for(my $i=0; $i<4; ++$i){
       $bonus[$i]=$race->[$bonusmap[$i]]*(1+$t);
    }
-	if($player{$pid}{points}>=500) {$bonus[3]=0.01} # countdown -99% rule
+	if($player{$pid} && $player{$pid}{points}>=500) {$bonus[3]=0.01} # countdown -99% rule
 	push(@prod, \@bonus);
 #	for(my $i=0; $i<3; ++$i){ $prod[$i]+=$bonus[$i]; }
 	return \@prod;
@@ -876,6 +876,7 @@ sub dblinkadd { my($sid,$url)=@_;
 #   elsif($url=~m!http://xtasisrebellion\.free\.fr/phpnuke/modules\.php\?name=Forums&file=viewtopic&t=(\d+)!) { $type="XR" } # hacked and outdated
    elsif($url=~m!http://xtasisrebellion\.xt\.ohost\.de/forum/index\.php\?topic=([0-9.]+)!) { $type="XR" } # SMF
    elsif($url=~m!http://(?:www\.)?ionstorm-alliance\.org/index\.php\?topic=([0-9.]+)!) { $type="IS" } # SMF
+   elsif($url=~m!http://(?:www\.)?eldruun.fr/cosa/index\.php\?topic=([0-9.]+)!) { $type="COSA" } # SMF
    elsif($url=~m!http://www.anacronic.com/FIR/index.php\?topic=([0-9.]+)!) { $type="FIR" } # SMF
    elsif($url=~m!http://frozenstar.zoreille.info/index.php\?topic=([0-9.]+)!) { $type="FrS" } # SMF
    elsif($url=~m!http://www.aw-oceans11.de/smf/index.php\?topic=([0-9.]+)!) { $type="OXI" } # SMF
@@ -1093,6 +1094,7 @@ sub fleet_launch_url($)
 	my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
 	return("http://$awserver/0/Fleet/Launch.php/?$params&id=".sidpid2pidm($sidpid));
 }
+
 
 our %fleetcolormap=(1=>"#777", 2=>"#d00", 3=>"#f77");
 # input: 1 row from fleet table

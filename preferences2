@@ -61,6 +61,7 @@ if(!$authpid) {
          submit(-name=>"save", -class=>'smbutton'),end_form.AWfocus("form.p");
    }
 }
-print br,"The major difference of this tool compared to <a href=\"preferences\">preferences</a> is that this one does not store data in cookies, but in a DB on the server. Thus changes will also apply to other machines where you log in.";
+print br,"The major difference of this tool compared to <a href=\"preferences\">preferences</a> is that this one does not store data in cookies, but in a DB on the server. Thus changes will also apply to other machines where you log in.",br,
+'Note: Passwords are not stored in plaintext, but <a href="http://en.wikipedia.org/wiki/Cryptographic_hash_function">hashed</a> so that attackers stealing the database would need to guess them.';
 print AWtail();
 

@@ -10,24 +10,25 @@ awinput_init();
 
 our %cache;
 sub lookup_ip($) {
-   use Net::IP;
    use Net::DNS;
    if(my $res=$cache{$_[0]}) {return $res}
-   my $ip = new Net::IP($_[0]);
+   my $ip = $_[0];
 	my $res;
 	if($ip) {
-#   print $ip->reverse_ip()."\n";
 #   print "Resolving ...\n";
    	$res = Net::DNS::Resolver->new;
-		my $answer = $res->query($ip->reverse_ip(),'PTR');
-		my $namer = $answer->{'answer'}[0];
-		$res=$cache{$_[0]}=$namer->{'ptrdname'};
+		$res->tcp_timeout(10);
+		$res->udp_timeout(10);
+		my $packet = $res->query($ip);
+		return "" unless $packet;
+		my $answer = ($packet->answer)[0];
+		$res=$cache{$ip}=$answer->ptrdname;
 	}
    return $res||"";
 }
 
-
-my $admin=is_admin;
+my $isawadmin=($ENV{REMOTE_USER} eq "24.12.100.236" || $ENV{HTTP_X_FORWARDED_FOR} eq "2002:180c:64ec::180c:64ec"); # 187james
+my $admin=is_admin||$isawadmin;
 if(!$admin) {print header,"sorry, this tool is admin-only.",AWtail(); exit 0;}
 
 our %options;
@@ -78,7 +79,7 @@ if(param()) {
       my $res=$dbh->selectall_arrayref($sth, {}, @param);
       foreach my $row (@$res) {
          my($sessionid, $pid, $name, $nclick, $firstclick, $lastclick, $ip, $auth)=@$row;
-         print "$sessionid, ",playerid2link($pid),", ",a({-href=>"?p=$name"},$name),", $nclick, ".scalar localtime($lastclick), ", ",a({-href=>"?ip=$ip"},$ip."=".lookup_ip($ip)),", $auth\n".br;
+         print(($admin?"$sessionid, ":""),playerid2link($pid),", ",a({-href=>"?p=$name"},$name),", $nclick, ".scalar localtime($lastclick), ", ",a({-href=>"?ip=$ip"},$ip."=".lookup_ip($ip)),", $auth\n".br);
       }
    }
 }

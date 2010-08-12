@@ -15,7 +15,7 @@ foreach my $pline (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 		my %a=(siege=>((shift(@a) eq "602020")?1:0));
 		for my $n(0,2..7) {$a[$n]+=0;}
       my @b=splice(@a,3,2);
-      $a[2]+=$b[0]/100; # or /($b[0]+$b[1])
+      $a[2]+=$b[0]/100.5; # or /($b[0]+$b[1]+0.5) # +1 because 100/100 is still below 1
 		my @label=qw(id name population growth pp production);
 		for my $n(0..5) {$a{$label[$n]}=$a[$n]}
 		#require awinput;

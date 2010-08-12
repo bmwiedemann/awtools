@@ -17,7 +17,7 @@ if(1 || $mangle::dispatch::g) {
       my($baseprice)=get_one_row("SELECT `price` FROM `prices` WHERE `item`=?", ["b".$art]);
       return "" if not $baseprice;
       my $p=$price/$baseprice;
-      return int(0.5+(($p-1)*100)**(log(3)/log(2)));
+      return int(0.5+(($p-1)*100)**(1.588971268));
    }
    s%<td colspan="2"><b>Prices</b>%<td colspan="3"><b>Prices</b>%;
    s%(<a href="?Stats/)([0-9a-z-]+)(\.html"?>[^<]+</a></td>)(<td align=right>\$)([0-9.,-]+)%"$1$2$3<td>".maparti($2,$5)."</td>$4$5"%ge;

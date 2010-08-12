@@ -1,5 +1,24 @@
+#Cut: brownie:fleet/launch: inline <td> with plan.comment | onmouseover: pop up inline iframe of system
+Cut: would it be possible to have an incoming only page with fleets in chronological order
+Elfenlied: planet/detail: yellow +0 link to spend remaining PP into building (useful before spend-all)
+all account settings via brownie:News/Settings
+optional (default off) planet/detail +1 links spend immediately
+maybe a fleet-collision detector: warn (mislaunch?) if another friendly fleet arrives in same minute
+fighterlist/whocanintercept: yCV with A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
+fighterlist: zCV = yCV + xCV(artifact)
+show bestguarded/bestplanet in system-info
+mangle/www1.astrowars.com/0/alliance/detail.pm use getbuilding_player
+cookie/preferences2 for configurable timeout
+#AWforum [alli] on players in postings
+#fix "bc" link on fleets not working with CGIbrownie
+#drop hardcoded addr =>getawwwwserver  grep www.astrowars.com mangle cgi-bin/* *pm -R
+#display race link via javascript on /register/customize_race.php
+feed tradelive from more pages
+store number of extra artifacts / use for tradepartners
+#drop PW from URL /register/customize_race.php?name=xx&id=xx&pw=
 feed new planets into tools (important at start of round)
 store SU payback price in DB "date hf rf gc rl" # parse/www1.astrowars.com/0/planets/spend_points.pm done ; use brownieplayer.lastupdate_at? or immediate update
+mangle/planet/spend_points: nice-to-have: all/half links for ships
 #fleets: display CV
 [RATS] TinyToon: btw, just an idea for brownie....it is possible to add a popup window to tactic live map? i mean when you move mouse at system to seee what is inside w/o cliking at it?
 starmap/planets table add modified_at, display in system-info
@@ -7,7 +26,7 @@ starmap/planets table add modified_at, display in system-info
 #check IPv6 usage: NAGROM , 1ntraflesh , lswift , rebeca , greenbird
 #map IPv6 forward addrs via 2002:ipv4 or to 127.x.x.x otherwise
 #SOAP/XML-RPC: getsessionid, build, launch, offertrade, getdata
-airecommend.pm: give reasons for recommendation to humans
+ai-recommend.pm: give reasons for recommendation to humans
 #gather internalplanet data + simulate eco every 15 mins (cron)
 secure all non-info (set/POST) admin and founder tools against http://cwe.mitre.org/top25/#CWE-352
 ?display show hh:mm instead of hours as float (in reltime)
@@ -18,7 +37,7 @@ secure all non-info (set/POST) admin and founder tools against http://cwe.mitre.
 #DBAccess(2): myselectall_arrayref($query, [$var1, $var2]);
 #display somewhere SELECT useralli.*,name  FROM `useralli`,playerextra WHERE `alli`=? AND useralli.pid=playerextra.pid
 #alliaccess manipulation CGI
-#mysql prices noon uppdate
+#mysql prices noon update
 
 #have checkdbpasswd return info on why it failed (blocked, non-existing user, wrong hash, expired) and log it (and possibly output it to user?)
 security: show warning on several users->same IP to detect abuse
@@ -55,8 +74,8 @@ mysql replication
 #arrival-find: E=0..4 speed=22..26 dist=0 planet=1,2,4
 #allow dropping toolsaccess bits granted by others (set mask)
 #use allirelations table (in addition to prev method)
-use login table to take load off relations dbm (missing/broken data?)
-move relations to mysql
+#use login table to take load off relations dbm (missing/broken data?)
+#move relations to mysql
 #orange-bg incomings
 green.css tests+fixes
 ?planet/details feed own fleet and sieging owner into tools.
@@ -65,13 +84,13 @@ green.css tests+fixes
 #brownie:planets/buildings: spend-all only with PP>=150
 add "next update in x seconds" into brownie - fix add update in security screen
 #IIR=internal: ETC, prod, (SUs, artis)
-internal planet: buildings, PP, fractional pop
-?feed more info into tools: exact planet building levels - e.g. to make up sim
+#internal planet: buildings, PP, fractional pop
+#?feed more info into tools: exact planet building levels - e.g. to make up sim
 #fix science ranking points calc in relations
 ?findjumpy tool to look for free/unknown planets and friendly planets for attacks
 #interbeta: alliances.tag, *.alli -> CHAR(4)
-relations/system-info: recent battles
-reverse-engineer battle formulas (chance(att)) - use in whocanintercept - add a "calc this battle" link next to it
+#relations/system-info: recent battles via link to Rasta
+reverse-engineer battle formulas (chance(att)) - use in whocanintercept - add a "calc this battle" link next to it # some in jstools2
 playerprefs: phone, msn, email
 #whocansee: rewrite to work without whocansee.pl , add xE
 whocansee: in cases where both XR and EN have an intelreport... I think it would be best to just display the newer one # done?
@@ -80,8 +99,6 @@ whocansee: in cases where both XR and EN have an intelreport... I think it would
 fleet estimator (using attacking CV, killed CV, signed TAs, estimated PP/h)
 #mangle/All_Incomings: könnte hinter dem Namen des Betroffenden ein link zu seiner Alli ansicht liegen..
 auto-IM to team/alli about new incoming fleets
-fighterlist/whocanintercept: yCV with A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
-fighterlist: zCV = yCV + xCV(artifact)
 #was done: xCV calculation: dont use outdated phys - instead worst-case - (4 days timeout)
 # [AF] SaggitariusA: ein anderes schönes tool wäre es mal, die PPs zu ermitteln, die man braucht, um auf planet #x eine SBy zu bauen (mit FS natürlich)
 #add recv message count to AWTools header: SELECT count(imid) FROM `imessage` WHERE `recvpid` = ? GROUP BY recvpid
@@ -89,7 +106,7 @@ fighterlist: zCV = yCV + xCV(artifact)
 #add alliance relation comment to alliance page
 interbeta: prevent dups with cls incomings
 #optimize ranking and antispy tools performance
-major rewrite to not use DBM files (mysql instead)
+#major rewrite to not use DBM files (mysql instead) . only read-only mldbm left (except planets.mldbm)
 #non-keyboard input with security-code +numbers(spend,launch,buy) for PDAs (non-default)?
 #modperl transition
 #making easy to run as non-root
@@ -104,6 +121,7 @@ major rewrite to not use DBM files (mysql instead)
 #brownie: integrate imessage
 #general user preferences DB: tz, customhtml, race+sci for planets,arrival, AW-forum style
 #remember user timezones from settings page and use for GMT+n display in fleets and arrival
+auto-update timezone on DST change
 #Timezone for added fleets in AW
 #verify +59 feed/alliance_detail.pm
 #flexible map - coloring by last round's tag (fallback)
@@ -141,7 +159,7 @@ relation: rearrange basic player info in table
 -anon export for relations
 #fleets (and others) with local times instead of GMT. not for BB-export
 correlate strongest fleet to best guarded
-merge strongest fleets history to catch moving fleets or see growth/loss
+#merge strongest fleets history to catch moving fleets or see growth/loss ; rasta has such
 #RSA thread link - auto from referer. e.g. use $::planetinfo{"$sid#0"}
 #add battlecalc link to relations - def/att from race or just worst-case
 #Arnaken: could you sum up the fleets of everyone ie at the end of the fleet page ?
@@ -158,7 +176,7 @@ changing the map look to look more "AW-like" - much like Mob's tools... I really
 -wie wäre es mit einer möglichkeit eine sys ID, einen energylevel und einen biolevwel einzugeben und dann werden alle potentiellen jumper mit weniger als 2h flugzeit gesucht, als optionen kann man alle von aktiven und verbündeten, von kleinen spielermn und free/unknown einzeln filtern lassen
 
 #alliance: add player.trade column
-[AF] Teddy_200: another thing too that would be nice is an alliance TA statistics page, with things like average number of TAs in an alliance, Average TR, prehaps date when the members got their TAs etc. Thins like that
+[AF] Teddy_200: another thing too that would be nice is an alliance TA statistics page, with things like average number of TAs in an alliance, Average TR, prehaps date when the members got their TAs etc. Things like that
 [AF] Teddy_200: at least if someone got a TA last update it would be marked somehow - that way you would know that player has just "lost" 20kA$...
 
 #first, could it be possible to add starbase CV to defending fleets ? :)

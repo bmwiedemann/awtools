@@ -34,6 +34,7 @@ if(0) {
    $r->set_keepalive();
    my $timeout=30*60;
    $r->headers_out->set("max-age"=>$timeout);
+   $r->headers_out->set("vary"=>"Authentication,Cookie");
    $r->headers_out->set("expires"=>awstandard::HTTPdate($modified+$timeout)); #   Sat, 20 Jan 2007 07:12:55 GMT
 #   $r->headers_out->set("debug"=>1);
    $r->set_last_modified($modified);

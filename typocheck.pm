@@ -53,10 +53,10 @@ sub simitestclient($)
 {
 	my($str)=@_;
 	require IO::Socket;
-	my $sock=IO::Socket::INET->new(PeerAddr=>"alpha.zq1.de:6987", Timeout=>2) or return (); # die "error opening socket: $!";
+	my $sock=IO::Socket::INET->new(PeerAddr=>"delta.zq1.de:6987", Timeout=>2) or return (); # die "error opening socket: $!";
 	print $sock $str,"\n";
 	my @res;
-   local $_;
+	local $_;
 	while(<$sock>) {
 		chop;
 		last if($_ eq "");
@@ -110,8 +110,7 @@ sub stripwiki($)
 # use encoding "utf8";
 sub checktext($)
 {
-	my $x=stripwiki(shift);
-   my $a=split_words($x);
+   my $a=split_words(stripwiki(shift));
 #	print;
 #	binmode STDOUT, ":utf8";
 	my @out;

@@ -19,6 +19,7 @@ my %specialname=qw(
       pentabarf 1
       Banana9977 1
       cutebird 1
+      PedroMorello 1
 );
 my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
 
@@ -82,7 +83,8 @@ sub mangle_dispatch(%) { my($options)=@_;
                $joinlink="<br>".$$options{authlink}."/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
             } elsif(is_founder($$options{pid})) {
                # if alliance founder, add extra "accept NAP with AF" link
-               $joinlink.="<br><a href=\"http://aw.lsmod.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
+               $joinlink.="<br>$$options{authlink}/public/alliopenaccount\">As founder of an alliance I want to use AWTools</a> ";
+               #$joinlink.="<br><a href=\"http://aw.lsmod.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
             }
          } else {
          }
@@ -119,10 +121,10 @@ sub mangle_dispatch(%) { my($options)=@_;
                my $l="$e$sep$s";
                s%^</tr></table>%</tr><tr class="bmwblankrow"><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b></td>
                   $s/preferences2">preferences2
-                  $l/tactical">tacmap
-                  $l/tactical-live2">tlarge
+                  $l/tactical-live2">tacmap
                   $l/system-info">system
                   $l/relations">player
+                  $l/imessage">BIM
                   $l/alliance">alliance
                   $l/fleets">fleets$e$&%m;
 #               $_.="test OK";
@@ -149,7 +151,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       if($ims && @$ims) { # have im
          my $nims=@$ims;
          my $bims=$nims>1?"$nims BIMs":"a BIM";
-         $imessage="<!-- start gb imessage --><div class=awimessage>You have received $$options{authlink}/imessage\" class=\"awtools\">$bims</a>.<br>";
+         $imessage="<!-- start gb imessage --><div class=awimessage>You have received $$options{authlink}/imessage\">$bims</a>.<br>";
          my $imend="</div><!-- end gb imessage -->\n";
          s!<center>!$imessage$imend$&!;
          foreach my $im (@$ims) {

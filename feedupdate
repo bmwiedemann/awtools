@@ -52,6 +52,7 @@ if(param()) {
 	print start_form(-method=>'post',-enctype=>"multipart/form-data", -name=>"form"),
 	textfield(-name=>'tz', -value=>$timezone, -class=>'text'), " timezone of subject: GMT+n", br,
 	textfield(-name=>'name',-value=>'', -class=>'text'), " who reports (e.g. for own fleet movements)", br,
+	textfield(-name=>'url',-value=>'', -class=>'text'), " source URL", br,
 	textarea(-name=>'html',-value=>"", -cols=>40, -rows=>9, -class=>'text'), " copy+paste HTML source here", br,
 	filefield(-name=>'file', -class=>'file'), " or upload a downloaded HTML file", br.AWfocus("form.html"),
 #	checkbox('debug'), br,

@@ -15,7 +15,7 @@ if(!$interbeta) {
 		my($pid,$k)=get_one_row("SELECT `pid`,`name` FROM `player` WHERE `pid` = ? LIMIT 1", [$kpid]);
       if(!$pid) {push(@droplist,[$kpid,"*resigned*"]);next} # wipe non-existent players
       my $a=playerid2tag($pid);
-      if(lc($k) eq "klappstuhl") {next}
+      if(lc($k) eq "riven3dxxxx") {next}
       if($a) {push(@droplist,[$pid,$k]);next} # drop tagged players
    }
    my $sth=$dbh->prepare("DELETE FROM `useralli` WHERE pid = ?");

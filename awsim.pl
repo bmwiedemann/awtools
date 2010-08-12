@@ -10,7 +10,7 @@ our @buildings=qw"hf rf gc rl sb";
 our $updatetime=4; # update each quarter hour
 #our %racebonus=qw(pop 0.13 pp 0.05 cul 0.05 sci 0.11); beta7
 #our %racebonus=qw(pop 0.10 pp 0.04 cul 0.04 sci 0.10); beta8
-our %racebonus=qw(pop 0.07 pp 0.04 cul 0.04 sci 0.08);
+our %racebonus=qw(pop 0.07 pp 0.04 cul 0.05 sci 0.08);
 %options=qw(
 init 1
 initialp 3

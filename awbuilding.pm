@@ -11,7 +11,7 @@ use awinput;
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = 
-qw(&getbuilding &getbuilding_sidpid &getbuilding_player &update_building &update_building_pp);
+qw(&getbuilding &getbuilding_alli &getbuilding_sidpid &getbuilding_player &update_building &update_building_pp);
 
 my $expiry=15*24*60*60;
 
@@ -23,18 +23,23 @@ sub getbuilding($@)
 	return $dbh->selectall_arrayref($sth, {}, @$vars);
 }
 
+sub getbuilding_alli($$)
+{
+	my($cond,$vars)=@_;
+	my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},32);
+	return getbuilding(",toolsaccess WHERE $allimatch AND $cond", [@$amvars, @$vars]);
+}
+
 sub getbuilding_sidpid($$)
 {
 	my($sid,$pid)=@_;
-	my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},32);
-	return getbuilding(",toolsaccess WHERE $allimatch AND sidpid=? AND updated_at>?", [@$amvars, sidpid22sidpid3m($sid,$pid), time()-$expiry]);
+	return getbuilding_alli("sidpid=? AND updated_at>?", [sidpid22sidpid3m($sid,$pid), time()-$expiry]);
 }
 
 sub getbuilding_player($)
 {
 	my($pid)=@_;
-	my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},32);
-	return getbuilding(",toolsaccess WHERE $allimatch AND ownerid=? AND updated_at>?", [@$amvars, $pid, time()-$expiry]);
+	return getbuilding_alli("ownerid=? AND updated_at>?", [$pid, time()-$expiry]);
 }
 
 sub update_building($$$%)

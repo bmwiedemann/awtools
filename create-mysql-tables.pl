@@ -5,6 +5,35 @@ use DBAccess;
 if(!$dbh) {die "DB err: $!"}
 # create tables
 
+#$dbh->do("DROP TABLE `smsalliaccount`");
+$dbh->do(qq!
+CREATE TABLE `smsalliaccount` (
+`alli` CHAR(4) NOT NULL,
+`cent` DECIMAL(20,3) NOT NULL,
+`last_at` INT NOT NULL,
+PRIMARY KEY ( `alli` ),
+);!);
+
+exit 0;
+
+#$dbh->do("DROP TABLE `internalplanet`");
+$dbh->do(qq!
+CREATE TABLE `internalplanet` (
+`sidpid`  INT NOT NULL,
+`time` INT NOT NULL,
+`alli` CHAR(4) NOT NULL,
+`ownerid`  INT NOT NULL,
+`pop`	DOUBLE NOT NULL COMMENT 'population level',
+`pp`	FLOAT NOT NULL COMMENT 'production points',
+`b1`	FLOAT NOT NULL COMMENT 'hf',
+`b2`	FLOAT NOT NULL COMMENT 'rf',
+`b3`	FLOAT NOT NULL COMMENT 'gc',
+`b4`	FLOAT NOT NULL COMMENT 'rl',
+`b5`	FLOAT NOT NULL COMMENT 'sb',
+PRIMARY KEY ( `sidpid` ),
+INDEX (`time`),
+);!);
+
 #$dbh->do("DROP TABLE `battlecalc`");
 $dbh->do(qq!
 CREATE TABLE `battlecalc` (
@@ -264,9 +293,10 @@ tz  MEDIUMINT,
 customhtml TEXT,
 forumstyle VARCHAR(20) NOT NULL,
 awtoolsstyle VARCHAR(20) NOT NULL,
-storeir    BOOL NOT NULL,
-storepw    BOOL NOT NULL,
-forumauth  BOOL NOT NULL,
+storeir    BOOL DEFAULT '0' NOT NULL,
+storepw    BOOL DEFAULT '0' NOT NULL,
+forumauth  BOOL DEFAULT '0' NOT NULL,
+flags		  INT  DEFAULT '0' NOT NULL COMMENT '1=unconfirmedspendpp',
 PRIMARY KEY ( pid ));!);
 
 $dbh->do(qq!

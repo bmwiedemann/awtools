@@ -8,7 +8,7 @@ use Encode;
 #$_.="$ENV{REQUEST_URI} ; $ENV{QUERY_STRING}";
 $_=decode_utf8($_);
 if($ENV{REQUEST_URI}=~m{wikipedia.org/w/index.php.*action=(edit|submit)}) {
-	if(!m{<li id="pt-preferences"><a href="/wiki/Spezial:Einstellungen" title="Eigene Einstellungen">Einstellungen}) {
+	if(!m{<li +id="pt-preferences"><a href="/wiki/Spezial:Einstellungen" title="Eigene Einstellungen">Einstellungen}) {
 		$_="denied. please log in first.";
 	}
    if(m{<textarea tabindex="1" accesskey="," id="wpTextbox1" cols="80" rows="25" style="width: 100%" name="wpTextbox1">([^<]+)^</textarea>}m) {

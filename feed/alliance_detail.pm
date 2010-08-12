@@ -2,9 +2,21 @@ use strict;
 package feed::alliance_detail;
 use awstandard;
 use awinput;
+use awbuilding;
 my $ironly=0;
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
+
+if(0 && $::options{name} eq "greenbird"){
+	my $data=getparsed(\%::options); # costs ~5ms
+	my $pid=$::options{pid};
+	foreach my $p(@{$data->{planet}}) {
+		my %h=("pop"=>$p->{"pop"},
+      hf=>$p->{hf}, rf=>$p->{rf}, gc=>$p->{gc}, rl=>$p->{rl}, sb=>$p->{sb},
+      ownerid=>$pid);
+#		update_building($p->{sid},$p->{pid},0,\%h); # costs 60ms
+	}
+}
 
 #my $dbname2="/home/bernhard/db/$ENV{REMOTE_USER}-relation.dbm";
 #use DB_File;

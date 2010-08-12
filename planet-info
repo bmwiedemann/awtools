@@ -58,7 +58,7 @@ if($options{status} && $options{status}>=1 && $options{status}<=9) {
 	my @pinfo=getplanetinfo($sid,$pid,1);
 	my $mod=(@pinfo)? "modified" : "added";
    my $plinfo;
-	if($options{submit}=~/delete/) {
+	if($options{submit} && $options{submit}=~/delete/) {
 		$mod="deleted";
 	} else {
 		#$options{info}=$options{comment};
