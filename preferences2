@@ -36,12 +36,13 @@ if(!$authpid) {
       $data{storeir}=param("storeir");
       $data{storepw}=param("storepw");
       $data{forumauth}=param("forumauth");
+      $data{flags}=((param("immediatebuild")||0)&1);
       $h{$authpid}=\%data;
       print "data saved";
    } else {
       my $prefs=awinput::getuserprefs($authpid);
       if($prefs) {
-         my($pid,$tz,$customhtml,$forumstyle, $awtoolsstyle, $storeir, $storepw, $forumauth)=@$prefs;
+         my($pid,$tz,$customhtml,$forumstyle, $awtoolsstyle, $storeir, $storepw, $forumauth, $flags)=@$prefs;
          param("p",$tz);
          param("awfstyle",$forumstyle);
          param("awtstyle",$awtoolsstyle);
@@ -49,12 +50,14 @@ if(!$authpid) {
          param("storeir",$storeir);
          param("storepw",$storepw);
          param("forumauth",$forumauth);
+         param("immediatebuild",$flags&1);
       }
       print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," TimeZone",br,
          popup_menu(-name=>'awfstyle', -values=>[qw(subBlack subSilver)])," AW forum style",br,
          popup_menu(-name=>'awtstyle', -values=>["",qw(blue aw plain)])," AWTools style",br,
 			checkbox(-name=>'storepw', -value=>1), ' auto-update player\'s <a href="userpasswd">AWTools-password</a> from AW',br,
 			checkbox(-name=>'forumauth', -value=>1), ' allow log in with <a href="authawforum">AW-forum user+pass</a>',br,
+			checkbox(-name=>'immediatebuild', -value=>1), ' raise buildings without confirmation',br,
 			(is_extended()?():(checkbox(-name=>'storeir', -label=>'Store IR for basic brownie user (for use in planets and travel-time prediction)', -value=>1),br)),
 			
          textarea(-name=>'customhtml', -cols=>40, -rows=>9, -class=>'text'), " custom HTML here",br,

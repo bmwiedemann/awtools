@@ -12,7 +12,11 @@ if($planet != $data->{n}-1) {
    s/#404040/#802020/g;
    s/(body.*"#000000">)/$&\n<div style="background-color: #300">/;
 	s%</body>%<br/><span class=bmwwarning>warning: You should not spend PP on this page as they would go to planet 7 (that is an old AW bug). Refresh and then spend your PPs.</span><br/>$&%;
+	$planet=$data->{n}-1;
 }
+
+my $prefs=getuserprefs($::options{pid});
+my $immediate=($prefs->[8]&1); # build without confirmation option
 
 # add access keys
 s{>Previous</a></td>}{ accesskey="p" $&};
@@ -114,8 +118,14 @@ foreach my $n (0..$#buildings) {
 		if($n==4) { # SB-autogrowth
 			$ppplusbonus+=$sbautogrowth;
 		}
+		my $plusnull="";
+		# add +0 link to use before spend-all
+		if(int($pp) && ($mangle::dispatch::g || $::options{name} eq "elfenlied")) {
+			my $url=build_url({i=>$planet, points=>int($pp), p=>int($pp), type=>$n, immediate=>$immediate});
+			$plusnull=qq(&nbsp;<a href="$url$dscost" style="background-color:#840">+0</a>);
+		}
       my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%0.f%%)</span>",($ppneeded-$realpp)/$ppplusbonus, 100*$prodbonus);
-      s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5&nbsp;$hours$6%;
+      s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5&nbsp;$hours$plusnull$6%;
       next;
    }
    next if(($ppneeded>1500 && $buil ne "Starbase") || $ppneeded>$pp);
@@ -133,7 +143,9 @@ foreach my $n (0..$#buildings) {
 
 	my $intpp=int($pp);
 	my $np1=$n+1;
-   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" accesskey=$np1 href="/0/Planets/Spend_Points.php/?p=$intpp&amp;i=$planet&amp;points=$5&amp;produktion=$awstandard::buildingval[$n]$dscost" style="background-color:blue" onclick="
+	my $dest=$immediate?"submit.php":"Spend_Points.php/";
+	if($immediate){$onclickjs=""}
+   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" accesskey=$np1 href="/0/Planets/$dest?p=$intpp&amp;i=$planet&amp;points=$5&amp;produktion=$awstandard::buildingval[$n]$dscost" style="background-color:blue" onclick="
 	document.form.points.value='$5'; $onclickjs">+1</a>$6%;
 #   $debug.="<br>test: $buil $val[$n] $2 $4";
 }

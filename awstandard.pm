@@ -530,12 +530,15 @@ sub map_forward_ip($)
 sub build_url(%)
 { my($f)=@_;
    my %opts;
-   foreach my $k (qw(i points)) {
+   foreach my $k (qw(i p points)) {
+		next unless defined $f->{$k};
       $opts{$k}=$f->{$k};
    }
    $opts{produktion}=$awstandard::buildingval[$f->{type}];
+	if($f->{immediate}) {delete $opts{p}}
    my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
-   return("http://$awserver/0/Planets/submit.php?$params");
+	my $dest=$f->{immediate}?"submit.php":"Spend_Points.php/";
+   return("http://$awserver/0/Planets/$dest?$params");
 }
 
 sub getparsed($)
