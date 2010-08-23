@@ -530,6 +530,7 @@ sub map_forward_ip($)
 sub build_url(%)
 { my($f)=@_;
    my %opts;
+	if(!defined($f->{immediate})) {$f->{immediate}=1}
    foreach my $k (qw(i p points)) {
 		next unless defined $f->{$k};
       $opts{$k}=$f->{$k};

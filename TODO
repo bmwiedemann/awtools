@@ -1,8 +1,8 @@
 #Cut: brownie:fleet/launch: inline <td> with plan.comment | onmouseover: pop up inline iframe of system
 Cut: would it be possible to have an incoming only page with fleets in chronological order
-Elfenlied: planet/detail: yellow +0 link to spend remaining PP into building (useful before spend-all)
+#Elfenlied: planet/detail: yellow +0 link to spend remaining PP into building (useful before spend-all)
+#optional (default off) planet/detail +1 & +0 links spend immediately
 all account settings via brownie:News/Settings
-optional (default off) planet/detail +1 links spend immediately
 maybe a fleet-collision detector: warn (mislaunch?) if another friendly fleet arrives in same minute
 fighterlist/whocanintercept: yCV with A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
 fighterlist: zCV = yCV + xCV(artifact)

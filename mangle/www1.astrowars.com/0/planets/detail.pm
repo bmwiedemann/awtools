@@ -16,7 +16,9 @@ if($planet != $data->{n}-1) {
 }
 
 my $prefs=getuserprefs($::options{pid});
-my $immediate=($prefs->[8]&1); # build without confirmation option
+my $prefsflags=$prefs->[8];
+my $immediate=($prefsflags&1); # build without confirmation option
+my $wantplusnull=($prefsflags&2); # add +0 links
 
 # add access keys
 s{>Previous</a></td>}{ accesskey="p" $&};
@@ -120,7 +122,7 @@ foreach my $n (0..$#buildings) {
 		}
 		my $plusnull="";
 		# add +0 link to use before spend-all
-		if(int($pp) && ($mangle::dispatch::g || $::options{name} eq "elfenlied")) {
+		if(int($pp) && $wantplusnull) {
 			my $url=build_url({i=>$planet, points=>int($pp), p=>int($pp), type=>$n, immediate=>$immediate});
 			$plusnull=qq(&nbsp;<a href="$url$dscost" style="background-color:#840">+0</a>);
 		}
