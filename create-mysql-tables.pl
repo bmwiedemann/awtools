@@ -11,10 +11,10 @@ CREATE TABLE `smsalliaccount` (
 `alli` CHAR(4) NOT NULL,
 `cent` DECIMAL(20,3) NOT NULL,
 `last_at` INT NOT NULL,
-PRIMARY KEY ( `alli` ),
+PRIMARY KEY ( `alli` )
 );!);
 
-exit 0;
+#exit 0;
 
 #$dbh->do("DROP TABLE `internalplanet`");
 $dbh->do(qq!
@@ -31,7 +31,7 @@ CREATE TABLE `internalplanet` (
 `b4`	FLOAT NOT NULL COMMENT 'rl',
 `b5`	FLOAT NOT NULL COMMENT 'sb',
 PRIMARY KEY ( `sidpid` ),
-INDEX (`time`),
+INDEX (`time`)
 );!);
 
 #$dbh->do("DROP TABLE `battlecalc`");
@@ -70,8 +70,8 @@ $dbh->do(qq!
 CREATE TABLE `brownieplayer` (
 `pid` INT PRIMARY KEY,
 `lastupdate_at` INT NOT NULL,
-`lastclick_at` INT NOT NULL
-`prevlogin_at` INT NOT NULL
+`lastclick_at` INT NOT NULL,
+`prevlogin_at` INT NOT NULL,
 `lastlogin_at` INT NOT NULL
 );!);
 
@@ -178,12 +178,13 @@ CREATE TABLE `battles` (
 `cv_att` INT,
 `att_id` INT,
 `def_id` INT,
-`win_id` INT INDEX,
+`win_id` INT,
 `planet_id` TINYINT,
 `system_id` INT,
 `time` INT NOT NULL,
-PRIMARY KEY ( `id` )
+PRIMARY KEY ( `id` ),
 INDEX ( `system_id`,`planet_id` ),
+INDEX ( `win_id` )
 );!);
 
 $dbh->do(qq!
