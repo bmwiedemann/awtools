@@ -11,6 +11,9 @@ if($::options{url}=~m%/0/Alliance/$%) {
 #   s%</body>%<span class="bmwnotice">note: new direct links behind points of players.</span><br>$&%;
 }
 
-s%<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#000000' width="600"%$& class="main_inner" id="allianceoverview"%;
+s%(<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#000000') width="600"%$1 class="main_inner" id="allianceoverview"%;
+s{width="260">}{width="100%"};
+s{width="340">}{width="100%"};
+#s{ width="600">}{>};
 
 1;

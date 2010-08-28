@@ -31,4 +31,8 @@ sub calcbonus($$) {
 
 s{id=23">\(\+(\d+) per hour\)</a>(?:\s*<b>([+-]\d+)%</b>)?}{"$& = ".calcbonus($1,$2)."/h"}ge;
 
+if($::options{handheld}) {
+	s{(<img src="/images/(?:dot|leer)\.gif" height="10" width=")(\d+)}{$1.int($2/2.5)}ge
+}
+
 1;

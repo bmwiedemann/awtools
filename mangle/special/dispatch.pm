@@ -9,7 +9,9 @@ sub mangle() {
    # remove text ads
 #      s/<table><tr><td><table bgcolor="#\d+" style="cursor: pointer;".*//;
    # disable other ads
-#      s/(?:pagead2\.googlesyndication\.com)|(?:games\.advertbox\.com)|(?:oz\.valueclick\.com)|(?:optimize\.doubleclick\.net)/nowhere.lsmod.de/g;
+		if($::options{handheld}) {
+	      s/(?:pagead2\.googlesyndication\.com)|(?:games\.advertbox\.com)|(?:oz\.valueclick\.com)|(?:optimize\.doubleclick\.net)/nowhere.lsmod.de/g;
+		}
       s/(?:http:\/\/oz\.valueclick\.com)/http:\/\/nowhere.lsmod.de/g;
    }
    # fix color specification

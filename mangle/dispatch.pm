@@ -49,8 +49,16 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $alli="\U$ENV{REMOTE_USER}";
    
    # greenbird special
-	if($g && $::options{req}) {
-		$info{url}=$::options{req}->headers_in()->get("Host");
+	if($::options{req}) {
+		my $h=$::options{req}->headers_in();
+		my $agent=$h->get("User-Agent");
+		if($g) {
+			$info{url}=$h->get("Host");
+			$info{agent}=$agent;
+		}
+		if($agent=~m/BlackBerry|Android|iPhone|iPad/) {
+			$::options{handheld}=1;
+		}
 	}
    if(m/onLoad="document.login.secure.focus\(\);">/) {
       if($g) {
@@ -290,7 +298,12 @@ sub mangle_dispatch(%) { my($options)=@_;
       foreach my $s (@style){
          if(-r "$awstandard::cssdir/$s.css") {$style=$s;last;}
       }
-      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://$bmwserver/code/css/$style.css">%;
+      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://$bmwserver/code/css/$style.css">
+<link rel="stylesheet" href="http://$bmwserver/code/css/style_mobile.css" media="handheld" type="text/css" />
+<!--[if !IE]>-->
+<link type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" href="http://$bmwserver/code/css/style_mobile.css" />
+<!--<![endif]-->
+%;
    }
    if($gameuri || $g) {
       # fix AR's broken HTML

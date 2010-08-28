@@ -181,6 +181,11 @@ if(1) {
    }
 }
 
+if($::options{handheld}) {
+	# reduce progress bars
+	s{(<img src="/images/(?:dot|leer)\.gif" height="10" width=")([0-9.]+)}{$1.int($2/2.5)}ge
+}
+
 s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/planets_spend_points.js"></script>$&%;
 my $spend=qq!
 <div style="display:none" id="spenddiv">

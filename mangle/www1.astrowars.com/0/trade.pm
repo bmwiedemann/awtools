@@ -25,4 +25,7 @@ if(1 || $mangle::dispatch::g) {
    s%</body>%<span style="color:green">note: added number of total units sold in galaxy to artifacts table</span>$&%;
 }
 
+s{<table width="300"}{<table class="outersubtable"}g;
+s{ width="300">}{class="innersubtable">}g;
+
 1;
