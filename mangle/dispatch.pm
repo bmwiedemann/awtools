@@ -56,7 +56,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 			$info{url}=$h->get("Host");
 			$info{agent}=$agent;
 		}
-		if($agent=~m/BlackBerry|Android|iPhone|iPad/) {
+		if($agent=~m/BlackBerry|Android|iPhone|Maemo|IEMobile/) {
 			$::options{handheld}=1;
 		}
 	}

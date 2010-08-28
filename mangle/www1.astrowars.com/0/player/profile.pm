@@ -6,7 +6,7 @@ use awhtmlout;
 use DBAccess2;
 
 # add AWTools link at bottom
-if(m%(<b>Player / Profile</b></td>\s*<td>)([^<]*)%) {
+if(m%(<b>Player / Profile</b></td>\s*<td>)([^<]*)% && !$::options{handheld}) {
    $::extralink="$::bmwlink/relations?name=$2\">AWTools($2)</a>";
 }
 s%(<b>Player / Profile</b></td>\s*<td>)([^<]*)%$1$::bmwlink/relations?name=$2">AWTools($2)</a>%;

@@ -153,7 +153,9 @@ if(1) {
 		if(m{<br> <b>Ship\(s\) successfully launched.</b>}) {
 			s{</body>}{<iframe width="95%" height="300" src="/3/Fleet/"></iframe>$&};
 		}
-      s%</body>%<iframe width="95\%" height="700" src="$link"></iframe><br>$&%;
+		if(!$::options{handheld}) {
+	      s%</body>%<iframe width="95\%" height="700" src="$link"></iframe><br>$&%;
+		}
    }
 
    
