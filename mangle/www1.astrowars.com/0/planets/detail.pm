@@ -136,7 +136,7 @@ foreach my $n (0..$#buildings) {
 	var d=document.getElementById('spenddiv');
 	d.style.display='inline';
 	var l=document.getElementById('spendlink$n');
-	l.href='#';
+	l.href='#spend';
 	document.form.building$n.checked=true;
 	document.form.points.focus();
 	document.form.points.select();
@@ -189,6 +189,7 @@ if($::options{handheld}) {
 s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/planets_spend_points.js"></script>$&%;
 my $spend=qq!
 <div style="display:none" id="spenddiv">
+<a name="spend"></a>
 <table class="main_outer"><tr><td>
 <form action="/0/Planets/submit.php" name="form" method="post">
 <table class="main_inner" cellspacing="1">
