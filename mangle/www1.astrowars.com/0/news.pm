@@ -23,6 +23,9 @@ if(0 && s%Premium\s+Tools\s*</a></td>%$&<td>|</td><td><a href="/0/Alliance/Incom
 my $n=1;
 s%(?:<table border="0" CELLSPACING="1" CELLPADDING="1" width="600")|(?:<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#303030' width="600")%$&.' class="sub_inner" id="news'.($n++).'"'%ge;
 
+s{width="135" bgcolor='#404040'}{class="newsdate"}g;
+s{colspan="1" bgcolor='#101010'}{class="newsmessage"}g;
+
 # fix broken HTML
 s%</td><td><a href="Help.php">Help%$&</a>%;
 # add counter - 82x34

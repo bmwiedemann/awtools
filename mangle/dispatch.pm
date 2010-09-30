@@ -47,16 +47,17 @@ sub mangle_dispatch(%) { my($options)=@_;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
    my $joinlink="";
    my $alli="\U$ENV{REMOTE_USER}";
+	my $agent="";
    
    # greenbird special
 	if($::options{req}) {
 		my $h=$::options{req}->headers_in();
-		my $agent=$h->get("User-Agent");
+		$agent=$h->get("User-Agent");
 		if($g) {
 			$info{url}=$h->get("Host");
 			$info{agent}=$agent;
 		}
-		if($agent=~m/BlackBerry|Android|iPhone|Maemo|IEMobile/) {
+		if($agent=~m/BlackBerry|Android|iPhone|Maemo|IEMobile|Symbian/) {
 			$::options{handheld}=1;
 		}
 	}
@@ -298,10 +299,12 @@ sub mangle_dispatch(%) { my($options)=@_;
       foreach my $s (@style){
          if(-r "$awstandard::cssdir/$s.css") {$style=$s;last;}
       }
+		my $extracss="http://$bmwserver/code/css/style_mobile.css";
+		if($agent=~m/iPhone/) {$extracss="http://iphoneaw.zq1.de/main.css"}
       s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://$bmwserver/code/css/$style.css">
-<link rel="stylesheet" href="http://$bmwserver/code/css/style_mobile.css" media="handheld" type="text/css" />
+<link rel="stylesheet" href="$extracss" media="handheld" type="text/css" />
 <!--[if !IE]>-->
-<link type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" href="http://$bmwserver/code/css/style_mobile.css" />
+<link type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" href="$extracss" />
 <!--<![endif]-->
 %;
    }

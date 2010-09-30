@@ -32,7 +32,14 @@ sub calcbonus($$) {
 s{id=23">\(\+(\d+) per hour\)</a>(?:\s*<b>([+-]\d+)%</b>)?}{"$& = ".calcbonus($1,$2)."/h"}ge;
 
 if($::options{handheld}) {
-	s{(<img src="/images/(?:dot|leer)\.gif" height="10" width=")(\d+)}{$1.int($2/2.5)}ge
+	my $n=0;
+	s{(<img src="/images/(?:dot|leer)\.gif" height="10" width=")(\d+)}{$1.int($2/2.5)}ge;
+}
+
+{
+	my $n=0;
+	my %map=(dot=>1,leer=>2);
+	s{<img src="/images/(dot|leer)\.gif" }{$&."class=\"gauge$map{$1}\" id=\"sciencegauge".($1 eq "dot"?++$n:$n)."-$map{$1}".'" '}ge;
 }
 
 1;

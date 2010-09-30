@@ -140,6 +140,7 @@ foreach my $n (0..$#buildings) {
 	document.form.building$n.checked=true;
 	document.form.points.focus();
 	document.form.points.select();
+	window.setTimeout('document.form.points.focus()', 100); // work around firefox losing focus from #spend
 	%;
    #$onclickjs="";
 
@@ -210,7 +211,6 @@ my $spend=qq!
 <input type="hidden" name="i" value="$planet"></td></tr>
 </table>
 </form>
-<a name="spend"></a>
 </table>
 </div>
 </center>

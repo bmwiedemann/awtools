@@ -12,8 +12,8 @@ if($::options{url}=~m%/0/Alliance/$%) {
 }
 
 s%(<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#000000') width="600"%$1 class="main_inner" id="allianceoverview"%;
-s{width="260">}{width="100%"};
-s{width="340">}{width="100%"};
+s{width="260">}{width="100%" class="allianceinfo">};
+s{width="340">}{width="100%" class="alliancemembers">};
 #s{ width="600">}{>};
 
 1;
