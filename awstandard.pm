@@ -491,9 +491,9 @@ sub awxp2pl($) {
 
 sub awsyslink($;$$) {
    my($sid,$simple,$pid)=@_;
-   $simple||=1;
+   if(!defined($simple)){$simple=1}
    my $public=$ENV{REMOTE_USER}?"":"";#:"/public";
-   my $and=$ENV{REMOTE_USER}?'%':'&';
+   my $and=$ENV{REMOTE_USER}?'%26':'&';
    my $link=qq($public/system-info?id=$sid${and}simple=$simple${and}target=$pid">);
 }
 

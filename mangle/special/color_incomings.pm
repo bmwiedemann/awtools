@@ -22,7 +22,7 @@ sub add_fleets($$) { my($sid,$pid)=@_;
 sub mangle_incoming() {
 #   s%width=135 bgcolor="#894900" align=center>18:58:39 - May 19.*?<br>We suppose its the Fleet of <a href=/0/Player/Profile.php/?id=(\d+)%$&%;
 #going to attack <b>Alpha Kelb Alrai</b>          [914] 2
-s%(going to attack )(<b>[^<]*</b>\s*)\[(\d+)\] (\d+)(!<br>[^.]*\.php[^<]*</a>\.)%qq'$1$::bmwlink/system-info?id=$3">$2 [$3]</a> $4$5'.add_fleets($3,$4)%ge;
+s%(going to attack )(<b>[^<]*</b>\s*)\[(\d+)\] (\d+)(!<br>[^.]*\.php[^<]*</a>\.)%"$1$::bmwlink".awstandard::awsyslink($3,0,$4)."$2 [$3]</a> $4$5".add_fleets($3,$4)%ge;
 
 s%(<b>Attention !!!</b> We have evidence of an incoming fleet around that time. <br>)(\d+ Transports.*?going to attack)%$1<span style="background-color:#800">$2</span>%g;
 }
