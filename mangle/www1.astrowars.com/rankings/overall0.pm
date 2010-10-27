@@ -5,7 +5,7 @@ my $data=getparsed(\%::options);
 my $allicd=selectall_arrayref("SELECT *
 FROM `alliances`
 WHERE daysleft >=0
-ORDER BY `alliances`.`daysleft`");
+ORDER BY `alliances`.`daysleft`, `alliances`.`points` DESC");
 
 if($allicd && $allicd->[0]) {
 	my $nalli=0;
