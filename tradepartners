@@ -20,6 +20,12 @@ for my $p (qw'sort') {
 if(!defined $options{sort}){$options{sort}="8.-2";}
 
 
+our %owntas=();
+my $authpid=getauthpid();
+if($authpid) {
+	my @owntas=awinput::playerid2trades($authpid);
+	foreach my $t (@owntas) { $owntas{$t}=1; }
+}
 
 sub gettradepartners2($$) { my($maxta,$minad)=@_;
   my @result;
@@ -56,12 +62,12 @@ foreach my $entry (@tap) {
 #   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
 	my $cl="-1";
 	if(my $player=getplayer($pid)){$cl=$player->{culture}};
-   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus,$cl]);
+   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus,$cl, $owntas{$pid}?"X":"-"]);
 }
 
-print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti pop10 culture)], 
-         [\&display_pid, \&display_relation, \&display_round0, \&display_round0, \&display_string, \&display_round1, \&display_round0, \&display_round1, \&display_string, \&display_string],
-         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num],
+print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti pop10 culture TA)], 
+         [\&display_pid, \&display_relation, \&display_round0, \&display_round0, \&display_string, \&display_round1, \&display_round0, \&display_round1, \&display_string, \&display_string, \&display_string],
+         [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_string],
          sort_param_to_keys($options{sort}), \@tap2 );
 
 print AWtail();
