@@ -23,6 +23,7 @@ if(!defined $options{sort}){$options{sort}="8.-2";}
 our %owntas=();
 my $authpid=getauthpid();
 if($authpid) {
+	$owntas{$authpid}=1;
 	my @owntas=awinput::playerid2trades($authpid);
 	foreach my $t (@owntas) { $owntas{$t}=1; }
 }
@@ -62,7 +63,7 @@ foreach my $entry (@tap) {
 #   push(@$entry, sprintf("%.2f",$time), $pid, $rel[0]);
 	my $cl="-1";
 	if(my $player=getplayer($pid)){$cl=$player->{culture}};
-   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus,$cl, $owntas{$pid}?"X":"-"]);
+   push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus,$cl, $owntas{$pid}?"X":"o"]);
 }
 
 print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti pop10 culture TA)], 

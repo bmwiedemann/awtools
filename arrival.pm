@@ -7,6 +7,7 @@ my ($c,$a,$p,$e,$rs)=(850/60, 34, 0.1, 91/100, 0.17);
 
 # calculates and returns travel time for given options
 sub traveltime { my ($options)=@_;
+	if($$options{distance}<0 || $$options{planet}<0) {return 0}
    my $basetime=$c+sqrt(sqrt($$options{distance})+$$options{planet}*$p)*$a;
    my $time=$basetime *$e**$$options{energy};
    {

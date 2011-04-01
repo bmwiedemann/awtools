@@ -4,7 +4,8 @@ use CGI ":standard";
 
 print header("text/plain");
 
-foreach(sort keys %ENV) {
-   print "$_=$ENV{$_}\n";
-}
+print join("\n", map {"$_=$ENV{$_}"} sort keys %ENV);
+#foreach(sort keys %ENV) {
+#   print "$_=$ENV{$_}\n";
+#}
 

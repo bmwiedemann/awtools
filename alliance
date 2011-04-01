@@ -153,13 +153,14 @@ if($options{alliance}) {
       # footer
       @alliancepoints=@$livealliscore;
       if(scalar @alliancepoints == scalar @members) {
-         my $counted=@members;
+         my $counted=$members;
          if($counted>=10) {$counted-=int(($counted-5)/5)}
 #         @alliancepoints = reverse sort @alliancepoints;
 #print "$counted: @alliancepoints\n".br;
          my $sum=0;
-         foreach(@alliancepoints[0..$counted-1]) { $sum+=$_ }
-         printf "current alliance score: %.2f".br,($sum/$counted);
+			my $maxindex=(($counted>=@alliancepoints)?@alliancepoints-1:$counted-1);
+         foreach(@alliancepoints[0..$maxindex]) { $sum+=$_ }
+         printf "current alliance score: %.2f (counting %i members)".br,($sum/$counted, $counted);
          
       }
       printf "average culture: %.2f".br,($totalcul/@members);

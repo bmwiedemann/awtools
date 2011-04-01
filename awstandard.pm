@@ -128,7 +128,7 @@ sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/code/css/tools/common.css" />!);
 #   push(@$heads, "<title>$title</title>");
 	$owncgi=~s!/cgi-bin/(?:modperl/)?!!;
-	foreach my $item (qw(index.html tactical-live tactical-live2 relations allirelations alliance system-info fleets imessage)) {
+	foreach my $item (qw(index.html tactical-live2 relations allirelations alliance system-info fleets imessage)) {
 		my %h=(href=>$item);
 		my $linktext=$headerlinkmap{$item}||$item;
 		if($item eq $owncgi) {

@@ -5,6 +5,17 @@ use DBAccess;
 if(!$dbh) {die "DB err: $!"}
 # create tables
 
+$dbh->do(qq!
+CREATE TABLE `bestguarded` (
+`sidpid` INT NOT NULL,
+`time` INT NOT NULL,
+`cv` INT NOT NULL,
+PRIMARY KEY ( `sidpid` )
+);!);
+
+exit 0;
+
+
 #$dbh->do("DROP TABLE `smsalliaccount`");
 $dbh->do(qq!
 CREATE TABLE `smsalliaccount` (

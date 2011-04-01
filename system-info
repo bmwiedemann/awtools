@@ -9,6 +9,7 @@ use awstandard;
 use awinput;
 use bbcode;
 use DBAccess;
+use model::bestguarded;
 #use awmap;
 awstandard_init();
 
@@ -224,6 +225,8 @@ if(param("legend")) {
 					$info=" ".span({-style=>"color: $scolor"},$planetstatusstring{$status})." ".playerid2link($pinfo[1]).": ".bbcode_trans($pinfo);
 				}
 			}
+			my @bestguarded = model::bestguarded::lookup($system,$planetid);
+			my $bestguarded=""; if($bestguarded[0]) { $bestguarded=" best guarded: $bestguarded[0] CV ".AWreltime($bestguarded[1]) }
          my $fleets = awinput::sidpid2fleets(sidpid22sidpid3m($system,$planetid), $wantcurrent);
          my $fleetsstr="";
          foreach my $f (@$fleets) {
@@ -243,7 +246,7 @@ if(param("legend")) {
 				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/images/aw/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
 				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/aw/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
             if($options{simple}) {$etalink=""}
-				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $info.$fleetsstr."</li>\n";
+				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $bestguarded.$info.$fleetsstr."</li>\n";
 			} else {
 				$output.=sprintf("$eol#%2i pop=%2i SB=%2i %s %s%s", $planetid, planet2pop($h), planet2sb($h), spinfo($$h{ownerid}), (planet2siege($h)?"[color=red]sieged[/color] ":""), $info);
 			}

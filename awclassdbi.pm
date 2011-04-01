@@ -52,3 +52,8 @@ AW::Alliaccess->has_a(pid => 'AW::Player');
 AW::Alliaccess->has_a(alliance => 'AW::Alliance');
 
 
+package AW::BestGuarded;
+use base 'AW::DBI';
+AW::BestGuarded->table('bestguarded');
+AW::BestGuarded->columns(All => qw'sidpid time cv');
+

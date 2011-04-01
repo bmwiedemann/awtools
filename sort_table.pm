@@ -1,3 +1,9 @@
+# produce a sortable HTML table from a @list
+#
+# Copyright 2007 Bernhard M. Wiedemann
+# Licensed for use, modification, distribution etc
+# under the terms of GNU General Public License v2 or later
+
 package sort_table;
 use strict;
 require 5.002;
@@ -61,7 +67,7 @@ sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
             my $oldparams=$ENV{QUERY_STRING};
             $oldparams=~s/sort=[-.0-9]*&?//;
             if($oldparams) {$oldparams="&$oldparams"}
-            $sortlinks.=a({-href=>"?sort=$sortval$oldparams"},img({-src=>"/images/aw/ico_arrow_$updown.gif", -alt=>"sort $updown", -style=>"border:0"}));
+            $sortlinks.=a({-href=>"?sort=$sortval$oldparams", -rel=>"nofollow"},img({-src=>"/images/aw/ico_arrow_$updown.gif", -alt=>"sort $updown", -style=>"border:0"}));
          }
          if(! defined ($$sortfunc[$n-1])) {$sortlinks=""}
          $headerstr.=th($_.$sortlinks);

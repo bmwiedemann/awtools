@@ -53,11 +53,11 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
    print "title $title\n";
    if($title=~/- profile - $aw/o) { require feed::profile; feed_profile(); return 0}
    my @time;
-	return unless @time=($title=~/(.*) - (\d+):(\d+):(\d+)/);
+   my $url=$$options{url};
+	return unless @time=($title=~/(.*) - (\d+):(\d+):(\d+)/) or $url=~m{/rankings/};
 	$title=shift(@time);
    my @module=();
    my $module=title2pm($title);
-   my $url=$$options{url};
    push(@module, url2pm($url), (1 ? $module :()));
    my $include;
    foreach my $m (@module) {

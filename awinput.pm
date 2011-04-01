@@ -1122,6 +1122,7 @@ sub show_fleet($) { my($f)=@_;
    if(!$eta && $iscurrent){$color.="; text-decoration:underline"}
    if($status==2) {$color.="; background-color: orange"}
    if($status==10) {$color.="; background-color: violet"}
+   if($status==18) {$color.="; background-color: gray"}
    my $tz2=($timezone>=0?"+":"").$timezone;
    if($eta) {$eta=AWisodatetime($eta+$tz)." GMT$tz2 ".awstandard::AWreltime($eta)} else {$eta="defending fleet.............."}
    if(length($eta)<$minlen1) {$eta.="&nbsp;" x ($minlen1-length($eta))}

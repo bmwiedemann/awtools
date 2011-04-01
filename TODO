@@ -1,9 +1,15 @@
 #Cut: brownie:fleet/launch: inline <td> with plan.comment | onmouseover: pop up inline iframe of system
 Cut: would it be possible to have an incoming only page with fleets in chronological order
+     sorter/filter for fleet
+	verify security of http://www1.astrowars.com/0/Alliance/Info.php/?tag=AF&mode=confirm
+check/fix brownie:Alliance/NAP/invite
+iframe-able tools (e.g. fleets) without header/title/footer &frame
 #Elfenlied: planet/detail: yellow +0 link to spend remaining PP into building (useful before spend-all)
 #optional (default off) planet/detail +1 & +0 links spend immediately
 all account settings via brownie:News/Settings
 maybe a fleet-collision detector: warn (mislaunch?) if another friendly fleet arrives in same minute
+fleet/launch: add system preview in iframe.
+alliance/detail: add values of prod/cul/sci with bonus
 fighterlist/whocanintercept: yCV with A$+PP->CV  yCV = xCV(realCV+CV(PP+A$))
 fighterlist: zCV = yCV + xCV(artifact)
 show bestguarded/bestplanet in system-info

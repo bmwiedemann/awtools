@@ -24,6 +24,7 @@ if(param()) {
 	  if(!$options{$p}) {$options{$p}=0}
      $options{$p}=~s/[^-+0-9o.]//g; # sanitize user input
 	}
+	if($options{distance}<0) {$options{distance}=0; print "<br><span style=\"color:red\">ERROR: negative distance</span></br>"}
    my $eenergy=sprintf("%.2f", arrival::effectiveenergy($options{racespeed},$options{energy}));
 	my $time=arrival::traveltime(\%options);
 	my $h=int($time);
