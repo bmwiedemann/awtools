@@ -30,7 +30,7 @@ sub feed_plain_race() {
 
 # for plain race feeding we expect a name right at the beginning
 if(1 || $::options{name}=~m/greenbird/i) {
-   if(m/^\s*(\w+)\s/s && playername2idm($1)) { $::options{name}=$1 }
+   if(m/^\s*(?:\[\w+\] )?(\w+)\s/s && playername2idm($1)) { $::options{name}=$1 }
    else {return 1}
 }
 my $racere="";
@@ -45,7 +45,8 @@ foreach my $r (@awstandard::racestr) {
 	$racere.=qr"\*?\s*[+-]?\d+%\s+$r\s+\(([+-]?\d)\)\s*"s;
 }
 foreach my $sci (@awstandard::sciencestr) {
-	$sciencere.=qr"$sci\s+(\d+)\s*"s;
+   if($sci eq "Trade Revenue") {$sciencere.=qr"(?:$sci\s+(\d+))?"s;}
+	else { $sciencere.=qr"$sci\s+(\d+)\s*"s; }
 }
 #print "$_ $racere";
 my $name=$::options{name};
