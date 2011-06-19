@@ -45,7 +45,7 @@ updatecsv: dumpdbs
 	make importcsv
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
-	-for i in 4 3 2 1 ; do mv html/strongestfleet-{$$i,`expr $$i + 1`}.html ; done
+	-for i in 4 3 2 1 ; do mv html/strongestfleet-$$i.html html/strongestfleet-`expr $$i + 1`.html ; done
 	-perl manglestrongestfleet.pl www1.astrowars.com/rankings/strongestfleet-$d.html www1.astrowars.com/rankings/bestguarded-$d.html
 	perl importcsv-mysql.pl
 	#(cd html/awcache/ ; find -type f ) | perl -pe 's/^..//' > html/awcache/cache-list.txt
