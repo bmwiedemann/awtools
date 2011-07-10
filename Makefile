@@ -1,3 +1,4 @@
+SHELL=/bin/bash
 htpasswd=/usr/bin/htpasswd
 d=`date +%d-%m-%Y`
 mydate=`date +%y%m%d`
