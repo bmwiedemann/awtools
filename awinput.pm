@@ -694,8 +694,10 @@ sub _playerid2alli($)
    return (get_one_row("SELECT alli FROM useralli WHERE pid=?",[$_[0]]))[0];
 }
 
+my %bannedpid=();
+
 sub playerid2alli($) { my($pid)=@_;
-	if(!$pid) {return ""}
+	if(!$pid || $bannedpid{$pid}) {return ""}
    my $alli=_playerid2alli($pid);
    if(!$alli) {
 #      local $ENV{REMOTE_USER};
@@ -810,7 +812,7 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
 sub dbfleetaddfinish() {
 }
 
-sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
+sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod,$time)=@_;
    return if(!is_extended());
 #	my @rel=getrelation($name);
 #	my $oldentry="$rel[0] $rel[1] $rel[2]";# TODO $relation{$name};
@@ -824,7 +826,7 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod)=@_;
 #      print STDERR "$pid @$sci\n";
       my $etc=$sci->[7]; # TODO check if sci array is modified in awstandard::addplayerir
       my $dbh=get_dbh;
-      my $time=time();
+      $time||=time();
 		if($pid && $race && defined($race->[0])) {
 			my @sci=(undef,undef,undef,undef,undef,undef);
 			my @race=(undef,undef,undef,undef,undef,undef,undef, undef,undef);
@@ -873,6 +875,7 @@ sub dblinkadd { my($sid,$url)=@_;
    elsif($url=~m!http://flebb\.servebeer\.com/sknights/index\.php\?showtopic=(\d+)!) { $type="SK" } # IPB
    elsif($url=~m!http://z10.invisionfree.com/Trolls/index.php\?showtopic=(\d+)!) { $type="TROL" } # IPB
    elsif($url=~m!http://s6.invisionfree.com/LOVE/index.php\?showtopic=(\d+)!) { $type="LOVE" } # IPB
+   elsif($url=~m!http://s8.zetaboards.com/HFwF/topic/(\d+/\d+/)!) { $type="FARt" } # zeta?
 #   elsif($url=~m!http://xtasisrebellion\.free\.fr/phpnuke/modules\.php\?name=Forums&file=viewtopic&t=(\d+)!) { $type="XR" } # hacked and outdated
    elsif($url=~m!http://xtasisrebellion\.xt\.ohost\.de/forum/index\.php\?topic=([0-9.]+)!) { $type="XR" } # SMF
    elsif($url=~m!http://(?:www\.)?ionstorm-alliance\.org/index\.php\?topic=([0-9.]+)!) { $type="IS" } # SMF
@@ -1123,6 +1126,7 @@ sub show_fleet($) { my($f)=@_;
    if($status==2) {$color.="; background-color: orange"}
    if($status==10) {$color.="; background-color: violet"}
    if($status==18) {$color.="; background-color: gray"}
+   if($status==19) {$color.="; background-color: gray"}
    my $tz2=($timezone>=0?"+":"").$timezone;
    if($eta) {$eta=AWisodatetime($eta+$tz)." GMT$tz2 ".awstandard::AWreltime($eta)} else {$eta="defending fleet.............."}
    if(length($eta)<$minlen1) {$eta.="&nbsp;" x ($minlen1-length($eta))}

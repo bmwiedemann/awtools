@@ -14,6 +14,8 @@ for my $p (qw'alliance') {
 	$options{$p}=param($p);
    $options{$p}=~s/[^-+a-zA-Z0-9.]//g; # sanitize user input
 }
+$options{alliance}||=$ENV{REMOTE_USER};
+if($options{alliance} eq "guest") {$options{alliance}=""}
 
 if($options{alliance}) {
 	my $alli="\U$options{alliance}\E";

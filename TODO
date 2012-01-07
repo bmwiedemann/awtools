@@ -1,9 +1,18 @@
+brownie: fleet/send time-correction-offset in client-javascript
+Miguel Garcia / Orphebus: another idea for your brownie, if you have the mood :P
+[08:07:43 CEST] Miguel Garcia / Orphebus: whenever you get a news message of a battle with the ships info breakdown (like the one i will poste next), it could be nice to have a link to the BC with the data fed (like the one in the intercept feature). It could be useful, for example, when you don't know your opponent race or combat sciences
+ 07:53:22 - Jun 01 Congratulations! Your attacking fleet was victorious at Zozca 5. You lost about 40% and gained 2502 experience points from [TUP] Falcatrua
+D:3000/C:0/B:0 vs D:58/C:46/B:1/S:14
+	perl -e '$_="experience points from <a href=/0/Player/Profile.php/?id=48773>xiaolong</a>\..*?D:3000/C:0/B:0 vs D:58/C:46/B:1/S:14"; my @a=m{D:(\d+)/C:(\d+)/B:(\d+) vs D:(\d+)/C:(\d+)/B:(\d+)/S:(\d+)}; print "@a\n"'
+
+sci ETA
 #Cut: brownie:fleet/launch: inline <td> with plan.comment | onmouseover: pop up inline iframe of system
 Cut: would it be possible to have an incoming only page with fleets in chronological order
      sorter/filter for fleet
 	verify security of http://www1.astrowars.com/0/Alliance/Info.php/?tag=AF&mode=confirm
 check/fix brownie:Alliance/NAP/invite
 iframe-able tools (e.g. fleets) without header/title/footer &frame
+#alliance2 get alli tag from cookie/REMOTE_USER
 #Elfenlied: planet/detail: yellow +0 link to spend remaining PP into building (useful before spend-all)
 #optional (default off) planet/detail +1 & +0 links spend immediately
 all account settings via brownie:News/Settings
@@ -206,4 +215,12 @@ Anyway, that's up to you.
 
 Regards,
 monico.
+
+
+
+fix DB outage hangup:
+[Sat Sep 17 19:50:52 2011] [error] lookup of 'brownie::::' failed
+[Sat Sep 17 19:50:52 2011] [error] lookup of 'brownie::::' failed
+[Sat Sep 17 19:51:07 2011] [error] [client 78.251.76.249] failed to resolve handler `brownie::browniecgi': DB err:  at /home/aw/inc/DBAccess.pm line 14.\nCompilation failed in require at /home/aw/inc/feed/dispatch.pm line 7.\nBEGIN failed--compilation aborted at /home/aw/inc/feed/dispatch.pm line 7.\nCompilation failed in require at /home/aw/inc/brownie/process.pm line 12.\nBEGIN failed--compilation aborted at /home/aw/inc/brownie/process.pm line 12.\nCompilation failed in require at /home/aw/inc/brownie/browniecgi.pm line 14.\nBEGIN failed--compilation aborted at /home/aw/inc/brownie/browniecgi.pm line 14.\nCompilation failed in require at (eval 18) line 3.\n, referer: http://aw21.zq1.de/0/Map/
+[Sat Sep 17 19:51:07 2011] [error] [client 69.161.123.105] failed to resolve handler `brownie::browniecgi': DB err:  at /home/aw/inc/DBAccess.pm line 14.\nCompilation failed in require at /home/aw/inc/feed/dispatch.pm line 7.\nBEGIN failed--compilation aborted at /home/aw/inc/feed/dispatch.pm line 7.\nCompilation failed in require at /home/aw/inc/brownie/process.pm line 12.\nBEGIN failed--compilation aborted at /home/aw/inc/brownie/process.pm line 12.\nCompilation failed in require at /home/aw/inc/brownie/browniecgi.pm line 14.\nBEGIN failed--compilation aborted at /home/aw/inc/brownie/browniecgi.pm line 14.\nCompilation failed in require at (eval 18) line 3.\n, referer: http://aw21.zq1.de/0/Fleet/
 
