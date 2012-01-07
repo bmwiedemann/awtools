@@ -13,7 +13,7 @@ print AWheader("AW preferences tool");
 my $name=getauthname();
 my $authpid=getauthpid();
 if(!$authpid) {
-   print "Sorry, you can only use this tool when ".a({-href=>"authawforum?uri=/cgi-bin/preferences2"},"properly authenticated");
+   print "Sorry, you can only use this tool when ".a({-href=>"/manual/auth"},"properly authenticated");
 } else {
    if(param() && $ENV{REQUEST_METHOD} eq "POST") {
       foreach my $p (qw(p awfstyle awtstyle customhtml)) {
@@ -26,8 +26,6 @@ if(!$authpid) {
       my $dbh=get_dbh();
       my %h;
       tie %h,'Tie::DBI',$dbh,'playerprefs','pid',{CLOBBER=>1};
-#      my $sth=$dbh->prepare("UPDATE `playerprefs` SET `tz` = ? , `forumstyle` = ? , customhtml = ? WHERE `pid` = ?");
-#      my $res = $sth->execute($options{p}, $options{awfstyle}, $options{customhtml}, $authpid);
       my %data=%{$h{$authpid}||{}};
       $data{tz}=$options{p};
       $data{forumstyle}=$options{awfstyle};
@@ -56,7 +54,8 @@ if(!$authpid) {
          param("immediatebuild",$flags&1);
          param("plusnull",$flags&2);
       }
-      print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," TimeZone",br,
+      print start_form(-name=>"form"),
+			a({-href=>"http://$awserver/0/News/Settings.php"}, "set timezone in AW"),br,
          popup_menu(-name=>'awfstyle', -values=>[qw(subBlack subSilver)])," AW forum style",br,
          popup_menu(-name=>'awtstyle', -values=>["",qw(blue aw plain)])," AWTools style",br,
 			checkbox(-name=>'storepw', -value=>1), ' auto-update player\'s <a href="userpasswd">AWTools-password</a> from AW',br,

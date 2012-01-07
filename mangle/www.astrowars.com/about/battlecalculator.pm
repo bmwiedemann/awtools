@@ -53,9 +53,21 @@ if(m%Race Mod Attack</td>(.*)Race Mod Defense</td>(.*)Chance to win</td><td cols
 }
 #$_.=$p;
 
+my %cvmap=qw{des 3 cru 24 bat 60};
+sub cvof($$)
+{ my($type,$amount)=@_;
+   if($type eq "sta") {return int(0.5+(-10+10*(1.5**int($amount)))*0.4);}
+	return $cvmap{substr($type,0,3)}*$amount;
+}
+sub cvdiff($$$)
+{ my($type,$oldamount,$newamount)=@_;
+	return cvof($type, $oldamount)-cvof($type, $newamount);
+}
+
 #my @kill;
 my @killr;
 my @oships;
+my @killcv;
 foreach my $s (qw(des destroyer cru cruiser bat battleship sta)) {
    my($left)=m!input type="text" name="$s" size="5" value="\d+" class=text></td><td>([0-9.]*)</td>!;
    my $p2=$pmap{$s};
@@ -65,6 +77,7 @@ foreach my $s (qw(des destroyer cru cruiser bat battleship sta)) {
       $n=$&-1;
    }
    my $kill=$values{$p2}-$left;
+   $killcv[$n]+=cvdiff($s,$values{$p2},$left);
    if(!$oships[$n] || $values{$p2}>$oships[$n]) {
       $oships[$n]=$values{$p2};
 #   if(!$kill[$n] || $kill>$kill[$n]) { 
@@ -96,5 +109,14 @@ if($sb != int($sb)) {
    $sb=~s/[^0-9.+-]//g;
    s%(<a href=/portal/Starbase>Starbase</a></td><td><input type="text" name="sta" size="5" value=")\d+(" class=text>)%$1$sb$2%;
 }
+
+for my $i(0..1) {
+	$killr[$i]=sprintf("%.2f",$killr[$i]*100)+0;
+	$killcv[$i]=sprintf("%.2f",$killcv[$i])+0;
+}
+
+s{Combat Value \(XP\)</td><td colspan="2">[^<]*</td><td colspan="2">[^<]*</td></tr>}
+ {$&<tr><td>Killed CV</td><td colspan="2">$killcv[0]</td><td colspan="2">$killcv[1]</td></tr>
+<tr bgcolor="#303030"><td>Killed %</td><td colspan="2">$killr[0]%</td><td colspan="2">$killr[1]%</td></tr>};
 
 1;

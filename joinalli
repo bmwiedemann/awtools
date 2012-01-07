@@ -48,7 +48,7 @@ if($name && $pid && ($interbeta || (!$alli && !$awalli)) && param()) {
 
 } else {
    if(!$name) {
-      print "sorry, you need to ".a({-href=>"authawforum?uri=/cgi-bin/joinalli"},"authenticate")." first. This might even work if you player-ID was seen in earlier rounds.",br;
+      print "sorry, you need to authenticate first.",br;
 #This does not work on the first day of your sign in, because <a href=\"http://forum.rebelstudentalliance.co.uk/index.php?showtopic=20963\">there is no CSV data</a>.",br;
    } elsif(!$interbeta && $awalli) {
       print "sorry, you are already member of an alliance and can not join another one within AWTools";

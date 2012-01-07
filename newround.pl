@@ -43,4 +43,9 @@ awstandard::set_file_content("systemexportsecret", rand(1000000000000000)."\n");
 system(qw"/usr/bin/perl -i -pe", '@a=split("\t"); if($notfirst){$a[2]=$a[3]=$a[4]=$a[5]=0} $_=join("\t",@a)."\n"; $notfirst=1', "planets.csv");
 
 system("make importcsv");
-print "do not forget to start new log\n";
+
+for my $l ("log/brownie.log", "log/aw-access_log") {
+	rename($l, "$l.$oldname");
+}
+print "check start of new log + reloadhttp\n";
+

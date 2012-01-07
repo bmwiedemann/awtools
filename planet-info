@@ -116,4 +116,6 @@ if($options{id}) {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'id', -class=>'text'), " ID: system#planet".AWfocus("form.id"), br,
 	 submit(-name=>"query", -class=>'smbutton')
 }
-print end_form, AWtail();
+print end_form, 
+	br,"Note: entries expire 14 days after last modification",
+	AWtail();

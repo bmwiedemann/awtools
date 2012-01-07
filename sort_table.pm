@@ -51,7 +51,7 @@ sub sort_string($$) {$_[0] cmp $_[1]}
 sub sort_istring($$) {lc($_[0]) cmp lc($_[1])}
 
 
-sub sort_table(@@@) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
+sub sort_table($$$$$) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@_;
    my $headerstr="<table><tr>";
    {
       my $n=0;

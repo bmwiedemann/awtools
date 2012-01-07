@@ -55,7 +55,7 @@ if($authname && $authname eq "unknown") {
    $authname="";
 }
 if(!$authname) {
-  $errormessage="Sorry, you can only use this tool when ".a({-href=>"authawforum?uri=/cgi-bin/uploadcss"},"properly authenticated")." read also ".a({-href=>"/manual/auth"},"auth manual");
+  $errormessage="Sorry, you can only use this tool when ".a({-href=>"/manual/auth"},"properly authenticated")." read also ".a({-href=>"/manual/auth"},"auth manual");
 }
 if(param() && $authname) {
   $errormessage=process($authname);

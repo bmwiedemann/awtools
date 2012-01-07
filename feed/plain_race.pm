@@ -60,8 +60,10 @@ if(@science=/$sciencere/) {
 	print "science: @science<br>\n";
 }
 if(@race || @science) {
+	my $time=time-3600*24*300;
+	if(m/age\s+(\d+)/) {$time=time-3600*24*$1; print "age: $1 days<br>\n";}
 	if(!playername2idm($name)) {print "player $name not found<br>\n"}
-   else { dbplayeriradd($name, \@science, \@race); }
+   else { dbplayeriradd($name, \@science, \@race, undef, undef, undef, $time); }
 }
 }
 1;

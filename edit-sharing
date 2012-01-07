@@ -91,16 +91,18 @@ if($alli && param()) {
       # set masking out bits
       my $newmask=255;
       my (undef,undef,$rbits,undef,$rmask)=get_one_row("SELECT * FROM toolsaccess WHERE tag=? AND othertag=?",[$options{p}, $alli]);
-      foreach my $name (keys %bitmap) {
-         my $bit=(param("mask".$name)?1:0);
-         next if ($bitmap{$name} & $rbits)==0 or $bit;
-         $newmask&=~$bitmap{$name};
-#         print " $name = $bit  $newmask ";
-      }
-      settoolsaccess_rmask($alli, $options{p}, $newmask);
-#      $sth2->execute($newmask, $options{p}, $alli);
-      
-      print "modified $options{p}",br;
+		if(defined($rbits)) {
+			foreach my $name (keys %bitmap) {
+				my $bit=(param("mask".$name)?1:0);
+				next if ($bitmap{$name} & $rbits)==0 or $bit;
+				$newmask&=~$bitmap{$name};
+	#         print " $name = $bit  $newmask ";
+			}
+			settoolsaccess_rmask($alli, $options{p}, $newmask);
+	#      $sth2->execute($newmask, $options{p}, $alli);
+			
+			print "modified $options{p}",br;
+		}
    } elsif($action eq "del") {
       my $sth=$dbh->prepare("DELETE FROM `toolsaccess` WHERE tag=? AND othertag=?");
       $sth->execute($alli,$options{p});

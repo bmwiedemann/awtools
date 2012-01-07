@@ -11,14 +11,14 @@ my $alli=$ENV{REMOTE_USER};
 my $title="fleets [\U$alli\E]";
 my $wantcurrent=" AND `iscurrent` = 1 ";
 my %options;
-for my $p (qw'history onlyinc') {
+for my $p (qw'history onlyinc onlytrn') {
    $options{$p}=param($p);
 }
 if($options{history}) {$wantcurrent=""}
 if($options{onlyinc}) {$wantcurrent.=" AND (status & 7) = 2 ";}
 
 print AWheader($title);
-print p(a({-href=>"?history=".(!$options{history})},"toggle history")." ".a({-href=>"?onlyinc=".(!$options{onlyinc})},"toggle incomings"));
+print p(a({-href=>"?history=".(!$options{history})},"toggle history")." ".a({-href=>"?onlyinc=".(!$options{onlyinc})},"toggle incomings")." ".a({-href=>"?onlytrn=".(!$options{onlytrn})},"toggle attacking-TRN-only"));
 
 print "sys#planet: info".br;
 
@@ -52,6 +52,9 @@ foreach my $row1 (@sidpids) {
 
    my $res=awinput::get_fleets($sidpid, $wantcurrent);
    if(!$res || !@$res) {next}
+   my $wantplanet=!$options{onlytrn} || 
+      grep {$_->[8] && $_->[5] && $_->[4]!=$owner} @$res; # only return entries with non-zero TRN and non-zero ETA and not own planet
+   next unless $wantplanet;
    print "$str\n".br;
    foreach my $row2 (@$res) {
 		my($owner,$cv, $xcv)=@$row2[4,13,14];

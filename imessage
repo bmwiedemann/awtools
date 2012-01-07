@@ -55,7 +55,7 @@ my $admin=is_admin;
 
 print AWheader("Brownie Instant Messaging tool");
 if(!$authpid) {
-   print "Sorry, you can only use IMs when ".a({-href=>"authawforum?uri=/cgi-bin/imessage"},"properly authenticated");
+   print "Sorry, you can only use IMs when ".a({-href=>"/manual/auth"},"properly authenticated");
 } else {
    %options=(); # clear global var from last mod-perl loop
    $options{authpid}=$authpid;

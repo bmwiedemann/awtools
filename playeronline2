@@ -31,7 +31,7 @@ if(param()) {
    $options{name}=~s/[^a-zA-Z0-9.дцья*ы _\]\[-]+//g;
    if(my $id=playername2idm($options{name}))
       {  
-      my @logins=@{awlogins::get_logins($ENV{REMOTE_USER}, $id)}; 
+      my @logins=@{awlogins::get_logins($ENV{REMOTE_USER}, $id, "ORDER BY `n`")}; 
 #      my @logins=($rel[2]=~m/login:(\d+:\d+:\d+:\d+)/g);
       my @logs;
       my @logp;

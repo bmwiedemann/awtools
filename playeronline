@@ -31,7 +31,7 @@ if(param()) {
 	}
    if(my $id=playername2idm($options{name}))
    {
-      my @logins=@{awlogins::get_logins($ENV{REMOTE_USER}, $id)};
+      my @logins=@{awlogins::get_logins($ENV{REMOTE_USER}, $id, "ORDER BY `n`")};
       my @logs;
       my $lastlog=-1;
       my $lastlogn=-1;
