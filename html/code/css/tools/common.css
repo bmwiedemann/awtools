@@ -1,0 +1,21 @@
+@import url("/code/css/bmwaw.css");
+
+.headeractive {
+   text-decoration: none;
+}
+
+div.grouping {
+	border: gray 1px solid; 
+	padding: 3px;
+}
+
+pre, code {
+	font-family : monospace;
+}
+
+.bmwrunknown { color : gray; }
+
+.bmwtarget {
+	background-color : yellow;
+	border : 2px solid blue;
+}

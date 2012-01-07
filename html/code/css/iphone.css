@@ -1,0 +1,55 @@
+body {
+  -webkit-text-size-adjust:none;
+}
+
+table.main_outer, table.main_inner, table.top_navi, table.sub_inner {
+	font-size: 18pt;
+	width: 100%;
+}
+table.bottom_navi {
+	width: 99%;
+	font-size: 18pt;
+}
+
+table.map_inner, table.innersubtable {
+	width: 99%;
+}
+
+p#disclaimer, table.bottomad {
+        display : none;
+}
+
+.mouseout40 td, .mousein40 td{
+	font-size: 18pt;
+	padding: 20px;
+}
+
+input.smbutton {
+	font-size: 18pt;
+	width: 100px;
+	height: 50px;
+}
+
+.scitext, .text {
+	font-size: 18pt;
+	margin-right: 15px;
+	margin-left: 15px;
+}
+
+.awimessage {
+	font-size: 16pt;
+}
+
+.bmwblankrow {
+height: 1px;
+font-size: 1pt;
+}
+
+.allianceinfo, .alliancemembers, .innersubtable {
+	font-size: 18pt;
+}
+
+ .newsdate {
+   background-color : #404040;
+   width : 250px;
+}

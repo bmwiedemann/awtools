@@ -1,0 +1,36 @@
+/* *{
+font-family :Arial, Verdana, Helvetica, sans-serif;
+}*/
+
+body {
+	background-color: #eeeeff;
+	background-image: url("/blueish.png");
+}
+
+h1{
+  	font-size: 18pt;
+}
+
+div.header {
+	font-size: 11pt;
+}
+
+.headeractive {
+	background-color: #ffe99c;
+}
+
+table{
+  border-style:hidden;
+}
+
+tr.even {background-color:#eef ;}
+
+tr.odd {background-color:#dde ;}
+
+th {background-color:#77c ;}
+th, td.sort {padding:2px ;
+}
+th, td.sort {padding:2px ;
+   border-left: 1px solid gray;
+   border-bottom: 1px solid gray;}
+

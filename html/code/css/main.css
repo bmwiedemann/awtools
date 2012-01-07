@@ -1,0 +1,130 @@
+@import url("/code/css/bmwaw.css");
+
+body {
+	margin-top : 0px;
+	margin-left : 0px;
+	background-color : #000000;
+	font-family : verdana, arial, helvetica, sans-serif;
+}
+body, h1, table, input {
+	color : #ffffff;
+}
+body, table {
+	font-size : 10pt;
+}
+h1 {
+	font-size : 14pt;
+}
+form {
+	margin-bottom : 0;
+}
+a {
+	color : #aaddff;
+	text-decoration : none;
+}
+a:hover {
+	color : #ffffff !important;
+	background : #026060;
+}
+
+input.text, select  {
+	text-align : right;
+	border : #549c7d 0px solid;
+	color : #ffffff;
+	background-color : #404040;
+}
+input.smbutton {
+	border-left : #bbbbbb 1px solid;
+	border-right : #aaaaaa 1px solid;
+	border-top : #cccccc 1px solid;
+	border-bottom : #999999 1px solid;
+	font-weight : bold;
+	font-size : 9pt;
+	color : #ffffff;
+	background-color : #333333;
+}
+
+table.top_navi, table.bottom_navi{
+	background-color: #404040;
+	width: 670px;
+	height: 15px;
+	border-collapse: collapse;
+	padding: 0px;
+}
+
+table.main_outer {
+	background-color: #000000;
+	width: 670px;
+	border: 0px;
+	border-collapse: collapse;
+}
+
+table.main_inner {
+	width: 670px;
+	padding: 1px;
+	border: 0px;
+}
+
+table.map_inner {
+/*   width: 600px;*/
+}
+table.innersubtable {
+   width: 95%;
+}
+
+.t_navi_links {
+	color: #ffffff;
+	text-align: center;
+	padding: 0px;
+}
+
+.t_bmw_navi_links {
+	color: #ffffff;
+	text-align: center;
+	padding: 0px;
+}
+
+.t_navi_title {
+	width: 140px;
+	background-color: #202060;
+	padding: 0px;
+}
+
+.t_bmw_navi_title {
+	width: 140px;
+	background-color: #206020;
+	padding: 0px;
+}
+
+tr.mousein30 {
+	text-align : center;
+	background-color : #206060;
+}
+tr.mousein40 {
+	text-align : center;
+	background-color : #206060;
+}
+tr.mouseout30 {
+	text-align : center;
+	background-color : #303030;
+}
+tr.mouseout40 {
+	text-align : center;
+	background-color : #404040;
+}
+
+.bmwrunknown { color : gray; }
+
+
+table.main_outer, table.main_inner, table.bottom_navi, table.top_navi, table.sub_inner {
+        width : 670px;
+}
+
+.newsdate {
+	background-color : #404040;
+	width : 135px;
+}
+
+.newsmessage {
+	background-color : #101010;
+}

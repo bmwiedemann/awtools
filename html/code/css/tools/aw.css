@@ -1,0 +1,33 @@
+@import url("/code/css/bmwaw.css");
+
+	BODY {
+		background-color: #000000;
+	}
+
+	BODY, H1, A, TABLE, INPUT{
+		font-family : Verdana, Arial, Helvetica, sans-serif;
+		color : #FFFFFF;text-decoration: none;
+	}
+	BODY, TABLE {
+	  font-size: 10pt;
+	}
+	H1 {
+	  font-size: 14pt;
+	}
+form {margin-bottom : 0; }
+a { color: #99ffcc; }
+a:hover { color: #ffffff;	background: #026060; }
+input.file, textarea { border: #999999 1px solid; COLOR: #FFFFFF; background-color: #404040}
+input.text, select  { text-align:right; border: #000000 1px solid; color: #FFFFFF; background-color: #404040}
+input.smbutton {
+BORDER-RIGHT: #aaaaaa 1px solid; BORDER-TOP: #cccccc 1px solid; FONT-WEIGHT: bold; FONT-SIZE: 9pt; BORDER-LEFT: #bbbbbb 1px solid; COLOR: #ffffff; BORDER-BOTTOM: #999999 1px solid; background-color: #333333
+}
+/*H1, DIV.header { text-align:center; }*/
+div.header { background: #404040; }
+.headeractive { background: #202060 ;}
+img {border:0;}
+th {background-color:#226 ;}
+tr.even {background-color:#333 ;}
+tr.odd {background-color:#222 ;}
+
+

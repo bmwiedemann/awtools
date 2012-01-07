@@ -1,0 +1,128 @@
+/* colours in this file are optimized for dark background */
+
+.bottom_key {
+        color : gray;
+}
+.bmwnotice {
+        color : green;
+}
+.bmwbuildingavailable {
+        color : #6f6;
+}
+.bmwownfleet {
+        background-color : #050;
+}
+.bmwwarning {
+        color : #f44;
+}
+.bmwinfo {
+        color : #ff8;
+}
+.bmwincoming {
+        border: green 1px solid;
+}
+a.aw {
+	color : #aaddff;
+}
+a.awtools {
+	color : #77ffbb;
+}
+a.awglossary, a.othertool {
+	color : #ffddaa;
+}
+
+
+input.scitext {
+	background-color : #206060;
+	border : #549c7d 0px solid;
+	color : #ffffff;
+}
+
+div.awimessage {
+	text-align : left;
+	border : #549c7d 1px solid;
+	padding-left : 7px;
+	margin-left : 30px;
+	margin-right : 30px;
+	margin-top : 4px;
+	font-family : monospace;
+}
+
+.recvimessage {
+	color : #ff8;
+}
+
+.sentimessage {
+	color : #8f8;
+}
+
+p#disclaimer {
+	text-align : center;
+	color : white;
+	background-color : black;
+}
+
+.bmwrunknown { }
+a.bmwrtotalwar:link,a.bmwrtotalwar:visited,.bmwrtotalwar { color : #B22222 /*firebrick*/; }
+a.bmwrfoe:link,a.bmwrfoe:visited,.bmwrfoe { color : #FF4500 /*OrangeRed*/; }
+.bmwrtense { color : orange; }
+.bmwrneutral { color : gray; }
+.bmwrineutral { color : navy; }
+a.bmwrnap:link,a.bmwrnap:visited,.bmwrnap { color : #4169E1 /*RoyalBlue*/; }
+a.bmwrfriend:link,a.bmwrfriend:visited,.bmwrfriend { color : #00CED1 /*darkturquoise*/; }
+a.bmwrally:link,a.bmwrally:visited,.bmwrally { color : #32CD32 /*LimeGreen*/; }
+a.bmwrmember:link,a.bmwrmember:visited,.bmwrmember { color : green; }
+
+
+span.vkhidden input.vkbutton {
+	display:none;
+}
+input.vkbutton {
+   border-left : #bbbbbb 1px solid;
+   border-right : #aaaaaa 1px solid;
+   border-top : #cccccc 1px solid;
+   border-bottom : #999999 1px solid;
+   font-weight : bold;
+   font-size : 9pt;
+   color : #ffffff;
+   background-color : #333333;
+}
+
+.gray15 { color : #fff; }
+.gray14 { color : #eee; }
+.gray13 { color : #ddd; }
+.gray12 { color : #ccc; }
+.gray11 { color : #bbb; }
+.gray10 { color : #aaa; }
+.gray9  { color : #999; }
+.gray8  { color : #888; }
+.gray7  { color : #777; }
+.gray6  { color : #666; }
+.gray5  { color : #555; }
+.gray4  { color : #444; }
+.gray3  { color : #333; }
+.gray2  { color : #222; }
+.gray1  { color : #111; }
+.gray0  { color : #000; }
+
+.trgray4 { background-color: #404040; text-align: center }
+.trblue226 { background-color: #202060; text-align: center }
+.trsiege { background-color: #602020; text-align: center }
+
+@media handheld
+{
+  tr.bmwblankrow, tr.awtools {display : none;}
+}
+
+.badcolor {
+/*	color : red; */
+	color : #f66;
+}
+.notrecommended {
+	color : yellow;
+}
+
+.bmwdarkmessagebox {
+	background-color : #040;
+}
+

@@ -1,0 +1,49 @@
+@import url("/code/css/bmwaw.css");
+
+.recvimessage {
+	color : #770;
+}
+
+.sentimessage {
+	color : #070;
+}
+
+.bmwinfo {
+	color : #770;
+}
+
+a.aw {
+	color : #257;
+}
+a.awtools {
+	color : #052;
+}
+.bmwbuildingavailable {
+	color : #072;
+}
+a.awglossary,a.othertool {
+	color : #730;
+}
+
+p#disclaimer {
+   color : black;
+   background-color : white;
+}
+
+.gray0  { color : #fff; }
+.gray1  { color : #eee; }
+.gray2  { color : #ddd; }
+.gray3  { color : #ccc; }
+.gray4  { color : #bbb; }
+.gray5  { color : #aaa; }
+.gray6  { color : #999; }
+.gray7  { color : #888; }
+.gray8  { color : #777; }
+.gray9  { color : #666; }
+.gray10 { color : #555; }
+.gray11 { color : #444; }
+.gray12 { color : #333; }
+.gray13 { color : #222; }
+.gray14 { color : #111; }
+.gray15 { color : #000; }
+

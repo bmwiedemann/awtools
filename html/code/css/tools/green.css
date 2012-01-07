@@ -1,0 +1,16 @@
+body {
+	background-color: #f3ffd3;
+	background-image: url("/greenish.png");
+}
+
+div.header {
+	font-family : Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11pt;
+}
+
+.headeractive {
+	background-color: #d9ff80;
+}
+
+tr.even {background-color:#dec ;}
+th {background-color:#6b5 ;}

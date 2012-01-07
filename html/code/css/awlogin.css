@@ -1,0 +1,38 @@
+@import url(/code/css/bmwaw.css);
+
+body {
+	margin-top: 0px;
+	margin-left: 0px;
+	background-color: #000000;
+}
+body, h1, a, table, input {
+	font-family : verdana, arial, helvetica, sans-serif;
+	color : #ffffff;
+}
+body, table {
+	font-size: 10pt;
+}
+h1 {
+	font-size: 14pt;
+}
+
+input.text, select {
+	border-right: #131c13 1px solid;
+	border-top: #131c13 1px solid;
+	font-size: 10pt;
+	border-left: #131c13 1px solid;
+	color: #000000;
+	border-bottom: #131c13 1px solid;
+	font-family: verdana, arial, helvetica, sans-serif;
+	background-color: #777777;
+}
+input.smbutton {
+	border-left: #bbbbbb 1px solid;
+	border-right: #aaaaaa 1px solid;
+	border-top: #cccccc 1px solid;
+	border-bottom: #999999 1px solid;
+	font-weight: bold;
+	font-size: 9pt;
+	color: #ffffff;
+	background-color: #333333;
+}

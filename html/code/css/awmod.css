@@ -1,0 +1,53 @@
+@import url(/code/css/bmwaw.css);
+
+body {
+	margin-top : 0px;
+	margin-left : 0px;
+	background-color : #000000;
+	font-family : verdana, arial, helvetica, sans-serif;
+}
+body, h1, table, input {
+	color : #ffffff;
+}
+body, table {
+	font-size : 10pt;
+}
+h1 {
+	font-size : 14pt;
+}
+form {
+	margin-bottom : 0;
+}
+a {
+	color : #aaddff;
+	text-decoration : none;
+}
+a :hover {
+	color : #ffffff;
+	background : #026060;
+}
+a.awtools {
+	color : #77ffbb;
+}
+a.awglossary {
+	color : #ffddaa;
+}
+
+
+input.text, select  {
+	text-align : right;
+	border : #549c7d 0px solid;
+	color : #ffffff;
+	background-color : #404040;
+}
+input.smbutton {
+	border-right : #aaaaaa 1px solid;
+	border-top : #cccccc 1px solid;
+	font-weight : bold;
+	font-size : 9pt;
+	border-left : #bbbbbb 1px solid;
+	color : #ffffff;
+	border-bottom : #999999 1px solid;
+	background-color : #333333;
+}
+
