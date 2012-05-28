@@ -129,7 +129,7 @@ sub mangle_dispatch(%) { my($options)=@_;
                my $s=qq'<td class="white">$::bmwlink';
                my $l="$e$sep$s";
                s%^</tr></table>%</tr><tr class="bmwblankrow"><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b></td>
-                  $s/preferences2">preferences2
+                  $s/preferences2">prefs
                   $l/tactical-live2">tacmap
                   $l/system-info">system
                   $l/relations">player

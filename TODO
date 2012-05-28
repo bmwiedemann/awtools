@@ -1,3 +1,7 @@
+brownie: display AWTools-NAP reminder
+brownie: planet/details: use intra-update-time to make more accurate predictions on building ETA + second countdown?
+tactical*: specify center by system-id
+brownie: planet/details: display ppprod incl bonus
 brownie: fleet/send time-correction-offset in client-javascript
 Miguel Garcia / Orphebus: another idea for your brownie, if you have the mood :P
 [08:07:43 CEST] Miguel Garcia / Orphebus: whenever you get a news message of a battle with the ships info breakdown (like the one i will poste next), it could be nice to have a link to the BC with the data fed (like the one in the intercept feature). It could be useful, for example, when you don't know your opponent race or combat sciences
@@ -36,7 +40,7 @@ store SU payback price in DB "date hf rf gc rl" # parse/www1.astrowars.com/0/pla
 mangle/planet/spend_points: nice-to-have: all/half links for ships
 #fleets: display CV
 [RATS] TinyToon: btw, just an idea for brownie....it is possible to add a popup window to tactic live map? i mean when you move mouse at system to seee what is inside w/o cliking at it?
-starmap/planets table add modified_at, display in system-info
+starmap/planets table add modified_at, modified_by, display in system-info
 #fix same PHPSESSID on other account -> wrong alli value
 #check IPv6 usage: NAGROM , 1ntraflesh , lswift , rebeca , greenbird
 #map IPv6 forward addrs via 2002:ipv4 or to 127.x.x.x otherwise
