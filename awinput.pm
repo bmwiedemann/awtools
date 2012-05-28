@@ -870,6 +870,7 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod,$time)=@
 
 sub dblinkadd { my($sid,$url)=@_;
    my $type;
+   if($url=~m!http://astrowars-federation\.forumprofi\.de/showthread\.php\?tid=(\d+)!) { $type="AF" } # MyBB
    if($url=~m!http://forum\.rebelstudentalliance\.co\.uk/index\.php\?showtopic=(\d+)!) { $type="RSA" } # IPB
    if($url=~m!http://home\.rebelstudentalliance\.co\.uk/forum/index\.php/topic,(\d+\.\d+)\.html!) { $type="RSA" } # IPB
    elsif($url=~m!http://flebb\.servebeer\.com/sknights/index\.php\?showtopic=(\d+)!) { $type="SK" } # IPB
