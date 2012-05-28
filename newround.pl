@@ -36,6 +36,7 @@ system("perl -i.bak -pe 's/(round=.?)$oldname/\$1$newname/' Makefile");
 system("for f in $awstandard::dbmdir/*relation.dbm ; do ./clear.pl \$f ; done");
 
 awstandard::set_file_content("alltrades.csv", "id1\tid2\n");
+awstandard::set_file_content("html/alltrades.csv", "id1\tid2\n");
 awstandard::set_file_content("player.csv", "rank\tpoints\tid\tscience\tculture\tlevel\thome_id\tlogins\tfrom\tjoined\talliance\tname\ttrade\n");
 awstandard::set_file_content("battles.csv", "id\tcv_def\tcv_att\tatt_id\tdef_id\twin_id\tplanet_id\tsystem_id\ttime\n");
 awstandard::set_file_content("systemexportsecret", rand(1000000000000000)."\n");
