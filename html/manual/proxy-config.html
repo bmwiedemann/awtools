@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>proxy configuration tutorial page</title>
+<link rel="stylesheet" type="text/css" href="/code/css/tools/blue.css" />
+</head><body>
+
+<h1>Proxy Configuration Guide</h1>
+This guide shows in a few pics how to use proxy auto-configuration (.pac) files with various browsers.
+<br />
+<!--Instead of aw.pac you may use either 
+<a href="http://aw.lsmod.de/brownie81.pac">http://aw.lsmod.de/brownie81.pac</a> or 
+<a href="http://aw.lsmod.de/brownie80.pac">http://aw.lsmod.de/brownie80.pac</a> if you notice problems <i>(e.g. firewall blocking port 81 or a transparent proxy on port 80 interfering)</i-->
+<!-- or <a href="http://aw.lsmod.de/muffin.pac">http://aw.lsmod.de/muffin.pac</a--> <br />
+If you download the .pac file to use it from your HD, you need to specify it with a file:// URL, e.g. file://C:\brownie.pac or file:///home/user/brownie.pac <br />
+
+
+<br />
+<h2>firefox:</h2><br />
+<img src="images/muffin/muffin-firefox-tut1n.jpg" alt="proxy config for firefox" /><br />
+<img src="images/muffin/muffin-firefox-tut2.jpg" alt="proxy config for firefox" /><br />
+
+<h2>mozilla:</h2><br />
+<img src="images/muffin/muffin-mozilla-tut.jpg" alt="proxy config for mozilla" /><br />
+<p>
+NOTE: advanced mozilla / firefox users can also open the special "about:config" URL and change 2 values:<br />
+network.proxy.type = 2<br />
+network.proxy.autoconfig_url = http://aw.lsmod.de/brownie.pac
+</p>
+
+<h2>Opera:</h2><br />
+<img src="images/muffin/muffin-opera-tut.jpg" alt="proxy config for opera" /><br />
+<h2>Internet Explorer:</h2><br />
+<img src="images/muffin/muffin-IE-tut.jpg" alt="proxy config for IE" /><br />
+
+<h2>Safari</h2>
+<a href="http://www.lib.ucdavis.edu/ul/services/connect/setup/step1/safari.php">http://www.lib.ucdavis.edu/ul/services/connect/setup/step1/safari.php</a>
+
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+[quote=Jimmy,Jan 30 2007, 01:11 AM]
+Why not?
+
+Ok I am re-posting this as we have just gained a lot of new members and i am sure many of you don't know what brownie is. Brownie is the ultimate AW assistance tool that we have free access to. So if your not using it, you are making extra work for yourself!
+
+Brownie runs AW through a proxy which allows you to do alot more with AW. Interactive maps, instant access to race info seen by other players (even if your Bio is to low to see). automatically record your fleet movements so other alliance members can see where your going to, reserving of planets, etc etc.
+
+Read Greenbird's official manual [url=http://aw.lsmod.de/manual.html]here[/url]
+
+It will really change the way you play. It takes maybe 30 secs to set up!
+
+It is very quick an easy to do. All you need to do is set your PC up to run with a proxy which is explained [url=http://aw.lsmod.de/proxy-config.html]Here[/url] or you can read my own personal guide [url=http://forum.rebelstudentalliance.co.uk/index.php?showtopic=13631]Here[/url]
+
+Brownie allows for the tools to automatically be updated and so you can view them in game. If you want access to the tools without the use of brownie you can view them [url=http://aw.lsmod.de/cgi-bin/index.html]here[/url]
+
+User Name: rats
+Password: xxx
+
+All lowercase.
+
+If anyone has any problems setting this up and they want to make use of the tool MSN me at James_version1@hotmail.com and i will try to walk you through it if you find the instructions a little complex.
+
+Also for work theres a proxy free way of accessing brownie. Just log in to AW [url=http://aw21.zq1.de/]here[/url] rather than through the original AW URL.
+
+Jim
+[/quote]
+

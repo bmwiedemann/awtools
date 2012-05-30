@@ -1,0 +1,28 @@
+some are not familiar with some important features of GreenBirds' tools.   Here I will discuss marking incomings.
+
+It's important, especially when we start to get hit hard (by many incomings), to have our incomings screen as orderly as possible.
+
+This can be done simply and quickly; and ideally the person who has the incoming or the person who sent to defend against it should be the one to mark with the tools.. ..IMMEDIATELY after handling the incoming (ships in fleet, sb built, etc.).
+
+This can be done easily one of several ways, but for ease I will instruct directly from incomings screen.
+
+GB has some features that allow to represent the acknowledgment/outcome of an incoming.
+You can either mark the incoming as:
+1. 'handled'  ...speaks for itself
+2. 'not handled'  ...again clear and understandable
+3. 'move' ..ideally used for movement between alliance members and their ship movements between one anothers' planets.
+4. 'seen but not handled' ... again quite clear as to the meaning. This one should be used by the planet owner if/when he sees his incoming and it is apparent that it can not be covered.
+
+How to:
+1.  on alliance screen when an incoming appears it is color coded yellow (some see it as orange).. this is great and it is a quick visual alert of incoming.  As long as it remains this colour we have to assume the defender has not seen the incoming, or.. that he is unable to defend.
+2.  once defended (or ships are in movement towards defending it) the colour coding MUST be altered.   To remove the yellow/orange code completely (for defended acknowledgment) or change to violet colour status to indicate that the incoming as been seen but not covered.
+
+
+a.   click on 'edit'
+b.   choice the marking (handled, unhandled, seen but not handled, move)
+c.   click 'set'
+d.   go out and if you refresh the page you will see your coding change.
+
+
+this must be done promptly.. it's a very good habit and will make viewing long incoming lists less stressful. 
+

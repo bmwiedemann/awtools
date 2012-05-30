@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>greenbirds AW Tools manual page for developers</title>
+<link rel="stylesheet" type="text/css" href="/code/css/tools/blue.css" />
+<link href="/favicon.ico" type="image/ico" rel="icon" />
+<link href="http://aw.lsmod.de/favicon.ico" rel="shortcut icon" />
+</head><body>
+<a href="/cgi-bin/index.html">AW tools index</a>
+<h1>greenbird's AW Tools manual page for developers</h1>
+<h2>Introduction</h2>
+This page is for those who wish to code their own extra tools while using brownie/AWTools running on my server. If you want to run the whole proxy yourself on your server see <a href="/manual/awtools-install-guide">the AWTools-install-guide</a>.
+<h2>Getting the data</h2>
+All interesting alliance-private data is available for download from
+http://aw.lsmod.de/alli/af/
+(replace af with your AWTools user name). It is protected the same way as the AWTools itself, so you can authenticate with either user+pass or with a cookie you got from brownie. Data is updated every six hours (check timestamps in the directory)<br/>
+<code>wget --http-user af --http-password xsecretx http://aw.lsmod.de/alli/af/fleets.csv</code>
+<h2>Interpreting the data</h2> 
+This is actually a tricky part for the format of some files+formats I kept for legacy reasons
+<h3>relation.csv</h3>
+As the name suggests, this contains relations for players you know (relations are coded as integer: <a href="http://aw.lsmod.de/cgi-bin/system-info?legend=1">legend</a>) . The format was changed at GE11, so the following is now obsolete <span style="color:gray">But what the name does not tell, the most interesting bit of information in here are certainly the races and sciences from IRs and production values for own players.<br/>
+Format is:<br/>
+<pre>
+nameTABrelationTABallianceTABcomment<br/>
+</pre>
+The comment has \n for end-of-line characters, and \t for tab. 
+Thus a sample comment would look like this:<br/>
+<pre>
+automagic:
+production:667,615,324,HoR2,97,40332,15012 
+race:-1,+3,-1,-4,-1,+1,+3 
+science:1174107736,26,27,26,24,22,25,97,1174385191.19557
+login:7:1168152622:120:61 login:28:1168250809:240:61
+</pre>
+meaning of the values is as follows:<br/>
+production:prodPP(per hour),prodScience,prodCulture,artifact,tradebonus,A$,PP<br/>
+race:bio,sci,cul,prod,speed,att,def<br/>
+science:timeOfLastIRUpdate,Bio,Eco,Ene,Math,Phys,Soc,ETC(UNIX timestap with time to culture)<br/>
+login(may appear several times):loginnum(as seen in AW Logins value):loginUNIXtimestamp:idleTime:inaccuracy (61 (seconds) means, the login might have happened up to 1 minute earlier than given in timestamp)<br/></span>
+
+<h3>planetsplanning.csv</h3>
+This one is very similar to relations.csv described above. Format is given in it's header line
+<br>
+The special things about this: sysID#0 is actually displayed as HTML above a system. It is automagically added when the system-info tool detects a link from an alliances forum in a referer.<br/>
+The other special looks like 
+<pre>took:2007-03-15 s:2007-03-15 l:2007-03-15</pre>
+and is automagically added with fleet updates. l=launch, s=siege, took=taken a planet. Each is followed by an ISOdate string (yyyy-mm-dd). I could make it date+time if needed.
+<h3>fleets.csv</h3>
+This one is a simple CSV file as it comes directly out of my SQL-DB.
+Format is
+<pre>
+fleetID alli(the one who has seen it) status sidpid ownerid ETA firstseen lastseen trn cls ds cs bs cv xcv iscurrent info
+</pre>
+With info being the only free-form field and it is not used by the tools itself.<br/>
+Status can have values 0..3 which mean: 
+<ul><li>0=landed on other planet (siege)</li>
+<li>1=landed on own planet (defence)</li>
+<li>2=flying incoming</li>
+<li>3=flying own fleet (move)</li>
+<li>6=handled incoming</li>
+<li>10=seen but not handled incoming</li>
+</ul>
+The sidpid value needs special mentioning. It is the combination of systemId and planetID and stored as a single value: pid+13*sid<br/>
+Fleets that have iscurrent=0 are only more part of history (e.g arrived after a move or changed size at a battle). Fleets expire after 36h after "lastseen" time.
+
+<p>
+The same data is available live from brownie at <a href="http://aw.lsmod.de/cgi-bin/cdinfo?p=29">http://aw.lsmod.de/cgi-bin/cdinfo?p=29</a>. Please do not request it more often than once per minute.
+
+you can get more live data as above:
+<pre>
+   } elsif($p==2) {
+      dumpwholetable("cdcv");
+   } elsif($p==3) {
+      dumpwholetable("cdlive");
+   } elsif($p==15) {
+      dumpwholetable("playerextra");
+   } elsif($p==20) {
+      dumptable("intelreport", $alli, 4);
+   } elsif($p==21) {
+      dumptable("internalintel", $alli, 32);
+   } elsif($p==24) {
+      dumptable("planetinfos", $alli, 2);
+   } elsif($p==26) {
+      dumptable("relations", $alli, 8);
+   } elsif($p==27) {
+      dumptable("allirelations", $alli, 8);
+   } elsif($p==29) {
+      dumptable("fleets", $alli, 1);
+</pre>
+
+<h3>intelreport.csv</h3>
+<pre>alli pid modified_at growth science culture production speed attack defense trader startuplab
+   biology economy energy mathematics physics social racecurrent</pre>
+Beware of using entries with racecurrent=0 (those are usually from former rounds).<br>
+modified_at is a UNIX timestamp. Everything else should be straightforward.
+
+<h3>internalintel.csv</h3>
+This file contains data that is only available about members of the own alliance.
+<pre>alli pid modified_at production science culture artifact tr ad pp etc sus</pre>
+etc = Estimated Time to Culture<br>
+production/science/culture are hourly values without bonusses<br>
+
+<h3>holes.csv</h3>
+This one is actually only an extract of data from the other files (and the public ones of course). It is stored as cache to not waste ages with every click on the holes display tool. Format is
+<pre>
+sysid members members+friends enemies worstRelation
+</pre>
+<h3>spies.csv</h3>
+Same comment as with holes.csv. Format is
+<pre>
+spyName spyPID spyBio victimPID victimBio
+</pre>
+
+<h3>/alltrades.csv</h3>
+The <a href="alltrades.csv">http://aw.lsmod.de/alltrades.csv</a> is actually public data and very similar to AR's trades.csv. Differences are that it also contains trades signed between 00:00 and 04:00 and that the order of pids is different. It is always id1&gt;id2. A zero(0) as id might mean that the partner resigned or is not listed in the CSVs for other reasons.
+
+<h3>/cgi-bin/public/cdinfo</h3>
+The <a href="/cgi-bin/public/cdinfo">cdinfo tool</a> offers to export info public data that is available from brownie usage. It is specifically designed for automatic retrieval and processing (but if you have many users, caching the data for a minute is still a good idea). <br />
+<pre>
+The points+PL table format:
+playerid time points PL totalpop
+
+CV has format:
+sidpid time cv pop playerid
+
+where sidpid is systemID*13+planetID</pre>
+
+<hr/>
+   <p>
+      <a href="http://validator.w3.org/check?uri=referer"><img
+          src="/images/valid-xhtml10.png"
+          alt="Valid XHTML 1.0!" height="31" width="88" border="0" /></a>
+
+<a href="http://www.ermel.org/handcoded/">
+<img src="/images/handcode.jpg"
+width="82" height="33" border="0"
+alt="100% hand coded HTML" /></a>
+<img src="/images/vi_improved.gif" width="90" height="36" border="0" alt="powered by vim" />
+<img src="/images/logo_powered_by_perl.gif" width="100" height="33" border="0" alt="powered by perl" />
+    </p>
+</body></html>
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>greenbirds AW Tools manual page</title>
+<link rel="stylesheet" type="text/css" href="/blue.css" />
+<link href="/favicon.ico" type="image/ico" rel="icon" />
+<link href="http://aw.lsmod.de/favicon.ico" rel="shortcut icon" />
+</head><body>
+<a href="/cgi-bin/index.html">AW tools index</a> <a href="/manual.html">AW tools manual</a>
+<h1>greenbird's AW Tools manual page</h1>
+<h2>Authentication</h2>
+Some tools require a special user authentication. That is more than the per alliance authentication for most of the tools.<br/>
+<br/>
+<b>GE11 update</b>: it is now possible to <a href="/cgi-bin/userpasswd">set a password for a user</a> and log into the tools with that.<br/>
+The primary method for user-authentication is to click an AWTools link within <a href="/manual.html#brownie">brownie</a>. <br/>
+The other method is to use <a href="/cgi-bin/public/authawforum">AW forum authentication</a> - but that is now disabled by default. you can enable it in <a href="/cgi-bin/preferences2">the preferences2 tool</a><br/>
+NOTE: for security reasons, this does only work while your IP address stays the same. After a modem reconnect your ISP might assign you a different IP. Then you need to log into AW again with brownie enabled.
+
+<h2>General</h2>
+How does Authentication work with brownie/AWTools? How does it know which alliance players belong to?<br>
+Brownie uses alliance membership from AW's <code>alliances.csv</code> file.
+There is a way to have additional untagged members (useful before PL1 or after reaching 200 points). This is set by those users themselves with the <a href="/cgi-bin/joinalli">joinalli</a> tool and the secret alliance password.
+When you click AWTools links from the brownie, a cookie is set in your browser which is then used to authenticate you (because brownie has seen you successfully sign in to AW with it).<br>
+You also get a similar cookie from the <a href="/cgi-bin/public/authawforum">authawforum</a> tool (now disabled by default, but you can enable it in <a href="/cgi-bin/public/preferences2">preferences2</a> tool).
+
+
+</body>
+</html>

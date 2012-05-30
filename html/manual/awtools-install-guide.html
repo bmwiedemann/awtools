@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><head><title>greenbirds AWTools installation instructions</title>
+<link rel="stylesheet" type="text/css" href="/code/css/tools/blue.css" />
+<link href="/favicon.ico" type="image/ico" rel="icon" />
+<link href="http://aw.lsmod.de/favicon.ico" rel="shortcut icon" />
+</head><body>
+<a href="/cgi-bin/index.html">AW tools index</a>
+<h1>greenbird's AWTools+brownie installation instructions</h1>
+This document is by no means complete and not yet intended to. I will expand it as need comes. To tell you the truth, the tools have not always been written in a way that made it particularly easy to use them somewhere else. And I do not know of anyone who did it yet.
+
+<h2>Checking Preconditions</h2>
+In order to run my AWTools you will need to check that you meet some preconditions. You will need
+<ul>
+<li>A Linux machine on the internet (best with public IP+DNS) with apache2, mysql and perl (read: LAMP) with full read+write access to one DB</li>
+<li>root shell access, if you want to run on port 80 (default for www). Non-root-shell-access does work with non-priviledged ports ( &gt;1024).</li>
+<li>Ability to configure custom cron jobs (basically <code>crontab -e</code>)</li>
+<li>Knowledge about configuring apache2 with modperl, checking error logs etc.</li>
+<li>Being able to get one or more domain names (third level wildcard entries (*.lsmod.de) pointing to your server are fine)... if nothing helps, dyndns' staticDNS might also work.</li>
+<li>Some extra perl modules:
+  <pre>DB_File::Lock
+MLDBM
+DBI
+
+aptitude install libapache-dbi-perl libapache2-mod-perl2 libapache2-mod-geoip libdb-file-lock-perl libdbd-mysql-perl libmldbm-perl libgd-perl libgd-gd2-perl libnet-dns-perl libnet-ip-perl libcrypt-passwdmd5-perl libtie-dbi-perl libclass-dbi-mysql-perl perlmagick psmisc git-core make bzip2
+<!--wget http://www3.zq1.de/debian/binary/cpan-libtie-dbi-perl_1.02-1_all.deb &amp;&amp; dpkg -i cpan-libtie-dbi-perl_1.02-1_all.deb
+or dh-make-perl --build --cpan Tie::DBI-->
+</pre>
+There are two normal methods to get missing modules. The preferred one is through your Linux package management, however not every distribution has packages for everything you need (Debian has, SuSE doesnt). The second method that will always work is <code>perl -MCPAN -e 'install $name'</code>. <i>On SuSE there is also "/usr/lib/rpm/cpanflute" which allows to create perl-xxx.src.rpm packages from CPAN archives, but it requires some good insight into rpm and some tweaking to get it working with modern SuSE.</i>
+</li>
+<li>A phpMyAdmin is not strictly required, but I have it so that I can comfortably work with the DB (e.g. try SQL) without coding myself.</li>
+</ul>
+
+<h2>Starting the install</h2>
+I provide a .tar.gz archive with relevant code and data. Then you do:
+
+<pre>
+cd /home/aw
+#tar xzf bmw-awtools-2012-01-07.tar.gz
+git clone git://github.com/bmwiedemann/awtools.git
+ln -s awtools inc
+cd inc
+ln -s /home/aw base
+edit DBConf.pm          # supply your mysql user+pw here
+edit awstandard.pm      # set $bmwserver, $basedir and $interbeta flag
+edit brownie/browniecgi.pm # change $ourhost and $ourwwwhost to your hostnames of no-install brownie
+make init
+make updatecsv
+make access a=<i>tag</i> # probably need to adjust Makefile for this to work
+
+edit httpd-brownie.conf vhost-brownie.conf # adjust port numbers and pathes
+./restarthttpd.sh # to use a different instance of apache for serving brownie+AWtools
+</pre>
+If at any step there would be warnings or errors, you should examine it closely before trying to continue.
+<br />
+Other things you will want to adapt: disable the <code>authrsa</code> (RSA-forum based authentication) if you dont trust the admins there and change the <code>admin*</code> tools password hashes to your liking using the MD5 hash-code in there.
+<br />
+If you have other users on your machine, it is also recommended that only the www-user and yourself should be able to read+write files which contain secret information (<code>db/*.dbm DBConf.pm and systemexportsecret</code> - on my machine: chmod 660 ; chown wwwrun:bernhard ).
+
+<h2>The Code</h2>
+<a href="https://github.com/bmwiedemann/awtools">git repo</a> (has less files than below tars)<br/>
+<a href="http://aw.lsmod.de/bmw-awtools-120107.tar.gz">bmw-awtools-120107.tar.gz</a> (240kB, small features + maintenance)<br/>
+<a href="http://aw.lsmod.de/bmw-awtools-110621.tar.gz">bmw-awtools-110621.tar.gz</a> (240kB, mostly maintenance)<br/>
+<a href="http://aw.lsmod.de/bmw-awtools-100811.tar.gz">bmw-awtools-100811.tar.gz</a> (240kB, extra features, maintenance)<br/>
+<a href="http://aw.lsmod.de/bmw-awtools-090424.tar.gz">bmw-awtools-090424.tar.gz</a> (212kB, many extra features)<br/>
+<a href="http://aw.lsmod.de/bmw-awtools-080401.tar.gz">bmw-awtools-080401.tar.gz</a> (200kB, major cleanup, uses mysql in most places now)<br/>
+<a href="http://aw.lsmod.de/bmw-awtools-071219.tar.gz">bmw-awtools-071219.tar.gz</a><br/>
+<a href="http://aw.lsmod.de/bmw-awtools-071021.tar.gz">bmw-awtools-071021.tar.gz</a> (180kB)
+<br />
+The Code can be split into three categories:
+<ol>
+<li>CGI's that are started upon request from browsers (those are listed in the Makefile's <code>tools=</code> entry and hard-linked to the apache CGI dir with <code>make links</code>)</li>
+<li>Regular processing that is launched by cron in intervals of 5m, 6h, or 24h (updating maps, holes, spies, fetching CSV from AW) - see <code>aw-crontab</code> for example entries. Only the daily update must be at a fixed time (00:06 CET for me as my server is in Germany)</li>
+<li>Stuff that is called exclusively by the admin in a shell at need (e.g. <code>newround.pl and create-mysql-tables.pl and make access a=xxx</code> = installation stuff)</li>
+</ol>
+
+Code is also heavily modularized which makes it much easier to add mangling and feeding filters that do not affect the remainder of the operation. Modules (*.pm) can be used in all three types of perl code.
+
+<p>
+You may also want to check out my random collection of  <a href="http://aw.lsmod.de/code/">configs+data here</a>.
+
+</p>
+<p>
+<!-- Start of Globel Code -->
+<a href="http://www.free-counters.co.uk" target="_blank">
+<img src="http://008.free-counter.co.uk/count-080.pl?count=qwqykyh8yprcexpmgpax&amp;type=original&amp;prog=hit" border="0" alt="Free Counters"/>
+</a>
+<!-- End of Globel Code -->
+
+      <a href="http://validator.w3.org/check?uri=referer"><img
+          src="/images/valid-xhtml10.png"
+          alt="Valid XHTML 1.0!" height="31" width="88" border="0" /></a>
+
+<a href="http://www.ermel.org/handcoded/">
+<img src="/images/handcode.jpg"
+width="82" height="33" border="0"
+alt="100% hand coded HTML" /></a>
+<img src="/images/vi_improved.gif" width="90" height="36" border="0" alt="powered by vim" />
+<img src="/images/logo_powered_by_perl.gif" width="100" height="33" border="0" alt="powered by perl" />
+    </p>
+</body></html>
+
