@@ -13,9 +13,6 @@ CREATE TABLE `bestguarded` (
 PRIMARY KEY ( `sidpid` )
 );!);
 
-exit 0;
-
-
 #$dbh->do("DROP TABLE `smsalliaccount`");
 $dbh->do(qq!
 CREATE TABLE `smsalliaccount` (
