@@ -1,0 +1,23 @@
+body {
+	background-color: #eeeeff;
+	color: #000;
+	background-image: url("/blueish.png");
+}
+div.header {
+        font-family : Verdana, Arial, Helvetica, sans-serif;
+}
+.headeractive {
+	background-color: #ffe99c;
+}
+
+tr.even {background-color:#eef ;}
+tr.odd {background-color:#dde ;}
+th {background-color:#77c ;}
+
+th, td.sort {padding:2px ;
+   border-left: 1px solid gray;
+   border-bottom: 1px solid gray;}
+
+img#headlogo {
+	
+}
