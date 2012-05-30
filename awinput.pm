@@ -12,7 +12,7 @@ my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
 our $tradercost=5;
 
-$VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
+$VERSION = 1;
 @ISA = qw(Exporter);
 @EXPORT = qw(
 &awinput_init &getrelation &getallirelation &setallirelation &setrelation &playername2id &playername2idm &playerid2name &playerid2namem &playerid2home &playerid2country &getplanet &getplayer &getalliance 
