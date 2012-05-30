@@ -1231,12 +1231,13 @@ sub settoolsaccess_rmask($$$) {
 	$sth->execute($rmask, $tag, $alli);
 }
 
-sub settoolsaccess($$$;$) {
-        my ($alli,$tag,$rbits,$wbits)=@_;
+sub settoolsaccess($$$;$$) {
+        my ($alli,$tag,$rbits,$wbits,$flags)=@_;
 	$wbits||=0;
+	$flags||=0;
 	my $dbh=get_dbh();
-	my $sth=$dbh->prepare("INSERT INTO `toolsaccess` VALUES (?,?,?,?,255) ON DUPLICATE KEY UPDATE rbits=?");
-	$sth->execute($alli,$tag,$rbits,$wbits, $rbits);
+	my $sth=$dbh->prepare("INSERT INTO `toolsaccess` VALUES (?,?,?,?,255,?) ON DUPLICATE KEY UPDATE rbits=?");
+	$sth->execute($alli,$tag,$rbits,$wbits,$flags,  $rbits);
 }
 
 

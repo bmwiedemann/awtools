@@ -38,6 +38,7 @@ CREATE TABLE `internalplanet` (
 `b3`	FLOAT NOT NULL COMMENT 'gc',
 `b4`	FLOAT NOT NULL COMMENT 'rl',
 `b5`	FLOAT NOT NULL COMMENT 'sb',
+`updated_at` INT NOT NULL,
 PRIMARY KEY ( `sidpid` ),
 INDEX (`time`)
 );!);
@@ -69,6 +70,7 @@ CREATE TABLE `battlecalc` (
 `chance` DOUBLE NOT NULL,
 `kill1` DOUBLE NOT NULL,
 `kill2` DOUBLE NOT NULL,
+`modified_at` INT NOT NULL,
 UNIQUE ( ds1,ds2,cs1,cs2,bs1,bs2,sb, ph1,ph2,ma1,ma2,att1,att2,def1,def2 )
 );!);
 # att/def in percent (e.g. 100 is default for +0%)
@@ -93,7 +95,7 @@ CREATE TABLE `playerextra` (
 
 $dbh->do(qq!
 CREATE TABLE `prices` (
-`item` CHAR(4) NOT NULL,
+`item` CHAR(5) NOT NULL,
 `price` FLOAT NOT NULL,
 PRIMARY KEY ( `item` )
 );!);
@@ -131,6 +133,7 @@ CREATE TABLE `toolsaccess` (
 `rbits` TINYINT UNSIGNED NOT NULL COMMENT '1 for fleets, 2 for plans, 4 for IRs, 8 for relations, 16 for online allies, 32 for maps - reading permission',
 `wbits` TINYINT UNSIGNED NOT NULL COMMENT 'as rbits - mostly unused yet',
 `rmask` TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '255',
+`flags` INT(3) NOT NULL COMMENT '1=paid',
 UNIQUE ( `tag`,`othertag` ),
 UNIQUE ( `othertag`,`tag` )
 );!);
@@ -166,6 +169,7 @@ CREATE TABLE `imessage` (
 `recvpid` INT NOT NULL,
 `msg` TEXT NOT NULL,
 INDEX ( `time` ),
+INDEX ( `sendpid` ),
 INDEX ( `recvpid` )
 );!);
 
@@ -240,7 +244,7 @@ name VARCHAR ( 24 ) NOT NULL,
 nclick SMALLINT ,
 firstclick INT NOT NULL ,
 lastclick INT NOT NULL ,
-ip VARCHAR ( 15 ) NOT NULL,
+ip VARCHAR ( 45 ) NOT NULL,
 auth TINYINT ( 1 ) NOT NULL,
 proxy VARCHAR ( 60 ) NOT NULL,
 PRIMARY KEY ( sessionid ),
