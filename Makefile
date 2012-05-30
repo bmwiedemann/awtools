@@ -15,6 +15,7 @@ all:
 test:
 	for i in 0 1 2 3 4 5 6 7 8 9 10 11 ; do ./arrival.pl -p $$i ; done
 links:
+	mkdir -p cgi-bin/public
 	ln -f ${tools} cgi-bin/
 	ln -f topwars cgi-bin/topallis
 	ln -f ${tools} cgi-bin/public
@@ -23,6 +24,14 @@ links:
 
 
 init:
+	mkdir -p base/db base/db2 log
+	ln -sf base/db
+	-ln -sf . base/db/db
+	ln -sf inc/brownie base/
+	ln -sf inc/html base/
+	ln -sf html/code/css base/
+	ln -sf html/alli base/
+	-ln -sf . base/base
 	$(MAKE) links
 	perl -e 'print rand(1000000000000000)."\n"' > systemexportsecret
 	./create-mysql-tables.pl
@@ -44,6 +53,7 @@ updatecsv: dumpdbs
 	grep -v id trade.csv >> alltrades.csv || true
 	wget -x -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
 	make importcsv
+	mkdir -p www1.astrowars.com/rankings/
 	wget -o/dev/null http://${awserv}/rankings/bestguarded.php -O${awserv}/rankings/bestguarded-$d.html
 	wget -o/dev/null http://${awserv}/rankings/strongestfleet.php -O${awserv}/rankings/strongestfleet-$d.html
 	-for i in 4 3 2 1 ; do mv html/strongestfleet-$$i.html html/strongestfleet-`expr $$i + 1`.html ; done
