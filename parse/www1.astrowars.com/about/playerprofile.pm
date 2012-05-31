@@ -25,6 +25,7 @@ foreach my $line (m{<tr.(.+?)</td></tr>}gs) {
 			$v=$1;
 		}
 		$d->{$k}=$v;
+		if($k eq "rankpointsscored") { if($v=~m/^#(\d+) /) {$d->{rank}=$1;}}
 	} elsif($line=~m{^bgcolor=#404040 align=center><td colspan=3> Points: }) {
 		my @a=split("</td><td>",$');
 		my @b=split("[+=]",shift(@a));

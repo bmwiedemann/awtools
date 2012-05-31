@@ -15,6 +15,7 @@ my $opid=$data->{pid};
 print a({-href=>"relations?name=$name"},$name).br."\n";
 my $pl=$data->{playerlevel};
 my $pointsh=$data->{points};
+awinput::updateplayer($data);
 
 if($pointsh && $opid) {
    my $points=$pointsh->{total};

@@ -80,6 +80,8 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
       if($line=~m{<font color="#AAAAAA">\[(\w+)\]</font>}) {
          $d->{tag}=$1;
       }
+   } elsif ($line=~m{forums/privmsg\.php\?mode=post&u=(\d+) target="_blank}) {
+      $d->{pid}=$1;
    } else {
 #      $d->{$n++}=$line;
    }

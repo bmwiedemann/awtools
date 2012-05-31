@@ -1240,6 +1240,28 @@ sub settoolsaccess($$$;$$) {
 	$sth->execute($alli,$tag,$rbits,$wbits,$flags,  $rbits);
 }
 
+sub updateplayer
+{ my $data=shift; #hashref
+	my %dbmap=qw(
+		sciencelevel science
+		playerlevel level
+		culturelevel culture
+		traderevenue trade
+		points points
+		rank rank
+	);
+	return if not $data->{pid};
+	my $dbh=get_dbh();
+	my @setlist;
+	my @varlist;
+	foreach my $k (keys(%dbmap)) {
+		next unless $data->{$k};
+		push(@setlist, "$dbmap{$k}=?");
+		push(@varlist, $data->{$k});
+	}
+	my $setlist=join(", ", @setlist);
+	$dbh->do("UPDATE player SET $setlist WHERE pid=?", {}, @varlist, $data->{pid});
+}
 
 # input: alliance id
 # output: float score points value
