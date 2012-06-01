@@ -24,12 +24,18 @@ if(param()) {
       dumpwholetable("cdcv");
    } elsif($p==3) {
       dumpwholetable("cdlive");
+   } elsif($p==4) {
+      dumpwholetable("player");
+   } elsif($p==5) {
+      dumpwholetable("planets");
    } elsif($p==15) {
       dumpwholetable("playerextra");
    } elsif($p==20) {
 		dumptable("intelreport", $alli, 4);
    } elsif($p==21) {
 		dumptable("internalintel", $alli, 32);
+   } elsif($p==22) {
+		dumptable("logins", $alli, 4);
    } elsif($p==24) {
       dumptable("planetinfos", $alli, 2);
    } elsif($p==26) {
@@ -40,6 +46,8 @@ if(param()) {
       dumptable("fleets", $alli, 1);
    } elsif($p==30) {
       dumpwholetable("battlecalc");
+   } elsif($p==31) {
+      dumpwholetable("trades");
    } elsif($p==200) {
       my $sidpid=sidpid22sidpid3m(param("sid"),0);
       if($sidpid>12) {
@@ -50,7 +58,7 @@ if(param()) {
    print AWheader("AW CD data tool");
 	print start_form(-name=>"form", -method=>"get"),
 #      textfield(-name=>'p', -class=>'text'),br,
-      popup_menu(-name=>'p',-values=>[2..3], -labels=>{1=>"score",2=>"CV",3=>"points+PL"})," type of dump",br,
+      popup_menu(-name=>'p',-values=>[2..5,15,20..22,24,26..31], -labels=>{1=>"score",2=>"CV",3=>"points+PL", 4=>"players", 5=>"planets", 15=>"playerextra", 20=>"intelreport", 21=>"internalintel", 22=>"logins", 24=>"planetinfos", 26=>"relations", 27=>"allirelations", 29=>"fleets", 31=>"trades"})," type of dump",br,
 		submit(-name=>"query", -class=>'smbutton'),end_form,
       br,"During countdown, this tool will export live data for use in other tools. When your tool gets many hits, it would be nice if you rate-limit requests to one per minute and cache the result in between."
       ;
