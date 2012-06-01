@@ -23,9 +23,11 @@ foreach my $line (m{<tr.(.+?)</td></tr>}gs) {
 			$v={x=>$1, y=>$2};
 		} elsif($k eq "icq" && $v=~m{^<a href="http://wwp.icq.com/(\d+)">}) {
 			$v=$1;
+		} elsif($k eq "traderevenue") {
+			$v=~s/%//
 		}
 		$d->{$k}=$v;
-		if($k eq "rankpointsscored") { if($v=~m/^#(\d+) /) {$d->{rank}=$1;}}
+		if($k eq "rankpointsscored") { if($v=~m/^#(\d+) \((\d+)/) {$d->{rankpoints}=$2; $d->{rank}=$1;}}
 	} elsif($line=~m{^bgcolor=#404040 align=center><td colspan=3> Points: }) {
 		my @a=split("</td><td>",$');
 		my @b=split("[+=]",shift(@a));

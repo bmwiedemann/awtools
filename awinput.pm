@@ -1247,7 +1247,7 @@ sub updateplayer
 		playerlevel level
 		culturelevel culture
 		traderevenue trade
-		points points
+		rankpoints points
 		rank rank
 	);
 	return if not $data->{pid};

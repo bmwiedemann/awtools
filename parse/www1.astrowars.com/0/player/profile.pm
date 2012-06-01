@@ -27,7 +27,7 @@ foreach my $line (m{<tr><td(.+?)</tr>}gs) {
       elsif($key eq "Rank (Points Scored)") {
          $value=~m{#(\d+) \((\d+)\)};
          $d->{rank}=int($1);
-         $d->{points}=int($2);
+         $d->{rankpoints}=int($2);
       }
       elsif($key eq "Multi") {
          if($value=~m{bgcolor='#(\d+)'>Status}) {
