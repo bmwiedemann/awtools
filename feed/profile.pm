@@ -2,6 +2,7 @@ use Tie::DBI;
 #use strict;
 use awstandard;
 use awinput;
+# feed public player profile into DBs
 
 sub feed_profile() {
 print "profile feed\n";

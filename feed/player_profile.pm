@@ -1,5 +1,9 @@
 use strict;
 use dbaddpl;
+# feed in-game player profile to DBs
+my $data=getparsed(\%::options);
+awinput::updateplayer($data);
+
 my %timevalue=(""=>1, second=>1, minute=>60, hour=>3600, day=>86400);
 my %accuracytimevalue=(""=>86398, second=>1, minute=>60, hour=>3600, day=>86400);
 my $debug=$::options{debug};

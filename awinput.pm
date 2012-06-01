@@ -1256,11 +1256,13 @@ sub updateplayer
 	my @varlist;
 	foreach my $k (keys(%dbmap)) {
 		next unless $data->{$k};
-		push(@setlist, "$dbmap{$k}=?");
+		push(@setlist, "$dbmap{$k}");
 		push(@varlist, $data->{$k});
 	}
-	my $setlist=join(", ", @setlist);
+	my $setlist=join(", ", map {"$_=?"} @setlist);
 	$dbh->do("UPDATE player SET $setlist WHERE pid=?", {}, @varlist, $data->{pid});
+	open(my $journal, ">>", "/var/tmp/aw-player.journal");
+	print $journal "$data->{pid} @setlist=@varlist\n";
 }
 
 # input: alliance id
