@@ -19,7 +19,11 @@ foreach my $je (@jentries) {
 	my @k=split(" ",$k);
 	my @v=split(" ",$v);
 	my $pid=shift @k;
-	my %data=%{$player{$pid}};
+	# sanity check - better not update wrong data
+	if(!$pid || scalar(@v) != scalar(@k)) {exit 2}
+	my $pdata=$player{$pid};
+	next unless $pdata;
+	my %data=%$pdata;
 	my $n=0;
 	foreach $k (@k) {
 		$v=$v[$n++];
