@@ -1,0 +1,7 @@
+#!/usr/bin/perl -w
+# mark an alliance as paying user
+use strict;
+use awinput;
+
+my $alli=shift || die "need alli name";
+settoolsaccess($alli,$alli, 255, 255, 1);

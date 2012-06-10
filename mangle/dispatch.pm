@@ -42,6 +42,10 @@ sub mangle_dispatch(%) { my($options)=@_;
 #      $ENV{REMOTE_USER}="af";
 #   }
    
+   my @accesstexts=(
+      "Your alliance is using greenbird's extended AWTools but has not yet decided to NAP or pay this round",
+      "Your alliance has paid for greenbird's extended AWTools this round. Thanks!",
+      "Your alliance is using greenbird's extended AWTools for a NAP with greenbird's alliance for this round");
    my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}||"?", "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
@@ -85,6 +89,13 @@ sub mangle_dispatch(%) { my($options)=@_;
          $$options{authlink}="$origbmwlink/public/authaw?session=$session&amp;uri=/cgi-bin";
          if($ENV{REMOTE_USER}) {
             $::bmwlink=$$options{authlink};
+         }
+         if($ENV{REMOTE_USER}) {
+            # inform user about his terms of use
+            my($flags)=$dbh->selectrow_array("SELECT `flags` FROM `toolsaccess` WHERE tag=? and othertag=tag",{},$ENV{REMOTE_USER});
+            if($flags<=@accesstexts) {
+               $joinlink.="<br><span class=\"bmwinfo\">$accesstexts[$flags]</span> ";
+            }
          }
          if(($interbeta || !$ENV{REMOTE_USER}) && $$options{pid}) {
             my $atag=playerid2tag($$options{pid});

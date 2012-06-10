@@ -27,14 +27,15 @@ if($ENV{REQUEST_METHOD} eq "POST" && param()) {
 		print "you must say 'yes'",br;
 	} elsif($tag && $tag=~m/^[a-zA-Z]{1,4}$/) {
 		my $ltag=lc($tag);
-		settoolsaccess($ltag,$ltag,255,255);
+		settoolsaccess($ltag,$ltag,255,255,2);
 		mkdir("html/alli/$ltag");
 		print "added extended tools access for tag=$tag";
 	} else {
 		print "something failed. can not add tag=$tag";
 	}
 } else {
-	print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," type 'yes' here, if you want an extended AWTools account for '$tag'",br,
+	print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," type 'yes' here, if you want an extended AWTools account for '$tag' and agree to <a href=\"http://$bmwserver/manual/manual.html#policy\">the AWTools NAP rules</a>",br,br,
+	"Note: if you do not want an AWTools NAP, you can click the pay-button there",br,
 		submit(-name=>"create account", -class=>'smbutton'),end_form.AWfocus("form.p");
 }
 print AWtail();
