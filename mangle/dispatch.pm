@@ -43,7 +43,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 #   }
    
    my @accesstexts=(
-      "Your alliance is using greenbird's extended AWTools but has not yet decided to NAP or pay this round",
+      "Your alliance is using greenbird's extended AWTools but has not yet decided to NAP or pay this round. The founder can decide <a href=\"http://$bmwserver/cgi-bin/alliopenaccount\">here</a>",
       "Your alliance has paid for greenbird's extended AWTools this round. Thanks!",
       "Your alliance is using greenbird's extended AWTools for a NAP with greenbird's alliance for this round");
    my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}||"?", "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
@@ -94,7 +94,7 @@ sub mangle_dispatch(%) { my($options)=@_;
             # inform user about his terms of use
             my($flags)=$dbh->selectrow_array("SELECT `flags` FROM `toolsaccess` WHERE tag=? and othertag=tag",{},$ENV{REMOTE_USER});
             if($flags<=@accesstexts) {
-               $joinlink.="<br><span class=\"bmwinfo\">$accesstexts[$flags]</span> ";
+               $joinlink.="<br><span class=\"bmwinfo\" id=\"termsofaccess\">$accesstexts[$flags]</span> ";
             }
          }
          if(($interbeta || !$ENV{REMOTE_USER}) && $$options{pid}) {
