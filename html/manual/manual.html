@@ -8,10 +8,81 @@
 <link href="http://aw.lsmod.de/favicon.ico" rel="shortcut icon" />
 </head><body>
 <a href="/cgi-bin/index.html">AWTools index</a>
-<h1>greenbird's AW Tools manual page</h1>
-<h2>about</h2>
-The AWTools are a collection of open-source CGIs that you can access in any web-browser. There is also "brownie" - a filtering web-proxy integrated into the AWTools.
+<h1>about</h1>
+The AWTools are a collection of <a href="https://github.com/bmwiedemann/awtools">open-source</a> CGIs that you can access in any web-browser. There is also "brownie" - a filtering web-proxy integrated into the AWTools.
 Both are designed to enhance the user experience of <a href="http://www.astrowars.com">Astrowars</a> players.
+
+<a name="policy" />
+<h1>Tools Access Policy</h1>
+Alliances can get AWTools access from me (greenbird). (Guest access is always available and always free)<br />
+As you can imagine, coding all these great things took me some months and even after it is written, running and maintaining it costs me some more (both time and money).
+<br />So if you want to have access, here is the deal:
+<ul>
+<li>Either you <a href="http://www.lsmod.de/services/bank">pay me</a> 8.97 Euro/round (that is 2.99 Euro per month) - once for a whole alliance, not for each player. Notice that you should also PM me, because I often can not associate the transferring ID with an AW alliance.
+
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_xclick" />
+<input type="hidden" name="business" value="paypal5&#64;lsmod.de" />
+<input type="hidden" name="item_name" value="AWTools extended version for 3 months" />
+<input type="hidden" name="item_number" value="AW-2012-06" />
+<input type="hidden" name="amount" value="8.97" />
+<input type="hidden" name="no_shipping" value="1" />
+<input type="hidden" name="currency_code" value="EUR" />
+<input type="hidden" name="lc" value="DE" />
+<input type="hidden" name="bn" value="PP-BuyNowBF" />
+<input type="hidden" name="cn" value="Comment" />
+<input type="hidden" name="notify_url" value="http://aw.lsmod.de/cgi-bin/public/thanks" />
+<input type="hidden" name="return" value="http://aw.lsmod.de/cgi-bin/public/thanks" />
+<input type="hidden" name="cancel_return" value="http://aw.lsmod.de/" />
+<table>
+<tr><td><input type="text" name="os0" class="text" maxlength="200" /></td>
+<td><input type="hidden" name="on0" value="Info" />Alliance-tag</td></tr>
+<tr><td><input type="text" name="os1" class="text" maxlength="200" /></td>
+<td><input type="hidden" name="on1" value="AW Name" /><i>optional</i>: your in-game name for contact</td></tr>
+</table>
+<input type="submit" name="submit" class="smbutton" value="Buy with paypal for GE25" />
+</form>
+
+<a href="http://flattr.com/thing/326749/greenbirds-AWTools" target="_blank">
+<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+
+
+</li>
+<li>Or you agree to this political deal: 
+Your alliance offers to sign an alliance NAP with my alliance (GE25: AF) who can choose to accept it or decline it.
+ If the NAP is accepted, it is valid until either the current round is over or until two days (2d = 48h) after my alliance declared that it cancels the NAP.
+Notice that this asymmetry in cancelation is the price you have pay for using my AWTools (if you do not want to pay money). It is also because I can not decide on long term politics for my alliance alone.
+Then send me a PM: <form method="post" action="http://www.astrowars.com/forums/privmsg.php">
+<input type="hidden" name="mode" value="post" />
+<input type="hidden" name="u" value="49545" />
+<input type="hidden" name="username" value="greenbird" />
+<input type="hidden" name="subject" value="AWTools" />
+<input type="hidden" name="message" value="I want to use the extended AWTools for [i]the ... alliance[/i] in GE25 and agree to the NAP conditions given in the [url=http://aw.lsmod.de/manual.html#policy]AWTools manual[/url].
+(New account only) Preferred Password: ...
+Ciao" />
+<input type="hidden" name="folder" value="inbox" />
+<input type="hidden" name="disable_html" value="1" />
+<input type="hidden" name="attach_sig" value="1" />
+<input type="submit" name="preview" class="smbutton" value="Preview PM" />
+</form>
+
+<br/>
+Standard NAP terms:
+<ul>
+<li>- One should not launch to a system that is inhabited by the other party without getting permission before (call it coordination)</li>
+<li>- One should not pass on confidential information of the other party like intelligence reports and plans</li>
+<li>- No alliance will help a third party to attack the other alliance, that includes not allowing their planets to be used as airports and includes telling the other party about forced jumps</li>
+<li>- All above is valid until end of round (does not include interbeta - that is, after winner is declared)</li>
+<li><b style="color:darkred">- for AWTools NAPs, greenbird's alliance may cancel the NAP with 2 days advance notice</b></li>
+</ul>
+</li>
+</ul>
+<hr/>
+In any case I promise to keep confidential and not pass on alliance-internal data (e.g. fleets, relations, intel), even if we were at war.
+
+
+
+<h1>greenbird's AW Tools manual page</h1>
 <h2>tactical</h2>
 <a href="/cgi-bin/tactical">tactical</a> shows 12x12 pixels per system with each line representing a planet and our status with the owner. See <a href="/cgi-bin/system-info?legend=1">legend</a> for their meanings. A little red bar on the right means, that the planet is sieged. <br />
 Find your coordinates by counting the brighter lines (each 10 squares) or by looking at the status bar (works at least with IE and mozilla).
@@ -101,74 +172,6 @@ The proxy usually forwards the request to the original server (some have caches 
 This design allows for the proxy to inspect and modify both, the request and the response, which is what brownie code does.<br />
 To let proxies work properly with AW it requires another thing: it must not be an anonymous proxy, i.e. it must tell the destination about the original IP. This works by adding the X-Forwarded-For HTTP header to the request with this information.
 
-
-<a name="policy" />
-<h1>Tools Access Policy</h1>
-Sometimes members of other alliances come to me (greenbird) and ask if their alliance can have full access to the AWTools. (Guest access is always available and always free)<br />
-As you can imagine, coding all these great things took me some months and even after it is written, running and maintaining it costs me some more (both time and money).
-<br />So if you want to have access, here is the deal:
-<ul>
-<li>Either you <a href="http://www.lsmod.de/services/bank">pay me</a> 8.97 Euro/round (that is 2.99 Euro per month) - once for a whole alliance, not for each player. Notice that you should also PM me, because I often can not associate the transferring ID with an AW alliance.
-
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_xclick" />
-<input type="hidden" name="business" value="paypal5&#64;lsmod.de" />
-<input type="hidden" name="item_name" value="AWTools extended version for 3 months" />
-<input type="hidden" name="item_number" value="AW-2012-02" />
-<input type="hidden" name="amount" value="8.97" />
-<input type="hidden" name="no_shipping" value="1" />
-<input type="hidden" name="currency_code" value="EUR" />
-<input type="hidden" name="lc" value="DE" />
-<input type="hidden" name="bn" value="PP-BuyNowBF" />
-<input type="hidden" name="cn" value="Comment" />
-<input type="hidden" name="notify_url" value="http://aw.lsmod.de/cgi-bin/public/thanks" />
-<input type="hidden" name="return" value="http://aw.lsmod.de/cgi-bin/public/thanks" />
-<input type="hidden" name="cancel_return" value="http://aw.lsmod.de/" />
-<table>
-<tr><td><input type="text" name="os0" class="text" maxlength="200" /></td>
-<td><input type="hidden" name="on0" value="Info" />Alliance-tag</td></tr>
-<tr><td><input type="text" name="os1" class="text" maxlength="200" /></td>
-<td><input type="hidden" name="on1" value="AW Name" /><i>optional</i>: your in-game name for contact</td></tr>
-</table>
-<input type="submit" name="submit" class="smbutton" value="Buy with paypal for GE24" />
-</form>
-
-<a href="http://flattr.com/thing/326749/greenbirds-AWTools" target="_blank">
-<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
-
-
-</li>
-<li>Or you agree to this political deal: 
-Your alliance offers to sign an alliance NAP with my alliance (GE24: AF) who can choose to accept it or decline it.
- If the NAP is accepted, it is valid until either the current round is over or until two days (2d = 48h) after my alliance declared that it cancels the NAP.
-Notice that this asymmetry in cancelation is the price you have pay for using my AWTools (if you do not want to pay money). It is also because I can not decide on long term politics for my alliance alone.
-Then send me a PM: <form method="post" action="http://www.astrowars.com/forums/privmsg.php">
-<input type="hidden" name="mode" value="post" />
-<input type="hidden" name="u" value="49545" />
-<input type="hidden" name="username" value="greenbird" />
-<input type="hidden" name="subject" value="AWTools" />
-<input type="hidden" name="message" value="I want to use the extended AWTools for [i]the ... alliance[/i] in GE24 and agree to the NAP conditions given in the [url=http://aw.lsmod.de/manual.html#policy]AWTools manual[/url].
-(New account only) Preferred Password: ...
-Ciao" />
-<input type="hidden" name="folder" value="inbox" />
-<input type="hidden" name="disable_html" value="1" />
-<input type="hidden" name="attach_sig" value="1" />
-<input type="submit" name="preview" class="smbutton" value="Preview PM" />
-</form>
-
-<br/>
-Standard NAP terms:
-<ul>
-<li>- One should not launch to a system that is inhabited by the other party without getting permission before (call it coordination)</li>
-<li>- One should not pass on confidential information of the other party like intelligence reports and plans</li>
-<li>- No alliance will help a third party to attack the other alliance, that includes not allowing their planets to be used as airports and includes telling the other party about forced jumps</li>
-<li>- All above is valid until end of round (does not include interbeta - that is, after winner is declared)</li>
-<li><b style="color:darkred">- for AWTools NAPs, greenbird's alliance may cancel the NAP with 2 days advance notice</b></li>
-</ul>
-</li>
-</ul>
-<hr/>
-In any case I promise to keep confidential and not pass on alliance-internal data (e.g. fleets, relations, intel), even if we were at war.
 
 <h2>Sharing AWTools data with another alliance</h2>
 <a name="sharing">
