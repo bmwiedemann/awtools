@@ -133,7 +133,7 @@ CREATE TABLE `toolsaccess` (
 `rbits` TINYINT UNSIGNED NOT NULL COMMENT '1 for fleets, 2 for plans, 4 for IRs, 8 for relations, 16 for online allies, 32 for maps - reading permission',
 `wbits` TINYINT UNSIGNED NOT NULL COMMENT 'as rbits - mostly unused yet',
 `rmask` TINYINT( 3 ) UNSIGNED NOT NULL DEFAULT '255',
-`flags` INT(3) NOT NULL COMMENT '1=paid',
+`flags` INT(3) NOT NULL COMMENT '1=paid 2=NAP',
 UNIQUE ( `tag`,`othertag` ),
 UNIQUE ( `othertag`,`tag` )
 );!);
