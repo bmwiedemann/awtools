@@ -31,9 +31,9 @@ if(!$authpid) {
       $data{forumstyle}=$options{awfstyle};
       $data{awtoolsstyle}=$options{awtstyle};
       $data{customhtml}=$options{customhtml};
-      $data{storeir}=param("storeir");
-      $data{storepw}=param("storepw");
-      $data{forumauth}=param("forumauth");
+      $data{storeir}=param("storeir")?1:0;
+      $data{storepw}=param("storepw")?1:0;
+      $data{forumauth}=param("forumauth")?1:0;
       $data{flags}=(
 				(param("immediatebuild")?1:0)|
       		(param("plusnull")?2:0)
