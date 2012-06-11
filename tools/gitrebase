@@ -3,3 +3,4 @@ git remote add githubpublic git://github.com/bmwiedemann/awtools.git 2>/dev/null
 git stash
 git pull --rebase githubpublic master
 git stash pop
+make links >/dev/null
