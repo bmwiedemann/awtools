@@ -11,6 +11,8 @@ if($newround) {
    mkdir "html/$newname";
    unlink("html/round");
    symlink($newname, "html/round");
+   system("touch", "html/round/paid");
+   chmod(0666, "html/round/paid");
    foreach(qw"player alliances") {
       system("cp -a $_.csv $_.csv.$oldname");
    }
