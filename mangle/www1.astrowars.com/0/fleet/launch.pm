@@ -95,7 +95,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
          my $dist=($c2[0]-$c1[0])**2 + ($c2[1]-$c1[1])**2;
          push(@distlist, "disttable[$sid]=[$dist$own];\n");
       }
-      my $tz=$timezone;
+      my $tz=$timezone||0;
       my $starttime=sprintf("%i.%.6i ;", Time::HiRes::gettimeofday());
       s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="60" disabled></form>
       <script type="text/javascript">
