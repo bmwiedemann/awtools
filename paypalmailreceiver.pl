@@ -14,7 +14,8 @@ my $subject_header = $email->header("Subject");
 my $body = $email->body;
 
 my $verify=($text=~m/Received: from mx.\....\.paypal\.com \(mx.\..*paypal.com/);
-if($ret_header ne '<payment@paypal.com>') {$verify=0} # disable for test/debug
+# disabled because it contains payment sender in mail forwards
+#if($ret_header ne '<payment@paypal.com>') {$verify=0} # disable for test/debug
 
 my $extract="";
 if($subject_header=~m/Artikelnr. (AW-.*) - PayPal-Zahlung von (.*) erhalten/) {
