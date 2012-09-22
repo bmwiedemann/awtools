@@ -21,10 +21,10 @@ my $immediate=($prefsflags&1); # build without confirmation option
 my $wantplusnull=($prefsflags&2); # add +0 links
 
 # add access keys
-s{>Previous</a></td>}{ accesskey="p" $&};
-s{>Next</a></td>}{ accesskey="n" $&};
+s{>Previous</a></td>}{ rel="prev" accesskey="p" $&};
+s{>Next</a></td>}{ rel="next" accesskey="n" $&};
 s{>Buildings</a></td>}{ accesskey="b" $&};
-s{>Overview</a></td>}{ accesskey="o" $&};
+s{>Overview</a></td>}{ rel="index" accesskey="o" $&};
 # end
 
 
