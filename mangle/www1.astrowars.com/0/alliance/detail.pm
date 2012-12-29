@@ -17,14 +17,21 @@ if($::options{url}=~/id=(\d+)/) {
       my $previd=$id-1;
       my $nextid=$id+1;
       my $prevstring="";
+      my $nextfunc="";
+      my $prevfunc="";
 
       s%([^<>]*)(<br><table border=0)%
          my $id=playername2id($1);
          my $x=$1;
          if($id) { $x="<a href=\"/0/Player/Profile.php/?id=$id\">$1</a>"; }
          $x.$2%e;
-      if($previd>=0) { $prevstring.=qq'<a href="$url$previd" rel="prev" accesskey="p">&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;prev</a>'; }
-      if($nextid<@$members || $s) { $prevstring.=qq' <a href="$url$nextid" rel="next" accesskey="n">next&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</a>'; }
+      if($previd>=0) { $prevstring.=qq'<a href="$url$previd" rel="prev" accesskey="p">&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;prev</a>'; $prevfunc=qq'window.location = "$url$previd"';}
+      if($nextid<@$members || $s) { $prevstring.=qq' <a href="$url$nextid" rel="next" accesskey="n">next&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;</a>'; $nextfunc=qq'window.location = "$url$nextid"';}
+      # add touch next/prev
+      if(1) {
+         s{<body.*>}{<body onload="startup()">};
+         s{</head>}{<script>var touchdefaults={threshold:{x:30,y:30},swipeLeft:function(){$nextfunc},swipeRight:function(){$prevfunc}}</script><script type="text/javascript" src="http://aw.zq1.de/code/js/swipe.js"></script>$&};
+      }
       my $n=0;
       my $form="";
       if(@$members) {

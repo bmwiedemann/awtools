@@ -20,11 +20,23 @@ my $prefsflags=$prefs->[8];
 my $immediate=($prefsflags&1); # build without confirmation option
 my $wantplusnull=($prefsflags&2); # add +0 links
 
+my $nextfunc="";
+my $prevfunc="";
+my $redir='window.location="?i=';
 # add access keys
-s{>Previous</a></td>}{ rel="prev" accesskey="p" $&};
-s{>Next</a></td>}{ rel="next" accesskey="n" $&};
+s{>Previous</a></td>}{ rel="prev" accesskey="p" $&} and $prevfunc=$redir.($planet-1).'"';
+s{>Next</a></td>}{ rel="next" accesskey="n" $&} and $nextfunc=$redir.($planet+1).'"';
 s{>Buildings</a></td>}{ accesskey="b" $&};
 s{>Overview</a></td>}{ rel="index" accesskey="o" $&};
+# end
+
+# add touch next/prev
+if(1) {
+	s{<body.*>}{<body onload="startup()">};
+	s{</head>}{
+		<script>var touchdefaults={threshold:{x:30,y:30},swipeLeft:function(){$nextfunc},swipeRight:function(){$prevfunc}}</script><script type="text/javascript" src="http://aw.zq1.de/code/js/swipe.js"></script>
+	$&};
+}
 # end
 
 
