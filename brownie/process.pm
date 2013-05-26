@@ -162,7 +162,7 @@ sub process($;$) {my ($r,$proxy)=@_;
       my $u=$uri;
       $u=~s%(http://www1\.astrowars\.com/register/login\.php).+%$1%;
       $u=~s%(http://www1\.astrowars\.com/register/customize_race\.php).+%$1%;
-		my $uextra=$usercookie?"/$usercookie":"";
+      my $uextra=($usercookie && $usercookie ne $user)?"/$usercookie":"";
       my $log=localtime()." IP:$ip u:$user$uextra a:$ENV{REMOTE_USER} $u\n";
       open(LOG, ">>", "/home/aw/inc/log/brownie.log");
       print LOG $log;

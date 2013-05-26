@@ -4,20 +4,23 @@ use strict;
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 my $name=$::options{name};
+my $data=getparsed(\%::options);
 
 my @a;
 my @trade=();
-for(;(@a=m!<tr[^>]*><td[^>]*><a [^>]*>([^>]+)</a>.*?</tr>(.*)!); $
-_=$a[1]) {
-	push(@trade,$1);
+my @tpid=();
+foreach my $ta (@{$data->{ta}}) {
+	push(@trade,$ta->{name});
+	push(@tpid,$ta->{pid});
 }
 
 {
-	print " ".a({-href=>"relations?name=$name"},"name=$name").br();
+	print " ".a({-href=>"relations?name=$name"},"name=$name").br().join(",",@trade).br();
 #	tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
 #   $name="\L$name";
 #	my $oldentry=$relation{$name};
 	dbplayeriradd($name, undef, undef, undef, \@trade);
+	awinput::add_trades($::options{pid},\@tpid);
 #	if(!$debug) {$relation{$name}=$newentry;}
 #	else {print "<br>new:",$newentry;}
 }

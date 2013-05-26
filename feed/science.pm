@@ -4,6 +4,7 @@ use strict;
 use awstandard;
 use awinput;
 use DBAccess2;
+my $data=getparsed(\%::options);
 
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -14,32 +15,31 @@ my $name="\L$::options{name}";
 
 my @science;
 foreach my $sci (@awstandard::sciencestr) {
-	if(m!$sci</a> </td><td>(\d+)</td><td><img src="/images/dot.gif" height="10" width="(\d+)"><img src="/images/leer.gif" height="10" width="(\d+)"!) {
-		my $sl=$1;#+($2/($2+$3));
+	my $sl=$data->{lc($sci)}{level};
       if($debug) {
-         print "$sci: $sl $1 $2 $3\n<br>";
+         print "$sci: $sl\n<br>";
       }
-		push(@science, $sl);
-	}
+		push(@science, $sl); #trade bonus unknown - but we push undef here anyway
 }
-push(@science,undef); #trade bonus unknown
-if(my @a=m!Culture</a>.*INPUT type="text" value="(\d+):(\d+):(\d+)" size="8" name="z" class=text!) {
-   my $etc=time()-$::deliverytime+($a[0]*60+$a[1])*60+$a[2];
+
+if($data->{etc}) {
+   my $etc=$data->{etc};#time()-$::deliverytime+($a[0]*60+$a[1])*60+$a[2];
    push(@science,$etc);
    print " ETC: ".AWtime($etc).br();#" @a\n<br>";
 }
 # calc ETC for > 3 days
-if(m!Culture.*href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a>((?: <b>[+-]\d+%)|)!) {
-   my ($culperh,$culbonus)=($1,$2);
+{
+   my ($culperh,$culbonus)=(int($data->{cultureplus}{hourly}),$data->{cultureplus}{bonus});
 #   awdiag("$::options{name} $culperh $culbonus");
 
-   if($::options{pid}) {
+   if($ENV{REMOTE_USER} && $::options{pid}) {
 #      href="/0/Glossary//?id=20"><b>Science</b></a> <a class="awglossary" href="/0/Glossary//?id=23">(+626 per hour)</a>
-      my ($sciperh)=m!Science</b></a> <a href="/0/Glossary//\?id=23">\(\+(\d+) per hour\)</a>!;
+      my $sciperh=int($data->{scienceplus}{hourly});
+	use JSON::XS; print encode_json($data), "science=$sciperh";
       my $dbh=get_dbh();
       my $sth=$dbh->prepare("INSERT INTO `internalintel` (alli,pid,modified_at,science,culture) VALUES (?,?,UNIX_TIMESTAMP(),?,?) ON DUPLICATE KEY UPDATE `science`=VALUES(science), `culture`=VALUES(culture), modified_at=UNIX_TIMESTAMP()");
 #      my $sth=$dbh->prepare("INSERT INTO `internalintel` (alli,pid,science,culture) VALUES (?,?,?,?) UPDATE `internalintel` SET `culture`=?, `science`=? WHERE `alli`=? AND `pid`=?");
-      $sth->execute($ENV{REMOTE_USER}, $::options{pid}, $sciperh, $culperh);
+		#$sth->execute($ENV{REMOTE_USER}, $::options{pid}, $sciperh, $culperh); # disabled 2013-03-25 because values included boni
    }
    
    if(@science<9) {

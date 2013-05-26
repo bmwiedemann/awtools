@@ -70,6 +70,7 @@ sub planet_building_recommend(%)
 		}
 	}
 	$pp=$data->{$buildingname{$building}}->{remain};
+	return undef unless $pp;
 	return undef if($pp>$data->{productionpoints}->{num}); # only recommend affordable items
 	$level=$p->{$building}+1;
 	$reason=$reason{$building};

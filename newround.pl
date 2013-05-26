@@ -29,6 +29,8 @@ foreach my $name (qw(alliaccess cdcv cdlive alltrades trades battles fleets plhi
 }
 
 $dbh->do("DELETE  FROM `toolsaccess` WHERE `rbits` != 255 AND tag != ''");
+$dbh->do("UPDATE toolsaccess SET flags=0");
+$dbh->do("UPDATE toolsaccess SET flags=3 WHERE tag = 'af'");
 
 system("make cleanmap2");
 #system("cat empty.dbm > $awstandard::dbmdir/useralli.dbm");

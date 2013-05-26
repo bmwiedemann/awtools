@@ -2,6 +2,7 @@
 #use awinput;
 #use CGI ":standard";
 
+my $data=getparsed(\%::options);
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
@@ -27,6 +28,8 @@ for(;(@a=m!<tr[^>]*><td>([^<]+)</td><td>(?:<a href=/0/Map/.?.hl=(?:\d+)>)?<small
 	print "targeted: ".planetlink($sid)." $details<br>\n";
 	dbfleetadd($system,$planetid,$pid, $name, $time, 3, \@fleet);
 }
+
+
 for(;(@a=m!<tr align=center bgcolor="#(\d{6})">(?:[^<]*(?:<[^s])*)*?<small>([^<]*) (\d+)</small>(?:</a>)?</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td></tr>(.*)!); $_=$a[8]) {
 	my ($color,$system,$planetid)=@a[0..2];
 	if($system=~/\((\d+)\)/) {$system=$1}
@@ -40,4 +43,14 @@ for(;(@a=m!<tr align=center bgcolor="#(\d{6})">(?:[^<]*(?:<[^s])*)*?<small>([^<]
 	dbfleetadd($system,$planetid,$pid, $name, $time, $own, \@fleet);
 }
 
+
+# 2013: add stationary and moving fleets
+foreach my $f (@{$data->{fleet}}, @{$data->{movingfleet}}) {
+	my $system=$f->{sid};
+	my $planetid=$f->{pid};
+	my $own=!$f->{sieging};
+	my $time=$f->{eta}||0;
+	if($time) {$own=3}
+	dbfleetadd($system,$planetid,$pid, $name, $time, $own, $f->{ship});
+}
 1;

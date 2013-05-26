@@ -139,7 +139,7 @@ if($options{alliance}) {
             $needplanets, $pointsstr, $n+1, $$p{logins}, playerid2country($pid), $$p{joined}, $intel, $etc, $incomings, awinput::getlastlog($pid)]);
 		$n++;
 	}
-   print " ".a({-href=>"relations-bulk?user=".join("%0a",@membernames)."&alliance=$options{alliance}"},"edit relations for all members");
+	#print " ".a({-href=>"relations-bulk?user=".join("%0a",@membernames)."&alliance=$options{alliance}"},"edit relations for all members");
 	print sort_table([qw"links name home pl sl cl tr", '<span title="number of planets needed">need</span>', qw"pts(rank) arank log from joined intel ETC inco idle"],
          \@displayfuncs,
          [undef, \&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, 

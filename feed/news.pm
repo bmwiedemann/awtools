@@ -26,6 +26,8 @@ if(0){
 
 dbfleetaddinit(undef, 0);
 require 'feed/libincoming.pm';
-feed::libincoming::parseincomings($_);
+feed::libincoming::parseincomings($_); # FIXME drop old code?
+print "inco: @{$data->{incoming}}<br>";
+feed::libincoming::feedincomings($data->{incoming});
 dbfleetaddfinish();
 1;

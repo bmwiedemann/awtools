@@ -45,6 +45,7 @@ if(param()) {
 	}
    do 'feed/dispatch.pm';
    awinput_init();
+   $options{pid}=playername2id($options{name});
    feed::dispatch::feed_dispatch($html, \%options);
 } else {
 	my $uc=cookie('user');

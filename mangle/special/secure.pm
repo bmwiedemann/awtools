@@ -31,7 +31,7 @@ sub mangle($)
    if($string=~m/^[0-9a-f]{5}$/) {
       s!<img src="/0/secure.php"[^>]*>!Security Measure!i; # drop original image link
    }
-   s!<input type="text" name="secure" size="16" class=text!$& value=$string!;
+   s!<input type="text" id="secure" name="secure" maxlength="5"!$& value="$string"!;
    if(0) { # submit the form so that non-premium users login works like premium
       sleep 2+rand(4);
       my $bodycontent="secure=$string&submit2=submit";

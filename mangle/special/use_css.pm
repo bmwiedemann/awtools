@@ -3,10 +3,10 @@ use strict;
 #use awstandard;
 
 sub mangle() {
+	return 0;
 my $g=$mangle::dispatch::g;# || ($::options{name} eq "snappyduck");
 if($::options{url}=~/www1\.astrowars\.com\/0/) {
    if($g) {
-      s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
    }
    s%(<body) leftmargin=0 topmargin=0 bgcolor="#000000">%$1>%;
    s%<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#404040' width="600">\n<tr height=15 align="center"><td width="140" bgcolor="#202060">%<table class="top_navi">\n<tr class="t_navi_links" id="topnav"><td class="t_navi_title">%;

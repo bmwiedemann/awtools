@@ -5,17 +5,16 @@ if($::options{url}=~/nr=(\d+)/) {
    my $frame=$link;
    $frame=~s/.*(http:)/$1/;
    $link=~s/(simple=)\d/$1/; # enable full view for links
-   s%(Planets at)%$1 ${link}id=$id</a>%;
+   s%(Planets at )(ID \d+)%$1 ${link}$2</a>%;
 	# highlight planet
-	s{(<tr bgcolor="#\d+" align=center)(><td>$pid</td><td>)}{$1 style="font-weight: bold; font-size: 1.3em;"$2};
+	s{(<tr)(?: class="(\w+)")?(>\s*<td>$pid</td>\s*<td>)}{$1 class="highlighted $2"$3};
 
 	$frame.="[Your user agent does not support frames or is currently configured not to display frames.]";
-   if(s%<TABLE.*\z%Map / Detail</b></td>%) {
-      $_.=qq'<iframe width="95%" height="700" src="$frame</iframe></body></html>';
-   }
+   s{This system is out of your biology range.*updated once a day\)\.}
+	{$&<br/>or greenbird's version updated whenever someone in range views the system: <iframe width="95%" height="700" src="$frame</iframe></body></html>}s;
    s%Map / Detail</b></td>%$&<td>${link}AWtools($id)</a></td><td>|</td>%;
 #   if($ENV{REMOTE_USER}) {
-      s%Coordinates</a></td>\n</tr>\n</table>%$& <br><iframe width="95\%" height="900" src="$frame</iframe>%;
+      s%\n</table>%$& <br><iframe width="95\%" height="900" src="$frame</iframe>%;
 #   }
    $::extralink="${link}AWtools($id)</a>";
 }

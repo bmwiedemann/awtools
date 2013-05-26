@@ -35,9 +35,9 @@ if(!$authpid) {
       $data{storepw}=param("storepw")?1:0;
       $data{forumauth}=param("forumauth")?1:0;
       $data{flags}=(
-				(param("immediatebuild")?1:0)|
-      		(param("plusnull")?2:0)
-			);
+        (param("immediatebuild")?1:0)|
+        (param("plusnull")?2:0)
+      );
       $h{$authpid}=\%data;
       print "data saved";
    } else {
@@ -61,7 +61,7 @@ if(!$authpid) {
 			checkbox(-name=>'storepw', -value=>1), ' auto-update player\'s <a href="userpasswd">AWTools-password</a> from AW',br,
 			checkbox(-name=>'forumauth', -value=>1), ' allow log in with <a href="authawforum">AW-forum user+pass</a>',br,
 			checkbox(-name=>'immediatebuild', -value=>1), ' raise buildings without confirmation',br,
-			checkbox(-name=>'plusnull', -value=>2), ' add +0 links to spend remaining PP into a building',br,
+#			checkbox(-name=>'plusnull', -value=>2), ' add +0 links to spend remaining PP into a building',br,
 			(is_extended()?():(checkbox(-name=>'storeir', -label=>'Store IR for basic brownie user (for use in planets and travel-time prediction)', -value=>1),br)),
 			
          textarea(-name=>'customhtml', -cols=>40, -rows=>9, -class=>'text'), " custom HTML here",br,

@@ -25,10 +25,10 @@ if($ENV{REMOTE_USER}) {
       return "";
    }
 
-   s%(<td colspan=)3(>Trade</td>)%${1}4$2%;
-   s%(<td>Idle</td>)</tr>%$1<td>ETC</td></tr>%;
-   my $tdre=qr/<td>(?:<font color=#80b0b0>)?[^<]*(<\/font>)?<\/td>/;
-   s/(<tr align=center bgcolor=#303030 [^>]*><td><a href=[^>]*>)([^<]*)(<\/a>(?:<img src=[^>]*>)?<\/td>$tdre{12}<td>[^<]*)/$1.$2.$3.addidle($2)."<\/td><td>".addetc($2)/ge;
+	s%Idle</a></th>%$&\n<th>ETC</th>%;
+	s%Artifact">A</a></th>\s*<th scope="col"></th>%$&\n<th scope="col"></th>%;
+   my $tdre=qr/<td>(?:<span[^<>]*>)?[^<]*(<\/span>)?<\/td>\s*/;
+   s/(<tr[^>]*>\s*<td><a href=[^>]*>)([^<]*)(<\/a>(?:<img src=[^>]*>)?<\/td>\s*$tdre{12}<td>[^<]*)/$1.$2.$3.addidle($2)."<\/td><td>".addetc($2)/ge;
 #   $_.="notice: this filter is new. It adds time since last click and ETC (Estimated Time to Culture)";
 }
 

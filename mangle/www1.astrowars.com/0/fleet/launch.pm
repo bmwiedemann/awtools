@@ -36,7 +36,7 @@ $_=$page;
 #$_.=$extra;
 
 sub piddropdown($) {
-   my $ret='<select name="planet"><option></option>';
+   my $ret='<select name="planet" id="planet"><option></option>';
    for my $i (1..12) {
       my $sel=$_[0]==$i?" selected":"";
       $ret.=qq%<option$sel value="$i">$i</option>%;
@@ -45,7 +45,7 @@ sub piddropdown($) {
    return $ret;
 }
 
-s%<input type="text" name="planet" size="2" class=text value="(\d*)">%piddropdown($1)%ge;
+s%<input type="text" id="planet" name="planet" value="(\d*)" />%piddropdown($1)%ge;
 
 if(0) {
 s%Energy Level</a></td><td><select name="energy">%$&<option>-9999</option>%;
@@ -64,7 +64,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
    if($sci) {if($$sci[0]>99){shift(@$sci)};$refe=$$sci[2]}
    my @c1=systemid2coord($srcsid);
    if(defined($refs) && defined($refe) && $srcsid && (@c1)) {
-      s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/arrival.js"></script><script type="text/javascript" src="http://aw.lsmod.de/code/js/bmwajax.js"></script>$&%;
+      s%</head>%<script type="text/javascript" src="http://aw.zq1.de/code/js/arrival.js"></script><script type="text/javascript" src="http://aw.zq1.de/code/js/bmwajax.js"></script>$&%;
       
       if(m/name="destination2" size="3" class=text value="(\d+)"/) {
          push(@list, ["",$1]);
@@ -97,7 +97,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
       }
       my $tz=$timezone||0;
       my $starttime=sprintf("%i.%.6i ;", Time::HiRes::gettimeofday());
-      s%</form>%$& <form><input class="text" name="travel" size="9" disabled> <input class="text" name="arrival" size="60" disabled></form>
+      s%</form>%$& <form><input class="text" name="travel" size="9" disabled="disabled" /> <input class="text" name="arrival" size="60" disabled="disabled" /></form>
       <script type="text/javascript">
          <!--
          @distlist;
@@ -122,15 +122,17 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
 my($sid,$pid)=($::options{url}=~/\bnr=(\d+).*\bid=(\d+)/);
 sub setdest($$$)
 { my($sid,$pid,$text)=@_;
-	return qq%<a href="#bounce" onclick="var f=document.fleet; f.planet.value=$pid; if(f.destination2) f.destination2.value=$sid; f.destination.value=$sid; asyncfetchdist($sid);">$text</a>%
+	return qq%<a href="#bounce" onclick="var f=document.getElementById('launchFleet'); f.planet.value=$pid; if(f.destination2) f.destination2.value=$sid; f.destination.value=$sid; asyncfetchdist($sid);">$text</a>%
 }
 if($sid && $pid) {
 	my $loop=setdest($sid,$pid,"loop fleet");
-	s%(<td colspan=")3(" bgcolor='#602020'> <input type="submit".*</td>)%${1}1$2<td colspan="2" bgcolor="#206020">$loop</td><!-- loopmark -->%;
+	#s%(<td colspan=")3(" bgcolor='#602020'> <input type="submit".*</td>)%${1}1$2<td colspan="2" bgcolor="#206020">$loop</td><!-- loopmark -->%;
+	s%<input type="submit" value="Launch !!!" />%$&<!-- loopmark -->%;
 
-# add planed planets as targets
+# add planned planets as targets
 	my $plans=playerid2plans($::options{pid});
 	my $pstr="";
+	my $n=0;
 	foreach my $plan (@$plans) {
 		my($sidpid,$status,$who,$info)=@{$plan}[2..4,8];
 		my($sid,$pid)=sidpid32sidpid2m($sidpid);
@@ -141,23 +143,11 @@ if($sid && $pid) {
 		my $setstr=setdest($sid,$pid,"to $sid#$pid");
 		$info=~s/\n/<br>/g;
 #		$pstr.="$setstr @$plan<br/>\n";
-		$pstr.="<tr><td bgcolor='$scolor'>$statusstr: <a href=\"/0/Map/Detail.php/?nr=$sid&highlight=$pid\">$sysname#$pid</a></td><td bgcolor='#404040' style='padding-left: 5px' colspan=2>$setstr</td><td></td><td>$info</td></tr>";
+		$pstr.="<label for='target$n' style='background-color:$scolor'>$statusstr: <a href=\"/0/Map/Detail.php/?nr=$sid&amp;highlight=$pid\">$sysname#$pid</a></label><span id='target$n'>$setstr &nbsp; $info</span>";
+		$n++;
 	}
-	s{<!-- loopmark --></tr>}{$&$pstr};
+	s{<!-- loopmark -->}{$&$pstr};
 #	s{</body>}{<br>$pstr $&};
 }
-
-# send-all adjustments
-sub replacesendall($)
-{
-	my $x=shift;
-	my $y=$x;
-	$x=~s{>all}{>all with transports};
-	$y=~s{>all}{>all without transports};
-	$y=~s{(inf.value)=\d+}{$1=0};
-	return "$y | $x"
-}
-
-$ENV{QUERY_STRING}!~m/inf=0/ && s{(<a href="#all".*>all</a>)}{replacesendall($1)}e;
 
 1;

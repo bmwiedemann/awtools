@@ -3,7 +3,25 @@ use awparser;
 use awinput;
 
 #my @n;
-foreach my $line (m{<tr align=center(.*?)</td></tr>}gs) {
+my $c=getcaption($_);
+#$d->{caption}=$c;
+$c=~m/#(\d+) - ID (\d+) - (.*) (\d+)/;
+$d->{n}=$1;
+$d->{sid}=$2;
+$d->{name}=$3;
+$d->{pid}=$4;
+parsetable($_, sub {
+		my($line,$start, $a)=@_;
+		my $what=$a->[0];
+		if($what=~m{Glossary/index\.php\?id=\d+">([^<]+)<}) {
+			$what=$1;
+			$what=~s/\s+//g;
+			$d->{lc($what)}={num=>$a->[1], a2=>$a->[2], a3=>$a->[3]};
+			$a->[3]=~m/^\d+/ and $d->{lc($what)}->{remain}=$&;
+		}
+		$d->{debug2}="$line --".join(",", @$a);
+	});
+foreach my $line (m{<tr(.*?)</td>\s*</tr>}gs) {
    if($line=~m{([0-9.+]+)</td><td><img src="/images/dot.gif" height="10" width="([0-9.]+)"><img src="/images/leer.gif" height="10" width="([0-9.]+)"></td>}) {
       my $num=$1+$2/340;
       my $n1=$`;
@@ -33,12 +51,14 @@ foreach my $line (m{<tr align=center(.*?)</td></tr>}gs) {
 #	} elsif($line=~m{ bgcolor="#202060"><td>Hostile Fleet}) {
 #	} elsif($line=~m{Garrison</td><td>qty}) {
 #	} else { $d->{debug}=$line; 
+	} else {
+		$d->{debug}=$line;
 	}
 }
 #$d->{test}=\@n;
 
 for my $v ("Next") {
-	$d->{lc($v)}=tobool(m/">$v<\/a><\/td>/);
+	$d->{lc($v)}=tobool(m/">$v<\/a><\/li>/);
 }
 $d->{previous}=tobool($d->{n}>1);
 

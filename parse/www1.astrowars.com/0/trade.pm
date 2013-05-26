@@ -2,6 +2,24 @@ use strict;
 use awparser;
 
 if($::options{url}=~m/Trade\/$/) {
+	my $n=0;
+parsetable($_, sub {
+		my($line, $start, $a)=@_;
+		return if($line=~m/th scope="col"/);
+		my $key=$a->[0];
+		$key=~s{.*>([^<>]*)</a>}{$1};
+		$key=~s/ /_/g;
+		my $value=$a->[1];
+		if($value=~s/^\$//) {
+			$key.="_ad";
+			$value=~s/\.//g;
+		   $value=~s/,/./;
+		}
+		$value=~s/%$//;
+		#$d->{"x".$n++}="$key=>$value";
+		$d->{$key}=$value;
+	});
+
    my @p=();
    my @arti=();
    foreach my $line (m{<tr bgcolor=(.+?)</tr>}g) {

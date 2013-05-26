@@ -126,3 +126,15 @@ input.vkbutton {
 	background-color : #040;
 }
 
+.highlighted {
+	font-weight: bold;
+	font-size: 1.3em;
+}
+tr.highlighted td {
+	/*background-color : #244;*/
+	border: medium ridge #7cc;
+}
+
+#menu ul li:first-child {
+	width: 20%;
+}

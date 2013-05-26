@@ -1,8 +1,7 @@
 use strict;
 use awstandard;
 use awinput;
-use parse::dispatch;
-my $data=parse::dispatch::dispatch(\%::options);
+my $data=getparsed(\%::options);
 
 my @buildings=("Hydroponic Farm", "Robotic Factory", "Galactic Cybernet", "Research Lab", "Starbase");
 my $debug="";
@@ -10,6 +9,7 @@ my $debug="";
 my($planet)=($::options{url}=~/i=(\d+)/);
 if($planet != $data->{n}-1) {
    s/#404040/#802020/g;
+   s{</head>}{<style>td,th {background-color: #f00}</style>$&};
    s/(body.*"#000000">)/$&\n<div style="background-color: #300">/;
 	s%</body>%<br/><span class=bmwwarning>warning: You should not spend PP on this page as they would go to planet 7 (that is an old AW bug). Refresh and then spend your PPs.</span><br/>$&%;
 	$planet=$data->{n}-1;
@@ -24,10 +24,10 @@ my $nextfunc="";
 my $prevfunc="";
 my $redir='window.location="?i=';
 # add access keys
-s{>Previous</a></td>}{ rel="prev" accesskey="p" $&} and $prevfunc=$redir.($planet-1).'"';
-s{>Next</a></td>}{ rel="next" accesskey="n" $&} and $nextfunc=$redir.($planet+1).'"';
-s{>Buildings</a></td>}{ accesskey="b" $&};
-s{>Overview</a></td>}{ rel="index" accesskey="o" $&};
+#s{>Previous</a></td>}{ rel="prev" accesskey="p" $&} and $prevfunc=$redir.($planet-1).'"';
+#s{>Next</a></td>}{ rel="next" accesskey="n" $&} and $nextfunc=$redir.($planet+1).'"';
+s{>Buildings</a></li>}{ accesskey="b" $&};
+#s{>Overview</a></td>}{ rel="index" accesskey="o" $&};
 # end
 
 # add touch next/prev
@@ -48,20 +48,20 @@ my ($popplus,$pop,$popneeded)= map{$data->{population}->{$_}} qw(hourly num rema
 #   $debug.=" $popplus $pop $popneeded ";
 #   $debug.=$ppplus;
 
-sub manglesys($$) {my($sysname, $planet)=@_;
+sub manglesys($$$) {my($sysname, $sid, $planet)=@_;
    my $result="$sysname #$planet";
-   my $sid=systemname2id($sysname);
+#   my $sid=systemname2id($sysname);
    if($sid) {
       $sidpid=sidpid22sidpid3m($sid, $planet);
       my ($x,$y)=systemid2coord($sid);
-      return "<a accesskey=\"y\" href=\"/0/Map/Detail.php/?nr=$sid&highlight=$planet\">$sysname #$planet ($x,$y) id=$sid</a>";
+      return "<a accesskey=\"y\" href=\"/0/Map/Detail.php?nr=$sid&amp;highlight=$planet\">$sysname ($x,$y)</a>";
    }
    return $result;
 }
 
 my $recommend="";
 
-if(1 || $::options{name} eq "pikansjos" || $::options{name} eq "Marstranger" || $::options{name} eq "greenbird") {
+if(1 || $::options{name} eq "greenbird") {
 	require awrecommend;
 	my $rec=awrecommend::planet_building_recommend($data);
 	if($rec && $rec->{building}) {
@@ -73,14 +73,14 @@ if(1 || $::options{name} eq "pikansjos" || $::options{name} eq "Marstranger" || 
 	}
 }
 
-s%^([^<]+) (\d{1,2})(</td></tr>)%manglesys($1, $2).$3.$recommend%me;
+s%^(  <caption>#\d+ - )(ID [^<]+)%$1.manglesys($2, $data->{sid}, $data->{pid}).$3.$recommend%me;
 
-# find and pass cost of destroyer
-my $dscost="";
-if(m%/0/Glossary//\?id=17> Destroyer.*\n<td colspan="2">\d+/(\d+)</td></tr>%) {
-   $dscost="&amp;dscost=$1";
-   s%(<td><a href="/0/Planets/Spend_Points.php/\?p=\d+&)(i=\d+)("><b>Spend Points</b></a></td>)%$1amp;$2$dscost" accesskey="s$3%;
-}
+# find and pass cost of destroyer - obsolete
+#my $dscost="";
+#if(m%/Glossary/index\.php\?id=17">Destroyer</a>.*?<td>\d+/(\d+)</td>\s*</tr>%s) {
+#   $dscost="&amp;dscost=$1";
+#}
+s%(<li><a href="Spend_Points\.php\?[^"]+)(">Spend Points</a></li>)%$1" accesskey="s$2%;
 
 
 my $realpp=$pp;
@@ -136,7 +136,7 @@ foreach my $n (0..$#buildings) {
 		# add +0 link to use before spend-all
 		if(int($pp) && $wantplusnull) {
 			my $url=build_url({i=>$planet, points=>int($pp), p=>int($pp), type=>$n, immediate=>$immediate});
-			$plusnull=qq(&nbsp;<a href="$url$dscost" style="background-color:#840">+0</a>);
+			$plusnull=qq(&nbsp;<a href="$url" style="background-color:#840">+0</a>);
 		}
       my $hours=sprintf("<span style=\"color:gray\">in&nbsp;%.1fh&nbsp;(%0.f%%)</span>",($ppneeded-$realpp)/$ppplusbonus, 100*$prodbonus);
       s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5&nbsp;$hours$plusnull$6%;
@@ -158,9 +158,9 @@ foreach my $n (0..$#buildings) {
 
 	my $intpp=int($pp);
 	my $np1=$n+1;
-	my $dest=$immediate?"submit.php":"Spend_Points.php/";
+	my $dest=$immediate?"submit.php":"Spend_Points.php";
 	if($immediate){$onclickjs=""}
-   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" accesskey=$np1 href="/0/Planets/$dest?p=$intpp&amp;i=$planet&amp;points=$5&amp;produktion=$awstandard::buildingval[$n]$dscost" style="background-color:blue" onclick="
+   s%($buil)(</a></td><td>)(\d+)(.*?\n<td> *)(\d+)(</td></tr>)%$1$2$3$4$5 <a id="spendlink$n" accesskey=$np1 href="/0/Planets/$dest?p=$intpp&amp;i=$planet&amp;points=$5&amp;produktion=$awstandard::buildingval[$n]" style="background-color:blue" onclick="
 	document.form.points.value='$5'; $onclickjs">+1</a>$6%;
 #   $debug.="<br>test: $buil $val[$n] $2 $4";
 }
@@ -187,9 +187,8 @@ if(1) {
       $fstr.=$fs;
    }
    if($fstr) {
-      s%^</td></tr></table>$%
-      </td></tr><tr><td>$fstr
-      <br>
+      s%</td>\s*</tr>\s*</table>\s*</div>%
+      </td></tr><tr><td colspan="4">$fstr
       $&%m
    }
 }
@@ -199,7 +198,7 @@ if($::options{handheld}) {
 	s{(<img src="/images/(?:dot|leer)\.gif" height="10" width=")([0-9.]+)}{$1.int($2/2.5)}ge
 }
 
-s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/planets_spend_points.js"></script>$&%;
+s%</head>%<script type="text/javascript" src="http://aw.zq1.de/code/js/planets_spend_points.js"></script>$&%;
 my $spend=qq!
 <div style="display:none" id="spenddiv">
 <a name="spend"></a>
@@ -228,7 +227,17 @@ my $spend=qq!
 </center>
 !;
 
-s{</body>}{$spend$&};
+if($immediate) {
+	sub my_build_url(%) {
+		my $s=build_url(@_);
+		$s=~s/&/&amp;/g;
+		$s=~s{^http://[^/]+}{};
+		return $s;
+	}
+	s/href="Spend_Points\.php\?p=\d+&amp;i=(\d+)&amp;toSpend=(\d+)&amp;building=(..)/"href=\"".my_build_url({i=>$1, points=>$2, type=>$awstandard::buildingstr{uc($3)}, immediate=>$immediate})/ge;
+}
+
+#s{</body>}{$spend$&};
 
 $_.=$debug;
 

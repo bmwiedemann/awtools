@@ -4,11 +4,11 @@ use awparser;
 my($title)=m!\A.{0,200}<title>([^<>]*)</title>!s;
 $d->{"title"}=$title;
 my $ret=2;
-if($title eq "Astro Wars") {
-	if(m{<tr><td><a href="/0/secure.php">Security Measure</a></td><td>}) {
+if($title eq "Astro Wars Login") {
+	if(m{<legend>Security Measure</legend>}) {
 		$d->{security}=1;
 		$ret=1;
-	} elsif(m{<font color="#FF0000" size="5"><b>Please Login Again.</b></font><form action="/register/login.php" method="post" name=login>}) {
+	} elsif(m{<legend>Please login again</legend>}) {
 		$d->{relogin}=1;
 		$ret=1;
 	}
@@ -19,8 +19,8 @@ if($title eq "Astro Wars") {
    $d->{"time"}=join(":",@time);
    $d->{"timesec"}=$time[0]*3600+$time[1]*60+$time[2];
 
-   $d->{"trade"}=tobool(m{^<td>|</td><td><a href="/0/Trade/" class="white">Trade</a></td>});
-   $d->{"alliance"}=tobool(m{^<td>|</td><td><a href="/0/Alliance/" class="white">Alliance</a></td>});
+   $d->{"trade"}=tobool(m{<li><a href="/\d+/Trade/" accesskey=".">Trade</a></li>});
+   $d->{"alliance"}=tobool(m{<li><a href="/\d+/Alliance/" accesskey=".">Alliance</a></li>});
 # add timezone detector
 	$d->{"timezone"}=awstandard::guesstimezone($d->{"time"});
 

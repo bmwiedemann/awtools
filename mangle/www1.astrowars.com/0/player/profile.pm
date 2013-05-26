@@ -6,10 +6,10 @@ use awhtmlout;
 use DBAccess2;
 
 # add AWTools link at bottom
-if(m%(<b>Player / Profile</b></td>\s*<td>)([^<]*)% && !$::options{handheld}) {
+if(m%(<li class="bold">Player / Profile</li>\s*<li>)([^<]*)% && !$::options{handheld}) {
    $::extralink="$::bmwlink/relations?name=$2\">AWTools($2)</a>";
 }
-s%(<b>Player / Profile</b></td>\s*<td>)([^<]*)%$1$::bmwlink/relations?name=$2">AWTools($2)</a>%;
+s%(<li class="bold">Player / Profile</li>\s*<li>)([^<]*)%$1$::bmwlink/relations?name=$2">AWTools($2)</a>%;
 
 my $name=$2;
 # test for available intel
@@ -27,15 +27,15 @@ if($rac && defined($rac->[0])) {
    $$rac[7]="..".(-$$rac[7]);
    my $race=$racestr;
    $etc=playerid2etc($pid)||"";
-   if($etc) {$etc=AWisodatetime($etc);$etc="<tr><td bgcolor=\"#303030\">ETC</td><td>$etc</td></tr>";}
+   if($etc) {$etc=AWisodatetime($etc);$etc="<tr><th>ETC</th><td>$etc</td></tr>";}
    if(!m/Intelligence Report/) {
-      s%</table></td></tr></table>%$&<br> \n</td><td><table border="0" cellspacing="1" bgcolor="#404040"><tr><td>\n<table border="0" cellpadding="2" bgcolor="#101010">\n<tr><td colspan="2" bgcolor="#202060"><b>Tools Intelligence Report</b></td></tr><tr><td bgcolor="#303030">age</td><td>$intel</td></tr><tr><td bgcolor="#303030">race</td><td>$race</td></tr><tr><td bgcolor="#303030">science</td><td>$science</td></tr></table></td></tr></table><br>%;
+      s%<br class="fillFloat"%<div id="intel">\n<table id="IRscience">\n<caption>AWTools Intelligence Report</caption><tr><td bgcolor="#303030">age</td><td>$intel</td></tr><tr><th bgcolor="#303030">race</th><td>$race</td></tr><tr><td bgcolor="#303030">science</td><td>$science</td></tr></table></div>\n$&%;
    }
 }
-my($t2)=get_one_row("SELECT `trade` FROM `tradelive` WHERE `pid`=?", [$pid]);
-my $trade=$t2?qq(<tr><td bgcolor="#303030">Trade</td><td>$t2%</td></tr>):"";
+#my($t2)=get_one_row("SELECT `trade` FROM `tradelive` WHERE `pid`=?", [$pid]);
+my $trade="";#$t2?qq(<tr><th>TradeLive</th><td>$t2%</td></tr>):"";
 if($trade||$etc) {
-	s%<tr><td bgcolor="#303030">Culturelevel</td><td>\d+</td></tr>%$&$trade$etc%;
+	s%<tr>\s*<th scope="row">Culture level</th>\s*<td>\d+</td>\s*</tr>%$&$trade$etc%;
 }
 
 
@@ -45,11 +45,7 @@ my $logins=awlogins::get_logins($ENV{REMOTE_USER},$pid, "ORDER BY `time` DESC LI
 if($logins && defined($logins->[0])) {
 	my @l=@{$logins->[0]};
 	my $idle=sprintf("%im", (time()-$l[1])/60);
-	s!(>Idle</td><td>[^<]*)!$1 = $idle!;
+	s!(>Idle</th>\s*<td>[^<]*)!$1 = $idle!;
 }
-
-use awsql;
-my $prem=m!<small>Premium Member</small>! || 0;
-update_premium($pid, $prem);
 
 1;

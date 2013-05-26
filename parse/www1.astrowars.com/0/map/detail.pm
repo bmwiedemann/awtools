@@ -1,17 +1,36 @@
 use strict;
 use awparser;
 
-my($sysname, $sysx, $sysy)=(m{<tr align=center><td colspan="5">Planets at <b>([^<]+)</b> \(([-0-9]+)/([-0-9]+)\)</b></td></tr>});
+my $caption=getcaption($_);
+my($sid, $sysname, $sysx, $sysy)=($caption=~m{Planets at ID (\d+) - ([^<]+) \(([-0-9]+)/([-0-9]+)\)$});
+$d->{sid}=$sid;
 $d->{name}=$sysname;
 $d->{x}=int($sysx);
 $d->{y}=int($sysy);
 
 my @planet=();
-foreach my $line (m{<tr bgcolor=("#\d+" align=center><td>.+?)</tr>}g) {
-   if($line=~m{#(\d+)" align=center><td>(\d+)</td><td>(\d+)</td><td>(\d+)</td><td>(?:<a href=/0/Player/Profile.php/\?id=(\d+)>)?([^<]+)}) {
-      push(@planet, {id=>int($2), sieged=>tobool($1 eq "602020"), "population"=>int($3), starbase=>int($4), pid=>int($5), name=>$6});
-   }
-}
+my $n=10; # debug
+parsetable($_, sub {
+		my($line,$start, $a)=@_;
+		return if $line=~m{ID</th>}; # skip header
+		return if $start=~m/class="sysDetailFleet"/; # TODO parse later?
+		return if $start=~m/class="sysDetailInco"/; # TODO
+		return if($a->[0]<=0 || $a->[0]>12);
+		my %p=(
+			id=>int($a->[0]),
+			population=>int($a->[3]),
+			starbase=>int($a->[4]),
+			sieged=>tobool($start=~m/^ class="sieged"/),
+		);
+		my $ownerline=$a->[2];
+		if($ownerline=~m{Profile\.php\?id=(\d+)">([^<]+)</a>}) {
+			$p{pid}=$1;
+			$p{name}=$2;
+		}
+		push(@planet, \%p);
+#		$d->{"x".$n++}="$line --- $start -- ".join(",",@$a);
+	});
+
 $d->{planet}=\@planet;
 
 2;

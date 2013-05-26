@@ -99,7 +99,7 @@ if(1) {
    addtimer(0, $time, $script);
    $time=AWisodatetime($time);
    $time=qq'<form><input name="z" $commonattr value="$time"> $time UTC</form>';
-   s%</head>%<script type="text/javascript" src="http://aw.lsmod.de/code/js/fleet_send.js"></script>$&%;
+   s%</head>%<script type="text/javascript" src="http://aw.zq1.de/code/js/fleet_send.js"></script>$&%;
 } else {
    $time=AWisodatetime($time);
 }
@@ -111,7 +111,7 @@ if(1) {
    
 # add awauth
    for my $l ($destname, $srcname) {
-      $l=~s%<a href="http://aw.lsmod.de/cgi-bin%$::bmwlink%;
+      $l=~s%<a href="http://aw.zq1.de/cgi-bin%$::bmwlink%;
    }
 
 # add everything only here to the output HTML:
@@ -161,5 +161,8 @@ if(1) {
    
    $_.="post/param-data: http://$ENV{HTTP_HOST}$ENV{SCRIPT_NAME}?$param";
 }
+
+# add highlight to dest
+s{(Map/Detail\.php\?nr=\d+)(">\d+#)(\d+)(</a></td>)}{$1&amp;highlight=$3$2$3$4};
 
 1;

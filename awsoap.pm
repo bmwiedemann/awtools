@@ -42,7 +42,7 @@ sub _do_www1post(%)
 
 	my $ip=$h->{sourceip} || getip;
 	if($debug) {
-		$uri="http://aw.lsmod.de/cgi-bin/public/testenv?$uri";
+		$uri="http://aw.zq1.de/cgi-bin/public/testenv?$uri";
 	} else {
 		#$uri="http://aw21.zq1.de$uri";
 		$uri="http://aw21.uml11b.zq1.de:11080$uri";

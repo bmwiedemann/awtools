@@ -10,6 +10,24 @@ if($::options{url}=~m{Planets/$}) {
 $d->{"spend_all_points"}=tobool(m{<td><a href="/0/Planets/Spend_All_Points.php"><b>Spend All Points</b></a></td>});
 
 my @p;
+parsetable($_, sub {
+	my($line,$start, $a)=@_;
+	if($line=~m/^ class="last/) {
+		my @a=@$a;
+		foreach my $a (@a) {$a=~s/.* ([+-]\d+)%/$1/;$a+=0}
+		$d->{growthbonus}=shift(@a);
+		$d->{totalpop}=shift(@a);
+		$d->{productionbonus}=shift(@a);
+		$d->{totalpp}=shift(@a);
+		my $prodbonus=$d->{productionbonus}||0;
+		$prodbonus=1+($prodbonus/100);
+		$d->{hourlypp}=int(shift(@a)/$prodbonus+0.5);
+	} else {
+		$d->{debug}=$line;
+		$d->{debuga}="@$a";
+	}
+});
+
 foreach my $pline (m{<tr align=center bgcolor=(.+?)</tr>}g) {
 	if(my @a=($pline=~m{^"#(\d+).*\?i=(\d+)>([^<]+)</a></td><td>(\d+)</td><td> <img src="/images/dot.gif" height="10" width="(\d+)"><img src="/images/leer.gif" height="10" width="(\d+)"></td><td>\+(\d+)</td><td>(\d+)</td><td>\+(\d+)</td>})) {
 		my %a=(siege=>((shift(@a) eq "602020")?1:0));

@@ -10,7 +10,7 @@ my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
 sub filter() {
-	my $data=getparsed(\%::options);
+   my $data=getparsed(\%::options);
    return if(!$data->{name} || !$::options{url});
    return if($ENV{REMOTE_USER} eq "xr"); # TODO : drop later?
    my ($sysname,$x,$y)=($data->{name},$data->{x},$data->{y});
@@ -25,8 +25,8 @@ sub filter() {
    untie %awinput::planets;
    tie %awinput::planets, "MLDBM", "db/planets.mldbm", O_RDWR|O_CREAT, 0666 or print "can not write DB: $!";
 
-	my $planets=$data->{planet};
-	foreach my $pla (@$planets) {
+   my $planets=$data->{planet};
+   foreach my $pla (@$planets) {
       my ($siege,$pid,$pop,$sb,$playerid,$owner)=($pla->{sieged}, $pla->{id}, $pla->{population}, $pla->{starbase}, $pla->{pid}, $pla->{name});
 		next if not defined $playerid; # skip missing planets
       if($pop==0) {$pop++}

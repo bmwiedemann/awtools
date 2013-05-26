@@ -128,3 +128,10 @@ table.main_outer, table.main_inner, table.bottom_navi, table.top_navi, table.sub
 .newsmessage {
 	background-color : #101010;
 }
+
+
+/* override AW styles */
+div.progressBar {
+	background-color: #161;
+}
+

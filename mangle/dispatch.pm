@@ -35,7 +35,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    %::options=%$options;
    $toolscgiurl="http://$bmwserver/cgi-bin/"; # this is initially empty but for mangling we need absolute URLs
 
-   my $notice="";#<b style=\"color:green\">notice: road works ahead.... brownie + AWTools server has a scheduled maintenance period today (Monday 2007-03-26 12-18:00 UTC) and might be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br>";
+   my $notice="";#<b style=\"color:green\">notice: road works ahead.... brownie + AWTools server has a scheduled maintenance period today (Monday 2007-03-26 12-18:00 UTC) and might be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br/>";
 
 #   local $ENV{REMOTE_USER}=$ENV{REMOTE_USER};
 #   if($$options{name} eq "mauritz") { # map user to see AF data, but not feed
@@ -45,7 +45,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    my @accesstexts=(
       "Your alliance is using greenbird's extended AWTools but has not yet decided to NAP or pay this round. The founder can decide <a href=\"http://$bmwserver/cgi-bin/alliopenaccount\">here</a>",
       "Your alliance has paid for greenbird's extended AWTools this round. Thanks!",
-      "Your alliance is using greenbird's extended AWTools for a NAP with greenbird's alliance for this round");
+      "Your alliance is using greenbird's extended AWTools for a <a href=\"http://aw.zq1.de/manual.html#policy\">NAP</a> with greenbird's alliance for this round");
    my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}||"?", "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
@@ -65,7 +65,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 			$::options{handheld}=1;
 		}
 	}
-   if(m/onLoad="document.login.secure.focus\(\);">/) {
+   if(m/<form id="loginSecurity"/) {
       if($g) {
          if(do "mangle/special/secure.pm") {
             $_=mangle::special::secure::mangle($_);
@@ -94,17 +94,17 @@ sub mangle_dispatch(%) { my($options)=@_;
             # inform user about his terms of use
             my($flags)=$dbh->selectrow_array("SELECT `flags` FROM `toolsaccess` WHERE tag=? and othertag=tag",{},$ENV{REMOTE_USER});
             if($flags<=@accesstexts) {
-               $joinlink.="<br><span class=\"bmwinfo\" id=\"termsofaccess\">$accesstexts[$flags]</span> ";
+               $joinlink.="<br/><span class=\"bmwinfo\" id=\"termsofaccess\">$accesstexts[$flags]</span> ";
             }
          }
          if(($interbeta || !$ENV{REMOTE_USER}) && $$options{pid}) {
             my $atag=playerid2tag($$options{pid});
             if(($interbeta || !$atag) && $$options{name} && ($$options{name} ne "unknown")) {
-               $joinlink="<br>".$$options{authlink}."/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
+               $joinlink="<br/>".$$options{authlink}."/joinalli\">I am member of an alliance that already uses extended AWTools and want to join</a>";
             } elsif(is_founder($$options{pid})) {
                # if alliance founder, add extra "accept NAP with AF" link
-               $joinlink.="<br>$$options{authlink}/public/alliopenaccount\">As founder of an alliance I want to use AWTools</a> ";
-               #$joinlink.="<br><a href=\"http://aw.lsmod.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
+               $joinlink.="<br/>$$options{authlink}/public/alliopenaccount\">As founder of an alliance I want to use AWTools</a> ";
+               #$joinlink.="<br/><a href=\"http://aw.zq1.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
             }
          } else {
          }
@@ -133,20 +133,20 @@ sub mangle_dispatch(%) { my($options)=@_;
       } else { $info{page}=$module }
 
       if($ingameuri) {
-         if($alli) {
+         if(1||$alli) {
 #            eval q§
-               my $sep="<td>|</td>";
-               my $e="</a></td>";
-               my $s=qq'<td class="white">$::bmwlink';
+               my $sep="";
+               my $e="</a></li>\n";
+               my $s=qq'<li class="white">$::bmwlink';
                my $l="$e$sep$s";
-               s%^</tr></table>%</tr><tr class="bmwblankrow"><td class="t_navi_title"></td><td colspan="13"> &nbsp; </td></tr><tr class="t_bmw_navi_links"><td class="t_bmw_navi_title"><b>$::extralink</b></td>
+               s%^(  <div id="menu".*?)(</div>)%$1<ul class="t_bmw_navi_links"><li class="t_bmw_navi_title"><b>$::extralink</b></li>
                   $s/preferences2">prefs
                   $l/tactical-live2">tacmap
                   $l/system-info">system
                   $l/relations">player
                   $l/imessage">BIM
                   $l/alliance">alliance
-                  $l/fleets">fleets$e$&%m;
+                  $l/fleets">fleets$e</ul>$2%sm;
 #               $_.="test OK";
 #            § or $_.= $@;
          } else {
@@ -161,7 +161,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 #   do "mangle/special/color.pm"; 
    mangle::special::color::mangle();
 
-#   s%<br>\s*(<TABLE)%$1%; # remove some blanks
+#   s%<br/>\s*(<TABLE)%$1%; # remove some blanks
 
 # add footer + disclaimer
    my $imessage="";
@@ -171,7 +171,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       if($ims && @$ims) { # have im
          my $nims=@$ims;
          my $bims=$nims>1?"$nims BIMs":"a BIM";
-         $imessage="<!-- start gb imessage --><div class=awimessage>You have received $$options{authlink}/imessage\">$bims</a>.<br>";
+         $imessage="<!-- start gb imessage --><div class=\"awimessage\">You have received $$options{authlink}/imessage\">$bims</a>.<br/>";
          my $imend="</div><!-- end gb imessage -->\n";
          s!<center>!$imessage$imend$&!;
          foreach my $im (@$ims) {
@@ -179,13 +179,13 @@ sub mangle_dispatch(%) { my($options)=@_;
             my $fromto;
             my $c;
             if($sendpid==$$options{authpid}) {
-               $fromto=" =&gt ".playerid2link2($recvpid);
+               $fromto=" =&gt; ".playerid2link2($recvpid);
                $c="sentimessage";
             } else {
                $fromto=" &lt;= ".playerid2link2($sendpid);
                $c="recvimessage";
             }
-            $imessage.=AWisodatetime($time+3600*$$options{tz})."$fromto <span class=\"$c\">".bbcode_trans($msg)."</span> <br>";
+            $imessage.=AWisodatetime($time+3600*$$options{tz})."$fromto <span class=\"$c\">".bbcode_trans($msg)."</span> <br/>";
          }
          $imessage.=$imend;
       }
@@ -270,17 +270,17 @@ sub mangle_dispatch(%) { my($options)=@_;
 				}
 				push(@list,$x);
 			}
-			$online.="<br><span class=\"bmwinfo\">untagged $alli players: ".join(", ", @list)."</span>";
+			$online.="<br/><span class=\"bmwinfo\">untagged $alli players: ".join(", ", @list)."</span>";
 		}
       if($online){
-         $online="<span class=\"bottom_key\">allies online:</span> $online<br>"
+         $online="<span class=\"bottom_key\">allies online:</span> $online<br/>"
       }
    }
-#   if($alli eq "TGD" || $alli eq "AF" || $alli eq "RATS") {$notice="<b style=\"color:green\">note: RSA forum is down - backup forum is at <a href=\"http://s3.invisionfree.com/RSA_Outpost/index.php?act=idx\">http://s3.invisionfree.com/RSA_Outpost/</a>.</b><br>"}
+#   if($alli eq "TGD" || $alli eq "AF" || $alli eq "RATS") {$notice="<b style=\"color:green\">note: RSA forum is down - backup forum is at <a href=\"http://s3.invisionfree.com/RSA_Outpost/index.php?act=idx\">http://s3.invisionfree.com/RSA_Outpost/</a>.</b><br/>"}
 
    # aw21 transition
    if($$options{proxy} eq "brownie-cgi") {
-      $notice.="<br><b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.lsmod.de/manual/proxy-config\">brownie.pac</a></b><br>";
+      $notice.="<br/><b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.zq1.de/manual/proxy-config\">brownie.pac</a></b><br/>";
    }
    
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
@@ -296,11 +296,11 @@ sub mangle_dispatch(%) { my($options)=@_;
    }
    my $info=join(" ", map({"<span class=\"bottom_key\">$_=</span><span class=\"bottom_value\">$info{$_}</span>"} sort keys %info));
    $$options{mangleelapsed}=$$options{totalelapsed}=tv_interval ( $t2 );
-   my $gbcontent="$imessage<!-- start greenbird disclaimer -->\n$joinlink<p id=\"disclaimer\"><br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id=bmwinfo>$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
+   my $gbcontent="\n$imessage<!-- start greenbird disclaimer -->\n$joinlink<p id=\"disclaimer\"><br/>disclaimer: this page was mangled by greenbird's code. <br/>This means that errors in display or functionality might not exist in the original page. <br/>If you are unsure, disable mangling and try again.</p><p id=\"bmwinfo\">$notice$online$info</p>\n<!-- end greenbird disclaimer -->\n";
 
    if($gameuri) {
       my $style="main";
-      if(m%<b>Please Login Again.</b></font>%) {$style="awlogin";}
+      if(m%<legend>Please login again</legend>%) {$style="awlogin"; s/id="user"/$& autofocus="autofocus"/;}
       elsif(m%Enter the characters as they are shown in the box below%) {$style="awlogin";}
       elsif($url=~m!astrowars\.com/(rankings|about)/!) {$style="awlogin";}
       
@@ -312,23 +312,24 @@ sub mangle_dispatch(%) { my($options)=@_;
       }
 		my $extracss="http://$bmwserver/code/css/style_mobile.css";
 		if($agent=~m/iPhone/) {$extracss="http://iphoneaw.zq1.de/main.css"}
-      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://$bmwserver/code/css/$style.css">
-<link rel="stylesheet" href="$extracss" media="handheld" type="text/css" />
-<!--[if !IE]>-->
-<link type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" href="$extracss" />
-<!--<![endif]-->
-%;
+		s%  <link rel="stylesheet" type="text/css" media="screen" href=%$&"http://$bmwserver/code/css/$style.css" />\n$&%;
+#      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://$bmwserver/code/css/$style.css">
+#<link rel="stylesheet" href="$extracss" media="handheld" type="text/css" />
+#<!--[if !IE]>-->
+#<link type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" href="$extracss" />
+#<!--<![endif]-->
+#%;
    }
    if($gameuri || $g) {
       # fix AR's broken HTML
 
-      s%</body>%$gbcontent $&%;
       if($g) {
-         $_.=sprintf(" benchmark: auth:%ius pre:%ius aw:%ius sql:%ius mangle:%ius ", $$options{authelapsed}*1000000, $$options{prerequestelapsed}*1000000, $$options{awelapsed}*1000000, $$options{sqlelapsed}*1000000, $$options{mangleelapsed}*1000000);
+         $gbcontent.=sprintf(" benchmark: auth:%ius pre:%ius aw:%ius sql:%ius mangle:%ius ", $$options{authelapsed}*1000000, $$options{prerequestelapsed}*1000000, $$options{awelapsed}*1000000, $$options{sqlelapsed}*1000000, $$options{mangleelapsed}*1000000);
 #         s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
 #         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
 #         if($url=~m%^http://www1.astrowars.com/rankings/%){ s%</form>%%; }
       }
+      s%</body>%<div class="browniefooter">$gbcontent</div>\n$&%;
 #      do "mangle/special/use_css.pm"; 
       mangle::special::use_css::mangle();
       # fix AR's non-standard HTML

@@ -1,4 +1,5 @@
 use strict;
+use awstandard;
 use dbaddpl;
 # feed in-game player profile to DBs
 my $data=getparsed(\%::options);
@@ -9,12 +10,13 @@ my %accuracytimevalue=(""=>86398, second=>1, minute=>60, hour=>3600, day=>86400)
 my $debug=$::options{debug};
 if($debug) {print "debug mode - no modifications done<br>\n"}
 
-m,>\s*([^<]+)(?: \(\d+[^)<]*\)</font>)?(?:<br><small>Premium Member</small>)?</b></center>,; my $name=$1;
-if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+days?|),){
+my $name=$data->{name};
+if($name && $data->{idle}){
+	$data->{idle}=~m,(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+days?|),;
 	my $idle="$1 $2";
 	my $idlei=$1;
 	my $timestr=$2; $timestr=~s/s$//; $timestr=~s/^\s*//;
-   $idlei=~s!N/A!1!;
+	$idlei=~s!N/A!1!;
 	$idlei*=$timevalue{$timestr};
 	#my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday)=gmtime();
 	#$hour+=$::options{tz};
@@ -31,38 +33,27 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 	my $lastonline=time()-$idlei-$::deliverytime;
 	my $inaccuracy=$accuracytimevalue{$timestr}+1;
 	
-        m,Logins</td><td>(\d+),; my $logins=$1;
-	m,Playerlevel</a></td><td>(\d+ - \d+%)</td></tr>,; my $pl=$1;
-#        my $points=0;
-#        if(m,Rank \(Points Scored\)</td><td>([^<]*),){$points=$1};
-#        m,Playerlevel</td><td>(\d+),; my $pl=$1;
-        m,Sciencelevel</td><td>(\d+),; my $sl=$1;
-        m,Culturelevel</td><td>(\d+),; my $cl=$1;
-	#my $science="";
+	my $logins=$data->{logins};
+	my $pl=$data->{playerlevel};
+	#$pl=~s/^(\d+).*/$1/;
+	my $sl=$data->{sciencelevel};
+	my $cl=$data->{cultuelevel};
 	my @science;
 	foreach my $sci (@awstandard::sciencestr) {
-		next if ! m,$sci</td><td>([+-]?\d+),; #$sci{$sci}=$1;
-		#my $val=$1;
-		push(@science,$1);
-		#$sci=~/^(...)/;$sci=$1;
-		#$science.=" $sci=$val";
+		push(@science,$data->{lc($sci)});
 	}
 	if($debug){print "science: @science<br>\n";}
 	my @race;
-	{
-		my $racere="";
-		foreach my $r (@awstandard::racestr) {
-			$racere.=qr"<li>[+-]\d+[%h] $r \(([+-]\d)\)</li>";
-		}
-		if(/$racere/) {@race=($1,$2,$3,$4,$5,$6,$7);print "race: @race<br>\n"}
+	if($data->{racevalue}) {
+		@race=@{$data->{racevalue}};
 	}
+	#print "race=@race<br>\n";
 	my $lastonlinegmt=gmtime($lastonline);
 	print qq! <a href="relations?name=$name">name=$name</a> idle=$idle last=&quot;$lastonlinegmt&quot; logins=$logins pl=$pl sl=$sl cl=$cl\n<br>!;
 #tie(%relation, "DB_File", $dbname) or print "error accessing DB\n";
 #	$name="\L$name";
    dbplayeriradd($name, \@science, \@race, [$logins,$lastonline,$idlei,$inaccuracy]);
-   if($pl=~m/(\d+) - (\d+)%/ && lc($name) ne lc($::options{name})) {
-      $pl=$1+0.01*$2;
+   if(lc($name) ne lc($::options{name})) {
       dbaddpl(time()-$::deliverytime, $name, $pl);
       #system("/home/aw/inc/dbaddpl", time()-$::deliverytime, $name, $pl);
    }
@@ -70,6 +61,9 @@ if($name && m,Idle[^0-9\n]*(\d+|(?:N/A))(\s+seconds?|\s+minutes?|\s+hours?|\s+da
 #	my $newentry=addplayerir($oldentry, \@science, \@race, [$logins,$lastonline,$idlei,$inaccuracy]);
 #	if(!$debug) {$relation{$name}=$newentry;}
 #	else {print "<br>new:",$newentry;}
+	use awsql;
+	my $prem=$data->{premium};
+	update_premium($data->{pid}, $prem);
 }
 
 

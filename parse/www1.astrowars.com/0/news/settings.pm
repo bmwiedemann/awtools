@@ -1,8 +1,12 @@
 use strict;
 use awparser;
 
-foreach my $line (m{<tr><td bgcolor='#404040'>(.+?)</tr>}gs) {
-
+my $n=0;
+foreach my $line (m{<input type="text" ([^>]+ value="[^"]+")}g) {
+	if($line=~m{id="([^"]+)" name="[^"]+" value="([^"]+)"}) {
+		$d->{$1}=$2;
+	}
+	# old pre-2013:
 	if($line=~m{Email Address.*value="([^"]*)"}) {
 		$d->{emailaddress}=$1;
 	} elsif($line=~m{Glossary Language<br>.*value="([-0-9]+)" CHECKED}s) {

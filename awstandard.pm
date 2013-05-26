@@ -20,7 +20,7 @@ use Time::HiRes qw(gettimeofday tv_interval);
 our $server="www1.astrowars.com";       # AW game host
 our $awserver="www1.astrowars.com";     # proxied AW game host
 our $awforumserver="www.astrowars.com"; # AW forum host
-our $bmwserver="aw.lsmod.de";           # the domain name you use for the AWTools
+our $bmwserver="aw.zq1.de";             # the domain name you use for the AWTools
 our $bmwproxyaddr="aw21.zq1.de";
 our $proxyip="192.168.236.1";
 our $toolscgiurl="";#"http://$bmwserver/cgi-bin/";
@@ -40,6 +40,7 @@ our $style;
 our $timezone;
 our $updatetime15=16*60;
 our $plpointsfactor=1;
+our $awdatere=qr"\d\d:\d\d:\d\d\s-\s[A-Z][a-z][a-z]\s\d+";
 our @month=qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 our %month=qw(Jan 1 Feb 2 Mar 3 Apr 4 May 5 Jun 6 Jul 7 Aug 8 Sep 9 Oct 10 Nov 11 Dec 12);
 our @weekday=qw(Sun Mon Tue Wed Thu Fri Sat);
@@ -49,6 +50,7 @@ our @sciencestr=(qw(Biology Economy Energy Mathematics Physics Social),"Trade Re
 our @racestr=qw(growth science culture production speed attack defense);
 our @shipstr=qw(Transports Colony Destroyer Cruiser Battleship);
 our @buildingstr=qw(HF RF GC RL SB TRN CLS DS CS BS);
+our %buildingstr=(); {my $n=0; foreach my $x (@buildingstr) {$buildingstr{$x}=$n++}}
 our @buildingval=qw(farm fabrik kultur forschungslabor starbase infantrieschiff kolonieschiff destroyer cruiser battleship);
 our @racebonus=qw(0.07 0.08 0.05 0.04 0.01 0.12 0.16);
 our $magicstring="automagic:";
@@ -123,7 +125,7 @@ our %headerlinkmap=(imessage=>"BIM");
 sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
-   my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"}),Link({-rel=>"shortcut icon", -href=>"http://aw.lsmod.de/favicon.ico"})];
+   my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"}),Link({-rel=>"shortcut icon", -href=>"http://aw.zq1.de/favicon.ico"})];
    if($extra) {push(@$heads,$extra);}
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/code/css/tools/common.css" />!);
 #   push(@$heads, "<title>$title</title>");
@@ -194,9 +196,9 @@ sub mon2id($) {my($m)=@_;
 # output: UNIX timestamp
 sub parseawdate($) {my($d)=@_;
         my @val;
-        if(my @v=($d=~/(\d\d):(\d\d):(\d\d)\s-\s(\w{3})\s(\d+)/)) {
+        if(my @v=($d=~/(\d\d):(\d\d):(\d\d)\s-\s([A-Z][a-z][a-z])\s(\d+)/)) {
            @val=@v;
-        } elsif(@v=($d=~/(\w{3})\s(\d+)\s-\s(\d\d):(\d\d):(\d\d)/)) {
+        } elsif(@v=($d=~/([A-Z][a-z][a-z])\s(\d+)\s-\s(\d\d):(\d\d):(\d\d)/)) {
            @val=@v[2,3,4,0,1];
         } else { return undef }
 #if($d!~/(\d\d):(\d\d):(\d\d)\s-\s(\w{3})\s(\d+)/);
@@ -538,7 +540,7 @@ sub build_url(%)
    $opts{produktion}=$awstandard::buildingval[$f->{type}];
 	if($f->{immediate}) {delete $opts{p}}
    my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
-	my $dest=$f->{immediate}?"submit.php":"Spend_Points.php/";
+	my $dest=$f->{immediate}?"submit.php":"Spend_Points.php";
    return("http://$awserver/0/Planets/$dest?$params");
 }
 

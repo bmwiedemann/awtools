@@ -2,13 +2,13 @@ package awparser;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-$VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
+$VERSION = "1.0";
 @ISA = qw(Exporter);
 our $d=$::data;
 @EXPORT = 
 qw($d
 &tobool &toint &tofloat &unprettyprint
-&parselastupdate
+&parselastupdate &getcaption &parsetable
 );
 
 sub tobool($)
@@ -51,3 +51,22 @@ sub parselastupdate($)
 		$d->{lastupdatetime}=awstandard::parseawdate("$1 - $2");
 	}
 }
+
+sub getcaption($)
+{
+	return (($_[0]=~m{<caption>(.*)</caption>})[0]);
+}
+
+# input: inputstr, callback($line, $startofline, $arrayrefcells)
+sub parsetable($&)
+{
+	my $in=shift;
+	my $func=shift;
+	foreach my $line (m{<tr(.+?)</t[dh]>\s*</tr>}gs) {
+		my @a=split(/<\/t[dh]>\s*<t[dh][^>]*>/, $line);
+		$a[0]=~s/(.*)>\s*<t[dh]>(.*)/$2/;
+		&$func($line, $1, \@a);
+	}
+}
+
+1;

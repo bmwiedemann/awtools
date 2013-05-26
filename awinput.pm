@@ -456,6 +456,8 @@ sub setplanetinfo($%) { my($id,$options)=@_;
 	}
 }
 sub systemname2id($) { my($name)=@_;
+   if($name=~m/^(\d+)$/) { return $1 } # new 2013 format: SID#PID
+   if($name=~m/^(\d+) - /) { return $1 } # new 2013 format: SID - Name #PID
    if($name=~m/^\((\d+)\)$/) { return $1 }
 	$name=~s/\s+/ /;
 	return int($starmap{"\L$name"}||0);
@@ -569,7 +571,7 @@ sub playerid2production($) { my($pid)=@_;
 	if($iir) {
 	   @prod=@{$iir}[3..9];
       my $a=$prod[3];
-      $t=$prod[4]*0.01;
+      $t=($prod[4] || 0) * 0.01;
       if($a=~/(\w+)(\d)/) {
          my $effect=$artifact{$1}||0;
          for(my $i=0; $i<@$race; ++$i) {
@@ -671,7 +673,8 @@ sub getartifactprice($)
 {
 	my($arti)=@_;
 	if(!$arti) {return 0}
-	return ((get_one_row("SELECT `price` FROM `prices` WHERE `item`=?", [$arti]))[0]);
+	$arti=~s/ +//g;
+	return ((get_one_row("SELECT `price` FROM `prices` WHERE `item`=?", [lc($arti)]))[0]);
 }
 
 # input: pid
@@ -739,6 +742,7 @@ sub add_trades($@)
    foreach my $xpid (@$otherpids) {
       my $pid1=awmax($xpid,$ownpid);
       my $pid2=awmin($xpid,$ownpid);
+		next if($pid2<3);
       #next if($oldmap{"$pid1,$pid2"}); # do not re-add existing entries
       # pid1 is always larger than pid2
       my $result=$sth->execute($pid1, $pid2, $now);
@@ -849,6 +853,7 @@ sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod,$time)=@
       if($pid && $sci && defined($sci->[1])) {
          my @sci;
 			if($sci) {@sci=@{$sci}[0..5]}
+			foreach my $s (@sci){$s=int($s)} # round down
          my $sth=$dbh->prepare("UPDATE `intelreport` 
             SET racecurrent=1, biology=?, economy=?, energy=?, mathematics=?, physics=?, social=?, modified_at=?
             WHERE `alli`=? AND `pid`=?");
@@ -947,7 +952,10 @@ sub playerid2ir($) { my($plid)=@_;
 
 sub playerid2iir($) { my($plid)=@_;
    my ($allimatch, $amvars)=get_alli_match2($ENV{REMOTE_USER},32);
-   return get_one_rowref("SELECT internalintel.* FROM `internalintel`,toolsaccess WHERE `pid`=? AND $allimatch ORDER BY `modified_at` DESC LIMIT 1", [$plid, @$amvars]);
+   my $r=get_one_rowref("SELECT internalintel.* FROM `internalintel`,toolsaccess WHERE `pid`=? AND $allimatch ORDER BY `modified_at` DESC LIMIT 1", [$plid, @$amvars]);
+	$r->[6]||="";
+	$r->[6]=~tr/ //d; # artifact drop space
+	return $r;
 }
 
 # input integer player ID

@@ -1,3 +1,4 @@
+my $data=getparsed(\%::options);
 my $debug=1;#$::options{debug};
 if(1){
 if($debug) {print "debug mode - no modifications done<br>\n"}
@@ -10,6 +11,7 @@ dbfleetaddinit(undef, 2);
 
 require 'feed/libincoming.pm';
 feed::libincoming::parseincomings($_);
+feed::libincoming::feedincomings($data->{incoming});
 dbfleetaddfinish();
 }
 1;
