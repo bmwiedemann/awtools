@@ -13,7 +13,7 @@ qw(get_all_ims);
 
 # input options hash
 # input optional bit-combination: 1=recv 2=sent ; default 3
-sub get_all_ims(%;$)
+sub get_all_ims($;$)
 {
    my $options=shift;
    my $dbh=get_dbh;

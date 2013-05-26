@@ -248,7 +248,7 @@ sub alliancelink($) { my($atag)=@_;
 }
 
 
-sub addplayerir($@@;$@@) { my($oldentry,$sci,$race,$newlogin,undef,$prod)=@_;
+sub addplayerir($$$;$$$) { my($oldentry,$sci,$race,$newlogin,undef,$prod)=@_;
 	foreach($race,$sci) {next unless defined $_; if(!@$_){$_=undef}}
 	if($race) {$race="race:".join(",",@$race);} else {undef $race}
 	if($sci) {
@@ -318,7 +318,7 @@ sub fleet2cv(@) { my($fleet)=@_;
 	return $$fleet[2]*3+$$fleet[3]*24+$$fleet[4]*60;
 }
 # input time in UTC
-sub addfleet($$$$$@;$) { my($oldentry,$pid, $name, $time, $own, $fleet, $tz)=@_;
+sub addfleet($$$$$$;$) { my($oldentry,$pid, $name, $time, $own, $fleet, $tz)=@_;
 	my $status=4;
 	my $ships=0;
 	if($own) {$status=7}

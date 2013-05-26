@@ -773,7 +773,7 @@ sub dbfleetaddinit($;$) { my($pid,$screen)=@_; $screen||=0;
    } 
 }
 # type: 0=siege, 1=defending, 2=incoming 3=moving own
-sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
+sub dbfleetadd($$$$$$$;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
    return unless $ENV{REMOTE_USER};
    if(! defined($tz)) {$tz=$::options{tz}}
    if($time) {$time-=3600*$tz}
@@ -816,7 +816,7 @@ sub dbfleetadd($$$$$$@;$) { my($sid,$pid,$plid,$name,$time,$type,$fleet,$tz)=@_;
 sub dbfleetaddfinish() {
 }
 
-sub dbplayeriradd($;@@@@@) { my($name,$sci,$race,$newlogin,$trade,$prod,$time)=@_;
+sub dbplayeriradd($;$$$$$$) { my($name,$sci,$race,$newlogin,$trade,$prod,$time)=@_;
    return if(!is_extended());
 #	my @rel=getrelation($name);
 #	my $oldentry="$rel[0] $rel[1] $rel[2]";# TODO $relation{$name};
