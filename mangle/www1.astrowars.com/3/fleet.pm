@@ -23,7 +23,7 @@ $_='<?xml version="1.0" encoding="iso-8859-1"?>
 sub syshtml($$$)
 {
 	my($sid,$pid,$sysname)=@_;
-	return "<a href=\"/0/Map/Detail.php/?nr=$sid&amp;highlight=$pid\"><small>$sysname $pid</small></a>"
+	return "<a href=\"/0/Map/Detail.php?nr=$sid&amp;highlight=$pid\"><small>$sysname $pid</small></a>"
 }
 
 my $u=$::options{url};

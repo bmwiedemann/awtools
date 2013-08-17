@@ -143,7 +143,7 @@ if($sid && $pid) {
 		my $setstr=setdest($sid,$pid,"to $sid#$pid");
 		$info=~s/\n/<br>/g;
 #		$pstr.="$setstr @$plan<br/>\n";
-		$pstr.="<label for='target$n' style='background-color:$scolor'>$statusstr: <a href=\"/0/Map/Detail.php/?nr=$sid&amp;highlight=$pid\">$sysname#$pid</a></label><span id='target$n'>$setstr &nbsp; $info</span>";
+		$pstr.="<label for='target$n' style='background-color:$scolor'>$statusstr: <a href=\"/0/Map/Detail.php?nr=$sid&amp;highlight=$pid\">$sysname#$pid</a></label><span id='target$n'>$setstr &nbsp; $info</span>";
 		$n++;
 	}
 	s{<!-- loopmark -->}{$&$pstr};
