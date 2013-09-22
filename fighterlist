@@ -78,7 +78,7 @@ print sort_table([qw(name CV xCV biggestCV
       \&sort_num, \&sort_num, \&sort_num],
       sort_param_to_keys($options{sort}), \@data);
 
-print "<p><b>note: xCV is effective CV. It includes attack bonus and 1.5% per level of physics.<br>
+print "<p><b>note: xCV is effective CV. It includes attack bonus, 1% per player-level and 1.5% per level of physics.<br>
 &quot;xE&quot; is effective energy (the level you would need to have with speed +0 to be as fast)<br>
 &quot;biggestCV&quot; means CV of biggest fleet that is in a single chunk</b>";
 print AWtail();

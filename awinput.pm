@@ -982,7 +982,7 @@ sub playerid2battlestats($) {
 # take into consideration worst case IR
 sub estimate_xcv($$) { my($plid,$cv)=@_;
    return $cv if(!$plid || $plid<=2 || !defined($player{$plid}));
-   my ($phys,$att)=($player{$plid}{science}, +4);
+   my ($pl,$phys,$att)=($player{$plid}{level}, $player{$plid}{science}, +4);
    my ($race,$sci)=playerid2ir($plid);
    if($race && defined($$race[5])) { # use phys+race or SL+4
       $att=$$race[5];
@@ -995,7 +995,7 @@ sub estimate_xcv($$) { my($plid,$cv)=@_;
 # CS: (211633/1.25/100000-1)/40 = 0.0173266
 # CS: (101715/100000-1)/1 = 0.01715
 # BS: (107709/100000-1)/5 = 0.015418
-   return int($cv*(1+$phys*0.01525)*(1+$awstandard::racebonus[5]*$att));
+   return int($cv*(1+$phys*0.01525)*(1+$awstandard::racebonus[5]*$att)*(1+0.01*$pl));
 }
 
 # input: alli
@@ -1213,7 +1213,7 @@ sub getallidetailurl($) { my($pid)=@_;
 
    } else {return}
    $arank--;
-   return "http://$awserver/0/Alliance/Detail.php/?id=$arank";
+   return "http://$awserver/0/Alliance/Detail.php?id=$arank";
 }
 
 # input: alliance id

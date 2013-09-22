@@ -286,6 +286,6 @@ if(param("legend")) {
    textfield(-name=>'name', -class=>'text'), " system name", br,
    submit(-class=>'smbutton'), end_form;
 }
-print br.b("notice: fleets show two CV values with the second one being xCV = effective CV = CV*attbonus*physbonus").
+print br.b("notice: fleets show two CV values with the second one being xCV = effective CV = CV*attbonus*physbonus*plbonus").
 AWtail;
 
