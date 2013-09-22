@@ -3,6 +3,7 @@ use strict;
 #use awstandard;
 
 sub mangle() {
+	s/<div id="menu" /$&class="top_navi" /;
 	return 0;
 my $g=$mangle::dispatch::g;# || ($::options{name} eq "snappyduck");
 if($::options{url}=~/www1\.astrowars\.com\/0/) {
