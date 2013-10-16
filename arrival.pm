@@ -4,6 +4,7 @@ use strict;
 use awstandard;
 
 my ($c,$a,$p,$e,$rs)=(850/60, 34, 0.1, 91/100, 0.17);
+our @ttmalus=(10,8,6,5,4,3,2,1.5,1);
 
 # calculates and returns travel time for given options
 sub traveltime { my ($options)=@_;
@@ -11,7 +12,7 @@ sub traveltime { my ($options)=@_;
    my $basetime=$c+sqrt(sqrt($$options{distance})+$$options{planet}*$p)*$a;
    my $time=$basetime *$e**$$options{energy};
    {
-		my $ttmalus=5-$options->{racespeed};
+		my $ttmalus=$ttmalus[int($options->{racespeed})+4];
 		$time+= $$options{distance}?$ttmalus:$ttmalus/4;
 	}
    if($$options{own}) {$time/=2}

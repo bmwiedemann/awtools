@@ -13,11 +13,12 @@ var const3=0.1;		// planet fly cost is 10% of const2
 var const4=91/100;	// energy gain
 
 var disttable=new Array;
+var ttmalustable=[10,8,6,5,4,3,2,1.5,1];
 
 function travel_time(distsqr, planets, own) {
 	var time = (const1 + Math.sqrt(Math.sqrt(distsqr)+planets*const3)*const2)
 	   * Math.pow(const4,energy);
-	var ttmalus=3600*(5-racebonus);
+	var ttmalus=3600*ttmalustable[4+parseInt(racebonus)];
 	if(distsqr==0) ttmalus/=4;
 	if(own) return ((time+ttmalus)/2);
 	return (time+ttmalus);
