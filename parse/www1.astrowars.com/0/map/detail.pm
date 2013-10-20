@@ -7,6 +7,7 @@ $d->{sid}=$sid;
 $d->{name}=$sysname;
 $d->{x}=int($sysx);
 $d->{y}=int($sysy);
+$d->{bonus}=tobool(m/>Bonus Planets at ID/);
 
 my @planet=();
 my $n=10; # debug

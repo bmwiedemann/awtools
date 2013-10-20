@@ -69,7 +69,7 @@ if($options{alliance}) {
    #.a({-href=>"http://azgharde.celeonet.fr/tools/alliances.php?tag=$alli"},"azgharde")
       .a({class=>"othertool", -href=>"http://filix.exx.pl/aw/players.php?alli=$aid"},"filix")." "
       .a({class=>"othertool", -href=>"http://www.astrowars-tools.com/info.php?aTag=$alli"},"Rasta")
-      ." ".a({class=>"aw", -href=>"http://$awserver/0/Alliance/Info.php/?tag=$alli"}, "AW")
+      ." ".a({class=>"aw", -href=>"http://$awserver/0/Alliance/Info.php?tag=$alli"}, "AW")
       .$forumlink.br."\n$alli members (".scalar @members."/$members) ".bbcode_trans($info).br;
 
    my @members2;

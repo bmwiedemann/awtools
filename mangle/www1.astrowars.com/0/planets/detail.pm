@@ -70,7 +70,7 @@ if(1 || $::options{name} eq "greenbird") {
 	}
 }
 
-s%^(  <caption>#\d+ - )(ID [^<]+)%$1.manglesys($2, $data->{sid}, $data->{pid}).$3.$recommend%me;
+s%(<caption>(?:<[^<>]+>)?#\d+ - )(ID [^<]+)%$1.manglesys($2, $data->{sid}, $data->{pid}).$recommend%me;
 
 # find and pass cost of destroyer - obsolete
 #my $dscost="";
