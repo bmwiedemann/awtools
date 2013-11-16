@@ -52,7 +52,7 @@ sub proxy_handler {
    my $h=$r->headers_out();
    foreach my $k (qw(Content-Location Location URI)) {
       my $l=$h->get($k);
-      if($l && ( $l=~s!(http://)$desthost!$1$ourhost! || $l=~s!(http://)$wwwdesthost!$1$wwwourhost! || $l=~s!(http://)$rsadesthost!$1$rsaourhost!)) {
+      if($l && ( $l=~s!(http://)$desthost!$1$ourhost! || $l=~s!(http://)$rsadesthost!$1$rsaourhost!)) {
          $h->set($k,$l);
       }
    }
@@ -71,7 +71,6 @@ sub proxy_handler {
 		$$result=~s!(http-equiv="refresh"[^>]*url=http://)$desthost!$1$ourhost!i;
 		$$result=~s!(http-equiv="refresh"[^>]*url=http://)$wwwdesthost!$1$wwwourhost!i;
 		$$result=~s!(<a[^>]* href="?http://)$desthost!$1$ourhost!gi;
-		$$result=~s!(<a[^>]* href="?http://)$wwwdesthost!$1$wwwourhost!gi;
 		$$result=~s!(<img[^>]* src="?http://)$desthost!$1$ourhost!gi;
       $$result=~s!(<form action="?http://)$desthost!$1$ourhost!gi;
 		if(1) {
