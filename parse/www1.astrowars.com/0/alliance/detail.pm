@@ -73,6 +73,10 @@ foreach my $line (m{<tr(.+?)</t[dh]>\s*</tr>}gs) {
 		$d->{debug2}=$line;
 	}
 }
+for my $x ("production", "science", "culture") {
+  	# crop to base value ; omit value with bonus
+	$d->{$x}->{value} =~ s!^\+(\d+) .*!$1!;
+}
 $d->{planet}=\@planets;
 $d->{movingfleet}=\@movingfleet;
 
@@ -80,12 +84,14 @@ $d->{movingfleet}=\@movingfleet;
 # trades
 if(m{<h2>Trade Partners</h2>\s*<ul[^>]*>(.*?)</ul>\s*</div>}s) {
 	my @a=split(/<\/li>\s*<li>/,$1);
+	my @a2=();
 	foreach my $a (@a) {
 		if($a=~m{\?id=(\d+)">([^<]+)</a>}) {
 			$a={pid=>int($1), name=>$2};
+			push(@a2,$a);
 		}
 	}
-	$d->{tradeagreement}=\@a;
+	$d->{tradeagreement}=\@a2;
 }
 
 # race
