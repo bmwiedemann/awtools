@@ -100,7 +100,7 @@ if(m{<ul class="race"><li>(.*?)</li></ul>}) {
 	foreach my $a (@a) {
 		if($a eq "Trader") { $d->{racetrader}=1 }
 		elsif($a eq "Start Up Lab") { $d->{racesul}=1 }
-		elsif($a=~m{^([-+]\d+)[%h] (\w+) \(([-+]\d+)\)$}) {
+		elsif($a=~m{^([-+][0-9.]+)[%h] (\w+) \(([-+]\d+)\)$}) {
 			$a=[$2, int($1), int($3)];
 			$d->{"race$2"}={percent=>int($1), n=>int($3)};
 		} else {

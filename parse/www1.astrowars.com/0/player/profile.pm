@@ -96,7 +96,7 @@ foreach my $line (m{<tr>\s*<t[hd](.+?)</tr>}gs) {
    {
 	my $racere="";
 	foreach my $r (@awstandard::racestr) {
-		$racere.=qr"<li>[+-]\d+[%h] $r \(([+-]\d)\)</li>";
+		$racere.=qr"<li>[+-][0-9.]+[%h] $r \(([+-]\d)\)</li>";
 	}
 	if(/$racere/) {my @race=($1,$2,$3,$4,$5,$6,$7);$d->{racevalue}=\@race;}
    }
