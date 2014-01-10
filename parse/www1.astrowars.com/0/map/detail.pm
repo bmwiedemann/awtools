@@ -2,7 +2,7 @@ use strict;
 use awparser;
 
 my $caption=getcaption($_);
-my($sid, $sysname, $sysx, $sysy)=($caption=~m{Planets at ID (\d+) - ([^<]+) \(([-0-9]+)/([-0-9]+)\)$});
+my($sid, $sysname, $sysx, $sysy)=($caption=~m{Planets at ID (\d+) - ([^<]+) \(([-0-9]+)/([-0-9]+)\)});
 $d->{sid}=$sid;
 $d->{name}=$sysname;
 $d->{x}=int($sysx);
