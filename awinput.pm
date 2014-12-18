@@ -10,7 +10,7 @@ our (%alliances,%starmap,%player,%playerid,%planets,
    $dbnamer);
 my $startofround=0; # ((gmtime())[7]%91) <20
 our $alarmtime=99;
-our $tradercost=5;
+our $tradercost=4;
 
 $VERSION = 1;
 @ISA = qw(Exporter);
@@ -414,7 +414,7 @@ sub playerid2link($) { my($id)=@_;
 
 sub playerid2link2($) {   
    my $l=playerid2link($_[0]);
-   $l=~s!${toolscgiurl}relations!http://$awserver/0/Player/Profile.php/!;
+   $l=~s!${toolscgiurl}relations!http://$awserver/0/Player/Profile.php!;
    return $l;
 }
 

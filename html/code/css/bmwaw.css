@@ -77,6 +77,15 @@ a.bmwrmember:link,a.bmwrmember:visited,.bmwrmember { color : green; }
 span.vkhidden input.vkbutton {
 	display:none;
 }
+input[type='number'] {
+	cursor: text;
+	width: 4em;
+	height: 100%;
+	font-size: 1em;
+	color: inherit;
+	background-color: #404040;
+	text-align: right;
+}
 input.vkbutton {
    border-left : #bbbbbb 1px solid;
    border-right : #aaaaaa 1px solid;

@@ -114,7 +114,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
       //-->
       </script>%;
    }
-   s% name="destination2"%onchange="asyncfetchdist(document.forms[0].destination2.value)"$&%;
+   s% name="destination2"% onchange="asyncfetchdist(document.forms[0].destination2.value)"$&%;
    s%</body>%<span class="bmwnotice">note: predicted arrival time will be wrong if your local clock is wrong (or target ownership changed).</span>$&%
 }
 
@@ -149,5 +149,7 @@ if($sid && $pid) {
 	s{<!-- loopmark -->}{$&$pstr};
 #	s{</body>}{<br>$pstr $&};
 }
+
+s/(<input type=")text/$1number/g;
 
 1;
