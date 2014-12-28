@@ -11,7 +11,7 @@ use vars qw(@ISA @EXPORT);
 our $dbh;
 $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd);
 #if(!$dbh) { $DBConf::connectionInfo=~s/192.168.236.1/192.168.235.1/; $dbh = DBI->connect($DBConf::connectionInfo,$DBConf::dbuser,$DBConf::dbpasswd); }
-if(!$dbh) {die "DB err: $!"}
+if(!$dbh) {die "DB err: $! ".$dbh->err.$dbh->errstr }
 
 sub get_one_row($;@) {
    my($sql,$vars)=@_;
