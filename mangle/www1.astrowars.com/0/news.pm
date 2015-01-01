@@ -29,7 +29,7 @@ s{colspan="1" bgcolor='#101010'}{class="newsmessage"}g;
 # fix broken HTML
 s%</td><td><a href="Help.php">Help%$&</a>%;
 # add counter - 82x34
-s%</body>%<a href="http://6bone.informatik.uni-leipzig.de/ipv6/stats/stats.php3"><img src="http://6bone.informatik.uni-leipzig.de/ipv6/stats/log.php3?URL=aw21.zq1.de&amp;ImageId=5" border="0" width="82" height="34" alt="IPv6-ready" /></a>$&%;
+s%</body>%<a href="https://6bone.informatik.uni-leipzig.de/ipv6/stats/stats.php3"><img src="https://6bone.informatik.uni-leipzig.de/ipv6/stats/log.php3?URL=aw21.zq1.de&amp;ImageId=5" border="0" width="82" height="34" alt="IPv6-ready" /></a>$&%;
 
 require "mangle/special/color_incomings.pm"; mangle::special_color_incomings::mangle_incoming();
 

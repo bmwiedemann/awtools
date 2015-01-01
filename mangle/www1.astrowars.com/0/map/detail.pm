@@ -3,7 +3,7 @@ if($::options{url}=~/nr=(\d+)/) {
 	my($pid)=($::options{url}=~/&highlight=(\d+)/);
    my $link=$::bmwlink.awstandard::awsyslink($id,1,$pid);
    my $frame=$link;
-   $frame=~s/.*(http:)/$1/;
+   $frame=~s/.*(\/\/)/$1/;
    $link=~s/(simple=)\d/$1/; # enable full view for links
    s%(Planets at )(ID \d+)%$1 ${link}$2</a>%;
 	# highlight planet

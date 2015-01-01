@@ -52,7 +52,7 @@ sub proxy_handler {
    my $h=$r->headers_out();
    foreach my $k (qw(Content-Location Location URI)) {
       my $l=$h->get($k);
-      if($l && ( $l=~s!(http://)$desthost!$1$ourhost! || $l=~s!(http://)$rsadesthost!$1$rsaourhost!)) {
+      if($l && ( $l=~s!(http://)$desthost!//$ourhost! || $l=~s!(http://)$rsadesthost!$1$rsaourhost!)) {
          $h->set($k,$l);
       }
    }

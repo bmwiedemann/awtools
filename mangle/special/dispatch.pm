@@ -21,7 +21,7 @@ sub mangle() {
    my $icon="awfavicon.ico";
    if($::options{url}=~m!^http://forum.rebelstudentalliance!) {$icon="rsafavicon.ico"}
 	if($::options{url}=~m!^http://de.wikipedia!){return}
-   s%</head>%<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.zq1.de/$icon" />\n<link rel="shortcut icon" href="http://aw.zq1.de/$icon" />\n</head>%;
+   s%</head>%<link type="image/vnd.microsoft.icon" rel="icon" href="//aw.zq1.de/$icon" />\n<link rel="shortcut icon" href="//aw.zq1.de/$icon" />\n</head>%;
 }
 
 1;

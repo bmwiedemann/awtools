@@ -24,7 +24,7 @@ if($options{alliance}) {
    my @members=allianceid2members($aid);
    print "showing all \U$ENV{REMOTE_USER}\E alliance pages on one page (does not work with some browser versions)".br;
    for my $n (0..(scalar @members -1)) {
-   	print qq'<iframe width="95%" height="700" src="http://$awserver/0/Alliance/Detail.php/?id=$n"></iframe><br />';
+   	print qq'<iframe width="95%" height="700" src="//$awserver/0/Alliance/Detail.php/?id=$n"></iframe><br />';
    }
 } else {
 	print start_form(-method=>'get', -name=>"form"), textfield(-name=>'alliance', -class=>'text'), " alliance tag", AWfocus("form.alliance"), br,

@@ -34,7 +34,7 @@ if($ENV{REQUEST_METHOD} eq "POST" && param()) {
 		print "something failed. can not add tag=$tag";
 	}
 } else {
-	print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," type 'yes' here, if you want an extended AWTools account for '$tag' and agree to <a href=\"http://$bmwserver/manual/manual.html#policy\">the AWTools NAP rules</a> ; please also PM the founder of greenbirds alliance about it, so that he can know about it and add you to the NAP-List.",br,br,
+	print start_form(-name=>"form"),textfield(-name=>'p', -class=>'text')," type 'yes' here, if you want an extended AWTools account for '$tag' and agree to <a href=\"//$bmwserver/manual/manual.html#policy\">the AWTools NAP rules</a> ; please also PM the founder of greenbirds alliance about it, so that he can know about it and add you to the NAP-List.",br,br,
 	"Note: if you do not want an AWTools NAP, you can click the pay-button there",br,
 		submit(-name=>"create account", -class=>'smbutton'),end_form.AWfocus("form.p");
 }

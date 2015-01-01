@@ -115,10 +115,10 @@ if($options{name}) {# && $options{name} ne "unknown") {
         #$epl=$opl=0; # while bonus is not really working
 		my $awwww=getawwwwserver();
       $extralinks=" ".
-         a({-href=>"http://$awwww/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/images/aw/shield.png",-alt=>"defend"})).
-         a({-href=>"http://$awwww/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/images/aw/sword.png",-alt=>"attack"}))." ".
+         a({-href=>"//$awwww/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/images/aw/shield.png",-alt=>"defend"})).
+         a({-href=>"//$awwww/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/images/aw/sword.png",-alt=>"attack"}))." ".
          a({-href=>"arrival?energy=$eenergy&racespeed=$espeed"}, img({-src=>"/images/aw/shuttle.png",-alt=>"traveltime"}))." ".
-              a({-href=>"http://$awwww/forums/profile.php?mode=viewprofile&u=".$id}, img({-src=>"/images/icon_profile.gif",-alt=>"forum-profile"}))." ".a({-href=>"imessage?action=send&recv=$id"}, img({-src=>"/images/aw/imessage.gif",-alt=>"IM"}))." ";
+              a({-href=>"//$awwww/forums/profile.php?mode=viewprofile&u=".$id}, img({-src=>"/images/icon_profile.gif",-alt=>"forum-profile"}))." ".a({-href=>"imessage?action=send&recv=$id"}, img({-src=>"/images/aw/imessage.gif",-alt=>"IM"}))." ";
          $extralinks.=a({-href=>"playerbattles3?p=$id"},"PB")." ";
       }
    }

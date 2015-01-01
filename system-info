@@ -176,7 +176,7 @@ if(param("legend")) {
       my @lhistorylink=("http://filix.exx.pl/aw/star.php?id=$system", "filix");
 		my $extrasys="";
 		if($options{target}) {$extrasys="&highlight=$options{target}"}
-      my @mapdetailslink=("http://$awserver/0/Map/Detail.php?nr=$system$extrasys","Map/Details");
+      my @mapdetailslink=("//$awserver/0/Map/Detail.php?nr=$system$extrasys","Map/Details");
       if(!$options{export}) {
 			my @systeminfo=getplanetinfo($system,0);
 			my $sysinfo=$systeminfo[2]||"";

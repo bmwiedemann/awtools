@@ -125,7 +125,7 @@ our %headerlinkmap=(imessage=>"BIM");
 sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
-   my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"}),Link({-rel=>"shortcut icon", -href=>"http://aw.zq1.de/favicon.ico"})];
+   my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"}),Link({-rel=>"shortcut icon", -href=>"//aw.zq1.de/favicon.ico"})];
    if($extra) {push(@$heads,$extra);}
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/code/css/tools/common.css" />!);
 #   push(@$heads, "<title>$title</title>");
@@ -232,10 +232,10 @@ sub planetlink($) {my ($id)=@_;
         return qq!<a href="planet-info?id=$escaped">$id</a>!;
 }
 sub profilelink($) { my($id)=@_;
-        qq!<a class="aw" href="http://$awserver/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a class="aw" href="http://$awserver/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
+        qq!<a class="aw" href="//$awserver/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a class="aw" href="//$awserver/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
 }
 sub alliancedetailslink($) { my($id)=@_;
-        qq!<a class="aw" href="http://$awserver/0/Alliance/Detail.php?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
+        qq!<a class="aw" href="//$awserver/0/Alliance/Detail.php?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
 }
 sub systemlink($;$) { my($id,$pid)=@_;
 	my $extra="";
@@ -541,7 +541,7 @@ sub build_url(%)
 	if($f->{immediate}) {delete $opts{p}}
    my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
 	my $dest=$f->{immediate}?"submit.php":"Spend_Points.php";
-   return("http://$awserver/0/Planets/$dest?$params");
+   return("//$awserver/0/Planets/$dest?$params");
 }
 
 sub getparsed($)

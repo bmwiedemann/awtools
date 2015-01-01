@@ -414,7 +414,7 @@ sub playerid2link($) { my($id)=@_;
 
 sub playerid2link2($) {   
    my $l=playerid2link($_[0]);
-   $l=~s!${toolscgiurl}relations!http://$awserver/0/Player/Profile.php!;
+   $l=~s!${toolscgiurl}relations!//$awserver/0/Player/Profile.php!;
    return $l;
 }
 
@@ -1104,7 +1104,7 @@ sub fleet_launch_url($)
 	($sidpid, $opts{inf}, $opts{col}, $opts{des}, $opts{cru}, $opts{bat})=@$f[3,8..12];
 	$opts{nr}=sidpid2sidm($sidpid);
 	my $params=join("&", map {"$_=$opts{$_}"} sort keys %opts);
-	return("http://$awserver/0/Fleet/Launch.php/?$params&id=".sidpid2pidm($sidpid));
+	return("//$awserver/0/Fleet/Launch.php/?$params&id=".sidpid2pidm($sidpid));
 }
 
 
@@ -1213,7 +1213,7 @@ sub getallidetailurl($) { my($pid)=@_;
 
    } else {return}
    $arank--;
-   return "http://$awserver/0/Alliance/Detail.php?id=$arank";
+   return "//$awserver/0/Alliance/Detail.php?id=$arank";
 }
 
 # input: alliance id

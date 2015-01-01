@@ -21,7 +21,7 @@ my %specialname=qw(
       cutebird 1
       PedroMorello 1
 );
-my $origbmwlink="<a class=\"awtools\" href=\"http://$bmwserver/cgi-bin";
+my $origbmwlink="<a class=\"awtools\" href=\"//$bmwserver/cgi-bin";
 
 # input options hash reference
 # input $_ with HTML code of a complete page
@@ -33,7 +33,7 @@ sub mangle_dispatch(%) { my($options)=@_;
    $$options{bmwlink}=$::bmwlink=$origbmwlink;
    $$options{authlink}=$origbmwlink;
    %::options=%$options;
-   $toolscgiurl="http://$bmwserver/cgi-bin/"; # this is initially empty but for mangling we need absolute URLs
+   $toolscgiurl="//$bmwserver/cgi-bin/"; # this is initially empty but for mangling we need absolute URLs
 
    my $notice="";#<b style=\"color:green\">notice: road works ahead.... brownie + AWTools server has a scheduled maintenance period today (Monday 2007-03-26 12-18:00 UTC) and might be temporarily unavailable then. Do not worry about errors during this time. Just reload a bit later.</b> (there is a known issue with some browsers' processing of .pac files that causes it to not use the proxy even after it is back running - the work-around for that problem is then to close all browser windows)<br/>";
 
@@ -43,9 +43,9 @@ sub mangle_dispatch(%) { my($options)=@_;
 #   }
    
    my @accesstexts=(
-      "Your alliance is using greenbird's extended AWTools but has not yet decided to NAP or pay this round. The founder can decide <a href=\"http://$bmwserver/cgi-bin/alliopenaccount\">here</a>",
+      "Your alliance is using greenbird's extended AWTools but has not yet decided to NAP or pay this round. The founder can decide <a href=\"//$bmwserver/cgi-bin/alliopenaccount\">here</a>",
       "Your alliance has paid for greenbird's extended AWTools this round. Thanks!",
-      "Your alliance is using greenbird's extended AWTools for a <a href=\"http://aw.zq1.de/manual.html#policy\">NAP</a> with greenbird's alliance for this round");
+      "Your alliance is using greenbird's extended AWTools for a <a href=\"//aw.zq1.de/manual.html#policy\">NAP</a> with greenbird's alliance for this round");
    my %info=("alli"=>$ENV{REMOTE_USER}, "pid"=>$$options{pid}, "user"=>$$options{name}||"?", "proxy"=>$$options{proxy}, "ip"=>$$options{ip});
    my $gameuri=defined($url) && $url=~m%^http://www1\.astrowars\.com/%;
    my $ingameuri=$gameuri && $url=~m%^http://www1\.astrowars\.com/0/%;
@@ -104,7 +104,7 @@ sub mangle_dispatch(%) { my($options)=@_;
             } elsif(is_founder($$options{pid})) {
                # if alliance founder, add extra "accept NAP with AF" link
                $joinlink.="<br/>$$options{authlink}/public/alliopenaccount\">As founder of an alliance I want to use AWTools</a> ";
-               #$joinlink.="<br/><a href=\"http://aw.zq1.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
+               #$joinlink.="<br/><a href=\"//aw.zq1.de/manual.html#policy\">As founder of an alliance I want to use AWTools</a> ";
             }
          } else {
          }
@@ -310,10 +310,10 @@ sub mangle_dispatch(%) { my($options)=@_;
       foreach my $s (@style){
          if(-r "$awstandard::cssdir/$s.css") {$style=$s;last;}
       }
-		my $extracss="http://$bmwserver/code/css/style_mobile.css";
-		if($agent=~m/iPhone/) {$extracss="http://iphoneaw.zq1.de/main.css"}
-		s%  <link rel="stylesheet" type="text/css" media="screen" href=%$&"http://$bmwserver/code/css/$style.css" />\n$&%;
-#      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="http://$bmwserver/code/css/$style.css">
+		my $extracss="//$bmwserver/code/css/style_mobile.css";
+		if($agent=~m/iPhone/) {$extracss="//iphoneaw.zq1.de/main.css"}
+		s%  <link rel="stylesheet" type="text/css" media="screen" href=%$&"//$bmwserver/code/css/$style.css" />\n$&%;
+#      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="//$bmwserver/code/css/$style.css">
 #<link rel="stylesheet" href="$extracss" media="handheld" type="text/css" />
 #<!--[if !IE]>-->
 #<link type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" href="$extracss" />
