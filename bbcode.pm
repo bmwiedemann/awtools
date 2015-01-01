@@ -18,8 +18,8 @@ sub bbcode_trans($)
    do {
       $count=0;
       $count+= s/\[([bui])\]([^[]*)\[\/\1\]/<$1>$2<\/$1>/;
-      $count+= s/\[(url)\](http:[^<>"[]*)\[\/\1\]/<a href="$2">$2<\/a>/;
-      $count+= s/\[(img)\](http:[^<>"[]*)\[\/\1\]/<$1 src="$2" \/>/;
+      $count+= s/\[(url)\](https?:[^<>"[]*)\[\/\1\]/<a href="$2">$2<\/a>/;
+      $count+= s/\[(img)\](https?:[^<>"[]*)\[\/\1\]/<$1 src="$2" \/>/;
       $count+= s/\[(color)=([a-z_-]+)\]([^[]*)\[\/\1\]/<span style="color:$2;">$3<\/span>/i;
       $count+= s/\[(size)=([0-9.]+)\]([^[]*)\[\/\1\]/<span style="font-size:$2em;">$3<\/span>/i;
    } while($count);
