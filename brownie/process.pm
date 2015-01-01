@@ -76,6 +76,7 @@ sub process($;$) {my ($r,$proxy)=@_;
    } else {
       # nph-brownie sends in full HTTP-requests from localhost but we want the original IP in here
       $request->header("Via", $ownid);
+		$xff=~s/::ffff://; # clean IPv6-style IPv4 addrs from haproxy
 		my $oxff=$xff;
 		$xff=~s/.*,\s*//;
       $ENV{HTTP_AWIP}=$ENV{REMOTE_ADDR}=$ip=$xff;
@@ -84,8 +85,8 @@ sub process($;$) {my ($r,$proxy)=@_;
 			$request->header("X-Forwarded-For6", $oxff);
 			$oxff=~s/$xff/$nxff/;
 			#$ip=$nxff;
-			$request->header("X-Forwarded-For", $oxff);
 		}
+		$request->header("X-Forwarded-For", $oxff);
 
 #      if($ip eq "192.168.234.46") { $ENV{REMOTE_ADDR}=$options{ip}=$ip="76.16.109.166"; }
       $options{proxy}.="-cgi";

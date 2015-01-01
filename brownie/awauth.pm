@@ -10,6 +10,7 @@ sub handler {
   $r->headers_in->unset("awpid");
   my $ip=$r->connection()->remote_ip();
   if(awstandard::isproxy($ip) && (my $xff=$r->headers_in->{"X-Forwarded-For"})) { # this is for cgi-proxy auth
+	$xff=~s/^::ffff://;
 	$ip=$xff;
 	$ip=~s/.*,\s*//;
   }
