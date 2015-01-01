@@ -64,7 +64,7 @@ if($ENV{REMOTE_USER}) { # && $mangle::dispatch::g) {
    if($sci) {if($$sci[0]>99){shift(@$sci)};$refe=$$sci[2]}
    my @c1=systemid2coord($srcsid);
    if(defined($refs) && defined($refe) && $srcsid && (@c1)) {
-      s%</head>%<script type="text/javascript" src="http://aw.zq1.de/code/js/arrival.js"></script><script type="text/javascript" src="http://aw.zq1.de/code/js/bmwajax.js"></script>$&%;
+      s%</head>%<script type="text/javascript" src="//aw.zq1.de/code/js/arrival.js"></script><script type="text/javascript" src="//aw.zq1.de/code/js/bmwajax.js"></script>$&%;
       
       if(m/name="destination2" size="3" class=text value="(\d+)"/) {
          push(@list, ["",$1]);

@@ -335,6 +335,7 @@ sub mangle_dispatch(%) { my($options)=@_;
       # fix AR's non-standard HTML
       s%(<a href)\s*=([a-zA-Z0-9/.:?&\%=-]+)([> ])%$1="$2"$3%g;
    }
+   s{http:(//pagead2.googlesyndication.com/pagead/show_ads.js)}{https:$1};
 }
 
 1;

@@ -30,7 +30,7 @@ if($::options{url}=~/id=(\d+)/) {
       # add touch next/prev
       if(1) {
          s{<body.*>}{<body onload="startup()">};
-         s{</head>}{<script>var touchdefaults={threshold:{x:30,y:30},swipeLeft:function(){$nextfunc},swipeRight:function(){$prevfunc}}</script><script type="text/javascript" src="http://aw.zq1.de/code/js/swipe.js"></script>$&};
+         s{</head>}{<script>var touchdefaults={threshold:{x:30,y:30},swipeLeft:function(){$nextfunc},swipeRight:function(){$prevfunc}}</script><script type="text/javascript" src="//aw.zq1.de/code/js/swipe.js"></script>$&};
       }
       my $n=0;
       my $form="";

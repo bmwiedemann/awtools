@@ -6,6 +6,7 @@ if($::options{pid}) {
 
 	my $browniesettings=qq{<fieldset><legend>brownie settings</legend> <label for="immediatebuild">immediatebuild</label><input type="checkbox" id="immediatebuild" name="immediatebuild" $immediatecheck/><br/></fieldset>};
 	s{<fieldset>\s*<legend>Password}{$browniesettings$&};
+	s{http:(//status.icq.com)}{https:$1};
 }
 
 1;

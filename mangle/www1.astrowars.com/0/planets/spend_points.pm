@@ -1,6 +1,6 @@
 # clear input field
 my $script='<script type="text/javascript">document.getElementById("spendPP").points.focus();</script>';
-s%</head>%<script type="text/javascript" src="http://aw.zq1.de/code/js/planets_spend_points.js"></script>$&%;
+s%</head>%<script type="text/javascript" src="//aw.zq1.de/code/js/planets_spend_points.js"></script>$&%;
 
 if($::options{url}=~/produktion=(\w+)/) {
    my $prod=$1;

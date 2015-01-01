@@ -122,7 +122,7 @@ function asyncfetchdist(sid1)
 {
 	if(disttable[sid1]) return;
 	// use window.location.host instead of browniedomain
-	Ab("http://"+window.location.host+"/brownie/systemowners?sid="+sid1, function(c,s) {
+	Ab("//"+window.location.host+"/brownie/systemowners?sid="+sid1, function(c,s) {
          if(c == 'NOTFOUND') return;
          var a=c.split(" ");
          var dx=a[12]-sx;

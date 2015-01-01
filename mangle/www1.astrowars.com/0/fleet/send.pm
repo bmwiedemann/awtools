@@ -99,7 +99,7 @@ if(1) {
    addtimer(0, $time, $script);
    $time=AWisodatetime($time);
    $time=qq'<form><input name="z" $commonattr value="$time"> $time UTC</form>';
-   s%</head>%<script type="text/javascript" src="http://aw.zq1.de/code/js/fleet_send.js"></script>$&%;
+   s%</head>%<script type="text/javascript" src="//aw.zq1.de/code/js/fleet_send.js"></script>$&%;
 } else {
    $time=AWisodatetime($time);
 }
@@ -111,7 +111,7 @@ if(1) {
    
 # add awauth
    for my $l ($destname, $srcname) {
-      $l=~s%<a href="http://aw.zq1.de/cgi-bin%$::bmwlink%;
+      $l=~s%<a href="//aw.zq1.de/cgi-bin%$::bmwlink%;
    }
 
 # add everything only here to the output HTML:
@@ -147,7 +147,7 @@ if(1) {
    s%<small>To launch your fleet deactivate the Arrival Time Calculator.{0,4}</small>% $form%;
 
    my $link=$::bmwlink.awstandard::awsyslink($destsid,1,$destpid);
-   $link=~s/.*(http:)/$1/;
+   $link=~s/.*(\/\/)/$1/;
    s%</body>%<span class="bmwnotice">note: predicted arrival time will be wrong if you use the back button of your browser.</span><br>$&%;
    if($destsid) {
 		if(m{>Ship\(s\) successfully launched.</div>}) {

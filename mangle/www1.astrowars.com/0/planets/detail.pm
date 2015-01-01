@@ -31,7 +31,7 @@ $data->{next} and $nextfunc=$redir.($planet+1).'"';
 if(1) {
 	s{<body.*>}{<body onload="startup()">};
 	s{</head>}{
-		<script>var touchdefaults={threshold:{x:30,y:30},swipeLeft:function(){$nextfunc},swipeRight:function(){$prevfunc}}</script><script type="text/javascript" src="http://aw.zq1.de/code/js/swipe.js"></script>
+		<script>var touchdefaults={threshold:{x:30,y:30},swipeLeft:function(){$nextfunc},swipeRight:function(){$prevfunc}}</script><script type="text/javascript" src="//aw.zq1.de/code/js/swipe.js"></script>
 	$&};
 }
 # end
@@ -195,7 +195,7 @@ if($::options{handheld}) {
 	s{(<img src="/images/(?:dot|leer)\.gif" height="10" width=")([0-9.]+)}{$1.int($2/2.5)}ge
 }
 
-s%</head>%<script type="text/javascript" src="http://aw.zq1.de/code/js/planets_spend_points.js"></script>$&%;
+s%</head>%<script type="text/javascript" src="//aw.zq1.de/code/js/planets_spend_points.js"></script>$&%;
 my $spend=qq!
 <div style="display:none" id="spenddiv">
 <a name="spend"></a>
@@ -228,7 +228,7 @@ if($immediate) {
 	sub my_build_url(%) {
 		my $s=build_url(@_);
 		$s=~s/&/&amp;/g;
-		$s=~s{^http://[^/]+}{};
+		$s=~s{^//[^/]+}{};
 		return $s;
 	}
 	s/href="Spend_Points\.php\?p=\d+&amp;i=(\d+)&amp;toSpend=(\d+)&amp;building=(..)/"href=\"".my_build_url({i=>$1, points=>$2, type=>$awstandard::buildingstr{uc($3)}, immediate=>$immediate})/ge;
