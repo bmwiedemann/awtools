@@ -52,7 +52,8 @@ our @shipstr=qw(Transports Colony Destroyer Cruiser Battleship);
 our @buildingstr=qw(HF RF GC RL SB TRN CLS DS CS BS);
 our %buildingstr=(); {my $n=0; foreach my $x (@buildingstr) {$buildingstr{$x}=$n++}}
 our @buildingval=qw(farm fabrik kultur forschungslabor starbase infantrieschiff kolonieschiff destroyer cruiser battleship);
-our @racebonus=qw(0.08 0.08 0.05 0.04 0.01 0.12 0.16);
+our @racebonus=qw(0.09 0.08 0.05 0.04 0.01 0.12 0.16);
+our @speedtable=qw(10 8 6 5 4 3 2 1.5 1);
 our $magicstring="automagic:";
 our %artifact=(""=>0, "BM"=>4, "AL"=>2, "CP"=>1, "CR"=>5, "CD"=>8, "MJ"=>10, "HoR"=>15);
 our @relationcolor=("", "firebrick", "OrangeRed", "orange", "grey", "navy", "RoyalBlue", "darkturquoise", "LimeGreen", "green");

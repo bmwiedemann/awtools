@@ -29,7 +29,7 @@ sub ir2string(@@) {
       my $n=0;
       foreach(@race) {
          my $bonus=$awstandard::racebonus[$n]*100*$_;
-         if($n==4) {$bonus=5-$_;$string.="+${bonus}h $awstandard::racestr[$n++] ($_)".br; next}
+         if($n==4) {$bonus=$awstandard::speedtable[4+$_];$string.="+${bonus}h $awstandard::racestr[$n++] ($_)".br; next}
          if($bonus>=0) {$bonus="+".$bonus}
          $string.="$bonus% $awstandard::racestr[$n++] ($_)".br;
       }
