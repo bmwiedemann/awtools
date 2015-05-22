@@ -14,10 +14,11 @@ parsetable($_, sub {
 		my($line,$start, $a)=@_;
 		my $what=$a->[0];
 		if($what=~m{Glossary/index\.php\?id=\d+">([^<]+)<}) {
-			$what=$1;
+			$what=lc($1);
 			$what=~s/\s+//g;
-			$d->{lc($what)}={num=>$a->[1], a2=>$a->[2], a3=>$a->[3]};
-			$a->[3]=~m/^\d+/ and $d->{lc($what)}->{remain}=$&;
+			$d->{$what}={num=>$a->[1], a2=>$a->[2], a3=>$a->[3]};
+			$a->[3]=~m/^\d+/ and $d->{$what}->{remain}=$&;
+			$a->[2]=~m/(\d+)%/ and $d->{$what}->{num}+=$1/100;
 		}
 		$d->{debug2}="$line --".join(",", @$a);
 	});
