@@ -45,9 +45,10 @@ sub replacefunc($$$$) {my ($rel,$n,$conq1,$conq2)=@_;
 	my $c=($conq1+$conq2)/$n**0.25;
 	$fr-=3+$c;
 	my $saturation=(($n+$c)/13)*(1-$min)+$min;
-	$saturation=($saturation>1)?1:($saturation<0?0:$saturation);
+	$saturation=($saturation>1)?1:($saturation<0.01?0.01:$saturation);
 	my $col='"'.join(",",huefunc($fr),$saturation,1).'"';
-	return qq! [color=$col$l];!;
+	my $len=0.3/$saturation;
+	return qq! [color=$col$l, len=$len];!;
 }
 
 open(F, "<", shift(@ARGV)) or die "error opening input file: $!";
@@ -57,7 +58,7 @@ while(<F>) {
    next if not $_ || /^\s*$/;
    push(@edges,$_);
 }
-if(!@edges || !$edges[0] || @edges<40) {exit 0}
+if(!@edges || !$edges[0] || @edges<20) {print "too little data\n"; exit 0}
 my %allis;
 foreach(@edges) {
 	next unless /^([^ ]+) -- ([^ ;]+)/;
