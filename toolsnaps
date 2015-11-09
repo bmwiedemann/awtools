@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+# safe 070204
+use strict;
+use CGI ":standard";
+
+use awstandard;
+use DBAccess;
+
+print AWheader("AWTools NAPs");
+my $data=$dbh->selectall_arrayref("SELECT tag FROM `toolsaccess` WHERE `flags` = 2 ORDER BY tag");
+foreach my $e (@$data) {
+	print "@$e".br;
+}
+
+print AWtail();
+

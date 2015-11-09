@@ -44,7 +44,7 @@ if(is_founder(getauthpid())||is_admin()) {
 }
 if(is_admin()) {
 	print h2("AWtools admin links");
-	foreach(qw(adminuseralli adminviewbrownie awtoolstatistics hoststats)) {
+	foreach(qw(adminuseralli adminviewbrownie awtoolstatistics hoststats toolsnaps)) {
 		print a({-href=>$_},$_)," &nbsp; ";
 	}
 }
@@ -56,8 +56,8 @@ if(is_admin()) {
  a({class=>"awglossary", href=>"http://$forumaddr/portal/Main_Page"},"AW help"),br,
  "other tools: ".
  a({class=>"othertool", href=>"http://www.astrowars-tools.com/"}, "Rasta31"), " ",
- a({class=>"othertool", href=>"http://lefois.de/aw/tool/"}, "Lefois"), " ",
  "outdated: ",
+ a({class=>"othertool", href=>"http://lefois.de/aw/tool/"}, "Lefois"), " ",
  a({class=>"othertool", href=>"http://filix.exx.pl/aw/"}, "Filix"), " ",
  #a({href=>"http://www.v-lo.krakow.pl/~filix/sq/"}, "Filix"), " ",
  a({class=>"othertool", href=>"http://www.gipi.biz/2007-2/"}, "Gipi"), " ",
