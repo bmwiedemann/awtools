@@ -50,7 +50,7 @@ my @tap=gettradepartners2(4, 000);
 my @tap2;
 my $dbh=get_dbh;
 my $sth=$dbh->prepare("SELECT COUNT(*) FROM planets
-                       WHERE ownerid=? AND population>=10");
+                       WHERE ownerid=? AND population>=14");
 foreach my $entry (@tap) {
    my ($name, $pid, $ad, $adplus, $prod, $partners)=@$entry;
    if(!$pid || !$prod) {next}
@@ -66,7 +66,7 @@ foreach my $entry (@tap) {
    push(@tap2, [$pid, $rel[0], $ad, $prod, $partners, $time, $adplus, $timeplus, $playerbonus,$cl, $owntas{$pid}?"X":"o"]);
 }
 
-print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti pop10 culture TA)], 
+print sort_table([qw(who relation A$ prod/h partners ready(h) A$+arti ready+arti pop14 culture TA)], 
          [\&display_pid, \&display_relation, \&display_round0, \&display_round0, \&display_string, \&display_round1, \&display_round0, \&display_round1, \&display_string, \&display_string, \&display_string],
          [\&sort_pid, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_num, \&sort_string],
          sort_param_to_keys($options{sort}), \@tap2 );
