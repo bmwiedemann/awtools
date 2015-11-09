@@ -10,6 +10,8 @@ my @a;
 my @trade=();
 my @tpid=();
 foreach my $ta (@{$data->{ta}}) {
+	# other status: "request is pending" "establishing trade infrastructure?"
+	next if $ta->{status} ne "active trading";
 	push(@trade,$ta->{name});
 	push(@tpid,$ta->{pid});
 }
