@@ -58,7 +58,7 @@ sub process($;$) {my ($r,$proxy)=@_;
       $request->header($key,$val);
    }
    my $c=$r->connection();
-   my $ip=$c->remote_ip();
+   my $ip=$c->client_ip();
    %::options=(); # make sure we wipe everything global from before
    my %options=qw(tz 0 name undefuser);
    $options{proxy}=$proxy||"unknown";
