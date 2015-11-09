@@ -280,7 +280,7 @@ sub mangle_dispatch(%) { my($options)=@_;
 
    # aw21 transition
    if($$options{proxy} eq "brownie-cgi") {
-      $notice.="<br/><b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.zq1.de/manual/proxy-config\">brownie.pac</a></b><br/>";
+		#$notice.="<br/><b style=\"color:green\">notice: Dear brownie-cgi user, please also try the faster <a href=\"http://aw21.zq1.de/\">aw21.zq1.de</a> or even the fully integrated <a href=\"http://aw.zq1.de/manual/proxy-config\">brownie.pac</a></b><br/>";
    }
    
    if(!$alli) {$alli=qq!<b style="color:red">no</b>!}
@@ -300,7 +300,11 @@ sub mangle_dispatch(%) { my($options)=@_;
 
    if($gameuri) {
       my $style="main";
-      if(m%<legend>Please login again</legend>%) {$style="awlogin"; s/id="user"/$& autofocus="autofocus"/;}
+      if(m%<legend>Please login again</legend>%) {
+			$style="awlogin";
+			s/id="user"/$& autofocus="autofocus"/;
+
+		}
       elsif(m%Enter the characters as they are shown in the box below%) {$style="awlogin";}
       elsif($url=~m!astrowars\.com/(rankings|about)/!) {$style="awlogin";}
       
@@ -323,7 +327,9 @@ sub mangle_dispatch(%) { my($options)=@_;
    if($gameuri || $g) {
       # fix AR's broken HTML
 
+		s!accesskey="1">Astro Wars</a></li>!accesskey="1">AW</a></li>!;
       if($g) {
+         s{</head>}{<meta name="viewport" content="width=device-width, initial-scale=1">\n$&}; # for mobile devices
          $gbcontent.=sprintf(" benchmark: auth:%ius pre:%ius aw:%ius sql:%ius mangle:%ius ", $$options{authelapsed}*1000000, $$options{prerequestelapsed}*1000000, $$options{awelapsed}*1000000, $$options{sqlelapsed}*1000000, $$options{mangleelapsed}*1000000);
 #         s%^%<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"\n "http://www.w3.org/TR/html4/loose.dtd">\n%;
 #         s%BODY, H1, A, TABLE, INPUT{%BODY {\nmargin-top: 0px;\nmargin-left: 0px;\n}\n $&%;
