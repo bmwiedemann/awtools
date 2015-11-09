@@ -22,5 +22,15 @@ foreach my $value(@a[0..2]) {
    print qq'<img src="/images/dot.gif" height="10" width="$p1"><img src="/images/leer.gif" height="10" width="$p2"> $value',br;
 }
 
+sub printcmd
+{
+	print @_,":\n";
+	print `@_`,"\n";
+}
+print "<pre>";
+printcmd("free");
+printcmd("df / /home");
+print "</pre>";
+
 print AWtail();
 
