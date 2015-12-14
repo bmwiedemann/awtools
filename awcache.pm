@@ -85,6 +85,7 @@ sub awservecache()
 {
 	my $u=$::options{url};
    return 2 if not $u=~m!https?://([^/]+)(/.*)!;
+   return 2 if $u=~m/\.\./;
    my($domain,$path)=(lc($1),$2); # domain is case-insensitive
    $u="$cachedir/$domain$path";
 #	print STDERR $u." url \n";
