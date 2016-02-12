@@ -131,7 +131,7 @@ sub planets {
 
 print "reading CSV files\n";
 for my $f (@mods) {
-	my $file="$f.csv";
+	my $file="csv/$f.csv";
 	my $head=1;
 	$firstline=1;
 	print "\t$file\n";

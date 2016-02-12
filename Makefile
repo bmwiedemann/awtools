@@ -35,7 +35,7 @@ init:
 	$(MAKE) links
 	perl -e 'print rand(1000000000000000)."\n"' > systemexportsecret
 	./create-mysql-tables.pl
-	wget -Oalltrades.csv http://aw.lsmod.de/alltrades.csv
+	wget -Ocsv/alltrades.csv http://aw.zq1.de/alltrades.csv
 
 #system-ids.txt:
 #	grep 303030 ~/public_html/aw/id.html | perl -ne 'm%>([^>]*)</td>%;print $1,"\n"' > ~/code/cvs/perl/awcalc/system-ids.txt
@@ -48,9 +48,10 @@ updateprices:
 	rm -f newdb/*
 
 updatecsv: dumpdbs
+	mkdir -p csv
 	wget -x -nc -o/dev/null http://${f2}
-	tar xjf ${f2}
-	grep -v id trade.csv >> alltrades.csv || true
+	cd csv ; tar xjf ../${f2}
+	grep -v id csv/trade.csv >> csv/alltrades.csv || true
 	wget -x -o/dev/null http://www1.astrowars.com/0/Trade/prices.txt
 	make importcsv
 	mkdir -p www1.astrowars.com/rankings/
@@ -180,7 +181,7 @@ reloadapache:
 tgz:
 	rm -rf bmw-awtools
 	mkdir bmw-awtools
-	cp -a *.pl *.pm ${tools} prices.csv livemap preproc parse feed mangle model ../brownie Makefile bmw-awtools
+	cp -a *.pl *.pm ${tools} csv/prices.csv livemap preproc parse feed mangle model ../brownie Makefile bmw-awtools
 	cp -a --parent html/code/css/{tools,*.css} html/code/js html/images/aw bmw-awtools
 	cd bmw-awtools &&\
 	chmod 755 html && mkdir -p cgi-bin/public log &&\

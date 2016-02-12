@@ -14,7 +14,7 @@ if($newround) {
    system("touch", "html/round/paid");
    chmod(0666, "html/round/paid");
    foreach(qw"player alliances") {
-      system("cp -a $_.csv $_.csv.$oldname");
+      system("cp -a csv/$_.csv csv/$_.csv.$oldname");
    }
 #   system("ssh root\@awdb cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
 #	if($?>>8) {die "backup failed";}
@@ -39,13 +39,13 @@ system("perl -i.bak -pe 's/(round=.?)$oldname/\$1$newname/' Makefile");
 #system("for f in $awstandard::dbmdir/*planets.dbm ; do cat empty.dbm > \$f ; done");
 system("for f in $awstandard::dbmdir/*relation.dbm ; do ./clear.pl \$f ; done");
 
-awstandard::set_file_content("alltrades.csv", "id1\tid2\n");
+awstandard::set_file_content("csv/alltrades.csv", "id1\tid2\n");
 awstandard::set_file_content("html/alltrades.csv", "id1\tid2\n");
-awstandard::set_file_content("player.csv", "rank\tpoints\tid\tscience\tculture\tlevel\thome_id\tlogins\tfrom\tjoined\talliance\tname\ttrade\n");
-awstandard::set_file_content("battles.csv", "id\tcv_def\tcv_att\tatt_id\tdef_id\twin_id\tplanet_id\tsystem_id\ttime\n");
+awstandard::set_file_content("csv/player.csv", "rank\tpoints\tid\tscience\tculture\tlevel\thome_id\tlogins\tfrom\tjoined\talliance\tname\ttrade\n");
+awstandard::set_file_content("csv/battles.csv", "id\tcv_def\tcv_att\tatt_id\tdef_id\twin_id\tplanet_id\tsystem_id\ttime\n");
 awstandard::set_file_content("systemexportsecret", rand(1000000000000000)."\n");
 
-system(qw"/usr/bin/perl -i -pe", '@a=split("\t"); if($notfirst){$a[2]=$a[3]=$a[4]=$a[5]=0} $_=join("\t",@a)."\n"; $notfirst=1', "planets.csv");
+system(qw"/usr/bin/perl -i -pe", '@a=split("\t"); if($notfirst){$a[2]=$a[3]=$a[4]=$a[5]=0} $_=join("\t",@a)."\n"; $notfirst=1', "csv/planets.csv");
 
 system("make importcsv");
 
