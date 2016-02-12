@@ -10,7 +10,7 @@ if($::options{url}=~m%http://www1.astrowars.com/$%) {
 	</head><body>
 <p> <a href="https://6bone.informatik.uni-leipzig.de/ipv6/stats/stats.php3"> <img src="https://6bone.informatik.uni-leipzig.de/ipv6/stats/log.php3?URL=aw21.zq1.de&amp;ImageId=5" border="0" width="82" height="34" alt="IPv6-ready" /></a> </p>
 <a href="https://flattr.com/thing/326749/greenbirds-AWTools" target="_blank">
-<img src="https://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a><br>
+<img src="https://button.flattr.com/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a><br>
 <a href="//$bmwserver/">AWTools</a><br>
 
 	%;
