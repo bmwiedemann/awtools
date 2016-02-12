@@ -10,7 +10,7 @@ require 5.002;
 
 require Exporter;
 our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-$VERSION = sprintf "%d.%03d", q$Revision$ =~ /(\d+)/g;
+$VERSION = 1;
 @ISA = qw(Exporter);
 @EXPORT = qw(
 &display_string &display_round0 &display_round1 &display_round2 &display_etc &display_needplanets &sort_num &sort_string &sort_istring &sort_table &sort_param_to_keys
@@ -67,7 +67,7 @@ sub sort_table($$$$$) { my($header, $displayfunc, $sortfunc, $sortkeys, $data)=@
             my $oldparams=$ENV{QUERY_STRING};
             $oldparams=~s/sort=[-.0-9]*&?//;
             if($oldparams) {$oldparams="&$oldparams"}
-            $sortlinks.=a({-href=>"?sort=$sortval$oldparams", -rel=>"nofollow"},img({-src=>"/images/aw/ico_arrow_$updown.gif", -alt=>"sort $updown", -style=>"border:0"}));
+            $sortlinks.=a({-href=>"?sort=$sortval$oldparams", -rel=>"nofollow"},img({-src=>"/code/images/aw/ico_arrow_$updown.gif", -alt=>"sort $updown", -style=>"border:0"}));
          }
          if(! defined ($$sortfunc[$n-1])) {$sortlinks=""}
          $headerstr.=th($_.$sortlinks);

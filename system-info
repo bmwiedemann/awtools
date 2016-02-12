@@ -41,7 +41,7 @@ sub spinfo($) { my($id)=@_; # short player info string
 	my $alliancestr="";
 	if(!$rel[1] && $aid>0) { $rel[1]=allianceid2tag($aid); }
 	if($rel[1]) { $alliancestr="[".$rel[1]."]"; }
-	my $rellink=qq! <a href="relations?name=$name"><img src="/images/aw/relations-colored.gif" alt="relations" title="player info" /></a> !;
+	my $rellink=qq! <a href="relations?name=$name"><img src="/code/images/aw/relations-colored.gif" alt="relations" title="player info" /></a> !;
 	if($options{export}) {
 		return "[color=$color]$alliancestr $name [/color]";
 	}
@@ -182,7 +182,7 @@ if(param("legend")) {
 			my $sysinfo=$systeminfo[2]||"";
          if(1 || $sysinfo) {
             $sysinfo=~s!^<br />!!;
-            $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/images/aw/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
+            $sysinfo=p.a({-href=>"planet-info?id=$system%230"},img({-src=>"/code/images/aw/system.png",-alt=>"edit sys"}))." ".$sysinfo.p;
          }
 			tprint $output, $eol, a({-href=>"tactical-live2?xs=$x&ys=$y&xe=29&ye=19&fast=1"},"tactical")." ".tlink(\@lstarmaplink)." ".tlink(\@rbattleslink)." ".tlink(\@rhistorylink)." ".tlink(\@lbattleslink)." ".tlink(\@mapdetailslink)." ".a({-href=>"whocansee?sid=$system"},"WhoCanSee"),br,bbcode_trans($sysinfo),
 			"planets here: <a name=\"planets\" /><ul>";
@@ -238,13 +238,13 @@ if(param("legend")) {
          }
          my $img;
          if($options{simple}) {$img="edit"}
-         else {$img='<img src="/images/aw/edit-planet.gif" title="edit planet-info" alt="planet info"/>'}
+         else {$img='<img src="/code/images/aw/edit-planet.gif" title="edit planet-info" alt="planet info"/>'}
 			my $plink=qq! <a href="planet-info?id=$id">$img</a> !;
 			my $siegedcol="";
 			if(planet2siege($h)) { $siegedcol=qq!style="background-color: red"!; }
 			if(!$options{export}) {
-				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/images/aw/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
-				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/images/aw/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
+				my $etalink=" ".a({-href=>"?id=$system&refpid=$planetid"},img({-src=>"/code/images/aw/shuttle.png",-alt=>"set ref", -title=>"set ETA source"}));
+				if(defined($refsys)) {$etalink.=qq!<a href="eta?sid=$system&amp;pid=$planetid"><img src="/code/images/aw/shuttle-dn.png" alt="ETA" title="calculate ETA" /></a> !;}
             if($options{simple}) {$etalink=""}
 				printf "<span $siegedcol><code>#%2i pop=%2i SB=%2i</code></span> %s%s %s%s", $planetid, planet2pop($h), planet2sb($h), $plink, $etalink, spinfo($$h{ownerid}), $bestguarded.$info.$fleetsstr."</li>\n";
 			} else {

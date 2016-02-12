@@ -51,10 +51,10 @@ if(defined($options{xs}) && !($options{xe}<0 || $options{ye}<0 || $options{xe}>1
 				if($mx%10<=1) {$n|=2}
 				if($my%10<=1) {$n|=1}
 				if($mx%10==0||$my%10==0) {$n=3}
-				$f="/$n.gif";
+				$f="/code/images/aw/$n.gif";
 				$link=qq!<a href="?xs=$mx&amp;ys=$my&amp;xe=$options{xe}&amp;ye=$options{ye}&amp;scale=$options{scale}&amp;type=$options{type}">!;
 			} else {
-            $f="/cgi-bin/nphperl/tactical-live-tile?x=$mx&amp;y=$my&amp;o=$options{type}";
+            $f="/cgi-bin/tactical-live-tile?x=$mx&amp;y=$my&amp;o=$options{type}";
 				$link=qq!<a href="system-info?mapx=$mx&amp;mapy=$my">!;}
 			my $formatstr="";
 			if(1||$my==$ys || $mx==$xs) {$formatstr=qq! height="$imgsize" width="$imgsize"!}

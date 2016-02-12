@@ -21,7 +21,7 @@ if(0) {
    my $ret=require "livemap/draw.pm";
    if(!$o) {$o="1,2,3"}
    if(!$ret) {
-      $image=`cat $awstandard::htmldir/images/awmaperror.png`;
+      $image=`cat $awstandard::htmldir/code/images/aw/awmaperror.png`;
    } else {
       $o=~s/%2C/,/;
       $o=~s/[^0-9,]//g; # sanitize user input

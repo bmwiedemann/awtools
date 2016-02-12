@@ -90,8 +90,7 @@ if($options{name}) {# && $options{name} ne "unknown") {
 	my $extralinks="";
 	my $playerref;
 	if($id>2) {$playerref=getplayer($id)}
-   {
-      if($playerref) {
+   if($playerref) {
 		my $p=$playerref;
       my($epl,$eenergy,$ephys,$emath,$espeed,$eatt,$edef)=awinput::playerid2battlestats($id);
       $espeed=~s/\+//;
@@ -115,16 +114,15 @@ if($options{name}) {# && $options{name} ne "unknown") {
         #$epl=$opl=0; # while bonus is not really working
 		my $awwww=getawwwwserver();
       $extralinks=" ".
-         a({-href=>"//$awwww/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/images/aw/shield.png",-alt=>"defend"})).
-         a({-href=>"//$awwww/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/images/aw/sword.png",-alt=>"attack"}))." ".
-         a({-href=>"arrival?energy=$eenergy&racespeed=$espeed"}, img({-src=>"/images/aw/shuttle.png",-alt=>"traveltime"}))." ".
-              a({-href=>"//$awwww/forums/profile.php?mode=viewprofile&u=".$id}, img({-src=>"/images/icon_profile.gif",-alt=>"forum-profile"}))." ".a({-href=>"imessage?action=send&recv=$id"}, img({-src=>"/images/aw/imessage.gif",-alt=>"IM"}))." ";
+         a({-href=>"//$awwww/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ephys&fphysics=$ophys&pmath=$emath&fmath=$omath&plevel=$epl&flevel=$opl&praceatt=$eatt&fraceatt=$oatt&pracedef=$edef&fracedef=$odef&submit2=calculate+battle&go=1"},img({-src=>"/code/images/aw/shield.png",-alt=>"defend"})).
+         a({-href=>"//$awwww/about/battlecalculator/?des=0&destroyer=0&cru=0&cruiser=0&bat=0&battleship=0&sta=0&pphysics=$ophys&fphysics=$ephys&pmath=$omath&fmath=$emath&plevel=$opl&flevel=$epl&praceatt=$oatt&fraceatt=$eatt&pracedef=$odef&fracedef=$edef&submit2=calculate+battle&go=1"},img({-src=>"/code/images/aw/sword.png",-alt=>"attack"}))." ".
+         a({-href=>"arrival?energy=$eenergy&racespeed=$espeed"}, img({-src=>"/code/images/aw/shuttle.png",-alt=>"traveltime"}))." ".
+              a({-href=>"//$awwww/forums/profile.php?mode=viewprofile&u=".$id}, img({-src=>"/code/images/aw/icon_profile.gif",-alt=>"forum-profile"}))." ".a({-href=>"imessage?action=send&recv=$id"}, img({-src=>"/code/images/aw/imessage.gif",-alt=>"IM"}))." ";
          $extralinks.=a({-href=>"playerbattles3?p=$id"},"PB")." ";
-      }
    }
 	$atag=$atag?" ".alliancelink($atag):"";
    my $pldurl=getallidetailurl($id);
-   if($pldurl) {$extralinks=a({-href=>$pldurl},img({-src=>"/images/aw/profile3.gif", -alt=>"alliance profile"})).$extralinks;}
+   if($pldurl) {$extralinks=a({-href=>$pldurl},img({-src=>"/code/images/aw/profile3.gif", -alt=>"alliance profile"})).$extralinks;}
 	print start_form(-name=>"form2"), "$new: ". span({-class=>getrelationclass($rel[0])},"$user ($id)").$atag.$lasttag." ", profilelink($id), $extralinks, 
    #a({-href=>"http://azgharde.celeonet.fr/tools/player.php?name=".$user}, "azgharde")." ".
          a({class=>"othertool", -href=>"http://www.astrowars-tools.com/info.php?pName=".$user}, "Rasta")." ".

@@ -61,7 +61,7 @@ if($options{alliance}) {
    my $alliname=$alliref->{name}||"";
    my $members=$alliref->{members}||"";
    if($forumlink) {$forumlink=" URL:".a({class=>"othertool", -href=>$forumlink}, $forumlink)}
-	my $rellink=qq! <a href="allirelations?p=$alli"><img src="/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
+	my $rellink=qq! <a href="allirelations?p=$alli"><img src="/code/images/aw/relations-colored.gif" title="alliance info" alt="alliance info" /></a> !;
    my @members=allianceid2members($aid);
    my @rel=getallirelation($allitag);
    my $info=$rel[1]||"";

@@ -233,10 +233,10 @@ sub planetlink($) {my ($id)=@_;
         return qq!<a href="planet-info?id=$escaped">$id</a>!;
 }
 sub profilelink($) { my($id)=@_;
-        qq!<a class="aw" href="//$awserver/about/playerprofile.php?id=$id"><img src="/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a class="aw" href="//$awserver/0/Player/Profile.php/?id=$id"><img src="/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
+        qq!<a class="aw" href="//$awserver/about/playerprofile.php?id=$id"><img src="/code/images/aw/profile1.gif" title="public" alt="public profile" /></a> <a class="aw" href="//$awserver/0/Player/Profile.php/?id=$id"><img src="/code/images/aw/profile2.gif" alt="personal profile" /></a>\n!;
 }
 sub alliancedetailslink($) { my($id)=@_;
-        qq!<a class="aw" href="//$awserver/0/Alliance/Detail.php?id=$id"><img src="/images/aw/profile3.gif" alt="member details" /></a>\n!;
+        qq!<a class="aw" href="//$awserver/0/Alliance/Detail.php?id=$id"><img src="/code/images/aw/profile3.gif" alt="member details" /></a>\n!;
 }
 sub systemlink($;$) { my($id,$pid)=@_;
 	my $extra="";
