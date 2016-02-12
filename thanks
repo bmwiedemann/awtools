@@ -10,11 +10,13 @@ awstandard_init();
 our %options;
 print AWheader("thanks for supporting AWTools");
 if(param()) {
-	foreach my $p (qw(p)) {
+	open(my $f, ">>/home/aw/thanks.log");
+	foreach my $p (param()) {
 		$options{$p}=param($p);
 	}
+	print $f join(", ", scalar localtime, %options);
 } else {
 }
-print "greenbird will have to look into it manually for now (usually takes less than 24 hours).";
+print "please also PM greenbird. Sometimes he will have to look into it manually for now (usually takes less than 24 hours).";
 print AWtail();
 
