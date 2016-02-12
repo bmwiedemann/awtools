@@ -17,8 +17,12 @@ our $debug=0;
 our $ownid="1.1 ${bmwserver}";
 
 our $UA = LWP::UserAgent->new(requests_redirectable=>[], parse_head=>0, timeout=>13);
+sub new_conn_cache()
+{
 # we need only one simultaneous connection per apache process (who forks)
 $UA->conn_cache(LWP::ConnCache->new( total_capacity=>1 ));
+}
+new_conn_cache();
 $UA->agent(join ("/", "brownie", $VERSION)." (greenbird's alliance proxy)");
 
 
@@ -199,8 +203,9 @@ sub process($;$) {my ($r,$proxy)=@_;
 
    my $content = $response->content;
 
-   if($content =~m/500 Server closed connection without sending any data back/) {
+   if($content =~m/500 Server closed connection without sending any data back/ || $content =~m/LWP::Protocol::http::Socket: connect: timeout at \/usr/) {
       sleep 1;
+      new_conn_cache();
       $response = $UA->request($request);
       $content = $response->content;#." (brownie retried after 'Server closed connection without sending any data back')";
    }
