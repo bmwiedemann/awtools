@@ -5,7 +5,7 @@ mydate=`date +%y%m%d`
 awserv=www1.astrowars.com
 f2=www1.astrowars.com/export/history/all$d.tar.bz2
 topn=500
-round=gold23
+round=gold35
 allies=$(shell ./get_allowed_alliances.pl)
 tools=index.html alliaccess alliance{,2} allicleanup alliopenaccount alliprefs allirelations arrival arrivalmany authaw authawforum awstatistics awtoolstatistics joinalli cdinfo distsqr ecocheck edit-fleet edit-sharing eta fighterlist fleets preferences{,2} tactical{,-large{,-tile},-live{,2,-tile}} relations relations-bulk system-info xml-info testenv planet-info feedupdatemangle feedupdate ranking racelink sim topwars whocanintercept coord fleetbattlecalc holes hoststats battles loginpos antispy2 antispy playerbattles{,3} guessrace imessage tradepartners whocansee permanentranking adminlookup adminuseralli adminviewbrownie uploadcss playeronline playeronline2 passwd plhistory thanks toolsnaps userpasswd ipban logout
 #allies=
@@ -96,7 +96,6 @@ cleanmap2:
 updateholes:
 	for a in $(allies) ; do \
 		REMOTE_USER=$$a perl holes3.pl > html/alli/$$a/holes.csv ; \
-		REMOTE_USER=$$a perl export-fleets.pl ; \
 		REMOTE_USER=$$a perl export-dbs.pl ; \
 	done
 updaterank:
@@ -147,7 +146,7 @@ TA.candidate: TA.in TA.done TA.pl
 
 chpasswd:
 	REMOTE_USER=$a perl -e 'use http_auth; setdbpasswd("$p");'
-	make reloadapache
+	#make reloadapache
 
 # note u=user-id
 chuserpasswd:
