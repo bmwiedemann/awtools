@@ -9,6 +9,9 @@ if($::options{url}=~m%/0/Alliance/$%) {
    my $n=0;
    s%(<td>)(\d+)(</td><td><a href=http://www.astrowars.com/forums/privmsg.php)%$1.'<a href="Detail.php/?id='.$n++.'">'.$2."</a>".$3%ge;
 #   s%</body>%<span class="bmwnotice">note: new direct links behind points of players.</span><br>$&%;
+# provide classic all-incos to premiums:
+s{>Premium incomings list</a></td>\s*</tr>}{$&<tr><td colspan="2" class="incoming"><a href="Incomings.php">All-Incomings</a></td></tr>}
+
 }
 
 s%(<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="0" bgcolor='#000000') width="600"%$1 class="main_inner" id="allianceoverview"%;
