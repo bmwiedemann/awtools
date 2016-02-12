@@ -230,7 +230,6 @@ while(my @a=each(%player)) {
 
 # re-export:
 if(1){
-   system("./playertradecheck.pl");
    my $prevtrades=$dbh->selectall_arrayref("SELECT pid1,pid2 FROM `trades`");
    open(F, ">", "html/alltrades.csv");
    print F "id1\tid2\n";
