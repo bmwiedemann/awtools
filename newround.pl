@@ -16,7 +16,7 @@ if($newround) {
    foreach(qw"player alliances") {
       system("cp -a $_.csv $_.csv.$oldname");
    }
-#   system("ssh root\@delta cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
+#   system("ssh root\@awdb cp -a /var/lib/mysql/astrowars /var/lib/mysql/astrowars_$oldname");
 #	if($?>>8) {die "backup failed";}
 }
 system("./updatelasttag.pl");
@@ -51,6 +51,11 @@ system("make importcsv");
 
 for my $l ("log/brownie.log", "log/aw-access_log") {
 	rename($l, "$l.$oldname");
+	fork || exec "xz", "$l.$oldname" || die; # compress in background
+}
+# truncate error logs
+foreach (qw(aw21-error_log aw2-error_log)) {
+	awstandard::set_file_content("log/$)", "");
 }
 print "check start of new log + reloadhttp\n";
 
