@@ -1,2 +1,2 @@
 #!/bin/sh
-kill -USR1 `cat /tmp/apache-brownie.pid`
+kill -USR1 `cat /tmp/aw/apache-brownie.pid`
