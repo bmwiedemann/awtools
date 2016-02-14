@@ -274,6 +274,8 @@ sub process($;$) {my ($r,$proxy)=@_;
    }
    my $awuri=$uri=~/^http:\/\/www1?\.astrowars\.com/;
    my $htmlcontent=$ctype=~m%text/html%;
+   if($ctype=~m%text/css%) {$htmlcontent=1}
+   $options{ctype}=$ctype;
    if($uri=~m{3/secure.php$}) {$htmlcontent=1}; #exception
 # mangle HTML pages:
    if($htmlcontent && ($awuri || $uri=~/^http:\/\/forum\.rebelstudentalliance/ || $uri=~m/http:\/\/de.wikipedia/)) {
