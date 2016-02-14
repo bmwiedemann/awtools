@@ -19,6 +19,9 @@ my $destdomain="astrowars.com";
 
 sub handler {
    my ($r) = @_;
+	if($r->uri =~ m{^/(?:cgi-bin/|code/|.well-known/|manual)}) {
+		return DECLINED;
+	}
 #   return DECLINED unless $r->unparsed_uri=~m%^http://%;
    # we handle this request
    $r->handler("perl-script");
