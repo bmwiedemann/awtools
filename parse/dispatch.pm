@@ -9,7 +9,9 @@ sub dispatch($)
 	my($options)=@_;
 	if($options->{data}){return $options->{data}}
 	my $t0 = [gettimeofday];
-	$d={"servertime"=>time()};
+	$d={"servertime"=>time(),
+	     nclick=>$::options{nclick},
+	   };
 	my $url=$options->{url};
 	my @module=url2pm($url);
 	my $module="";

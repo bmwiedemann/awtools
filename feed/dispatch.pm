@@ -18,7 +18,7 @@ sub feed_dispatch($%) { (local $_, my $options)=@_;
 #         $dbh->do("UPDATE `usersession` SET `nclick` = '0' WHERE `sessionid` = ".$dbh->quote($session));
 #      }
       my $time=time();
-      if($$options{url}=~m%^http://www1\.astrowars\.com/0/%) {
+      if($$options{url}=~m%^http://www1\.astrowars\.com/(?:\w+/)?0/%) {
          my $sth=$dbh->prepare_cached("UPDATE `usersession` SET `nclick` = `nclick` + 1 , `lastclick` = ? WHERE `sessionid` = ? LIMIT 1;");
          my $result=$sth->execute($time, $session);
          
