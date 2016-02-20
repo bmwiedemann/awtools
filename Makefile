@@ -187,7 +187,7 @@ tgz:
 	chmod 755 html && mkdir -p cgi-bin/public log &&\
 	cp -a ../dist-extra/* ../dist-extra/.ht* . &&\
 	perl -i -pe 'if($$n){$$n--;$$_=""} if(m/greenbird 1/){$$n=2};' mangle/dispatch.pm &&\
-	perl -i -pe 's/dbpasswd = .*/dbpasswd = "xxx";/; s/bmwuser/awuser/; ' DBConf.pm &&\
+	perl -i -pe 's/dbpasswd = .*/dbpasswd = "xxx";/; s/bmwuser/awuser/; ' DBPassword.pm &&\
 	find -name CVS -o -name ".*.swp" | xargs rm -rf &&\
 	rm -rf nph-brownie.cgi holes2.pl mangle/special/secure.pm brownie/old preproc/www1.astrowars.com/zq*
 	tar czf html/bmw-awtools-${mydate}.tar.gz bmw-awtools

@@ -6,7 +6,8 @@ our $dbms = 'mysql';
 our $dbhost = 'awdb.zq1.de';
 our $dbname = 'astrowars';
 our $dbuser = 'astrowars';
-our $dbpasswd = "xxx";
+our $dbpasswd;
+do "DBPassword.pm";
 our $connectionInfo="dbi:$dbms:$dbname;$dbhost";
 our $connectionInfowp="dbi:$dbms:wikipedia;$dbhost";
 
