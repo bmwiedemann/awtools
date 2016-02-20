@@ -11,4 +11,7 @@ s%(<b>Agreement</b></a></td>)(\n<td>|</td><td><a href="?/0/Trade/Buy)%$1
 s/method="post"/$& name="form"/;
 s/<input type="text" name="proqty"/$& onblur=document.form.buy[0].checked=true;/;
 
+s{<input type="text" id="([^/>]+/></td>\s*<td>)(\d+)</td>}
+ {<input type="number" min="0" max="$2" id="$1$2</td>}g;
+
 1;
