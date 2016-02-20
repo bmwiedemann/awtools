@@ -3,7 +3,7 @@
 package DBConf;
 use vars qw(@ISA @EXPORT);
 our $dbms = 'mysql';
-our $dbhost = '192.168.235.10';
+our $dbhost = 'awdb.zq1.de';
 our $dbname = 'astrowars';
 our $dbuser = 'astrowars';
 our $dbpasswd = "xxx";
