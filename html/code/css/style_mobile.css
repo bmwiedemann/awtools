@@ -2,16 +2,10 @@ body {
   -webkit-text-size-adjust:none;
 }
 
-table.main_outer, table.main_inner, table.top_navi, table.sub_inner {
-	width: 100%;
-}
-table.bottom_navi {
-	width: 99%;
+.buildUp {
+  font-size: 2em;
 }
 
-table.map_inner, table.innersubtable {
-	width: auto;
-}
 
 p#disclaimer, table.bottomad {
         display : none;
