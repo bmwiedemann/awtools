@@ -31,6 +31,7 @@ if($::options{url}=~/dsCost=(\w+)/) {
 #   s%<input type="radio" name="produktion" value="cruiser">%$& <input type="text" class="text" size="4" onchange="update_field(0, 9, 28); document.form.produktion[7].checked=true " value="2" />%;
 }
 
-s/(<input type=")text/$1number/g;
+s{<input type="text" ([^/>]+/> / )(\d+)}
+ {<input type="number" min="0" max="$2" $1$2}g;
 
 1;

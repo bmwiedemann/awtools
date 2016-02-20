@@ -150,6 +150,8 @@ if($sid && $pid) {
 #	s{</body>}{<br>$pstr $&};
 }
 
+s{<input type="text" id="([^/>]+/></td>\s*<td>)(\d+)</td>}
+ {<input type="number" min="0" max="$2" id="$1$2</td>}g;
 s/(<input type=")text/$1number/g;
 
 1;
