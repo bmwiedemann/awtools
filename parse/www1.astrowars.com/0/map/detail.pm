@@ -28,6 +28,7 @@ parsetable($_, sub {
 			$p{pid}=$1;
 			$p{name}=$2;
 		}
+		if($line=~m{<td>Free Planet</td>}) {$p{pid}=0}
 		push(@planet, \%p);
 #		$d->{"x".$n++}="$line --- $start -- ".join(",",@$a);
 	});
