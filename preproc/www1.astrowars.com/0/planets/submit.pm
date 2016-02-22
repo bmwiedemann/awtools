@@ -4,7 +4,7 @@ my $r=$::options{request};
 my $uri=$::options{url};
 $uri=~s{\?(.*)}{};
 my $params=$1;
-if($params) {
+if($params && $::options{request}->method() eq "GET") {
 	$r->uri($uri);
 	$::options{request}->method("POST");
 	$::options{request}->content($params);
