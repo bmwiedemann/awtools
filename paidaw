@@ -1,5 +1,6 @@
 #!/bin/sh
 # mark an alliance as paying user
+test -n "$1" || exit 5
 make access a=$1
 ./addalli.pl $1 1
 echo $1 >> html/round/paid
