@@ -183,6 +183,7 @@ sub getrelation($;$) { my($name)=@_;
 		$hadentry=1
 	}
 	while(!$rel || !$effrel) {
+		last unless $player{$pid};
 		my $aid=$player{$pid}{alliance};
 #		print "aid $aid \n";
 		my $atag;
