@@ -366,7 +366,7 @@ CREATE TABLE `internalintel` (
 `production` MEDIUMINT NOT NULL,
 `science` MEDIUMINT NOT NULL,
 `culture` MEDIUMINT NOT NULL,
-`artifact` CHAR(4) NOT NULL,
+`artifact` CHAR(5) NOT NULL,
 `tr` SMALLINT NOT NULL,
 `ad` INT NOT NULL,
 `pp` INT NOT NULL,
