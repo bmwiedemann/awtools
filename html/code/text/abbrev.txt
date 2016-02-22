@@ -1,0 +1,52 @@
+A$	astro dollar
+AD	astro dollar
+AL	astrolabe (arti)
+AS	account sitting
+AR	AllesRoger (AW coder/owner)
+AW	astrowars
+BC	battle calculator
+BM	basalt monolith (arti)
+BS	battleship (fleet)
+CD	countdown
+CD	charcoal diamond (arti)
+CLS	colony ships (fleet)
+CP	Celestial Prism (arti)
+CR	crystal rod (arti)
+CR	cruiser (fleet)
+CS	colony ship (fleet)
+CS	cruiser (fleet)
+CV	combat value
+cyb	galactic cybernet (building)
+Des	destroyer (fleet)
+DS	destroyer (fleet)
+ETA	estimated time of arrival
+FA	friendly attack
+FF	friendly fire
+FoA	ForumAdmin (forum)
+FS	friendly siege
+GC	galactic cybernet (building)
+HF	hydroponic farms (building)
+HoR	Heart of Rana (arti)
+MA	MultiAdmin (forum)
+MJ	Memory Jar (arti)
+PK	pop killing
+PL	player level
+PM	private message (forum)
+pop	population of a planet
+PP	production points
+RF	robotic factory (building)
+RL	real life
+RL	research lab (building)
+SAD	speed,attack,defence (race)
+SB	starbase (building)
+SF	speed fight(er)
+SL	science level
+SU	supply unit
+SUL	start up lab (race)
+TA	trade agreement
+TR	trade revenue
+TR	transports (fleet)
+TRN	transports (fleet)
+TRs	transports (fleet)
+TT	travel time
+XP	experience points
