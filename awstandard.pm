@@ -126,7 +126,7 @@ our %headerlinkmap=(imessage=>"BIM");
 sub AWheader3($$;$) { my($title, $title2, $extra)=@_;
 	my $links="";
 	my $owncgi=$ENV{SCRIPT_NAME}||"";
-   my $heads=[Link({-rel=>"icon", -href=>"/favicon.ico", -type=>"image/ico"}),Link({-rel=>"shortcut icon", -href=>"//aw.zq1.de/favicon.ico"})];
+   my $heads=[Link({-rel=>"icon", -href=>"/code/images/awtfavicon.ico", -type=>"image/ico"}),Link({-rel=>"shortcut icon", -href=>"/code/images/awtfavicon.ico"})];
    if($extra) {push(@$heads,$extra);}
    push(@$heads,qq!<link rel="stylesheet" type="text/css" href="/code/css/tools/common.css" />!);
 #   push(@$heads, "<title>$title</title>");

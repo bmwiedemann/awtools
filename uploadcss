@@ -78,7 +78,7 @@ if(!param() or $errormessage) {
 }
 
 print p('the first line is recommended to be
-@import url(http://aw.lsmod.de/code/css/main.css);<br/>
+@import url(/code/css/main.css);<br/>
 
 or at least draw the basic extensions from
 @import url(http://aw.lsmod.de/code/css/bmwaw.css);

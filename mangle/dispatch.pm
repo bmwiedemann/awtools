@@ -314,10 +314,10 @@ sub mangle_dispatch(%) { my($options)=@_;
       foreach my $s (@style){
          if(-r "$awstandard::cssdir/$s.css") {$style=$s;last;}
       }
-		my $extracss="//$bmwserver/code/css/style_mobile.css";
+		my $extracss="/code/css/style_mobile.css";
 		if($agent=~m/iPhone/) {$extracss="//iphoneaw.zq1.de/main.css"}
-		s%  <link rel="stylesheet" type="text/css" media="screen" href=%$&"//$bmwserver/code/css/$style.css" />\n$&%;
-#      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="//$bmwserver/code/css/$style.css">
+		s%  <link rel="stylesheet" type="text/css" media="screen" href=%$&"/code/css/$style.css" />\n$&%;
+#      s%<style type="text/css"><[^<>]*//-->\s*</style>%<link rel="stylesheet" type="text/css" href="/code/css/$style.css">
 #<link rel="stylesheet" href="$extracss" media="handheld" type="text/css" />
 #<!--[if !IE]>-->
 #<link type="text/css" rel="stylesheet" media="only screen and (max-device-width: 480px)" href="$extracss" />

@@ -7,9 +7,9 @@ if($::options{nclick}<300) {
 	$::options{mime}="text/html";
 	$_=qq(<html><head>
  <title>brownie had too many clicks</title>
-<link rel="stylesheet" type="text/css" href="http://aw.lsmod.de/code/css/main.css">
-<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/awfavicon.ico">
-<link rel="shortcut icon" href="http://aw.lsmod.de/awfavicon.ico">
+<link rel="stylesheet" type="text/css" href="/code/css/main.css">
+<link type="image/vnd.microsoft.icon" rel="icon" href="/code/images/awfavicon.ico">
+<link rel="shortcut icon" href="/code/images/awfavicon.ico">
 </head>
 <body><h1>brownie had too many clicks</h1>
 This is a message from brownie: 

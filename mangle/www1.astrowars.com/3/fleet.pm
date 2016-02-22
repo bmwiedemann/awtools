@@ -11,9 +11,9 @@ $_='<?xml version="1.0" encoding="iso-8859-1"?>
 	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Fleet</title>
-<link rel="stylesheet" type="text/css" href="//aw.zq1.de/code/css/awmod.css" />
-<link type="image/vnd.microsoft.icon" rel="icon" href="//aw.zq1.de/awfavicon.ico" />
-<link rel="shortcut icon" href="//aw.zq1.de/awfavicon.ico" />
+<link rel="stylesheet" type="text/css" href="/code/css/awmod.css" />
+<link type="image/vnd.microsoft.icon" rel="icon" href="/code/images/awfavicon.ico" />
+<link rel="shortcut icon" href="/code/images/awfavicon.ico" />
 </head><body>
 <center>
 <table border="0" cellspacing="1" cellpadding="2" class="main_inner">
