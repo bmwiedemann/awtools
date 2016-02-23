@@ -26,6 +26,9 @@ sub handler {
    my ($r) = @_;
 #   return DECLINED unless $r->proxyreq; # didnt work as mod_proxy sets proxyreq and steals request then
    return DECLINED unless $r->unparsed_uri=~m%^http://%;
+	if($r->uri =~ m{^/(?:cgi-bin/|code/|.well-known/|manual)}) {
+		return DECLINED;
+	}
 #   $r->proxyreq(2);
    # we handle this request
    $r->handler("perl-script");
