@@ -38,7 +38,7 @@ foreach my $h (@holes) {
    my $sum=0;
    my $worth=0;
    foreach my $p (@p) {
-      my $o=$p->{ownerid};
+      my $o=$p->{ownerid}||"";
       my $tag=lc(playerid2tag($o));
       next if $tag ne $ENV{REMOTE_USER}; # skip non-members
       my $pop=$p->{pop};
