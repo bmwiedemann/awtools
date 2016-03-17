@@ -13,6 +13,7 @@ use LWP::ConnCache;
 #use ModPerl::MethodLookup;
 #BEGIN {$VERSION = '1.02';}
 use brownie::process;
+use brownie::common;
 
 #@ISA = qw(LWP::UserAgent);
 #our $UA = __PACKAGE__->new(requests_redirectable=>[], parse_head=>0, timeout=>9);
@@ -23,19 +24,9 @@ use brownie::process;
 #our $phase=0;
 
 sub handler {
-   my ($r) = @_;
-#   return DECLINED unless $r->proxyreq; # didnt work as mod_proxy sets proxyreq and steals request then
-   return DECLINED unless $r->unparsed_uri=~m%^http://%;
-	if($r->uri =~ m{^/(?:cgi-bin/|code/|.well-known/|manual)}) {
-		return DECLINED;
-	}
-#   $r->proxyreq(2);
-   # we handle this request
-   $r->handler("perl-script");
-   $r->set_handlers(PerlHandler => \&proxy_handler);
-#   $r->push_handlers(PerlHandler => \&proxy_handler);
-#diag time()." a ".$phase++." ".$r->method." ".$r->uri." ".$r->filename." ".$r->unparsed_uri." \n";
-   return OK;
+    my ($r) = @_;
+    return DECLINED unless $r->unparsed_uri=~m%^http://%;
+    return brownie::common::handler($r, \&proxy_handler);
 }
 
 sub proxy_handler {

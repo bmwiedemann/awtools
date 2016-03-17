@@ -12,21 +12,14 @@ use LWP::ConnCache;
 #use Apache::URI;
 #use ModPerl::MethodLookup;
 use brownie::process;
+use brownie::common;
 use awstandard;
 my $desthost=$awstandard::server;#"www1.astrowars.com";
 my $wwwdesthost=$awstandard::awforumserver;#"www.astrowars.com";
 my $destdomain="astrowars.com";
 
 sub handler {
-   my ($r) = @_;
-	if($r->uri =~ m{^/(?:cgi-bin/|code/|.well-known/|manual)}) {
-		return DECLINED;
-	}
-#   return DECLINED unless $r->unparsed_uri=~m%^http://%;
-   # we handle this request
-   $r->handler("perl-script");
-   $r->set_handlers(PerlHandler => \&proxy_handler);
-   return OK;
+    return brownie::common::handler(shift, \&proxy_handler);
 }
 
 sub proxy_handler {
