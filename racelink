@@ -36,7 +36,7 @@ if(param()) {
    print "http://www1.astrowars.com/register/start.php?".join("&",@p);
    print br,"Beware: this link will sign you into AW immediately upon clicking";
 } else {
-   print "no input. ".a({-href=>"/customize_race.html"},"use this page")." to select your race".br;
+   print "no input. ".a({-href=>"/gbt/customize_race.html"},"use this page")." to select your race".br;
 }
 print AWtail();
 

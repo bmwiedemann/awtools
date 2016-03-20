@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+.bad { color : #f66;}
+.nr { color : #fd0;}
+	BODY, H1, A, TABLE, INPUT{
+		font-family : Verdana, Arial, Helvetica, sans-serif;
+		color : #FFFFFF;
+	}
+	BODY, TABLE {
+	  font-size: 10pt;
+	}
+	H1 {
+	  font-size: 14pt;
+	}
+
+INPUT.text, select {
+BORDER-RIGHT: #131c13 1px solid; BORDER-TOP: #131c13 1px solid; FONT-SIZE: 10pt; BORDER-LEFT: #131c13 1px solid; COLOR: #000000; BORDER-BOTTOM: #131c13 1px solid; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; BACKGROUND-COLOR: #777777
+}
+INPUT.smbutton {
+	BORDER-RIGHT: #aaaaaa 1px solid; BORDER-TOP: #cccccc 1px solid; FONT-WEIGHT: bold; FONT-SIZE: 9pt; BORDER-LEFT: #bbbbbb 1px solid; COLOR: #ffffff; BORDER-BOTTOM: #999999 1px solid; BACKGROUND-COLOR: #333333
+}
+
+</style><title>Create your own race!</title>
+<script language="JavaScript" type="text/javascript"><!--
+document.race.reset();
+//--></script>
+
+<script language="JavaScript" type="text/javascript">
+<!-- Begin
+var total = 0;
+var growth = 0;
+var culture = 0;
+var science = 0;
+var produktion = 0;
+var attack = 0;
+var defense = 0;
+var speed = 0;
+var trade = 0;
+
+function resetform() {
+total = 0;
+growth = 0;
+culture = 0;
+science = 0;
+produktion = 0;
+attack = 0;
+defense = 0;
+speed = 0;
+trade = 0;
+document.race.mysubmitbutton.disabled = false;
+}
+function checkform(f) {
+var myform = document.race;
+for(var i=0;i<myform.length;++i) {
+	if(myform.elements[i].type=='checkbox') {
+	  myform.elements[i].checked=false;
+	}
+}
+
+}
+function display(element,num) {
+if (element.checked) {
+total = total - num;
+} else {
+total = total + num;
+}
+update(element);
+}
+function update(element) {
+element.form.num.value = total + growth + culture + produktion + science + attack + defense + speed + trade;
+element.form.num2.value = (12 - attack - defense - speed)/10;
+element.form.num4.value=element.form.num3.value * (1 +
+element.form.num2.value/100);
+
+if (element.form.num.value == 0)
+  element.form.mysubmitbutton.disabled = false;
+else
+  element.form.mysubmitbutton.disabled = true;
+
+}
+function updategrowth(element,value) {
+growth = value/1;
+update(element);
+}
+function updatescience(element,value) {
+science = value/1;
+update(element);
+}
+function updateproduktion(element,value) {
+produktion = value/1;
+update(element);
+}
+function updateculture(element,value) {
+culture = value/1;
+update(element);
+}
+function updateattack(element,value) {
+attack = value/1;
+update(element);
+}
+function updatedefense(element,value) {
+defense = value/1;
+update(element);
+}
+function updatespeed(element,value) {
+speed = value/1;
+update(element);
+}
+function updatetrade(element,value) {
+trade = value/1;
+update(element);
+}
+
+// End -->
+
+</script>
+<link type="image/vnd.microsoft.icon" rel="icon" href="http://aw.lsmod.de/awfavicon.ico">
+<link rel="shortcut icon" href="http://aw.lsmod.de/awfavicon.ico"></head><body onload="checkform(this)" bgcolor="#000000">
+<h1>Create your own race!</h1><i>modified by <span style="color: green;">greenbird</span> to help you choosing good races... <span class="bad">red=bad (below -25%)</span>, <span class="nr">yellow=not recommended (below -13%)</span></i> oh and <span style="color: red;">plus/minus changed by brownie to reduce people's confusion with in-game races</span>
+<br>
+<br>
+This page is now old and deprecated. use <a href="http://aw21.zq1.de/register/customize_race.php">the brownie'd AW race creator</a> instead
+<hr>
+
+<!-- test ground -->
+<script language="JavaScript" type="text/javascript"><!--
+var races = [[-1,4,0,-4,4,-1,-2,0],[-1,0,0,-2,4,0,-1,0],[-3,0,2,-2,4,0,-1,0],[-3,-1,-2,-2,4,3,1,0],[-3,-2,-4,0,4,4,1,0],[-1,0,0,0,-4,4,1,0],[-3,-1,-1,4,-4,4,1,0],[-2,-2,0,0,-4,4,4,0],[-3,-3,0,0,-4,4,1,1],[-4,-4,3,4,-4,4,1,0]];
+var racestr = ["growth", "science", "culture", "produktion", "speed", "attack", "defense"];
+function use_race_template(race)
+{
+	var raceform=document.getElementsByName('race')[0];
+	for(i=0; i<7; ++i) {
+		document.getElementsByName(racestr[i])[race[i]+4].checked=true;
+		eval(racestr[i]+"="+(-race[i]));
+	}
+	document.getElementsByName("auswahl[]")[0].checked=(race[7]!=0); trade=-race[7]*5;
+	update(document.getElementsByName("growth")[0]);
+}
+//-->
+</script>
+
+
+<form name="racetypeform" action="">
+<select name="racetype" id="racetype">
+<option value=0>ultraspeedy</option>
+<option value=1>speedy</option>
+<option value=2>teamspeedy</option>
+<option value=3>heavyspeedy</option>
+<option value=4 selected>solofighter</option>
+<option value=5>fighter</option>
+<option value=6>prodfighter</option>
+<option value=7>heavyfighter</option>
+<option value=8>traderfighter</option>
+<option value=9>teamfighter</option>
+</select>
+<input type="button" class="smbutton" value="preview race" onclick="use_race_template(races[document.getElementById('racetype').value])">
+</form>
+<br>
+
+
+<br>
+<form name="race" method="post" action="http://aw.lsmod.de/cgi-bin/public/racelink">
+<input name="name" class="text"> Name <br>
+<!--input name="id" class="text"> Player ID<br-->
+<input name="pw" class="text" value="xxx"> Password (may be left unchanged)<br>
+
+<table border="0"><tbody><tr valign="top"><td>
+<table border="0">
+<tbody><tr bgcolor="#202060"><td colspan="18">Growth Bonus</td></tr>
+<tr bgcolor="#282828">
+<td colspan="2" class="bad" bgcolor="#631010">-28%</td><td colspan="2" class="nr" bgcolor="#561010">-21%</td><td colspan="2" class="nr" bgcolor="#491410">-14%</td><td colspan="2" bgcolor="#422115">-7%</td><td colspan="2" bgcolor="#352820">+0%</td><td colspan="2" bgcolor="#283525">+7%</td><td colspan="2" bgcolor="#214230">+14%</td><td colspan="2" bgcolor="#144935">+21%</td><td colspan="2" bgcolor="#105640">+28%</td></tr>
+<tr bgcolor="#202020">
+<td>-4</td><td><input name="growth" value="-4" onclick="updategrowth(this,4)" type="radio"></td><td>-3</td><td><input name="growth" value="-3" onclick="updategrowth(this,3)" type="radio"></td><td>-2</td><td><input name="growth" value="-2" onclick="updategrowth(this,2)" type="radio"></td><td>-1</td><td><input name="growth" value="-1" onclick="updategrowth(this,1)" type="radio"></td><td>+0</td><td><input name="growth" value="0" onclick="updategrowth(this,0)" checked="checked" type="radio"></td><td>+1</td><td><input name="growth" value="1" onclick="updategrowth(this,-1)" type="radio"></td><td>+2</td><td><input name="growth" value="2" onclick="updategrowth(this,-2)" type="radio"></td><td>+3</td><td><input name="growth" value="3" onclick="updategrowth(this,-3)" type="radio"></td><td>+4</td><td><input name="growth" value="4" onclick="updategrowth(this,-4)" type="radio"></td></tr>
+<tr bgcolor="#202060"><td colspan="18">Science Bonus</td></tr>
+<tr bgcolor="#282828">
+<td colspan="2" class="bad" bgcolor="#631010">-32%</td><td colspan="2" class="nr" bgcolor="#561010">-24%</td><td colspan="2" class="nr" bgcolor="#491410">-16%</td><td colspan="2" bgcolor="#422115">-8%</td><td colspan="2" bgcolor="#352820">+0%</td><td colspan="2" bgcolor="#283525">+8%</td><td colspan="2" bgcolor="#214230">+16%</td><td colspan="2" bgcolor="#144935">+24%</td><td colspan="2" bgcolor="#105640">+32%</td></tr>
+<tr bgcolor="#202020">
+<td>-4</td><td><input name="science" value="-4" onclick="updatescience(this,4)" type="radio"></td><td>-3</td><td><input name="science" value="-3" onclick="updatescience(this,3)" type="radio"></td><td>-2</td><td><input name="science" value="-2" onclick="updatescience(this,2)" type="radio"></td><td>-1</td><td><input name="science" value="-1" onclick="updatescience(this,1)" type="radio"></td><td>+0</td><td><input name="science" value="0" onclick="updatescience(this,0)" checked="checked" type="radio"></td><td>+1</td><td><input name="science" value="1" onclick="updatescience(this,-1)" type="radio"></td><td>+2</td><td><input name="science" value="2" onclick="updatescience(this,-2)" type="radio"></td><td>+3</td><td><input name="science" value="3" onclick="updatescience(this,-3)" type="radio"></td><td>+4</td><td><input name="science" value="4" onclick="updatescience(this,-4)" type="radio"></td></tr>
+
+<tr bgcolor="#202060"><td colspan="18">Culture Bonus</td></tr>
+<tr bgcolor="#282828">
+<td colspan="2" class="nr" bgcolor="#631010">-16%</td><td colspan="2" bgcolor="#561010">-12%</td><td colspan="2" bgcolor="#491410">-8%</td><td colspan="2" bgcolor="#422115">-4%</td><td colspan="2" bgcolor="#352820">+0%</td><td colspan="2" bgcolor="#283525">+4%</td><td colspan="2" bgcolor="#214230">+8%</td><td colspan="2" bgcolor="#144935">+12%</td><td colspan="2" bgcolor="#105640">+16%</td></tr>
+<tr bgcolor="#202020"><td>-4</td><td><input name="culture" value="-4" onclick="updateculture(this,4)" type="radio"></td><td>-3</td><td><input name="culture" value="-3" onclick="updateculture(this,3)" type="radio"></td><td>-2</td><td><input name="culture" value="-2" onclick="updateculture(this,2)" type="radio"></td><td>-1</td><td><input name="culture" value="-1" onclick="updateculture(this,1)" type="radio"></td><td>+0</td><td><input name="culture" value="0" onclick="updateculture(this,0)" checked="checked" type="radio"></td><td>+1</td><td><input name="culture" value="1" onclick="updateculture(this,-1)" type="radio"></td><td>+2</td><td><input name="culture" value="2" onclick="updateculture(this,-2)" type="radio"></td><td>+3</td><td><input name="culture" value="3" onclick="updateculture(this,-3)" type="radio"></td><td>+4</td><td><input name="culture" value="4" onclick="updateculture(this,-4)" type="radio"></td></tr>
+
+<tr bgcolor="#202060"><td colspan="18">Production Bonus</td></tr>
+<tr bgcolor="#282828"><td colspan="2" class="nr" bgcolor="#631010">-16%</td><td colspan="2" bgcolor="#561010">-12%</td><td colspan="2" bgcolor="#491410">-8%</td><td colspan="2" bgcolor="#422115">-4%</td><td colspan="2" bgcolor="#352820">+0%</td><td colspan="2" bgcolor="#283525">+4%</td><td colspan="2" bgcolor="#214230">+8%</td><td colspan="2" bgcolor="#144935">+12%</td><td colspan="2" bgcolor="#105640">+16%</td></tr>
+<tr bgcolor="#202020">
+<td>-4</td><td><input name="produktion" value="-4" onclick="updateproduktion(this,4)" type="radio"></td><td>-3</td><td><input name="produktion" value="-3" onclick="updateproduktion(this,3)" type="radio"></td><td>-2</td><td><input name="produktion" value="-2" onclick="updateproduktion(this,2)" type="radio"></td><td>-1</td><td><input name="produktion" value="-1" onclick="updateproduktion(this,1)" type="radio"></td><td>+0</td><td><input name="produktion" value="0" onclick="updateproduktion(this,0)" checked="checked" type="radio"></td><td>+1</td><td><input name="produktion" value="1" onclick="updateproduktion(this,-1)" type="radio"></td><td>+2</td><td><input name="produktion" value="2" onclick="updateproduktion(this,-2)" type="radio"></td><td>+3</td><td><input name="produktion" value="3" onclick="updateproduktion(this,-3)" type="radio"></td><td>+4</td><td><input name="produktion" value="4" onclick="updateproduktion(this,-4)" type="radio"></td></tr>
+
+
+<tr bgcolor="#202060"><td colspan="18">Speed</td></tr>
+<tr bgcolor="#282828"><td colspan="2" class="bad" bgcolor="#631010">-68%</td><td colspan="2" class="bad" bgcolor="#561010">-51%</td><td colspan="2" class="bad" bgcolor="#491410">-34%</td><td colspan="2" class="nr" bgcolor="#422115">-17%</td><td colspan="2" bgcolor="#352820">+0%</td><td colspan="2" bgcolor="#283525">+17%</td><td colspan="2" bgcolor="#214230">+34%</td><td colspan="2" bgcolor="#144935">+51%</td><td colspan="2" bgcolor="#105640">+68%</td></tr>
+<tr bgcolor="#202020">
+<td>-4</td><td><input name="speed" value="-4" onclick="updatespeed(this,4)" type="radio"></td><td>-3</td><td><input name="speed" value="-3" onclick="updatespeed(this,3)" type="radio"></td><td>-2</td><td><input name="speed" value="-2" onclick="updatespeed(this,2)" type="radio"></td><td>-1</td><td><input name="speed" value="-1" onclick="updatespeed(this,1)" type="radio"></td><td>+0</td><td><input name="speed" value="0" onclick="updatespeed(this,0)" checked="checked" type="radio"></td><td>+1</td><td><input name="speed" value="1" onclick="updatespeed(this,-1)" type="radio"></td><td>+2</td><td><input name="speed" value="2" onclick="updatespeed(this,-2)" type="radio"></td><td>+3</td><td><input name="speed" value="3" onclick="updatespeed(this,-3)" type="radio"></td><td>+4</td><td><input name="speed" value="4" onclick="updatespeed(this,-4)" type="radio"></td></tr>
+<tr bgcolor="#202060"><td colspan="18">Attack</td></tr>
+<tr bgcolor="#282828"><td colspan="2" class="bad" bgcolor="#631010">-48%</td><td colspan="2" class="bad" bgcolor="#561010">-36%</td><td colspan="2" class="nr" bgcolor="#491410">-24%</td><td colspan="2" class="" bgcolor="#422115">-12%</td><td colspan="2" bgcolor="#352820">+0%</td><td colspan="2" bgcolor="#283525">+12%</td><td colspan="2" bgcolor="#214230">+24%</td><td colspan="2" bgcolor="#144935">+36%</td><td colspan="2" bgcolor="#105640">+48%</td></tr>
+<tr bgcolor="#202020"><td>-4</td><td><input name="attack" value="-4" onclick="updateattack(this,4)" type="radio"></td><td>-3</td><td><input name="attack" value="-3" onclick="updateattack(this,3)" type="radio"></td><td>-2</td><td><input name="attack" value="-2" onclick="updateattack(this,2)" type="radio"></td><td>-1</td><td><input name="attack" value="-1" onclick="updateattack(this,1)" type="radio"></td><td>+0</td><td><input name="attack" value="0" onclick="updateattack(this,0)" checked="checked" type="radio"></td><td>+1</td><td><input name="attack" value="1" onclick="updateattack(this,-1)" type="radio"></td><td>+2</td><td><input name="attack" value="2" onclick="updateattack(this,-2)" type="radio"></td><td>+3</td><td><input name="attack" value="3" onclick="updateattack(this,-3)" type="radio"></td><td>+4</td><td><input name="attack" value="4" onclick="updateattack(this,-4)" type="radio"></td></tr>
+<tr bgcolor="#202060"><td colspan="18">Defense</td></tr>
+<tr bgcolor="#282828"><td colspan="2" class="bad" bgcolor="#631010">-64%</td><td colspan="2" class="bad" bgcolor="#561010">-48%</td><td colspan="2" class="bad" bgcolor="#491410">-32%</td><td colspan="2" class="nr" bgcolor="#422115">-16%</td><td colspan="2" bgcolor="#352820">+0%</td><td colspan="2" bgcolor="#283525">+16%</td><td colspan="2" bgcolor="#214230">+32%</td><td colspan="2" bgcolor="#144935">+48%</td><td colspan="2" bgcolor="#105640">+64%</td></tr>
+<tr bgcolor="#202020"><td>-4</td><td><input name="defense" value="-4" onclick="updatedefense(this,4)" type="radio"></td><td>-3</td><td><input name="defense" value="-3" onclick="updatedefense(this,3)" type="radio"></td><td>-2</td><td><input name="defense" value="-2" onclick="updatedefense(this,2)" type="radio"></td><td>-1</td><td><input name="defense" value="-1" onclick="updatedefense(this,1)" type="radio"></td><td>+0</td><td><input name="defense" value="0" onclick="updatedefense(this,0)" checked="checked" type="radio"></td><td>+1</td><td><input name="defense" value="1" onclick="updatedefense(this,-1)" type="radio"></td><td>+2</td><td><input name="defense" value="2" onclick="updatedefense(this,-2)" type="radio"></td><td>+3</td><td><input name="defense" value="3" onclick="updatedefense(this,-3)" type="radio"></td><td>+4</td><td><input name="defense" value="4" onclick="updatedefense(this,-4)" type="radio"></td></tr>
+
+</tbody></table></td><td>
+<table border="0">
+<tbody><tr bgcolor="#202060"><td colspan="3">Attributes</td></tr>
+<tr bgcolor="#202020"><td>Trader</td><td>+5</td><td><input name="auswahl[]" value="1" onclick="display(this,5)" type="checkbox"></td></tr>
+
+
+<tr bgcolor="#202060"><td colspan="3">start up bonus for the first planet</td></tr>
+<tr bgcolor="#202020"><td>Research Lab 12</td><td>+1</td><td><input name="auswahl[]" value="4" onclick="display(this,1)" type="checkbox"></td></tr>
+</tbody></table>
+<input value="0" name="num" size="5" onfocus="this.blur()" class="text" type="text"> value must be zero for all races<br>
+<input name="mysubmitbutton" value="create race link (does not log you in)" class="smbutton" type="submit"> <input value="reset" class="smbutton" onclick="resetform()" type="reset"><input name="gogo" value="gogo" type="hidden"><br></td></tr></tbody></table>
+<input name="name2" value="" type="hidden">
+<input name="id2" value="" type="hidden">
+<input name="pw2" value="" type="hidden">
+
+<ul type="square">
+<li>You need to choose your race before you join the game!</li>
+<li>Attack  = bonus to the CV for the chance to win calculation only</li>
+<li>Defense = more/fewer survivors<ul><li>if you choose +16% and you would loss 40% you will loss 40% / 1.16 = 34.5% instead</li>
+<li>if you choose -16% and you would loss 40% you will loss 40% / 0.84 = 47.6% instead</li></ul></li>
+<li>Speed = speed of your fleet (-50% means +100% travel time)</li>
+<li>Trader = can accept Trade Agreements for free.</li>
+<li>a race-bonus adds up with a bonus you achieve in the game</li>
+<li>Player Level Bonus per day <input value="1.2" name="num2" size="3" onfocus="this.blur()" class="text" type="text">% e.g. Level <input value="20" name="num3" size="3" class="text" type="text"> =&gt;
+<input value="" name="num4" size="4" onfocus="this.blur()" class="text" type="text"> after one
+day.</li>
+</ul>
+</form>
+<!-- start greenbird disclaimer -->
+<p id="disclaimer" style="text-align: center; color: white; background-color: black;"><br>disclaimer: this page was mangled by greenbird's code. <br>This means that errors in display or functionality might not exist in the original page. <br>If you are unsure, disable mangling and try again.</p><p id="bmwinfo"><span class="bottom_key">alli=</span><span class="bottom_value"></span> <span class="bottom_key">ip=</span><span class="bottom_value">87.188.215.132</span> <span class="bottom_key">page=</span><span class="bottom_value">mangled www1.astrowars.com/register/customize_race</span> <span class="bottom_key">pid=</span><span class="bottom_value"></span> <span class="bottom_key">proxy=</span><span class="bottom_value">brownie21</span> <span class="bottom_key">user=</span><span class="bottom_value"></span></p>
+<!-- end greenbird disclaimer -->
+ </body></html>
