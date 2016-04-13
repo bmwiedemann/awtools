@@ -496,7 +496,7 @@ sub awsyslink($;$$) {
    my($sid,$simple,$pid)=@_;
    if(!defined($simple)){$simple=1}
    my $public=$ENV{REMOTE_USER}?"":"";#:"/public";
-   my $and=$ENV{REMOTE_USER}?'%26':'&';
+   my $and='&amp;';
    my $link=qq($public/system-info?id=$sid${and}simple=$simple${and}target=$pid">);
 }
 
