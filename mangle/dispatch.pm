@@ -21,7 +21,7 @@ my %specialname=qw(
       cutebird 1
       PedroMorello 1
 );
-my $origbmwlink="<a class=\"awtools\" href=\"//$bmwserver/cgi-bin";
+my $origbmwlink="<a class=\"awtools\" href=\"/cgi-bin";
 
 # input options hash reference
 # input $_ with HTML code of a complete page
@@ -86,10 +86,6 @@ sub mangle_dispatch(%) { my($options)=@_;
 			$::options{nclicks}=$nclicks;
          if($nclicks>290) {$nclicks=qq'<b style="color:#f44">$nclicks</b>'}
          $info{clicks}=$nclicks;
-         $$options{authlink}="$origbmwlink/public/authaw?session=$session&amp;uri=/cgi-bin";
-         if($ENV{REMOTE_USER}) {
-            $::bmwlink=$$options{authlink};
-         }
          if($ENV{REMOTE_USER}) {
             # inform user about his terms of use
             my($flags)=$dbh->selectrow_array("SELECT `flags` FROM `toolsaccess` WHERE tag=? and othertag=tag",{},$ENV{REMOTE_USER});
