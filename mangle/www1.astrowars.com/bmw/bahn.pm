@@ -2,6 +2,7 @@
 m{<h2>Hinfahrt.*?</table>}s and 
 $_= qq{$&};
 
+s{<h2>.*?</h2>}{};
 s{/bin/query}{/bmw/bahn$&}g;
 s{<script type="text/javascript".*?</script>}{}gs;
 s{<img src.*}{}g;

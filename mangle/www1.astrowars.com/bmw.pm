@@ -14,6 +14,7 @@ s{<div id="printChart">.*(</body>)}
     <a href="https://reiseauskunft.bahn.de/bin/query.exe/dn?start=1&S=Röthenbach-Seespitze&Z=Nürnberg+Hbf" target="bahn" >origArbeit</a>
     <a href="https://aw21.zq1.de/bmw/bahn/bin/query.exe/dn?start=1&S=Röthenbach-Seespitze&Z=Nürnberg+Hbf" target="bahn">zur Arbeit</a>
     <a href="https://aw21.zq1.de/bmw/bahn/bin/query.exe/dn?start=1&Z=Röthenbach-Seespitze&S=Nürnberg+Hbf" target="bahn">Hbf</a>
+	 <a href="/bmw/static/dash.html">dashboard</a>
 	
     $1}s;
 s{<img class="loading-spinner.*}{};
